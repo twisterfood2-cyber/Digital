@@ -1,7 +1,7 @@
 {
   "name": "Digital Real Estate",
   "short_name": "Digital RE",
-  "start_url": "./search.html",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#0f2942",
   "theme_color": "#0f2942",
