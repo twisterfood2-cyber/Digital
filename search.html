@@ -651,6 +651,15 @@
   }
 
   window.google = { script: { run: makeRunner(null, null) } };
+
+  // تسجيل Service Worker عشان الموقع يبقى تطبيق قابل للتثبيت رسميًا
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/sw.js').catch(function(err) {
+        console.log('Service Worker registration failed:', err);
+      });
+    });
+  }
 </script>
 
 <!-- بوابة دخول المستخدمين - محدش يقدر يشوف أو يستخدم أي حاجة قبل ما يسجل دخول صحيح -->
