@@ -450,6 +450,24 @@
       transition: opacity .15s, transform .15s;
     }
     .price-info-fab:hover { opacity: 1; transform: scale(1.06); }
+    .add-unit-fab {
+      position: fixed;
+      bottom: 20px;
+      left: 236px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--gold);
+      color: #fff;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(201,153,46,0.4);
+      z-index: 500;
+      opacity: 0.9;
+      transition: opacity .15s, transform .15s;
+    }
+    .add-unit-fab:hover { opacity: 1; transform: scale(1.06); }
     .price-stats-search {
       width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px;
       font-size: 14px; margin-bottom: 14px;
@@ -948,6 +966,7 @@
 <button class="theme-fab" id="themeToggleBtn" title="الوضع الليلي">🌙</button>
 <button class="calc-fab" id="calcFabBtn" title="حاسبة السعر والتقسيط">🧮</button>
 <button class="price-info-fab" id="priceInfoFabBtn" title="متوسط سعر المتر لكل منطقة">📊</button>
+<button class="add-unit-fab" id="addUnitFabBtn" title="إضافة وحدة جديدة">➕</button>
 <div class="admin-panel" id="adminPanel">
   <button class="close-panel" id="adminPanelClose">✕</button>
   <h3>لوحة التحكم</h3>
@@ -1513,6 +1532,21 @@
       lastPriceStats = res.districtStats;
       renderPriceStatsTable(lastPriceStats);
     }).getDistrictPriceStats();
+  });
+
+  /* ---------- فتح شاشة إدخال الوحدة الجديدة - محمية بكلمة سر منفصلة تمامًا ---------- */
+  document.getElementById('addUnitFabBtn').addEventListener('click', function() {
+    const pin = prompt('كلمة سر فتح شاشة إضافة وحدة جديدة:');
+    if (pin === null) return;
+    if (!pin.trim()) { alert('لازم تدخل كلمة السر'); return; }
+
+    google.script.run.withSuccessHandler(function(isValid) {
+      if (!isValid) {
+        showToast('كلمة السر غير صحيحة', 'error');
+        return;
+      }
+      window.open('https://script.google.com/macros/s/AKfycby0Suh2iXdvCSy1N9G9e8u8VUjfHygiXe0owQyzUrHWcF_tIHMd7WnDZw2JtlXDkDDEWw/exec?page=entry', '_blank');
+    }).verifyDataEntryPin(pin);
   });
 
   document.getElementById('priceStatsCloseBtn').addEventListener('click', () => priceStatsModal.classList.remove('open'));
