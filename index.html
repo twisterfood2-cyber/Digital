@@ -359,78 +359,57 @@
     }
 
     /* زرار لوحة التحكم - صغير في الركن، مالوش شكل واضح كتير عشان مش لكل حد */
-    .admin-fab {
+    .fab-stack {
       position: fixed;
-      bottom: 182px;
+      bottom: 20px;
       left: 20px;
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: #ffffff;
+      border-radius: 22px;
+      box-shadow: 0 8px 26px rgba(15,41,66,0.18), 0 2px 8px rgba(15,41,66,0.08);
+      border: 1px solid rgba(15,41,66,0.06);
+    }
+    .fab-stack button {
+      position: static;
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      background: var(--navy);
-      color: #fff;
       border: none;
       font-size: 18px;
       cursor: pointer;
-      box-shadow: 0 4px 14px rgba(15,41,66,0.35);
-      z-index: 500;
-      opacity: 0.55;
-      transition: opacity .15s;
+      transition: opacity .15s, transform .15s;
+      flex-shrink: 0;
+    }
+    .admin-fab {
+      background: var(--navy);
+      color: #fff;
+      opacity: 0.65;
     }
     .admin-fab:hover { opacity: 1; }
 
     .calc-fab {
-      position: fixed;
-      bottom: 128px;
-      left: 20px;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
       background: var(--gold);
       color: #fff;
-      border: none;
-      font-size: 18px;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(201,153,46,0.4);
-      z-index: 500;
-      opacity: 0.9;
-      transition: opacity .15s, transform .15s;
+      opacity: 0.95;
     }
     .calc-fab:hover { opacity: 1; transform: scale(1.06); }
 
     .price-info-fab {
-      position: fixed;
-      bottom: 74px;
-      left: 20px;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
       background: var(--navy);
       color: #fff;
-      border: none;
-      font-size: 18px;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(15,41,66,0.35);
-      z-index: 500;
-      opacity: 0.9;
-      transition: opacity .15s, transform .15s;
+      opacity: 0.95;
     }
     .price-info-fab:hover { opacity: 1; transform: scale(1.06); }
     .add-unit-fab {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
       background: var(--gold);
       color: #fff;
-      border: none;
       font-size: 20px;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(201,153,46,0.4);
-      z-index: 500;
-      opacity: 0.9;
-      transition: opacity .15s, transform .15s;
+      opacity: 0.95;
     }
     .add-unit-fab:hover { opacity: 1; transform: scale(1.06); }
     .price-stats-search {
@@ -441,7 +420,7 @@
     /* لوحة التحكم */
     .admin-panel {
       position: fixed;
-      bottom: 236px;
+      bottom: 240px;
       left: 20px;
       width: 320px;
       max-height: 80vh;
@@ -926,11 +905,13 @@
   </div>
 </div>
 
-<!-- زر ولوحة تحكم المسؤول - مخفية عن باقي المستخدمين ومحمية بكلمة سر -->
-<button class="admin-fab" id="adminFab" title="لوحة التحكم">⚙</button>
-<button class="calc-fab" id="calcFabBtn" title="حاسبة السعر والتقسيط">🧮</button>
-<button class="price-info-fab" id="priceInfoFabBtn" title="متوسط سعر المتر لكل منطقة">📊</button>
-<button class="add-unit-fab" id="addUnitFabBtn" title="إضافة وحدة جديدة">➕</button>
+<!-- مستطيل الأزرار العائمة - مخفي عن باقي المستخدمين، بعض الأزرار محمية بكلمة سر -->
+<div class="fab-stack">
+  <button class="admin-fab" id="adminFab" title="لوحة التحكم">⚙</button>
+  <button class="calc-fab" id="calcFabBtn" title="حاسبة السعر والتقسيط">🧮</button>
+  <button class="price-info-fab" id="priceInfoFabBtn" title="متوسط سعر المتر لكل منطقة">📊</button>
+  <button class="add-unit-fab" id="addUnitFabBtn" title="إضافة وحدة جديدة">➕</button>
+</div>
 <div class="admin-panel" id="adminPanel">
   <button class="close-panel" id="adminPanelClose">✕</button>
   <h3>لوحة التحكم</h3>
