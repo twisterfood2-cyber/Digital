@@ -476,9 +476,6 @@
     #coverMsg { font-size: 11px; margin-top: 6px; display: none; }
     #coverMsg.success { color: var(--success-fg); display: block; }
     #coverMsg.error { color: var(--error-fg); display: block; }
-    #appIconMsg { font-size: 11px; margin-top: 6px; display: none; }
-    #appIconMsg.success { color: var(--success-fg); display: block; }
-    #appIconMsg.error { color: var(--error-fg); display: block; }
 
     /* بوابة التحكم في الوصول */
     .access-gate {
@@ -924,11 +921,6 @@
   <input type="file" id="coverFileInput" accept="image/*">
   <button class="small-btn" id="coverUploadBtn">رفع الصورة</button>
   <div id="coverMsg"></div>
-
-  <label style="margin-top:14px;">أيقونة التطبيق (لإضافته لشاشة الموبايل - مربعة يُفضّل)</label>
-  <input type="file" id="appIconFileInput" accept="image/*">
-  <button class="small-btn" id="appIconUploadBtn">رفع الأيقونة</button>
-  <div id="appIconMsg"></div>
 
   <button type="button" class="small-btn" id="openUsersModalBtn" style="margin-top:12px; background:var(--navy); color:#fff;">👥 إدارة المستخدمين</button>
   <a href="https://script.google.com/macros/s/AKfycby0Suh2iXdvCSy1N9G9e8u8VUjfHygiXe0owQyzUrHWcF_tIHMd7WnDZw2JtlXDkDDEWw/exec?page=dashboard" target="_blank" class="small-btn" style="display:block; text-align:center; text-decoration:none; margin-top:8px; background: var(--gold); color:#fff;">📊 لوحة الإحصائيات</a>
@@ -3144,35 +3136,6 @@
           msg.textContent = 'حدث خطأ: ' + err.message;
         })
         .uploadCoverImage(base64Data, file.type, adminPin);
-    };
-    reader.readAsDataURL(file);
-  });
-
-  document.getElementById('appIconUploadBtn').addEventListener('click', function() {
-    if (!adminPin) return;
-    const fileInput = document.getElementById('appIconFileInput');
-    const file = fileInput.files[0];
-    const msg = document.getElementById('appIconMsg');
-    if (!file) { msg.className = 'error'; msg.textContent = 'اختار صورة الأول'; return; }
-
-    const btn = document.getElementById('appIconUploadBtn');
-    btn.disabled = true; btn.textContent = 'جاري الرفع...';
-
-    const reader = new FileReader();
-    reader.onload = function() {
-      const base64Data = reader.result.split(',')[1];
-      google.script.run
-        .withSuccessHandler(function(res) {
-          btn.disabled = false; btn.textContent = 'رفع الأيقونة';
-          msg.className = res.success ? 'success' : 'error';
-          msg.textContent = res.success ? 'تم الرفع - هتفعل مع أول فتح جديد للصفحة' : res.message;
-        })
-        .withFailureHandler(function(err) {
-          btn.disabled = false; btn.textContent = 'رفع الأيقونة';
-          msg.className = 'error';
-          msg.textContent = 'حدث خطأ: ' + err.message;
-        })
-        .uploadAppIcon(base64Data, file.type, adminPin);
     };
     reader.readAsDataURL(file);
   });
