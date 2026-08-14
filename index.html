@@ -719,6 +719,8 @@
           <option value="monthly_desc">أعلى قسط شهري</option>
           <option value="area_asc">أقل مساحة</option>
           <option value="area_desc">أكبر مساحة</option>
+          <option value="installment_desc">أطول فترة سداد</option>
+          <option value="installment_asc">أقصر فترة سداد</option>
         </select>
       </div>
     </div>
@@ -1946,6 +1948,14 @@
       case 'monthly_desc':
         arr = arr.filter(u => num(u['Monthly Installment']) > 0);
         arr.sort((a, b) => num(b['Monthly Installment']) - num(a['Monthly Installment']));
+        break;
+      case 'installment_asc':
+        arr = arr.filter(u => num(u['Installment Years']) > 0);
+        arr.sort((a, b) => num(a['Installment Years']) - num(b['Installment Years']));
+        break;
+      case 'installment_desc':
+        arr = arr.filter(u => num(u['Installment Years']) > 0);
+        arr.sort((a, b) => num(b['Installment Years']) - num(a['Installment Years']));
         break;
       default: break; // "newest" - الترتيب الأصلي القادم من السيرفر
     }
