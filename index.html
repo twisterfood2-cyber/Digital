@@ -27,22 +27,6 @@
       --warn-bg: #fbf1da; --warn-fg: #8a6200;
       --error-bg: #fbe6e6; --error-fg: #b3261e;
     }
-    body.dark-mode {
-      --gold: #d9ab3f;
-      --gold-light: #3a3320;
-      --bg: #141b24;
-      --card: #1e2733;
-      --border: #303c4a;
-      --text: #eef1f4;
-      --muted: #9aa8b6;
-      --success-bg: #16302280; --success-fg: #4fd18b;
-      --warn-bg: #3a300f; --warn-fg: #e0b34a;
-      --error-bg: #3a1616; --error-fg: #f28080;
-    }
-    body.dark-mode { background: linear-gradient(180deg, #1c2733 0%, #141b24 100%) !important; background-attachment: fixed; }
-    body.dark-mode .unit-cover { background: #0f151c; }
-    body.dark-mode .spec-chip { background: #263140; color: var(--text); }
-    body.dark-mode .lightbox-overlay { background: rgba(0,0,0,0.92); }
     * { box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
@@ -377,7 +361,7 @@
     /* زرار لوحة التحكم - صغير في الركن، مالوش شكل واضح كتير عشان مش لكل حد */
     .admin-fab {
       position: fixed;
-      bottom: 20px;
+      bottom: 182px;
       left: 20px;
       width: 44px;
       height: 44px;
@@ -394,29 +378,10 @@
     }
     .admin-fab:hover { opacity: 1; }
 
-    .theme-fab {
-      position: fixed;
-      bottom: 20px;
-      left: 74px;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: var(--card);
-      color: var(--navy);
-      border: 1.5px solid var(--border);
-      font-size: 18px;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(15,41,66,0.2);
-      z-index: 500;
-      opacity: 0.75;
-      transition: opacity .15s, transform .15s;
-    }
-    .theme-fab:hover { opacity: 1; transform: scale(1.06); }
-
     .calc-fab {
       position: fixed;
-      bottom: 20px;
-      left: 128px;
+      bottom: 128px;
+      left: 20px;
       width: 44px;
       height: 44px;
       border-radius: 50%;
@@ -434,8 +399,8 @@
 
     .price-info-fab {
       position: fixed;
-      bottom: 20px;
-      left: 182px;
+      bottom: 74px;
+      left: 20px;
       width: 44px;
       height: 44px;
       border-radius: 50%;
@@ -453,7 +418,7 @@
     .add-unit-fab {
       position: fixed;
       bottom: 20px;
-      left: 236px;
+      left: 20px;
       width: 44px;
       height: 44px;
       border-radius: 50%;
@@ -476,7 +441,7 @@
     /* لوحة التحكم */
     .admin-panel {
       position: fixed;
-      bottom: 76px;
+      bottom: 236px;
       left: 20px;
       width: 320px;
       max-height: 80vh;
@@ -963,7 +928,6 @@
 
 <!-- زر ولوحة تحكم المسؤول - مخفية عن باقي المستخدمين ومحمية بكلمة سر -->
 <button class="admin-fab" id="adminFab" title="لوحة التحكم">⚙</button>
-<button class="theme-fab" id="themeToggleBtn" title="الوضع الليلي">🌙</button>
 <button class="calc-fab" id="calcFabBtn" title="حاسبة السعر والتقسيط">🧮</button>
 <button class="price-info-fab" id="priceInfoFabBtn" title="متوسط سعر المتر لكل منطقة">📊</button>
 <button class="add-unit-fab" id="addUnitFabBtn" title="إضافة وحدة جديدة">➕</button>
@@ -1417,22 +1381,6 @@
     }, 3200);
   }
   window.showToast = showToast;
-
-  /* ---------- الوضع الليلي ---------- */
-  function applyTheme(isDark) {
-    document.body.classList.toggle('dark-mode', isDark);
-    const btn = document.getElementById('themeToggleBtn');
-    if (btn) btn.textContent = isDark ? '☀️' : '🌙';
-  }
-  let savedTheme = '';
-  try { savedTheme = localStorage.getItem('theme') || ''; } catch (e) {}
-  applyTheme(savedTheme === 'dark');
-
-  document.getElementById('themeToggleBtn').addEventListener('click', function() {
-    const isDark = !document.body.classList.contains('dark-mode');
-    applyTheme(isDark);
-    try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch (e) {}
-  });
 
   /* ---------- حاسبة السعر والتقسيط ---------- */
   const calcModal = document.getElementById('calcModal');
