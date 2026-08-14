@@ -704,6 +704,10 @@
         <input type="number" id="f_maxArea" min="0">
       </div>
       <div>
+        <label>مساحة محددة بالظبط (م²)</label>
+        <input type="number" id="f_exactArea" min="0" placeholder="مثال: 120">
+      </div>
+      <div>
         <label>ترتيب النتائج حسب</label>
         <select id="f_sort">
           <option value="newest">الأحدث أولًا</option>
@@ -1305,7 +1309,8 @@
       minPrice: document.getElementById('f_minPrice').value,
       maxPrice: document.getElementById('f_maxPrice').value,
       minArea: document.getElementById('f_minArea').value,
-      maxArea: document.getElementById('f_maxArea').value
+      maxArea: document.getElementById('f_maxArea').value,
+      exactArea: document.getElementById('f_exactArea').value
     };
     try { localStorage.setItem('lastSearchFilters', JSON.stringify(filters)); } catch (e) {}
     return filters;
@@ -1321,6 +1326,7 @@
     if (saved.maxPrice) document.getElementById('f_maxPrice').value = saved.maxPrice;
     if (saved.minArea) document.getElementById('f_minArea').value = saved.minArea;
     if (saved.maxArea) document.getElementById('f_maxArea').value = saved.maxArea;
+    if (saved.exactArea) document.getElementById('f_exactArea').value = saved.exactArea;
     if (saved.city) {
       fCity.value = saved.city;
       populateDistrictSelect(fDistrict, saved.city, true, saved.district);
