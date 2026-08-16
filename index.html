@@ -766,6 +766,31 @@
       <button class="modal-close" id="calcModalCloseBtn">✕</button>
     </div>
 
+    <div style="background:#f7f4ff; border:1.5px solid #7c4dff; border-radius:12px; padding:14px; margin-bottom:16px;">
+      <div class="section-title" style="color:#7c4dff; margin-bottom:6px;">🤖 تعبئة تلقائية بالذكاء الاصطناعي</div>
+      <p style="font-size:12px; color:var(--muted); margin:0 0 10px; line-height:1.7;">
+        الصق رسالة المطور، أو ارفع صورة/PDF، والذكاء الاصطناعي هيملى الحاسبة تلقائيًا. راجع البيانات كويس قبل ما تصدّر.
+      </p>
+      <textarea id="calcAiPasteText" placeholder="الصق نص الرسالة هنا (اختياري)..." style="min-height:80px; width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit; font-size:13px;"></textarea>
+      <div id="calcAiImagePasteZone" tabindex="0" style="margin-top:8px; border:2px dashed #7c4dff; border-radius:10px; padding:14px; text-align:center; cursor:pointer; color:#7c4dff; font-size:12px; font-weight:600; background:#fff; outline:none;">
+        📋 دوس هنا وبعدين الصق صورة (Ctrl+V)
+      </div>
+      <div id="calcAiPastedImagePreview" style="display:none; margin-top:8px; position:relative; max-width:180px;">
+        <img id="calcAiPastedImageTag" style="width:100%; border-radius:8px; border:1px solid var(--border);">
+        <button type="button" id="calcAiPastedImageRemove" style="position:absolute; top:-8px; left:-8px; width:22px; height:22px; border-radius:50%; background:var(--error-fg); color:#fff; border:none; cursor:pointer; font-size:12px;">✕</button>
+      </div>
+      <input type="file" id="calcAiFileInput" accept="image/*,application/pdf" style="margin-top:8px; width:100%; font-size:12px;">
+      <div style="display:flex; align-items:center; gap:8px; margin-top:8px; font-size:11px;">
+        <span style="color:var(--muted); font-weight:600;">دقة الاستخراج:</span>
+        <button type="button" id="calcAiModelFastBtn" style="flex:1; padding:7px; border:1.5px solid #7c4dff; border-radius:8px; background:#7c4dff; color:#fff; font-weight:700; cursor:pointer; font-size:11px;">⚡ سريع</button>
+        <button type="button" id="calcAiModelAccurateBtn" style="flex:1; padding:7px; border:1.5px solid #7c4dff; border-radius:8px; background:#fff; color:#7c4dff; font-weight:700; cursor:pointer; font-size:11px;">🎯 دقيق</button>
+      </div>
+      <button type="button" id="calcAiExtractBtn" style="width:100%; margin-top:10px; padding:11px; border:none; border-radius:9px; background:#7c4dff; color:#fff; font-weight:700; font-size:13px; cursor:pointer;">
+        ✨ استخرج البيانات وابدأ التعبئة
+      </button>
+      <div id="calcAiExtractMsg" style="font-size:12px; margin-top:8px; display:none;"></div>
+    </div>
+
     <div class="section-title">بيانات الوحدة</div>
     <div class="grid">
       <div>
@@ -1520,6 +1545,164 @@
 
   calcModalCloseBtn.addEventListener('click', () => calcModal.classList.remove('open'));
   calcModal.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
+
+  /* ---------- تعبئة تلقائية بالذكاء الاصطناعي في الحاسبة ---------- */
+  let calcAiPastedImageBase64 = null;
+  let calcAiPastedImageMime = null;
+
+  document.getElementById('calcAiImagePasteZone').addEventListener('focus', function() {
+    this.style.background = '#ece4ff';
+    this.textContent = '✅ جاهز - الصق الصورة دلوقتي (Ctrl+V)';
+  });
+  document.getElementById('calcAiImagePasteZone').addEventListener('blur', function() {
+    this.style.background = '#fff';
+    this.textContent = '📋 دوس هنا وبعدين الصق صورة (Ctrl+V)';
+  });
+  document.getElementById('calcAiImagePasteZone').addEventListener('paste', function(e) {
+    const items = (e.clipboardData || window.clipboardData).items;
+    for (const item of items) {
+      if (item.type.indexOf('image') === 0) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        const reader = new FileReader();
+        reader.onload = function() {
+          calcAiPastedImageBase64 = reader.result.split(',')[1];
+          calcAiPastedImageMime = file.type;
+          document.getElementById('calcAiPastedImageTag').src = reader.result;
+          document.getElementById('calcAiPastedImagePreview').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+        return;
+      }
+    }
+  });
+  document.getElementById('calcAiPastedImageRemove').addEventListener('click', function() {
+    calcAiPastedImageBase64 = null;
+    calcAiPastedImageMime = null;
+    document.getElementById('calcAiPastedImagePreview').style.display = 'none';
+  });
+
+  let calcAiModelPreference = 'fast';
+  try { calcAiModelPreference = localStorage.getItem('aiModelPreference') || 'fast'; } catch (e) {}
+  const calcAiModelFastBtn = document.getElementById('calcAiModelFastBtn');
+  const calcAiModelAccurateBtn = document.getElementById('calcAiModelAccurateBtn');
+
+  function updateCalcAiModelButtons() {
+    if (calcAiModelPreference === 'accurate') {
+      calcAiModelAccurateBtn.style.background = '#7c4dff'; calcAiModelAccurateBtn.style.color = '#fff';
+      calcAiModelFastBtn.style.background = '#fff'; calcAiModelFastBtn.style.color = '#7c4dff';
+    } else {
+      calcAiModelFastBtn.style.background = '#7c4dff'; calcAiModelFastBtn.style.color = '#fff';
+      calcAiModelAccurateBtn.style.background = '#fff'; calcAiModelAccurateBtn.style.color = '#7c4dff';
+    }
+  }
+  updateCalcAiModelButtons();
+  calcAiModelFastBtn.addEventListener('click', function() {
+    calcAiModelPreference = 'fast';
+    try { localStorage.setItem('aiModelPreference', 'fast'); } catch (e) {}
+    updateCalcAiModelButtons();
+  });
+  calcAiModelAccurateBtn.addEventListener('click', function() {
+    calcAiModelPreference = 'accurate';
+    try { localStorage.setItem('aiModelPreference', 'accurate'); } catch (e) {}
+    updateCalcAiModelButtons();
+  });
+
+  document.getElementById('calcAiExtractBtn').addEventListener('click', function() {
+    const btn = this;
+    const msg = document.getElementById('calcAiExtractMsg');
+    const text = document.getElementById('calcAiPasteText').value.trim();
+    const fileInput = document.getElementById('calcAiFileInput');
+    const file = fileInput.files[0];
+
+    if (!text && !file && !calcAiPastedImageBase64) {
+      msg.style.display = 'block';
+      msg.style.color = 'var(--error-fg)';
+      msg.textContent = 'الصق نص أو صورة، أو ارفع صورة/PDF الأول';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '⏳ جاري القراءة والاستخراج...';
+    msg.style.display = 'none';
+
+    function callExtract(fileBase64, mimeType) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          btn.disabled = false;
+          btn.textContent = '✨ استخرج البيانات وابدأ التعبئة';
+          if (!res.success) {
+            msg.style.display = 'block';
+            msg.style.color = 'var(--error-fg)';
+            msg.textContent = res.message;
+            return;
+          }
+          fillCalcFormFromAI(res.data);
+          msg.style.display = 'block';
+          msg.style.color = 'var(--success-fg)';
+          msg.textContent = '✅ تم استخراج البيانات - راجعها كويس قبل التصدير';
+        })
+        .withFailureHandler(function(err) {
+          btn.disabled = false;
+          btn.textContent = '✨ استخرج البيانات وابدأ التعبئة';
+          msg.style.display = 'block';
+          msg.style.color = 'var(--error-fg)';
+          msg.textContent = 'حدث خطأ: ' + err.message;
+        })
+        .extractUnitDataWithAI(text, fileBase64, mimeType, calcAiModelPreference);
+    }
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function() {
+        const base64Data = reader.result.split(',')[1];
+        callExtract(base64Data, file.type);
+      };
+      reader.readAsDataURL(file);
+    } else if (calcAiPastedImageBase64) {
+      callExtract(calcAiPastedImageBase64, calcAiPastedImageMime);
+    } else {
+      callExtract(null, null);
+    }
+  });
+
+  function fillCalcFormFromAI(data) {
+    const directMap = {
+      developer: 'calcDeveloper', projectName: 'calcProjectName', unitArea: 'calcUnitArea',
+      floor: 'calcFloor', gardenArea: 'calcGardenArea', terraceArea: 'calcTerraceArea',
+      roofArea: 'calcRoofArea', price: 'calcPrice', discountPercent: 'calcDiscount',
+      downPayment: 'calcDownPayment', downPaymentBase: 'calcDownPaymentBase',
+      paymentAmount: 'calcPaymentAmount', paymentCount: 'calcPaymentCount',
+      paymentSchedule: 'calcPaymentSchedule', installmentYears: 'calcInstallmentYears',
+      notes: 'calcNotes'
+    };
+
+    Object.keys(directMap).forEach(key => {
+      const value = data[key];
+      if (!value) return;
+      const el = document.getElementById(directMap[key]);
+      if (!el) return;
+      el.value = value;
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    // المدينة والمنطقة
+    if (data.city) {
+      const cityMatch = Object.keys(CITY_DISTRICTS).find(c => c === data.city || c.includes(data.city) || data.city.includes(c));
+      if (cityMatch) {
+        calcCitySelect.value = cityMatch;
+        let districtMatch = '';
+        if (data.district) {
+          districtMatch = CITY_DISTRICTS[cityMatch].find(d =>
+            d === data.district || d.includes(data.district) || data.district.includes(d)) || '';
+        }
+        populateDistrictSelect(calcDistrictSelect, cityMatch, false, districtMatch);
+      }
+    }
+
+    if (typeof runCalculator === 'function') runCalculator();
+  }
 
   const calcFieldIds = ['calcPrice', 'calcDiscount', 'calcDownPayment', 'calcDownPaymentBase', 'calcPaymentAmount', 'calcPaymentCount', 'calcInstallmentYears'];
   let lastCalcResult = null;
