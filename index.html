@@ -2125,8 +2125,24 @@
       case 'price_desc': arr.sort((a, b) => num(b['Price']) - num(a['Price'])); break;
       case 'area_asc': arr.sort((a, b) => num(a['Unit Area (sqm)']) - num(b['Unit Area (sqm)'])); break;
       case 'area_desc': arr.sort((a, b) => num(b['Unit Area (sqm)']) - num(a['Unit Area (sqm)'])); break;
-      case 'pricePerMeter_asc': arr.sort((a, b) => num(a['Price per Meter']) - num(b['Price per Meter'])); break;
-      case 'pricePerMeter_desc': arr.sort((a, b) => num(b['Price per Meter']) - num(a['Price per Meter'])); break;
+      case 'pricePerMeter_asc':
+        arr.sort((a, b) => {
+          const pa = num(a['Price per Meter']), pb = num(b['Price per Meter']);
+          if (pa === 0 && pb === 0) return 0;
+          if (pa === 0) return 1;  // مالوش سعر متر (زي الفيلات) - يتحط آخر القائمة
+          if (pb === 0) return -1;
+          return pa - pb;
+        });
+        break;
+      case 'pricePerMeter_desc':
+        arr.sort((a, b) => {
+          const pa = num(a['Price per Meter']), pb = num(b['Price per Meter']);
+          if (pa === 0 && pb === 0) return 0;
+          if (pa === 0) return 1;  // مالوش سعر متر (زي الفيلات) - يتحط آخر القائمة
+          if (pb === 0) return -1;
+          return pb - pa;
+        });
+        break;
       case 'monthly_asc':
         arr = arr.filter(u => num(u['Monthly Installment']) > 0);
         arr.sort((a, b) => num(a['Monthly Installment']) - num(b['Monthly Installment']));
