@@ -725,6 +725,10 @@
           <option value="downpayment_desc">أعلى مقدم</option>
         </select>
       </div>
+      <div id="ppmYearsFilterWrap" style="display:none;">
+        <label>مقارنة سعر المتر حسب عدد سنوات تقسيط (اختياري)</label>
+        <input type="number" id="f_ppmYears" min="0" placeholder="مثال: 5">
+      </div>
     </div>
 
     <div class="btn-row">
@@ -2120,12 +2124,21 @@
   function sortUnits(units, sortBy) {
     let arr = units.slice();
     const num = (v) => Number(v) || 0;
+
+    function filterByPPMYears(list) {
+      const yearsInput = document.getElementById('f_ppmYears');
+      const yearsValue = yearsInput ? yearsInput.value.trim() : '';
+      if (!yearsValue) return list;
+      return list.filter(u => Number(u['Installment Years']) === Number(yearsValue));
+    }
+
     switch (sortBy) {
       case 'price_asc': arr.sort((a, b) => num(a['Price']) - num(b['Price'])); break;
       case 'price_desc': arr.sort((a, b) => num(b['Price']) - num(a['Price'])); break;
       case 'area_asc': arr.sort((a, b) => num(a['Unit Area (sqm)']) - num(b['Unit Area (sqm)'])); break;
       case 'area_desc': arr.sort((a, b) => num(b['Unit Area (sqm)']) - num(a['Unit Area (sqm)'])); break;
       case 'pricePerMeter_asc':
+        arr = filterByPPMYears(arr);
         arr.sort((a, b) => {
           const pa = num(a['Price per Meter']), pb = num(b['Price per Meter']);
           if (pa === 0 && pb === 0) return 0;
@@ -2135,6 +2148,7 @@
         });
         break;
       case 'pricePerMeter_desc':
+        arr = filterByPPMYears(arr);
         arr.sort((a, b) => {
           const pa = num(a['Price per Meter']), pb = num(b['Price per Meter']);
           if (pa === 0 && pb === 0) return 0;
@@ -2681,7 +2695,13 @@
   window.runSearch = runSearch;
 
   document.getElementById('f_sort').addEventListener('change', function() {
+    const isPPMSort = this.value === 'pricePerMeter_asc' || this.value === 'pricePerMeter_desc';
+    document.getElementById('ppmYearsFilterWrap').style.display = isPPMSort ? 'block' : 'none';
     renderResults(sortUnits(lastResults, this.value));
+  });
+
+  document.getElementById('f_ppmYears').addEventListener('input', function() {
+    renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
   });
 
   document.getElementById('searchBtn').addEventListener('click', runSearch);
