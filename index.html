@@ -136,6 +136,10 @@
     }
     .fav-btn:hover { transform: scale(1.12); }
     .fav-btn.active { color: var(--gold); }
+    .price-drop-badge {
+      background: linear-gradient(90deg, #1e7145, #2e9d63); color: #fff; font-size: 11px; font-weight: 800;
+      padding: 6px 12px; text-align: center;
+    }
     .compare-checkbox {
       position: absolute; top: 12px; right: 12px; z-index: 5;
       width: 26px; height: 26px; border-radius: 6px; background: rgba(255,255,255,0.9);
@@ -640,6 +644,21 @@
     <img id="coverImg" src="" alt="صورة الغلاف">
   </div>
   <h1>🔍 Search for units at Digital Real Estate</h1>
+
+<div style="background:#f7f4ff; border:1.5px solid #7c4dff; border-radius:14px; padding:16px; margin-bottom:16px;">
+  <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+    <span style="font-size:14px; font-weight:800; color:#7c4dff;">🤖 بحث ذكي بلغة طبيعية</span>
+  </div>
+  <p style="font-size:12px; color:var(--muted); margin:0 0 10px; line-height:1.7;">
+    اكتب طلبك بشكل عادي، مثال: "شقق في التجمع تحت 4 مليون بمقدم أقل من 10%"
+  </p>
+  <div style="display:flex; gap:8px;">
+    <input type="text" id="nlSearchInput" placeholder="اكتب طلبك هنا..." style="flex:1; padding:11px 14px; border:1.5px solid var(--border); border-radius:8px; font-size:14px;">
+    <button type="button" id="nlSearchBtn" style="padding:11px 20px; border:none; border-radius:8px; background:#7c4dff; color:#fff; font-weight:700; font-size:13px; cursor:pointer; white-space:nowrap;">🔍 بحث</button>
+  </div>
+  <div id="nlSearchMsg" style="font-size:12px; margin-top:8px; display:none;"></div>
+</div>
+
 <div class="filters-card">
     <div class="grid">
       <div>
@@ -2092,16 +2111,27 @@
 
   /* ---------- نظام المفضلة ---------- */
   function getFavorites() {
-    try { return JSON.parse(localStorage.getItem('favoriteUnits') || '[]'); } catch (e) { return []; }
+    try {
+      const raw = JSON.parse(localStorage.getItem('favoriteUnits') || '[]');
+      // توافق مع الشكل القديم (كانت مصفوفة نصوص بس، من غير سعر محفوظ)
+      return raw.map(f => (typeof f === 'string') ? { id: f, price: null } : f);
+    } catch (e) { return []; }
+  }
+  function getFavoriteIds() {
+    return getFavorites().map(f => f.id);
   }
   function isFavorite(unitId) {
-    return getFavorites().indexOf(unitId) !== -1;
+    return getFavoriteIds().indexOf(unitId) !== -1;
   }
-  function toggleFavorite(unitId, btnEl) {
+  function getFavoritePrice(unitId) {
+    const fav = getFavorites().find(f => f.id === unitId);
+    return fav ? fav.price : null;
+  }
+  function toggleFavorite(unitId, btnEl, currentPrice) {
     let favs = getFavorites();
-    const idx = favs.indexOf(unitId);
+    const idx = favs.findIndex(f => f.id === unitId);
     if (idx === -1) {
-      favs.push(unitId);
+      favs.push({ id: unitId, price: Number(currentPrice) || null });
       if (btnEl) btnEl.classList.add('active');
       showToast('⭐ تمت إضافة الوحدة للمفضلة', 'success');
     } else {
@@ -2193,8 +2223,8 @@
 
   function renderResults(units) {
     if (showFavoritesOnly) {
-      const favs = getFavorites();
-      units = units.filter(u => favs.indexOf(u['Unit ID']) !== -1);
+      const favIds = getFavoriteIds();
+      units = units.filter(u => favIds.indexOf(u['Unit ID']) !== -1);
     }
     const container = document.getElementById('results');
     const count = document.getElementById('resultsCount');
@@ -2217,10 +2247,19 @@
           ${images.length > 1 ? `<span class="img-count-badge">📷 ${images.length} صور</span>` : ''}
         </div>` : '';
 
+      const favPrice = getFavoritePrice(u['Unit ID']);
+      const currentPrice = Number(u['Price']) || 0;
+      const priceDropped = favPrice && currentPrice > 0 && currentPrice < favPrice;
+      const priceDropBadge = priceDropped ? `
+        <div class="price-drop-badge" title="السعر نزل من ${fmtNum(favPrice)} لـ ${fmtNum(currentPrice)} جنيه">
+          🔻 نزل السعر ${fmtNum(favPrice - currentPrice)} جنيه
+        </div>` : '';
+
       return `
       <div class="unit-card status-${u['Status']}">
         ${coverHtml}
-        <button type="button" class="fav-btn ${isFavorite(u['Unit ID']) ? 'active' : ''}" onclick="toggleFavorite('${u['Unit ID']}', this)" title="إضافة للمفضلة">★</button>
+        ${priceDropBadge}
+        <button type="button" class="fav-btn ${isFavorite(u['Unit ID']) ? 'active' : ''}" onclick="toggleFavorite('${u['Unit ID']}', this, ${currentPrice})" title="إضافة للمفضلة">★</button>
         <label class="compare-checkbox" title="إضافة للمقارنة">
           <input type="checkbox" ${compareList.indexOf(u['Unit ID']) !== -1 ? 'checked' : ''} onchange="toggleCompare('${u['Unit ID']}', this)">
         </label>
@@ -2706,10 +2745,87 @@
 
   document.getElementById('searchBtn').addEventListener('click', runSearch);
 
+  /* ---------- بحث ذكي بلغة طبيعية ---------- */
+  function applyNaturalLanguageFilters(filters) {
+    if (filters.keyword) document.getElementById('f_keyword').value = filters.keyword;
+    if (filters.category) document.getElementById('f_category').value = filters.category;
+    if (filters.propertyType) document.getElementById('f_propertyType').value = filters.propertyType;
+    if (filters.finishing) document.getElementById('f_finishing').value = filters.finishing;
+    if (filters.status) document.getElementById('f_status').value = filters.status;
+    if (filters.rooms) document.getElementById('f_rooms').value = filters.rooms;
+    if (filters.minPrice) document.getElementById('f_minPrice').value = filters.minPrice;
+    if (filters.maxPrice) document.getElementById('f_maxPrice').value = filters.maxPrice;
+    if (filters.minArea) document.getElementById('f_minArea').value = filters.minArea;
+    if (filters.maxArea) document.getElementById('f_maxArea').value = filters.maxArea;
+    if (filters.city) {
+      fCity.value = filters.city;
+      populateDistrictSelect(fDistrict, filters.city, true, filters.district || '');
+    }
+  }
+
+  document.getElementById('nlSearchBtn').addEventListener('click', function() {
+    const btn = this;
+    const msg = document.getElementById('nlSearchMsg');
+    const query = document.getElementById('nlSearchInput').value.trim();
+    if (!query) {
+      msg.style.display = 'block';
+      msg.style.color = 'var(--error-fg)';
+      msg.textContent = 'اكتب طلبك الأول';
+      return;
+    }
+
+    let modelPref = 'fast';
+    try { modelPref = localStorage.getItem('aiModelPreference') || 'fast'; } catch (e) {}
+
+    btn.disabled = true;
+    btn.textContent = '⏳ جاري الفهم...';
+    msg.style.display = 'none';
+
+    google.script.run
+      .withSuccessHandler(function(res) {
+        btn.disabled = false;
+        btn.textContent = '🔍 بحث';
+        if (!res.success) {
+          msg.style.display = 'block';
+          msg.style.color = 'var(--error-fg)';
+          msg.textContent = res.message;
+          return;
+        }
+        applyNaturalLanguageFilters(res.filters);
+        runSearch();
+        msg.style.display = 'block';
+        msg.style.color = 'var(--success-fg)';
+        msg.textContent = '✅ تم فهم طلبك وتطبيق الفلاتر المناسبة';
+      })
+      .withFailureHandler(function(err) {
+        btn.disabled = false;
+        btn.textContent = '🔍 بحث';
+        msg.style.display = 'block';
+        msg.style.color = 'var(--error-fg)';
+        msg.textContent = 'حدث خطأ: ' + err.message;
+      })
+      .parseNaturalLanguageSearch(query, modelPref);
+  });
+
+  document.getElementById('nlSearchInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('nlSearchBtn').click();
+  });
+
   document.getElementById('favToggleBtn').addEventListener('click', function() {
     showFavoritesOnly = !showFavoritesOnly;
     this.classList.toggle('active', showFavoritesOnly);
     renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
+
+    if (showFavoritesOnly) {
+      const favs = getFavorites();
+      const droppedCount = lastResults.filter(u => {
+        const fav = favs.find(f => f.id === u['Unit ID']);
+        return fav && fav.price && Number(u['Price']) > 0 && Number(u['Price']) < fav.price;
+      }).length;
+      if (droppedCount > 0) {
+        showToast('🔻 ' + droppedCount + ' من وحداتك المفضلة نزل سعرها', 'success');
+      }
+    }
   });
   updateFavCount();
 
