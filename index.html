@@ -140,6 +140,9 @@
       background: linear-gradient(90deg, #1e7145, #2e9d63); color: #fff; font-size: 11px; font-weight: 800;
       padding: 6px 12px; text-align: center;
     }
+    .price-drop-badge.price-up-badge {
+      background: linear-gradient(90deg, #b3261e, #d9534f);
+    }
     .compare-checkbox {
       position: absolute; top: 12px; right: 12px; z-index: 5;
       width: 26px; height: 26px; border-radius: 6px; background: rgba(255,255,255,0.9);
@@ -777,6 +780,9 @@
       <div class="modal-title">مقارنة الوحدات</div>
       <button class="modal-close" id="compareModalCloseBtn">✕</button>
     </div>
+    <button type="button" id="compareExportPdfBtn" style="margin-bottom:14px; padding:10px 18px; border:none; border-radius:9px; background:var(--navy); color:#fff; font-weight:700; font-size:13px; cursor:pointer;">
+      📄 تصدير مقارنة PDF
+    </button>
     <div id="compareModalContent"></div>
   </div>
 </div>
@@ -918,6 +924,17 @@
     </div>
 
     <button type="button" id="calcExportBtn" style="width:100%; margin-top:16px; padding:13px; border:none; border-radius:9px; background:var(--navy); color:#fff; font-weight:700; font-size:14px; cursor:pointer;">📄 تصدير النتيجة PDF</button>
+  </div>
+</div>
+
+<!-- مودال الوحدات المشابهة -->
+<div class="modal-overlay" id="similarUnitsModal">
+  <div class="modal-box" style="max-width:600px;">
+    <div class="modal-header">
+      <div class="modal-title">🔄 وحدات مشابهة</div>
+      <button class="modal-close" id="similarUnitsCloseBtn">✕</button>
+    </div>
+    <div id="similarUnitsContent" style="max-height:65vh; overflow-y:auto;"></div>
   </div>
 </div>
 
@@ -2250,10 +2267,19 @@
       const favPrice = getFavoritePrice(u['Unit ID']);
       const currentPrice = Number(u['Price']) || 0;
       const priceDropped = favPrice && currentPrice > 0 && currentPrice < favPrice;
-      const priceDropBadge = priceDropped ? `
+      const priceIncreased = favPrice && currentPrice > 0 && currentPrice > favPrice;
+      let priceDropBadge = '';
+      if (priceDropped) {
+        priceDropBadge = `
         <div class="price-drop-badge" title="السعر نزل من ${fmtNum(favPrice)} لـ ${fmtNum(currentPrice)} جنيه">
           🔻 نزل السعر ${fmtNum(favPrice - currentPrice)} جنيه
-        </div>` : '';
+        </div>`;
+      } else if (priceIncreased) {
+        priceDropBadge = `
+        <div class="price-drop-badge price-up-badge" title="السعر زاد من ${fmtNum(favPrice)} لـ ${fmtNum(currentPrice)} جنيه">
+          🔺 زاد السعر ${fmtNum(currentPrice - favPrice)} جنيه
+        </div>`;
+      }
 
       return `
       <div class="unit-card status-${u['Status']}">
@@ -2324,6 +2350,9 @@
             <button type="button" class="whatsapp-btn" onclick='shareOnWhatsApp(${JSON.stringify(u)})'><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2Zm5.8 14.03c-.24.68-1.4 1.32-1.93 1.36-.5.05-1.02.24-3.4-.71-2.88-1.15-4.73-4.06-4.87-4.25-.14-.19-1.17-1.56-1.17-2.97s.73-2.11 1-2.4c.24-.27.53-.34.7-.34h.5c.16 0 .38-.03.58.45.24.57.79 1.98.86 2.12.07.14.11.3.02.48-.09.19-.14.3-.28.46-.14.17-.29.37-.42.5-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.16-.19.68-.79.86-1.06.19-.28.37-.23.62-.14.26.09 1.63.77 1.91.91.28.14.47.21.53.33.07.12.07.68-.17 1.36Z"/></svg> WhatsApp</button>
             <button type="button" class="pdf-btn" onclick='downloadUnitPDF(${JSON.stringify(u)}, this)'>📄 PDF</button>
           </div>
+          <button type="button" class="similar-units-btn" onclick='showSimilarUnits(${JSON.stringify(u)})' style="width:100%; margin-top:8px; padding:9px; border:1.5px solid #7c4dff; border-radius:8px; background:#f7f4ff; color:#7c4dff; font-weight:700; font-size:12px; cursor:pointer;">
+            🔄 وحدات مشابهة
+          </button>
           ${(u['Developer Name'] || u['Entered By']) ? `
           <div style="margin-top:8px; padding-top:8px; border-top:1px dashed var(--border); font-size:11px; color:var(--muted); display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px;">
             ${u['Developer Name'] ? `<span>🏗 المطور: ${u['Developer Name']}</span>` : '<span></span>'}
@@ -2431,6 +2460,70 @@
     pdfContactModal.classList.add('open');
   }
   window.downloadUnitPDF = downloadUnitPDF;
+
+  /* ---------- وحدات مشابهة ---------- */
+  const similarUnitsModal = document.getElementById('similarUnitsModal');
+
+  function showSimilarUnits(referenceUnit) {
+    similarUnitsModal.classList.add('open');
+    const content = document.getElementById('similarUnitsContent');
+    content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:24px;">جاري البحث عن وحدات مشابهة...</div>';
+
+    const searchFilters = {
+      district: referenceUnit['Area/District'] || '',
+      city: referenceUnit['City'] || ''
+    };
+
+    google.script.run
+      .withSuccessHandler(function(candidates) {
+        const refPrice = Number(referenceUnit['Price']) || 0;
+        const refArea = Number(referenceUnit['Unit Area (sqm)']) || 0;
+
+        const scored = candidates
+          .filter(u => u['Unit ID'] !== referenceUnit['Unit ID'])
+          .map(u => {
+            const priceDiff = refPrice > 0 ? Math.abs((Number(u['Price']) || 0) - refPrice) / refPrice : 1;
+            const areaDiff = refArea > 0 ? Math.abs((Number(u['Unit Area (sqm)']) || 0) - refArea) / refArea : 1;
+            return { unit: u, score: priceDiff + areaDiff };
+          })
+          .sort((a, b) => a.score - b.score)
+          .slice(0, 4)
+          .map(s => s.unit);
+
+        renderSimilarUnits(scored);
+      })
+      .withFailureHandler(function() {
+        content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:24px;">حصل خطأ في البحث</div>';
+      })
+      .searchUnits(searchFilters);
+  }
+  window.showSimilarUnits = showSimilarUnits;
+
+  function renderSimilarUnits(units) {
+    const content = document.getElementById('similarUnitsContent');
+    if (!units.length) {
+      content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:24px;">مفيش وحدات مشابهة كفاية في نفس المنطقة حاليًا</div>';
+      return;
+    }
+    content.innerHTML = units.map(u => {
+      const images = u['Images'] ? u['Images'].split(',').map(s => s.trim()).filter(Boolean) : [];
+      const coverImg = images.length > 0 ? images[0] : '';
+      return `
+        <div style="display:flex; gap:12px; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:10px; align-items:center;">
+          ${coverImg ? `<img src="${coverImg}" style="width:70px; height:70px; border-radius:8px; object-fit:cover; flex-shrink:0;">` : `<div style="width:70px; height:70px; border-radius:8px; background:var(--bg); flex-shrink:0; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:11px;">لا صورة</div>`}
+          <div style="flex:1; min-width:0;">
+            <div style="font-weight:800; color:var(--navy); font-size:13px;">${u['Property Type'] || ''} - ${u['Unit Area (sqm)'] || '-'} م²</div>
+            <div style="font-size:11px; color:var(--muted); margin-top:2px;">${u['Project Name'] || ''} - ${u['Area/District'] || ''}</div>
+            <div style="font-weight:800; color:var(--gold); font-size:14px; margin-top:4px;">${fmtNum(u['Price'])} جنيه</div>
+          </div>
+          <button type="button" onclick='shareOnWhatsApp(${JSON.stringify(u)})' style="flex-shrink:0; padding:8px 12px; border:none; border-radius:8px; background:#4FA579; color:#fff; font-weight:700; font-size:11px; cursor:pointer;">واتساب</button>
+        </div>
+      `;
+    }).join('');
+  }
+
+  document.getElementById('similarUnitsCloseBtn').addEventListener('click', () => similarUnitsModal.classList.remove('open'));
+  similarUnitsModal.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
 
   function closePdfContactModal() {
     pdfContactModal.classList.remove('open');
@@ -2822,9 +2915,12 @@
         const fav = favs.find(f => f.id === u['Unit ID']);
         return fav && fav.price && Number(u['Price']) > 0 && Number(u['Price']) < fav.price;
       }).length;
-      if (droppedCount > 0) {
-        showToast('🔻 ' + droppedCount + ' من وحداتك المفضلة نزل سعرها', 'success');
-      }
+      const increasedCount = lastResults.filter(u => {
+        const fav = favs.find(f => f.id === u['Unit ID']);
+        return fav && fav.price && Number(u['Price']) > 0 && Number(u['Price']) > fav.price;
+      }).length;
+      if (droppedCount > 0) showToast('🔻 ' + droppedCount + ' من وحداتك المفضلة نزل سعرها', 'success');
+      if (increasedCount > 0) showToast('🔺 ' + increasedCount + ' من وحداتك المفضلة زاد سعرها', 'error');
     }
   });
   updateFavCount();
@@ -2868,8 +2964,7 @@
 
   document.getElementById('compareGoBtn').addEventListener('click', openCompareModal);
 
-  function openCompareModal() {
-    const units = lastResults.filter(u => compareList.indexOf(u['Unit ID']) !== -1);
+  function buildCompareRows(units) {
     const rows = [
       { label: 'الصورة', get: u => {
         const imgs = (u['Images'] || '').split(',').map(s => s.trim()).filter(Boolean);
@@ -2902,10 +2997,11 @@
       { label: 'التسليم', get: u => u['Delivery Date'] || '-' },
       { label: 'ملاحظات', get: u => u['Notes'] || '-' }
     ];
+    return rows.filter(r => units.some(u => r.get(u) !== '-'));
+  }
 
-    const visibleRows = rows.filter(r => units.some(u => r.get(u) !== '-'));
-
-    const tableHtml = `
+  function buildCompareTableHtml(units, visibleRows) {
+    return `
       <table class="compare-table">
         <thead>
           <tr>
@@ -2923,7 +3019,12 @@
         </tbody>
       </table>
     `;
-    document.getElementById('compareModalContent').innerHTML = tableHtml;
+  }
+
+  function openCompareModal() {
+    const units = lastResults.filter(u => compareList.indexOf(u['Unit ID']) !== -1);
+    const visibleRows = buildCompareRows(units);
+    document.getElementById('compareModalContent').innerHTML = buildCompareTableHtml(units, visibleRows);
     document.getElementById('compareModal').classList.add('open');
   }
 
@@ -2933,6 +3034,94 @@
   document.getElementById('compareModal').addEventListener('click', function(e) {
     if (e.target === this) this.classList.remove('open');
   });
+
+  /* ---------- تصدير PDF مقارنة لأكتر من وحدة ---------- */
+  async function downloadComparePDF() {
+    const btn = document.getElementById('compareExportPdfBtn');
+    const units = lastResults.filter(u => compareList.indexOf(u['Unit ID']) !== -1);
+    if (units.length < 2) { showToast('محتاج وحدتين على الأقل للمقارنة', 'error'); return; }
+
+    btn.disabled = true;
+    btn.textContent = '⏳ جاري التجهيز...';
+
+    let agentName = '', agentPhone = '';
+    try {
+      agentName = localStorage.getItem('pdfAgentName') || '';
+      agentPhone = localStorage.getItem('pdfAgentPhone') || '';
+    } catch (e) {}
+
+    try {
+      const visibleRows = buildCompareRows(units);
+      const tableHtml = buildCompareTableHtml(units, visibleRows);
+
+      const pageDiv = document.createElement('div');
+      pageDiv.style.position = 'absolute';
+      pageDiv.style.left = '-9999px';
+      pageDiv.style.top = '0';
+      pageDiv.style.width = '720px';
+      pageDiv.style.fontFamily = "'Segoe UI', Tahoma, Arial, sans-serif";
+      pageDiv.style.direction = 'rtl';
+      pageDiv.style.background = '#ffffff';
+
+      pageDiv.innerHTML = `
+        <div style="background:#0f2942;padding:18px 24px;">
+          <div style="color:#fff;font-size:18px;font-weight:800;">📊 مقارنة الوحدات - Digital Real Estate</div>
+          <div style="color:#c9992e;font-size:12px;margin-top:4px;">${units.length} وحدات - ${new Date().toLocaleDateString('en-GB')}</div>
+        </div>
+        <div style="padding:18px 24px;">${tableHtml}</div>
+        <div style="background:#0f2942;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;">
+          <span style="font-size:12px;color:#fff;font-weight:700;">${agentName || 'Digital Real Estate Team'}${agentPhone ? ' — ' : ''}<span style="color:#ecd08c;">${agentPhone || ''}</span></span>
+          <span style="font-size:9px;color:#9fb0c2;white-space:nowrap;">Contact Info</span>
+        </div>
+      `;
+      document.body.appendChild(pageDiv);
+
+      await new Promise(resolve => setTimeout(resolve, 400));
+
+      const canvas = await html2canvas(pageDiv, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+      document.body.removeChild(pageDiv);
+
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 8;
+      const imgWidth = pageWidth - margin * 2;
+      const usableHeight = pageHeight - margin * 2;
+      const pageHeightPx = Math.floor((usableHeight * canvas.width) / imgWidth);
+
+      let renderedPx = 0;
+      let first = true;
+      while (renderedPx < canvas.height) {
+        let sliceHeightPx = Math.min(pageHeightPx, canvas.height - renderedPx);
+        const remainderAfter = canvas.height - (renderedPx + sliceHeightPx);
+        if (remainderAfter > 0 && remainderAfter < 20) sliceHeightPx += remainderAfter;
+
+        const pageCanvas = document.createElement('canvas');
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = sliceHeightPx;
+        const ctx = pageCanvas.getContext('2d');
+        ctx.drawImage(canvas, 0, renderedPx, canvas.width, sliceHeightPx, 0, 0, canvas.width, sliceHeightPx);
+
+        const sliceImgHeight = (sliceHeightPx * imgWidth) / canvas.width;
+        if (!first) pdf.addPage();
+        pdf.addImage(pageCanvas.toDataURL('image/jpeg', 0.92), 'JPEG', margin, margin, imgWidth, sliceImgHeight);
+
+        renderedPx += sliceHeightPx;
+        first = false;
+      }
+
+      pdf.save('مقارنة وحدات - ' + units.length + ' وحدات.pdf');
+      showToast('✅ تم تصدير ملف المقارنة بنجاح', 'success');
+    } catch (err) {
+      showToast('حصل خطأ أثناء التصدير: ' + err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '📄 تصدير مقارنة PDF';
+    }
+  }
+
+  document.getElementById('compareExportPdfBtn').addEventListener('click', downloadComparePDF);
 
   document.getElementById('advancedFiltersToggle').addEventListener('click', function() {
     const block = document.getElementById('advancedFiltersBlock');
@@ -2947,6 +3136,8 @@
     document.querySelectorAll('.filters-card select').forEach(s => s.value = '');
     document.getElementById('f_sort').value = 'newest';
     populateDistrictSelect(fDistrict, '', true);
+    document.getElementById('nlSearchInput').value = '';
+    document.getElementById('nlSearchMsg').style.display = 'none';
     runSearch();
   });
 
