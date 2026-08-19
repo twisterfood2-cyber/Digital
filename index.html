@@ -927,6 +927,17 @@
   </div>
 </div>
 
+<!-- مودال بروفايل المطور -->
+<div class="modal-overlay" id="developerProfileModal">
+  <div class="modal-box" style="max-width:480px;">
+    <div class="modal-header">
+      <div class="modal-title" id="devProfileTitle">🏗 بروفايل المطور</div>
+      <button class="modal-close" id="devProfileCloseBtn">✕</button>
+    </div>
+    <div id="devProfileContent" style="max-height:65vh; overflow-y:auto;"></div>
+  </div>
+</div>
+
 <!-- مودال الوحدات المشابهة -->
 <div class="modal-overlay" id="similarUnitsModal">
   <div class="modal-box" style="max-width:600px;">
@@ -996,6 +1007,7 @@
   <div id="coverMsg"></div>
 
   <button type="button" class="small-btn" id="openUsersModalBtn" style="margin-top:12px; background:var(--navy); color:#fff;">👥 إدارة المستخدمين</button>
+  <button type="button" class="small-btn" id="openDevProfilesModalBtn" style="margin-top:8px; background:#7c4dff; color:#fff;">🏗 إدارة بيانات المطورين</button>
   <a href="https://script.google.com/macros/s/AKfycby0Suh2iXdvCSy1N9G9e8u8VUjfHygiXe0owQyzUrHWcF_tIHMd7WnDZw2JtlXDkDDEWw/exec?page=dashboard" target="_blank" class="small-btn" style="display:block; text-align:center; text-decoration:none; margin-top:8px; background: var(--gold); color:#fff;">📊 لوحة الإحصائيات</a>
 </div>
 
@@ -1027,6 +1039,47 @@
 
     <div class="section-title">المستخدمون الحاليون</div>
     <div id="usersListContent" style="max-height:40vh; overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- مودال إدارة بيانات المطورين -->
+<div class="modal-overlay" id="devProfilesModal">
+  <div class="modal-box" style="max-width:520px;">
+    <div class="modal-header">
+      <div class="modal-title">🏗 إدارة بيانات المطورين</div>
+      <button class="modal-close" id="devProfilesModalCloseBtn">✕</button>
+    </div>
+
+    <div class="section-title">إضافة / تعديل بيانات مطور</div>
+    <div class="grid">
+      <div>
+        <label>اسم المطور</label>
+        <input type="text" id="devProfileNameInput" list="devProfileNameDatalist" placeholder="اسم المطور بالظبط زي ما هو مسجل">
+        <datalist id="devProfileNameDatalist"></datalist>
+      </div>
+      <div>
+        <label>صاحب الشركة</label>
+        <input type="text" id="devProfileOwnerInput" placeholder="اسم صاحب الشركة">
+      </div>
+      <div>
+        <label>سنة التأسيس</label>
+        <input type="text" id="devProfileYearInput" placeholder="مثال: 2005">
+      </div>
+      <div>
+        <label>رابط لوجو (اختياري)</label>
+        <input type="text" id="devProfileLogoInput" placeholder="https://...">
+      </div>
+    </div>
+    <label style="margin-top:10px; display:block;">نبذة عن الشركة</label>
+    <textarea id="devProfileDescInput" placeholder="نبذة مختصرة عن تاريخ الشركة..." style="min-height:70px; width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit; font-size:13px;"></textarea>
+    <label style="margin-top:10px; display:block;">أعمال سابقة</label>
+    <textarea id="devProfileWorksInput" placeholder="أهم المشاريع السابقة للشركة..." style="min-height:70px; width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit; font-size:13px;"></textarea>
+
+    <button type="button" id="saveDevProfileBtn" style="width:100%; margin-top:12px; padding:11px; border:none; border-radius:9px; background:#7c4dff; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">حفظ بيانات المطور</button>
+    <div id="saveDevProfileMsg" style="font-size:12px; margin-top:8px;"></div>
+
+    <div class="section-title">المطورين المسجّلين حاليًا</div>
+    <div id="devProfilesListContent" style="max-height:35vh; overflow-y:auto;"></div>
   </div>
 </div>
 
@@ -2357,7 +2410,7 @@
           </button>
           ${(u['Developer Name'] || u['Entered By']) ? `
           <div style="margin-top:8px; padding-top:8px; border-top:1px dashed var(--border); font-size:11px; color:var(--muted); display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px;">
-            ${u['Developer Name'] ? `<span>🏗 المطور: ${u['Developer Name']}</span>` : '<span></span>'}
+            ${u['Developer Name'] ? `<span>🏗 المطور: <a href="javascript:void(0)" onclick='showDeveloperProfile(${JSON.stringify(u['Developer Name'])})' style="color:var(--navy); font-weight:800; text-decoration:underline; cursor:pointer;">${u['Developer Name']}</a></span>` : '<span></span>'}
             ${u['Entered By'] ? `<span>👤 أضافها: ${u['Entered By']}</span>` : ''}
           </div>` : ''}
         </div>
@@ -2502,6 +2555,55 @@
       .searchUnits(searchFilters);
   }
   window.showSimilarUnits = showSimilarUnits;
+
+  /* ---------- بروفايل المطور ---------- */
+  const developerProfileModal = document.getElementById('developerProfileModal');
+
+  function showDeveloperProfile(developerName) {
+    document.getElementById('devProfileTitle').textContent = '🏗 ' + developerName;
+    developerProfileModal.classList.add('open');
+    const content = document.getElementById('devProfileContent');
+    content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:24px;">جاري التحميل...</div>';
+
+    google.script.run
+      .withSuccessHandler(function(res) {
+        if (!res.success) { content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:24px;">حصل خطأ في التحميل</div>'; return; }
+        if (!res.found) {
+          content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:24px; line-height:1.8;">لسه معندناش بيانات مسجلة عن المطور ده.<br>تقدر تضيفها من لوحة التحكم ⚙</div>';
+          return;
+        }
+        content.innerHTML = `
+          ${res.logoUrl ? `<div style="text-align:center; margin-bottom:14px;"><img src="${res.logoUrl}" style="max-width:140px; max-height:80px; object-fit:contain;"></div>` : ''}
+          <div style="background:#0f2942; border-radius:12px; padding:14px; margin-bottom:12px;">
+            <div style="color:#c9992e; font-size:11px; font-weight:700; margin-bottom:4px;">صاحب الشركة</div>
+            <div style="color:#fff; font-size:14px; font-weight:800;">${res.ownerName || 'غير متاح'}</div>
+          </div>
+          ${res.foundedYear ? `
+          <div style="background:var(--bg); border-radius:10px; padding:12px 14px; margin-bottom:12px;">
+            <div style="color:var(--muted); font-size:11px; font-weight:700; margin-bottom:4px;">سنة التأسيس</div>
+            <div style="color:var(--navy); font-size:14px; font-weight:800;">${res.foundedYear}</div>
+          </div>` : ''}
+          ${res.description ? `
+          <div style="background:var(--bg); border-radius:10px; padding:12px 14px; margin-bottom:12px;">
+            <div style="color:var(--muted); font-size:11px; font-weight:700; margin-bottom:4px;">نبذة عن الشركة</div>
+            <div style="color:var(--text); font-size:13px; line-height:1.8; white-space:pre-wrap;">${res.description}</div>
+          </div>` : ''}
+          ${res.previousWorks ? `
+          <div style="background:var(--bg); border-radius:10px; padding:12px 14px;">
+            <div style="color:var(--muted); font-size:11px; font-weight:700; margin-bottom:4px;">أعمال سابقة</div>
+            <div style="color:var(--text); font-size:13px; line-height:1.8; white-space:pre-wrap;">${res.previousWorks}</div>
+          </div>` : ''}
+        `;
+      })
+      .withFailureHandler(function() {
+        content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:24px;">حصل خطأ في التحميل</div>';
+      })
+      .getDeveloperProfile(developerName);
+  }
+  window.showDeveloperProfile = showDeveloperProfile;
+
+  document.getElementById('devProfileCloseBtn').addEventListener('click', () => developerProfileModal.classList.remove('open'));
+  developerProfileModal.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
 
   function renderSimilarUnits(units) {
     const content = document.getElementById('similarUnitsContent');
@@ -3788,6 +3890,114 @@
         msg.textContent = 'حدث خطأ: ' + err.message;
       })
       .addUserAccount(name, email, password, adminPin);
+  });
+
+  /* ---------- إدارة بيانات المطورين ---------- */
+  const devProfilesModal = document.getElementById('devProfilesModal');
+
+  document.getElementById('openDevProfilesModalBtn').addEventListener('click', function() {
+    if (!adminPin) return;
+    devProfilesModal.classList.add('open');
+    loadDevProfilesList();
+    // نعبّي الاقتراحات بأسماء كل المطورين المسجلين في النظام حاليًا
+    google.script.run.withSuccessHandler(function(res) {
+      document.getElementById('devProfileNameDatalist').innerHTML = res.developers.map(d => `<option value="${d}">`).join('');
+    }).getDeveloperProjectMap();
+  });
+  document.getElementById('devProfilesModalCloseBtn').addEventListener('click', () => devProfilesModal.classList.remove('open'));
+  devProfilesModal.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
+
+  function loadDevProfilesList() {
+    const content = document.getElementById('devProfilesListContent');
+    content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:14px; font-size:12px;">جاري التحميل...</div>';
+    google.script.run.withSuccessHandler(function(res) {
+      if (!res.success) { content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:14px; font-size:12px;">' + res.message + '</div>'; return; }
+      renderDevProfilesList(res.profiles);
+    }).getAllDeveloperProfiles(adminPin);
+  }
+
+  function renderDevProfilesList(profiles) {
+    const content = document.getElementById('devProfilesListContent');
+    if (!profiles.length) {
+      content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:14px; font-size:12px;">مفيش مطورين مسجّلين لسه</div>';
+      return;
+    }
+    content.innerHTML = profiles.map(p => `
+      <div class="access-req-item">
+        <div class="name">${p.developerName}</div>
+        <div class="meta">${p.ownerName || 'بدون اسم صاحب شركة'}${p.foundedYear ? ' - تأسست ' + p.foundedYear : ''}</div>
+        <div class="actions">
+          <button type="button" class="approve-btn" onclick='editDevProfile(${JSON.stringify(p)})'>✏️ تعديل</button>
+          <button type="button" class="reject-btn" onclick="removeDevProfile('${p.developerName.replace(/'/g, "\\'")}')">🗑 حذف</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function editDevProfile(p) {
+    document.getElementById('devProfileNameInput').value = p.developerName || '';
+    document.getElementById('devProfileOwnerInput').value = p.ownerName || '';
+    document.getElementById('devProfileYearInput').value = p.foundedYear || '';
+    document.getElementById('devProfileLogoInput').value = p.logoUrl || '';
+    document.getElementById('devProfileDescInput').value = p.description || '';
+    document.getElementById('devProfileWorksInput').value = p.previousWorks || '';
+    window.scrollTo(0, 0);
+  }
+  window.editDevProfile = editDevProfile;
+
+  function removeDevProfile(developerName) {
+    if (!adminPin) return;
+    const confirmed = confirm('متأكد إنك عايز تمسح بيانات المطور ده؟');
+    if (!confirmed) return;
+    google.script.run.withSuccessHandler(function(res) {
+      if (!res.success) { showToast(res.message, 'error'); return; }
+      showToast('تم حذف بيانات المطور', 'success');
+      loadDevProfilesList();
+    }).deleteDeveloperProfile(adminPin, developerName);
+  }
+  window.removeDevProfile = removeDevProfile;
+
+  document.getElementById('saveDevProfileBtn').addEventListener('click', function() {
+    if (!adminPin) return;
+    const btn = this;
+    const msg = document.getElementById('saveDevProfileMsg');
+    const developerName = document.getElementById('devProfileNameInput').value.trim();
+    if (!developerName) {
+      msg.style.color = 'var(--error-fg)';
+      msg.textContent = 'لازم تكتب اسم المطور';
+      return;
+    }
+
+    btn.disabled = true; btn.textContent = 'جاري الحفظ...';
+    google.script.run
+      .withSuccessHandler(function(res) {
+        btn.disabled = false; btn.textContent = 'حفظ بيانات المطور';
+        msg.style.color = res.success ? 'var(--success-fg)' : 'var(--error-fg)';
+        msg.textContent = res.message;
+        if (res.success) {
+          document.getElementById('devProfileNameInput').value = '';
+          document.getElementById('devProfileOwnerInput').value = '';
+          document.getElementById('devProfileYearInput').value = '';
+          document.getElementById('devProfileLogoInput').value = '';
+          document.getElementById('devProfileDescInput').value = '';
+          document.getElementById('devProfileWorksInput').value = '';
+          loadDevProfilesList();
+        }
+      })
+      .withFailureHandler(function(err) {
+        btn.disabled = false; btn.textContent = 'حفظ بيانات المطور';
+        msg.style.color = 'var(--error-fg)';
+        msg.textContent = 'حدث خطأ: ' + err.message;
+      })
+      .saveDeveloperProfile(
+        adminPin,
+        developerName,
+        document.getElementById('devProfileOwnerInput').value.trim(),
+        document.getElementById('devProfileYearInput').value.trim(),
+        document.getElementById('devProfileDescInput').value.trim(),
+        document.getElementById('devProfileWorksInput').value.trim(),
+        document.getElementById('devProfileLogoInput').value.trim()
+      );
   });
 </script>
 </body>
