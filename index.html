@@ -923,6 +923,20 @@
   </div>
 </div>
 
+<!-- مودال اختيار الصور للمشاركة -->
+<div class="modal-overlay" id="shareImagesModal">
+  <div class="modal-box" style="max-width:480px;">
+    <div class="modal-header">
+      <div class="modal-title">🖼️ مشاركة نص + صور</div>
+      <button class="modal-close" id="shareImagesCloseBtn">✕</button>
+    </div>
+    <div id="shareImagesContent" style="max-height:55vh; overflow-y:auto;"></div>
+    <button type="button" id="shareImagesConfirmBtn" style="width:100%; margin-top:14px; padding:12px; border:none; border-radius:9px; background:var(--navy); color:#fff; font-weight:700; font-size:14px; cursor:pointer;">
+      📤 مشاركة
+    </button>
+  </div>
+</div>
+
 <!-- مودال بروفايل المطور -->
 <div class="modal-overlay" id="developerProfileModal">
   <div class="modal-box" style="max-width:480px;">
@@ -1343,6 +1357,9 @@
 </div>
 
 <script>
+  // كشف الموبايل - عشان ميزات زي "مشاركة نص+صور" تظهر بس فين شغالة فعليًا
+  const IS_MOBILE_DEVICE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+
   // بيانات المدن والمناطق التابعة لها - مشتركة بين شاشة الإدخال وشاشة البحث
   // تقدر تضيف/تعدّل أي مدينة أو منطقة من هنا وهتنعكس في الصفحتين تلقائيًا
   const CITY_DISTRICTS = {
@@ -2396,6 +2413,10 @@
             <button type="button" class="whatsapp-btn" onclick='shareOnWhatsApp(${JSON.stringify(u)})'><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2Zm5.8 14.03c-.24.68-1.4 1.32-1.93 1.36-.5.05-1.02.24-3.4-.71-2.88-1.15-4.73-4.06-4.87-4.25-.14-.19-1.17-1.56-1.17-2.97s.73-2.11 1-2.4c.24-.27.53-.34.7-.34h.5c.16 0 .38-.03.58.45.24.57.79 1.98.86 2.12.07.14.11.3.02.48-.09.19-.14.3-.28.46-.14.17-.29.37-.42.5-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.16-.19.68-.79.86-1.06.19-.28.37-.23.62-.14.26.09 1.63.77 1.91.91.28.14.47.21.53.33.07.12.07.68-.17 1.36Z"/></svg> WhatsApp</button>
             <button type="button" class="pdf-btn" onclick='downloadUnitPDF(${JSON.stringify(u)}, this)'>📄 PDF</button>
           </div>
+          ${IS_MOBILE_DEVICE ? `
+          <button type="button" onclick='openShareImagesModal(${JSON.stringify(u)})' style="width:100%; margin-top:8px; padding:9px; border:none; border-radius:8px; background:var(--navy); color:#fff; font-weight:700; font-size:12px; cursor:pointer;">
+            🖼️ نص + صور
+          </button>` : ''}
           <button type="button" class="similar-units-btn" onclick='showSimilarUnits(${JSON.stringify(u)})' style="width:100%; margin-top:8px; padding:9px; border:1.5px solid #7c4dff; border-radius:8px; background:#f7f4ff; color:#7c4dff; font-weight:700; font-size:12px; cursor:pointer;">
             🔄 وحدات مشابهة
           </button>
@@ -2448,10 +2469,9 @@
   });
 
   /* ---------- مشاركة بيانات الوحدة عبر واتساب (مع الصور لو الجهاز بيدعم) ---------- */
-  function shareOnWhatsApp(u) {
-    google.script.run.logUnitActivity(u['Unit ID'], u['Project Name'], 'WhatsApp');
+  function buildUnitShareText(u) {
     const hasDiscount = Number(u['Discount Percentage']) > 0;
-    const lines = [
+    return [
       `🏢 ${u['Property Type']}${u['Project Name'] ? ' - ' + u['Project Name'] : ''}`,
       `📍 ${u['City']} - ${u['Area/District']}`,
       `📐 المساحة: ${u['Unit Area (sqm)']} م²`,
@@ -2473,12 +2493,93 @@
       '',
       `رقم الوحدة: ${u['Unit ID']}`
     ].filter(Boolean).join('\n');
+  }
+
+  function shareOnWhatsApp(u) {
+    google.script.run.logUnitActivity(u['Unit ID'], u['Project Name'], 'WhatsApp');
+    const lines = buildUnitShareText(u);
 
     const waDomain = ['h', 't', 't', 'p', 's', ':', '/', '/'].join('') + ['w', 'a', '.', 'm', 'e'].join('');
     const url = waDomain + '/?text=' + encodeURIComponent(lines);
     window.open(url, '_blank');
   }
   window.shareOnWhatsApp = shareOnWhatsApp;
+
+  /* ---------- مشاركة النص + الصور المختارة (Web Share API) ---------- */
+  const shareImagesModal = document.getElementById('shareImagesModal');
+  let shareImagesUnit = null;
+
+  function openShareImagesModal(u) {
+    shareImagesUnit = u;
+    const images = u['Images'] ? u['Images'].split(',').map(s => s.trim()).filter(Boolean) : [];
+    const content = document.getElementById('shareImagesContent');
+
+    if (!images.length) {
+      content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:20px;">الوحدة دي مفيهاش صور مرفقة</div>';
+    } else {
+      content.innerHTML = `
+        <p style="font-size:12px; color:var(--muted); margin-bottom:10px;">اختار الصور اللي عايز تشاركها (تقدر تختار وحدة أو أكتر أو كل الصور):</p>
+        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px;">
+          ${images.map((img, i) => `
+            <label style="position:relative; display:block; cursor:pointer;">
+              <img src="${img}" style="width:100%; height:90px; object-fit:cover; border-radius:8px; border:2px solid var(--border);">
+              <input type="checkbox" class="share-img-checkbox" value="${img}" checked style="position:absolute; top:6px; left:6px; width:18px; height:18px; cursor:pointer;">
+            </label>
+          `).join('')}
+        </div>
+      `;
+    }
+    shareImagesModal.classList.add('open');
+  }
+  window.openShareImagesModal = openShareImagesModal;
+
+  document.getElementById('shareImagesCloseBtn').addEventListener('click', () => shareImagesModal.classList.remove('open'));
+  shareImagesModal.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
+
+  document.getElementById('shareImagesConfirmBtn').addEventListener('click', async function() {
+    if (!shareImagesUnit) return;
+    const btn = this;
+    const selectedUrls = Array.from(document.querySelectorAll('.share-img-checkbox:checked')).map(cb => cb.value);
+
+    if (!navigator.share) {
+      showToast('المشاركة بالصور مش مدعومة على المتصفح/الجهاز ده - جرب من الموبايل', 'error');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '⏳ جاري التجهيز...';
+
+    try {
+      const text = buildUnitShareText(shareImagesUnit);
+      const files = [];
+
+      for (let i = 0; i < selectedUrls.length; i++) {
+        const dataUrl = await fetchImageAsDataUrl(selectedUrls[i]);
+        if (!dataUrl) continue;
+        const res = await fetch(dataUrl);
+        const blob = await res.blob();
+        files.push(new File([blob], 'unit-image-' + (i + 1) + '.jpg', { type: blob.type || 'image/jpeg' }));
+      }
+
+      const shareData = { text: text, title: shareImagesUnit['Project Name'] || 'تفاصيل الوحدة' };
+      if (files.length > 0 && navigator.canShare && navigator.canShare({ files: files })) {
+        shareData.files = files;
+      } else if (files.length > 0) {
+        showToast('⚠️ الجهاز ده مش بيدعم مشاركة الصور، هتتشارك التفاصيل بس', 'error');
+      }
+
+      google.script.run.logUnitActivity(shareImagesUnit['Unit ID'], shareImagesUnit['Project Name'], 'WhatsApp');
+      await navigator.share(shareData);
+      shareImagesModal.classList.remove('open');
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        showToast('حصل خطأ أثناء المشاركة: ' + err.message, 'error');
+      }
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '📤 مشاركة';
+    }
+  });
 
   /* ---------- جلب صورة كـ base64 من السيرفر (لتفادي مشكلة CORS مع Drive) ---------- */
   function fetchImageAsDataUrl(url) {
