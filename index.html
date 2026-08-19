@@ -2541,11 +2541,14 @@
   /* ---------- بروفايل المطور ---------- */
   const developerProfileModal = document.getElementById('developerProfileModal');
 
+  let currentDevProfile = null;
+
   function showDeveloperProfile(developerName) {
     document.getElementById('devProfileTitle').textContent = '🏗 ' + developerName;
     developerProfileModal.classList.add('open');
     const content = document.getElementById('devProfileContent');
     content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:24px;">جاري التحميل...</div>';
+    currentDevProfile = null;
 
     google.script.run
       .withSuccessHandler(function(res) {
@@ -2554,28 +2557,8 @@
           content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:24px; line-height:1.8;">لسه معندناش بيانات مسجلة عن المطور ده.<br>تقدر تضيفها من لوحة التحكم ⚙</div>';
           return;
         }
-        content.innerHTML = `
-          ${res.logoUrl ? `<div style="text-align:center; margin-bottom:14px;"><img src="${res.logoUrl}" style="max-width:140px; max-height:80px; object-fit:contain;"></div>` : ''}
-          <div style="background:#0f2942; border-radius:12px; padding:14px; margin-bottom:12px;">
-            <div style="color:#c9992e; font-size:11px; font-weight:700; margin-bottom:4px;">صاحب الشركة</div>
-            <div style="color:#fff; font-size:14px; font-weight:800;">${res.ownerName || 'غير متاح'}</div>
-          </div>
-          ${res.foundedYear ? `
-          <div style="background:var(--bg); border-radius:10px; padding:12px 14px; margin-bottom:12px;">
-            <div style="color:var(--muted); font-size:11px; font-weight:700; margin-bottom:4px;">سنة التأسيس</div>
-            <div style="color:var(--navy); font-size:14px; font-weight:800;">${res.foundedYear}</div>
-          </div>` : ''}
-          ${res.description ? `
-          <div style="background:var(--bg); border-radius:10px; padding:12px 14px; margin-bottom:12px;">
-            <div style="color:var(--muted); font-size:11px; font-weight:700; margin-bottom:4px;">نبذة عن الشركة</div>
-            <div style="color:var(--text); font-size:13px; line-height:1.8; white-space:pre-wrap;">${res.description}</div>
-          </div>` : ''}
-          ${res.previousWorks ? `
-          <div style="background:var(--bg); border-radius:10px; padding:12px 14px;">
-            <div style="color:var(--muted); font-size:11px; font-weight:700; margin-bottom:4px;">أعمال سابقة</div>
-            <div style="color:var(--text); font-size:13px; line-height:1.8; white-space:pre-wrap;">${res.previousWorks}</div>
-          </div>` : ''}
-        `;
+        currentDevProfile = res;
+        content.innerHTML = buildDevProfileHtml(res, true);
       })
       .withFailureHandler(function() {
         content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:24px;">حصل خطأ في التحميل</div>';
@@ -2583,6 +2566,113 @@
       .getDeveloperProfile(developerName);
   }
   window.showDeveloperProfile = showDeveloperProfile;
+
+  function buildDevProfileHtml(res, includeButtons) {
+    const buttonsHtml = includeButtons ? `
+      <div style="display:flex; gap:8px;">
+        <button type="button" id="devProfileWhatsAppBtn" style="flex:1; padding:11px; border:none; border-radius:9px; background:#4FA579; color:#fff; font-weight:700; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px; height:16px;"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2Zm5.8 14.03c-.24.68-1.4 1.32-1.93 1.36-.5.05-1.02.24-3.4-.71-2.88-1.15-4.73-4.06-4.87-4.25-.14-.19-1.17-1.56-1.17-2.97s.73-2.11 1-2.4c.24-.27.53-.34.7-.34h.5c.16 0 .38-.03.58.45.24.57.79 1.98.86 2.12.07.14.11.3.02.48-.09.19-.14.3-.28.46-.14.17-.29.37-.42.5-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.16-.19.68-.79.86-1.06.19-.28.37-.23.62-.14.26.09 1.63.77 1.91.91.28.14.47.21.53.33.07.12.07.68-.17 1.36Z"/></svg>
+          واتساب
+        </button>
+        <button type="button" id="devProfileExportPdfBtn" style="flex:1; padding:11px; border:none; border-radius:9px; background:var(--navy); color:#fff; font-weight:700; font-size:13px; cursor:pointer;">
+          📄 تصدير PDF
+        </button>
+      </div>` : '';
+
+    return `
+      <div style="background:linear-gradient(135deg, #0f2942 0%, #1a3a5c 100%); border-radius:16px; padding:22px 18px; margin-bottom:16px; text-align:center; position:relative; overflow:hidden;">
+        <div style="position:absolute; top:-30px; left:-30px; width:100px; height:100px; background:rgba(201,153,46,0.12); border-radius:50%;"></div>
+        <div style="position:absolute; bottom:-40px; right:-20px; width:120px; height:120px; background:rgba(201,153,46,0.08); border-radius:50%;"></div>
+        ${res.logoUrl ? `<img src="${res.logoUrl}" style="max-width:130px; max-height:70px; object-fit:contain; margin-bottom:10px; position:relative;">` : ''}
+        <div style="color:#fff; font-size:18px; font-weight:800; position:relative;">${res.developerName}</div>
+        ${res.foundedYear ? `<div style="color:#c9992e; font-size:12px; font-weight:700; margin-top:4px; position:relative;">تأسست عام ${res.foundedYear}</div>` : ''}
+      </div>
+
+      ${res.ownerName ? `
+      <div style="display:flex; align-items:center; gap:12px; background:var(--bg); border-radius:12px; padding:14px 16px; margin-bottom:12px;">
+        <div style="width:38px; height:38px; border-radius:50%; background:#c9992e; color:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">👤</div>
+        <div>
+          <div style="color:var(--muted); font-size:11px; font-weight:700;">صاحب الشركة</div>
+          <div style="color:var(--navy); font-size:14px; font-weight:800;">${res.ownerName}</div>
+        </div>
+      </div>` : ''}
+
+      ${res.description ? `
+      <div style="border-right:3px solid #c9992e; background:var(--bg); border-radius:0 12px 12px 0; padding:14px 16px; margin-bottom:12px;">
+        <div style="color:#c9992e; font-size:12px; font-weight:800; margin-bottom:6px; display:flex; align-items:center; gap:6px;">📋 نبذة عن الشركة</div>
+        <div style="color:var(--text); font-size:13px; line-height:1.9; white-space:pre-wrap;">${res.description}</div>
+      </div>` : ''}
+
+      ${res.previousWorks ? `
+      <div style="border-right:3px solid #0f2942; background:var(--bg); border-radius:0 12px 12px 0; padding:14px 16px; margin-bottom:16px;">
+        <div style="color:var(--navy); font-size:12px; font-weight:800; margin-bottom:6px; display:flex; align-items:center; gap:6px;">🏆 أعمال سابقة</div>
+        <div style="color:var(--text); font-size:13px; line-height:1.9; white-space:pre-wrap;">${res.previousWorks}</div>
+      </div>` : ''}
+
+      ${buttonsHtml}
+    `;
+  }
+
+  document.getElementById('devProfileContent').addEventListener('click', function(e) {
+    if (e.target.closest('#devProfileWhatsAppBtn')) shareDevProfileOnWhatsApp();
+    if (e.target.closest('#devProfileExportPdfBtn')) exportDevProfilePDF();
+  });
+
+  function shareDevProfileOnWhatsApp() {
+    if (!currentDevProfile) return;
+    const p = currentDevProfile;
+    const lines = [
+      `🏗 *${p.developerName}*`,
+      p.foundedYear ? `📅 تأسست عام ${p.foundedYear}` : '',
+      p.ownerName ? `👤 صاحب الشركة: ${p.ownerName}` : '',
+      '',
+      p.description ? `📋 نبذة عن الشركة:\n${p.description}` : '',
+      '',
+      p.previousWorks ? `🏆 أعمال سابقة:\n${p.previousWorks}` : ''
+    ];
+    const text = lines.filter(Boolean).join('\n');
+    window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+  }
+
+  async function exportDevProfilePDF() {
+    if (!currentDevProfile) return;
+    const btn = document.getElementById('devProfileExportPdfBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ جاري التجهيز...';
+
+    try {
+      const pageDiv = document.createElement('div');
+      pageDiv.style.position = 'absolute';
+      pageDiv.style.left = '-9999px';
+      pageDiv.style.top = '0';
+      pageDiv.style.width = '600px';
+      pageDiv.style.fontFamily = "'Segoe UI', Tahoma, Arial, sans-serif";
+      pageDiv.style.direction = 'rtl';
+      pageDiv.style.background = '#ffffff';
+      pageDiv.style.padding = '20px';
+      pageDiv.innerHTML = buildDevProfileHtml(currentDevProfile, false);
+      document.body.appendChild(pageDiv);
+
+      await new Promise(resolve => setTimeout(resolve, 300));
+      const canvas = await html2canvas(pageDiv, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+      document.body.removeChild(pageDiv);
+
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const margin = 10;
+      const imgWidth = pageWidth - margin * 2;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', margin, margin, imgWidth, imgHeight);
+      pdf.save('بروفايل ' + currentDevProfile.developerName + '.pdf');
+      showToast('✅ تم تصدير الملف بنجاح', 'success');
+    } catch (err) {
+      showToast('حصل خطأ أثناء التصدير: ' + err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '📄 تصدير PDF';
+    }
+  }
 
   document.getElementById('devProfileCloseBtn').addEventListener('click', () => developerProfileModal.classList.remove('open'));
   developerProfileModal.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
