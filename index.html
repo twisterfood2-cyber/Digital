@@ -2704,7 +2704,7 @@
       const imgWidth = pageWidth - margin * 2;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', margin, margin, imgWidth, imgHeight);
-      pdf.save('بروفايل ' + res.developerName + '.pdf');
+      pdf.save(res.developerName + ' Profile.pdf');
       showToast('✅ تم تصدير الملف بنجاح', 'success');
     } catch (err) {
       showToast('حصل خطأ أثناء التصدير: ' + err.message, 'error');
