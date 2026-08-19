@@ -2484,6 +2484,7 @@
   /* ---------- توليد بروشور PDF لوحدة واحدة ---------- */
   let pendingPdfUnit = null;
   let pendingPdfBtn = null;
+  let pendingDevProfileExport = false;
   const pdfContactModal = document.getElementById('pdfContactModal');
   const pdfAgentNameInput = document.getElementById('pdfAgentName');
   const pdfAgentPhoneInput = document.getElementById('pdfAgentPhone');
@@ -2636,21 +2637,60 @@
 
   async function exportDevProfilePDF() {
     if (!currentDevProfile) return;
+
+    // نستخدم نفس نافذة بيانات السيلز اللي بتظهر وقت تصدير أي وحدة
+    let agentName = '', agentPhone = '';
+    try {
+      agentName = localStorage.getItem('pdfAgentName') || '';
+      agentPhone = localStorage.getItem('pdfAgentPhone') || '';
+    } catch (e) {}
+
+    pdfAgentNameInput.value = agentName;
+    pdfAgentPhoneInput.value = agentPhone;
+    pendingPdfUnit = null; // مفيش وحدة، إحنا بنصدّر بروفايل مطور
+    pendingDevProfileExport = true;
+    pdfContactModal.classList.add('open');
+  }
+
+  async function generateDevProfilePDF(agentName, agentPhone) {
     const btn = document.getElementById('devProfileExportPdfBtn');
-    btn.disabled = true;
-    btn.textContent = '⏳ جاري التجهيز...';
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ جاري التجهيز...'; }
 
     try {
+      const res = currentDevProfile;
       const pageDiv = document.createElement('div');
-      pageDiv.style.position = 'absolute';
+      pageDiv.style.position = 'fixed';
       pageDiv.style.left = '-9999px';
       pageDiv.style.top = '0';
-      pageDiv.style.width = '600px';
+      pageDiv.style.width = '480px';
       pageDiv.style.fontFamily = "'Segoe UI', Tahoma, Arial, sans-serif";
       pageDiv.style.direction = 'rtl';
       pageDiv.style.background = '#ffffff';
-      pageDiv.style.padding = '20px';
-      pageDiv.innerHTML = buildDevProfileHtml(currentDevProfile, false);
+      pageDiv.style.display = 'flex';
+      pageDiv.style.flexDirection = 'column';
+      pageDiv.style.minHeight = '600px';
+
+      pageDiv.innerHTML = `
+        <div style="background:#0f2942;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="color:#ecd08c;font-size:15px;font-weight:700;">Digital Real Estate</div>
+            <div style="color:#9fb0c2;font-size:11px;margin-top:2px;">بوابتك الآمنة إلى عالم الاستثمار العقاري</div>
+          </div>
+          <div style="color:#fff;font-size:11px;background:rgba(255,255,255,0.15);padding:4px 10px;border-radius:6px;">بروفايل مطور</div>
+        </div>
+
+        <div style="padding:20px; flex:1;">
+          ${buildDevProfileHtml(res, false)}
+        </div>
+
+        <div style="margin-top:auto;background:#0f2942;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+          <span style="font-size:12px;color:#fff;font-weight:700;">${agentName || 'Digital Real Estate Team'}${agentPhone ? ' — ' : ''}<span style="color:#ecd08c;">${agentPhone || ''}</span></span>
+          <span style="font-size:9px;color:#9fb0c2;white-space:nowrap;">Contact Info</span>
+        </div>
+        <div style="padding:10px 20px;text-align:center;font-size:10px;color:#9aa4ae;">
+          تم إصدار هذا الملف بتاريخ ${new Date().toLocaleDateString('ar-EG')}
+        </div>
+      `;
       document.body.appendChild(pageDiv);
 
       await new Promise(resolve => setTimeout(resolve, 300));
@@ -2664,13 +2704,12 @@
       const imgWidth = pageWidth - margin * 2;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', margin, margin, imgWidth, imgHeight);
-      pdf.save('بروفايل ' + currentDevProfile.developerName + '.pdf');
+      pdf.save('بروفايل ' + res.developerName + '.pdf');
       showToast('✅ تم تصدير الملف بنجاح', 'success');
     } catch (err) {
       showToast('حصل خطأ أثناء التصدير: ' + err.message, 'error');
     } finally {
-      btn.disabled = false;
-      btn.textContent = '📄 تصدير PDF';
+      if (btn) { btn.disabled = false; btn.textContent = '📄 تصدير PDF'; }
     }
   }
 
@@ -2707,6 +2746,7 @@
     pdfContactModal.classList.remove('open');
     pendingPdfUnit = null;
     pendingPdfBtn = null;
+    pendingDevProfileExport = false;
   }
   document.getElementById('pdfContactCloseBtn').addEventListener('click', closePdfContactModal);
   pdfContactModal.addEventListener('click', function(e) {
@@ -2723,8 +2763,11 @@
 
     const u = pendingPdfUnit;
     const btnEl = pendingPdfBtn;
+    const isDevExport = pendingDevProfileExport;
     closePdfContactModal();
-    if (u && btnEl) {
+    if (isDevExport) {
+      await generateDevProfilePDF(agentName, agentPhone);
+    } else if (u && btnEl) {
       await generateUnitPDF(u, btnEl, agentName, agentPhone);
     }
   });
