@@ -2509,8 +2509,11 @@
   const shareImagesModal = document.getElementById('shareImagesModal');
   let shareImagesUnit = null;
 
+  let shareImagesCache = {}; // url -> dataUrl (بيتجهزوا مقدمًا عشان لحظة المشاركة تبقى فورية)
+
   function openShareImagesModal(u) {
     shareImagesUnit = u;
+    shareImagesCache = {};
     const images = u['Images'] ? u['Images'].split(',').map(s => s.trim()).filter(Boolean) : [];
     const content = document.getElementById('shareImagesContent');
 
@@ -2527,7 +2530,22 @@
             </label>
           `).join('')}
         </div>
+        <div id="shareImagesPrepStatus" style="font-size:11px; color:var(--muted); margin-top:10px; text-align:center;">⏳ جاري تجهيز الصور في الخلفية...</div>
       `;
+
+      // نجهّز كل الصور مقدمًا في الخلفية وانت لسه بتختار، عشان لحظة "مشاركة" تبقى فورية
+      // (متصفحات الموبايل بترفض المشاركة لو حصل تأخير حتى بسيط بعد الضغط على الزرار)
+      let readyCount = 0;
+      images.forEach(imgUrl => {
+        fetchImageAsDataUrl(imgUrl).then(dataUrl => {
+          shareImagesCache[imgUrl] = dataUrl;
+          readyCount++;
+          const statusEl = document.getElementById('shareImagesPrepStatus');
+          if (statusEl) {
+            statusEl.textContent = readyCount === images.length ? '✅ الصور جاهزة للمشاركة' : `⏳ جاري تجهيز الصور (${readyCount}/${images.length})...`;
+          }
+        });
+      });
     }
     shareImagesModal.classList.add('open');
   }
@@ -2546,17 +2564,24 @@
       return;
     }
 
-    btn.disabled = true;
-    btn.textContent = '⏳ جاري التجهيز...';
+    // لو فيه صور لسه بتتجهز في الخلفية، ننتظرها هنا (المفروض تكون خلصت خلاص وانت بتختار)
+    const notReady = selectedUrls.filter(url => !shareImagesCache[url]);
+    if (notReady.length > 0) {
+      btn.disabled = true;
+      btn.textContent = '⏳ استنى ثانية، الصور لسه بتتجهز...';
+      await Promise.all(notReady.map(url => fetchImageAsDataUrl(url).then(dataUrl => { shareImagesCache[url] = dataUrl; })));
+    }
 
     try {
+      // من هنا لحد نداء navigator.share() لازم يكون سريع جدًا (من غير أي انتظار شبكة)
+      // عشان المتصفح يفضل "فاكر" إن ده حصل بسبب ضغطة المستخدم مباشرة
       const text = buildUnitShareText(shareImagesUnit);
       const files = [];
 
       for (let i = 0; i < selectedUrls.length; i++) {
-        const dataUrl = await fetchImageAsDataUrl(selectedUrls[i]);
+        const dataUrl = shareImagesCache[selectedUrls[i]];
         if (!dataUrl) continue;
-        const res = await fetch(dataUrl);
+        const res = await fetch(dataUrl); // ده تحويل محلي بس (data: URI)، مش طلب شبكة حقيقي
         const blob = await res.blob();
         files.push(new File([blob], 'unit-image-' + (i + 1) + '.jpg', { type: blob.type || 'image/jpeg' }));
       }
