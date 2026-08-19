@@ -2403,6 +2403,7 @@
 
   /* ---------- مشاركة بيانات الوحدة عبر واتساب (مع الصور لو الجهاز بيدعم) ---------- */
   function shareOnWhatsApp(u) {
+    google.script.run.logUnitActivity(u['Unit ID'], u['Project Name'], 'WhatsApp');
     const hasDiscount = Number(u['Discount Percentage']) > 0;
     const lines = [
       `🏢 ${u['Property Type']}${u['Project Name'] ? ' - ' + u['Project Name'] : ''}`,
@@ -2458,6 +2459,7 @@
       pdfAgentPhoneInput.value = localStorage.getItem('pdfAgentPhone') || '';
     } catch (e) {}
     pdfContactModal.classList.add('open');
+    google.script.run.logUnitActivity(u['Unit ID'], u['Project Name'], 'PDF');
   }
   window.downloadUnitPDF = downloadUnitPDF;
 
