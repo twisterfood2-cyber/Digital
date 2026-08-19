@@ -809,11 +809,6 @@
         <button type="button" id="calcAiPastedImageRemove" style="position:absolute; top:-8px; left:-8px; width:22px; height:22px; border-radius:50%; background:var(--error-fg); color:#fff; border:none; cursor:pointer; font-size:12px;">✕</button>
       </div>
       <input type="file" id="calcAiFileInput" accept="image/*,application/pdf" style="margin-top:8px; width:100%; font-size:12px;">
-      <div style="display:flex; align-items:center; gap:8px; margin-top:8px; font-size:11px;">
-        <span style="color:var(--muted); font-weight:600;">دقة الاستخراج:</span>
-        <button type="button" id="calcAiModelFastBtn" style="flex:1; padding:7px; border:1.5px solid #7c4dff; border-radius:8px; background:#7c4dff; color:#fff; font-weight:700; cursor:pointer; font-size:11px;">⚡ سريع</button>
-        <button type="button" id="calcAiModelAccurateBtn" style="flex:1; padding:7px; border:1.5px solid #7c4dff; border-radius:8px; background:#fff; color:#7c4dff; font-weight:700; cursor:pointer; font-size:11px;">🎯 دقيق</button>
-      </div>
       <button type="button" id="calcAiExtractBtn" style="width:100%; margin-top:10px; padding:11px; border:none; border-radius:9px; background:#7c4dff; color:#fff; font-weight:700; font-size:13px; cursor:pointer;">
         ✨ استخرج البيانات وابدأ التعبئة
       </button>
@@ -1048,6 +1043,19 @@
     <div class="modal-header">
       <div class="modal-title">🏗 إدارة بيانات المطورين</div>
       <button class="modal-close" id="devProfilesModalCloseBtn">✕</button>
+    </div>
+
+    <div style="background:#f7f4ff; border:1.5px solid #7c4dff; border-radius:12px; padding:14px; margin-bottom:16px;">
+      <div class="section-title" style="color:#7c4dff; margin-bottom:6px;">🤖 تعبئة تلقائية بالذكاء الاصطناعي</div>
+      <p style="font-size:12px; color:var(--muted); margin:0 0 10px; line-height:1.7;">
+        الصق نص عن الشركة، أو ارفع ملف بروشور/PDF، والذكاء الاصطناعي هيملى البيانات تلقائيًا تحت.
+      </p>
+      <textarea id="devAiPasteText" placeholder="الصق نص عن الشركة هنا (اختياري)..." style="min-height:70px; width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit; font-size:13px;"></textarea>
+      <input type="file" id="devAiFileInput" accept="image/*,application/pdf" style="margin-top:8px; width:100%; font-size:12px;">
+      <button type="button" id="devAiExtractBtn" style="width:100%; margin-top:10px; padding:10px; border:none; border-radius:9px; background:#7c4dff; color:#fff; font-weight:700; font-size:13px; cursor:pointer;">
+        ✨ استخرج البيانات وابدأ التعبئة
+      </button>
+      <div id="devAiExtractMsg" style="font-size:12px; margin-top:8px; display:none;"></div>
     </div>
 
     <div class="section-title">إضافة / تعديل بيانات مطور</div>
@@ -1677,32 +1685,6 @@
     document.getElementById('calcAiPastedImagePreview').style.display = 'none';
   });
 
-  let calcAiModelPreference = 'fast';
-  try { calcAiModelPreference = localStorage.getItem('aiModelPreference') || 'fast'; } catch (e) {}
-  const calcAiModelFastBtn = document.getElementById('calcAiModelFastBtn');
-  const calcAiModelAccurateBtn = document.getElementById('calcAiModelAccurateBtn');
-
-  function updateCalcAiModelButtons() {
-    if (calcAiModelPreference === 'accurate') {
-      calcAiModelAccurateBtn.style.background = '#7c4dff'; calcAiModelAccurateBtn.style.color = '#fff';
-      calcAiModelFastBtn.style.background = '#fff'; calcAiModelFastBtn.style.color = '#7c4dff';
-    } else {
-      calcAiModelFastBtn.style.background = '#7c4dff'; calcAiModelFastBtn.style.color = '#fff';
-      calcAiModelAccurateBtn.style.background = '#fff'; calcAiModelAccurateBtn.style.color = '#7c4dff';
-    }
-  }
-  updateCalcAiModelButtons();
-  calcAiModelFastBtn.addEventListener('click', function() {
-    calcAiModelPreference = 'fast';
-    try { localStorage.setItem('aiModelPreference', 'fast'); } catch (e) {}
-    updateCalcAiModelButtons();
-  });
-  calcAiModelAccurateBtn.addEventListener('click', function() {
-    calcAiModelPreference = 'accurate';
-    try { localStorage.setItem('aiModelPreference', 'accurate'); } catch (e) {}
-    updateCalcAiModelButtons();
-  });
-
   document.getElementById('calcAiExtractBtn').addEventListener('click', function() {
     const btn = this;
     const msg = document.getElementById('calcAiExtractMsg');
@@ -1744,7 +1726,7 @@
           msg.style.color = 'var(--error-fg)';
           msg.textContent = 'حدث خطأ: ' + err.message;
         })
-        .extractUnitDataWithAI(text, fileBase64, mimeType, calcAiModelPreference);
+        .extractUnitDataWithAI(text, fileBase64, mimeType);
     }
 
     if (file) {
@@ -2973,9 +2955,6 @@
       return;
     }
 
-    let modelPref = 'fast';
-    try { modelPref = localStorage.getItem('aiModelPreference') || 'fast'; } catch (e) {}
-
     btn.disabled = true;
     btn.textContent = '⏳ جاري الفهم...';
     msg.style.display = 'none';
@@ -3003,7 +2982,7 @@
         msg.style.color = 'var(--error-fg)';
         msg.textContent = 'حدث خطأ: ' + err.message;
       })
-      .parseNaturalLanguageSearch(query, modelPref);
+      .parseNaturalLanguageSearch(query);
   });
 
   document.getElementById('nlSearchInput').addEventListener('keydown', function(e) {
@@ -3906,6 +3885,68 @@
   });
   document.getElementById('devProfilesModalCloseBtn').addEventListener('click', () => devProfilesModal.classList.remove('open'));
   devProfilesModal.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
+
+  /* ---------- استخراج بيانات المطور بالذكاء الاصطناعي ---------- */
+  document.getElementById('devAiExtractBtn').addEventListener('click', function() {
+    const btn = this;
+    const msg = document.getElementById('devAiExtractMsg');
+    const text = document.getElementById('devAiPasteText').value.trim();
+    const fileInput = document.getElementById('devAiFileInput');
+    const file = fileInput.files[0];
+
+    if (!text && !file) {
+      msg.style.display = 'block';
+      msg.style.color = 'var(--error-fg)';
+      msg.textContent = 'الصق نص أو ارفع ملف الأول';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '⏳ جاري الاستخراج...';
+    msg.style.display = 'none';
+
+    function callExtract(fileBase64, mimeType) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          btn.disabled = false;
+          btn.textContent = '✨ استخرج البيانات وابدأ التعبئة';
+          if (!res.success) {
+            msg.style.display = 'block';
+            msg.style.color = 'var(--error-fg)';
+            msg.textContent = res.message;
+            return;
+          }
+          const d = res.data;
+          if (d.developerName) document.getElementById('devProfileNameInput').value = d.developerName;
+          if (d.ownerName) document.getElementById('devProfileOwnerInput').value = d.ownerName;
+          if (d.foundedYear) document.getElementById('devProfileYearInput').value = d.foundedYear;
+          if (d.description) document.getElementById('devProfileDescInput').value = d.description;
+          if (d.previousWorks) document.getElementById('devProfileWorksInput').value = d.previousWorks;
+          msg.style.display = 'block';
+          msg.style.color = 'var(--success-fg)';
+          msg.textContent = '✅ تم استخراج البيانات - راجعها قبل الحفظ';
+        })
+        .withFailureHandler(function(err) {
+          btn.disabled = false;
+          btn.textContent = '✨ استخرج البيانات وابدأ التعبئة';
+          msg.style.display = 'block';
+          msg.style.color = 'var(--error-fg)';
+          msg.textContent = 'حدث خطأ: ' + err.message;
+        })
+        .extractDeveloperProfileWithAI(text, fileBase64, mimeType);
+    }
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function() {
+        const base64Data = reader.result.split(',')[1];
+        callExtract(base64Data, file.type);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      callExtract(null, null);
+    }
+  });
 
   function loadDevProfilesList() {
     const content = document.getElementById('devProfilesListContent');
