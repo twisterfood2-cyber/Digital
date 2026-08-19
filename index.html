@@ -1083,7 +1083,10 @@
     <label style="margin-top:10px; display:block;">أعمال سابقة</label>
     <textarea id="devProfileWorksInput" placeholder="أهم المشاريع السابقة للشركة..." style="min-height:70px; width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit; font-size:13px;"></textarea>
 
-    <button type="button" id="saveDevProfileBtn" style="width:100%; margin-top:12px; padding:11px; border:none; border-radius:9px; background:#7c4dff; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">حفظ بيانات المطور</button>
+    <div style="display:flex; gap:8px; margin-top:12px;">
+      <button type="button" id="saveDevProfileBtn" style="flex:2; padding:11px; border:none; border-radius:9px; background:#7c4dff; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">حفظ بيانات المطور</button>
+      <button type="button" id="clearDevProfileFormBtn" style="flex:1; padding:11px; border:1.5px solid var(--border); border-radius:9px; background:#fff; color:var(--muted); font-weight:700; font-size:13px; cursor:pointer;">🗑 تفريغ</button>
+    </div>
     <div id="saveDevProfileMsg" style="font-size:12px; margin-top:8px;"></div>
 
     <div class="section-title">المطورين المسجّلين حاليًا</div>
@@ -4020,6 +4023,22 @@
   devProfilesModal.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
 
   /* ---------- استخراج بيانات المطور بالذكاء الاصطناعي ---------- */
+  document.getElementById('clearDevProfileFormBtn').addEventListener('click', function() {
+    // الفورم اليدوي
+    document.getElementById('devProfileNameInput').value = '';
+    document.getElementById('devProfileOwnerInput').value = '';
+    document.getElementById('devProfileYearInput').value = '';
+    document.getElementById('devProfileLogoInput').value = '';
+    document.getElementById('devProfileDescInput').value = '';
+    document.getElementById('devProfileWorksInput').value = '';
+    document.getElementById('saveDevProfileMsg').textContent = '';
+
+    // خانات الذكاء الاصطناعي
+    document.getElementById('devAiPasteText').value = '';
+    document.getElementById('devAiFileInput').value = '';
+    document.getElementById('devAiExtractMsg').style.display = 'none';
+  });
+
   document.getElementById('devAiExtractBtn').addEventListener('click', function() {
     const btn = this;
     const msg = document.getElementById('devAiExtractMsg');
