@@ -189,7 +189,7 @@
     /* صندوق عرض الصور المكبر */
     .lightbox-overlay {
       display: none; position: fixed; inset: 0; background: rgba(8,15,20,0.9);
-      z-index: 1000; align-items: center; justify-content: center; padding: 20px;
+      z-index: 1700; align-items: center; justify-content: center; padding: 20px;
     }
     .lightbox-overlay.open { display: flex; }
     .lightbox-overlay img { max-width: 90vw; max-height: 80vh; border-radius: 10px; }
@@ -512,7 +512,7 @@
     /* Modal */
     .modal-overlay {
       display: none; position: fixed; inset: 0; background: rgba(10,20,30,0.55);
-      z-index: 999; align-items: flex-start; justify-content: center; padding: 40px 16px; overflow-y: auto;
+      z-index: 1600; align-items: flex-start; justify-content: center; padding: 40px 16px; overflow-y: auto;
     }
     .modal-overlay.open { display: flex; }
     .modal-box {
@@ -648,16 +648,16 @@
     <button type="button" class="top-action-btn top-action-add" id="addUnitFabBtn">➕ Add Unit</button>
   </div>
 
-<div style="background:#f7f4ff; border:1.5px solid #7c4dff; border-radius:14px; padding:16px; margin-bottom:16px;">
+<div style="background:var(--bg); border:1.5px solid var(--navy); border-radius:14px; padding:16px; margin-bottom:16px;">
   <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-    <span style="font-size:14px; font-weight:800; color:#7c4dff;">🤖 بحث ذكي بلغة طبيعية</span>
+    <span style="font-size:14px; font-weight:800; color:var(--navy);">🤖 بحث ذكي بلغة طبيعية</span>
   </div>
   <p style="font-size:12px; color:var(--muted); margin:0 0 10px; line-height:1.7;">
     اكتب طلبك بشكل عادي، مثال: "شقق في التجمع تحت 4 مليون بمقدم أقل من 10%"
   </p>
   <div style="display:flex; gap:8px;">
     <input type="text" id="nlSearchInput" placeholder="اكتب طلبك هنا..." style="flex:1; padding:11px 14px; border:1.5px solid var(--border); border-radius:8px; font-size:14px;">
-    <button type="button" id="nlSearchBtn" style="padding:11px 20px; border:none; border-radius:8px; background:#7c4dff; color:#fff; font-weight:700; font-size:13px; cursor:pointer; white-space:nowrap;">🔍 بحث</button>
+    <button type="button" id="nlSearchBtn" style="padding:11px 20px; border:none; border-radius:8px; background:var(--navy); color:#fff; font-weight:700; font-size:13px; cursor:pointer; white-space:nowrap;">🔍 بحث</button>
   </div>
   <div id="nlSearchMsg" style="font-size:12px; margin-top:8px; display:none;"></div>
 </div>
@@ -1355,8 +1355,8 @@
   // كشف الموبايل - عشان ميزات زي "مشاركة نص+صور" تظهر بس فين شغالة فعليًا
   const IS_MOBILE_DEVICE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
 
-  // زرار الرجوع لأعلى الصفحة - موبايل بس، وبيظهر لما تنزل تحت شوية
-  if (IS_MOBILE_DEVICE) {
+  // زرار الرجوع لأعلى الصفحة - على كل الأجهزة، بيظهر لما تنزل تحت شوية
+  (function() {
     const scrollTopBtn = document.getElementById('scrollTopBtn');
     window.addEventListener('scroll', function() {
       if (window.scrollY > 400) {
@@ -1368,7 +1368,7 @@
     scrollTopBtn.addEventListener('click', function() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
-  }
+  })();
 
   // تصغير مقاس صور جوجل درايف لعرضها كصورة كارت صغيرة (بدل تحميل الحجم الكامل 1000px
   // لصورة هتتعرض في مساحة صغيرة جدًا - ده أكبر سبب لبطء ظهور الصور على الموبايل)
