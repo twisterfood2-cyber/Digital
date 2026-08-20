@@ -3640,6 +3640,26 @@
   });
 
   function openEditModal(unitId) {
+    // لو كلمة السر متحفوظة من قبل في الجهاز، نستخدمها مباشرة من غير ما نطلبها تاني
+    let savedPin = '';
+    try { savedPin = localStorage.getItem('adminPin') || ''; } catch (e) {}
+
+    if (savedPin) {
+      google.script.run.withSuccessHandler(function(isValid) {
+        if (isValid) {
+          verifiedPin = savedPin;
+          loadUnitIntoEditForm(unitId);
+        } else {
+          try { localStorage.removeItem('adminPin'); } catch (e) {}
+          askForEditPin(unitId);
+        }
+      }).verifyAdminPin(savedPin);
+      return;
+    }
+    askForEditPin(unitId);
+  }
+
+  function askForEditPin(unitId) {
     const pin = prompt("أدخل كلمة سر التعديل:");
     if (pin === null) return; // المستخدم ضغط إلغاء
     if (pin.trim() === '') { alert('لازم تدخل كلمة السر'); return; }
@@ -3649,6 +3669,7 @@
         showToast('كلمة السر غير صحيحة - غير مصرح لك بالتعديل', 'error');
         return;
       }
+      try { localStorage.setItem('adminPin', pin); } catch (e) {}
       verifiedPin = pin;
       loadUnitIntoEditForm(unitId);
     }).verifyAdminPin(pin);
