@@ -369,20 +369,19 @@
     /* زرار لوحة التحكم - صغير في الركن، مالوش شكل واضح كتير عشان مش لكل حد */
     .top-action-btn {
       border: none;
-      border-radius: 10px;
-      padding: 13px 10px;
-      font-size: 13px;
-      font-weight: 700;
+      border-radius: 12px;
+      padding: 18px 12px;
+      font-size: 15px;
+      font-weight: 800;
       cursor: pointer;
-      color: #fff;
+      background: #ffffff;
+      color: var(--navy);
       transition: transform .15s, box-shadow .15s;
-      box-shadow: 0 3px 10px rgba(15,41,66,0.15);
+      box-shadow: 0 6px 16px rgba(15,41,66,0.16), 0 2px 4px rgba(15,41,66,0.08);
+      border-bottom: 3px solid var(--gold);
     }
-    .top-action-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(15,41,66,0.22); }
-    .top-action-admin { background: var(--navy); }
-    .top-action-calc { background: var(--gold); }
-    .top-action-price { background: var(--navy); }
-    .top-action-add { background: var(--gold); }
+    .top-action-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 22px rgba(15,41,66,0.22), 0 3px 6px rgba(15,41,66,0.1); }
+    .top-action-btn:active { transform: translateY(-1px); }
 
     .price-stats-search {
       width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px;
