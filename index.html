@@ -3990,16 +3990,41 @@
 
   adminFab.addEventListener('click', function() {
     if (adminPanel.classList.contains('open')) { closeAdminPanel(); return; }
+
+    // لو كلمة السر متحفوظة من قبل في الجهاز، نتحقق منها تلقائيًا من غير ما نطلبها تاني
+    let savedPin = '';
+    try { savedPin = localStorage.getItem('adminPin') || ''; } catch (e) {}
+
+    if (savedPin) {
+      google.script.run.withSuccessHandler(function(isValid) {
+        if (isValid) {
+          openAdminPanelWithPin(savedPin);
+        } else {
+          try { localStorage.removeItem('adminPin'); } catch (e) {}
+          askForAdminPin();
+        }
+      }).verifyAdminPin(savedPin);
+      return;
+    }
+    askForAdminPin();
+  });
+
+  function askForAdminPin() {
     const pin = prompt('كلمة سر لوحة التحكم:');
     if (pin === null) return;
     google.script.run.withSuccessHandler(function(isValid) {
       if (!isValid) { alert('كلمة السر غير صحيحة'); return; }
-      adminPin = pin;
-      adminPanel.classList.add('open');
-      refreshLiveCount();
-      liveCountTimer = setInterval(refreshLiveCount, 10000);
+      try { localStorage.setItem('adminPin', pin); } catch (e) {}
+      openAdminPanelWithPin(pin);
     }).verifyAdminPin(pin);
-  });
+  }
+
+  function openAdminPanelWithPin(pin) {
+    adminPin = pin;
+    adminPanel.classList.add('open');
+    refreshLiveCount();
+    liveCountTimer = setInterval(refreshLiveCount, 10000);
+  }
 
   function closeAdminPanel() {
     adminPanel.classList.remove('open');
