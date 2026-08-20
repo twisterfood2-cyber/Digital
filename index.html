@@ -312,6 +312,28 @@
     .toast-info { background: var(--navy); }
 
     /* شريط المقارنة العائم */
+    #scrollTopBtn {
+      position: fixed;
+      bottom: 90px;
+      left: 16px;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: none;
+      background: var(--navy);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(15,41,66,0.35);
+      z-index: 950;
+      display: none;
+      opacity: 0.9;
+      transition: opacity .15s, transform .15s;
+    }
+    #scrollTopBtn:hover { opacity: 1; transform: translateY(-2px); }
+    #scrollTopBtn.show { display: block; }
+
     .compare-bar {
       position: fixed; bottom: 0; left: 0; right: 0; z-index: 900;
       background: var(--navy); color: #fff; padding: 14px 24px;
@@ -745,6 +767,8 @@
 <div id="toastContainer" class="toast-container"></div>
 
 <!-- شريط المقارنة العائم -->
+<button type="button" id="scrollTopBtn" title="ارجع لأعلى">⬆</button>
+
 <div class="compare-bar" id="compareBar">
   <span>📊 هتقارن <b id="compareCount">0</b> وحدات</span>
   <button type="button" id="compareGoBtn" disabled>عرض المقارنة</button>
@@ -1330,6 +1354,21 @@
 <script>
   // كشف الموبايل - عشان ميزات زي "مشاركة نص+صور" تظهر بس فين شغالة فعليًا
   const IS_MOBILE_DEVICE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+
+  // زرار الرجوع لأعلى الصفحة - موبايل بس، وبيظهر لما تنزل تحت شوية
+  if (IS_MOBILE_DEVICE) {
+    const scrollTopBtn = document.getElementById('scrollTopBtn');
+    window.addEventListener('scroll', function() {
+      if (window.scrollY > 400) {
+        scrollTopBtn.classList.add('show');
+      } else {
+        scrollTopBtn.classList.remove('show');
+      }
+    });
+    scrollTopBtn.addEventListener('click', function() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
 
   // تصغير مقاس صور جوجل درايف لعرضها كصورة كارت صغيرة (بدل تحميل الحجم الكامل 1000px
   // لصورة هتتعرض في مساحة صغيرة جدًا - ده أكبر سبب لبطء ظهور الصور على الموبايل)
