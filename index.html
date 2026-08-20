@@ -367,59 +367,23 @@
     }
 
     /* زرار لوحة التحكم - صغير في الركن، مالوش شكل واضح كتير عشان مش لكل حد */
-    .fab-stack {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      z-index: 500;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      padding: 10px;
-      background: #ffffff;
-      border-radius: 22px;
-      box-shadow: 0 8px 26px rgba(15,41,66,0.18), 0 2px 8px rgba(15,41,66,0.08);
-      border: 1px solid rgba(15,41,66,0.06);
-    }
-    .fab-stack button {
-      position: static;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
+    .top-action-btn {
       border: none;
-      font-size: 18px;
+      border-radius: 10px;
+      padding: 13px 10px;
+      font-size: 13px;
+      font-weight: 700;
       cursor: pointer;
-      transition: opacity .15s, transform .15s;
-      flex-shrink: 0;
-    }
-    .admin-fab {
-      background: var(--navy);
       color: #fff;
-      opacity: 0.65;
+      transition: transform .15s, box-shadow .15s;
+      box-shadow: 0 3px 10px rgba(15,41,66,0.15);
     }
-    .admin-fab:hover { opacity: 1; }
+    .top-action-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(15,41,66,0.22); }
+    .top-action-admin { background: var(--navy); }
+    .top-action-calc { background: var(--gold); }
+    .top-action-price { background: var(--navy); }
+    .top-action-add { background: var(--gold); }
 
-    .calc-fab {
-      background: var(--gold);
-      color: #fff;
-      opacity: 0.95;
-    }
-    .calc-fab:hover { opacity: 1; transform: scale(1.06); }
-
-    .price-info-fab {
-      background: var(--navy);
-      color: #fff;
-      opacity: 0.95;
-    }
-    .price-info-fab:hover { opacity: 1; transform: scale(1.06); }
-    .add-unit-fab {
-      background: var(--gold);
-      color: #fff;
-      font-size: 20px;
-      opacity: 0.95;
-    }
-    .add-unit-fab:hover { opacity: 1; transform: scale(1.06); }
     .price-stats-search {
       width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px;
       font-size: 14px; margin-bottom: 14px;
@@ -428,20 +392,26 @@
     /* لوحة التحكم */
     .admin-panel {
       position: fixed;
-      bottom: 240px;
-      left: 20px;
-      width: 320px;
-      max-height: 80vh;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 92%;
+      max-width: 380px;
+      max-height: 82vh;
       overflow-y: auto;
       background: #fff;
       border-radius: 14px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
       padding: 18px;
-      z-index: 500;
+      z-index: 1500;
       display: none;
       border-top: 4px solid var(--gold);
     }
     .admin-panel.open { display: block; }
+    .admin-panel-overlay {
+      position: fixed; inset: 0; background: rgba(10,20,30,0.5); z-index: 1499; display: none;
+    }
+    .admin-panel-overlay.open { display: block; }
     .access-req-item {
       border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; margin-bottom: 6px;
     }
@@ -648,6 +618,13 @@
     <img id="coverImg" src="" alt="صورة الغلاف">
   </div>
   <h1>🔍 Search for units at Digital Real Estate</h1>
+
+  <div id="topActionBar" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-bottom:16px;">
+    <button type="button" class="top-action-btn top-action-admin" id="adminFab">⚙ Admin Panel</button>
+    <button type="button" class="top-action-btn top-action-calc" id="calcFabBtn">🧮 Calculator</button>
+    <button type="button" class="top-action-btn top-action-price" id="priceInfoFabBtn">📊 Price/m²</button>
+    <button type="button" class="top-action-btn top-action-add" id="addUnitFabBtn">➕ Add Unit</button>
+  </div>
 
 <div style="background:#f7f4ff; border:1.5px solid #7c4dff; border-radius:14px; padding:16px; margin-bottom:16px;">
   <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
@@ -996,13 +973,7 @@
   </div>
 </div>
 
-<!-- مستطيل الأزرار العائمة - مخفي عن باقي المستخدمين، بعض الأزرار محمية بكلمة سر -->
-<div class="fab-stack">
-  <button class="admin-fab" id="adminFab" title="لوحة التحكم">⚙</button>
-  <button class="calc-fab" id="calcFabBtn" title="حاسبة السعر والتقسيط">🧮</button>
-  <button class="price-info-fab" id="priceInfoFabBtn" title="متوسط سعر المتر لكل منطقة">📊</button>
-  <button class="add-unit-fab" id="addUnitFabBtn" title="إضافة وحدة جديدة">➕</button>
-</div>
+<div class="admin-panel-overlay" id="adminPanelOverlay"></div>
 <div class="admin-panel" id="adminPanel">
   <button class="close-panel" id="adminPanelClose">✕</button>
   <h3>لوحة التحكم</h3>
@@ -4043,15 +4014,18 @@
   function openAdminPanelWithPin(pin) {
     adminPin = pin;
     adminPanel.classList.add('open');
+    document.getElementById('adminPanelOverlay').classList.add('open');
     refreshLiveCount();
     liveCountTimer = setInterval(refreshLiveCount, 10000);
   }
 
   function closeAdminPanel() {
     adminPanel.classList.remove('open');
+    document.getElementById('adminPanelOverlay').classList.remove('open');
     if (liveCountTimer) { clearInterval(liveCountTimer); liveCountTimer = null; }
   }
   document.getElementById('adminPanelClose').addEventListener('click', closeAdminPanel);
+  document.getElementById('adminPanelOverlay').addEventListener('click', closeAdminPanel);
 
   function refreshLiveCount() {
     if (!adminPin) return;
