@@ -695,6 +695,12 @@
     <button type="button" class="top-action-btn top-action-calc" id="calcFabBtn">🧮 Your Quote</button>
     <button type="button" class="top-action-btn top-action-price" id="priceInfoFabBtn">📊 Price/m²</button>
     <button type="button" class="top-action-btn top-action-add" id="addUnitFabBtn">➕ Add Unit</button>
+    <button type="button" class="top-action-btn" id="resaleModeBtn">🏘 Resale Units</button>
+  </div>
+
+  <div id="resaleModeBanner" style="display:none; align-items:center; justify-content:space-between; gap:10px; background:#fdf7ea; border:1.5px solid var(--gold); border-radius:12px; padding:12px 16px; margin-bottom:16px;">
+    <span style="font-size:13px; font-weight:800; color:#6b5416;">🏘 إنت دلوقتي بتشوف وحدات الريسيل بس</span>
+    <button type="button" id="exitResaleModeBtn" style="padding:8px 14px; border:none; border-radius:8px; background:var(--navy); color:#fff; font-weight:700; font-size:12px; cursor:pointer; white-space:nowrap;">الرجوع للوحدات الأساسية</button>
   </div>
 
 <div style="background:var(--bg); border:1.5px solid var(--navy); border-radius:14px; padding:16px; margin-bottom:16px;">
@@ -1386,6 +1392,51 @@
         </div>
       </div>
 
+      <div class="section-title">نوع العرض</div>
+      <div class="grid">
+        <div>
+          <label>نوع العرض</label>
+          <select name="listingType" id="editListingType">
+            <option value="أولى">أولى من المطور</option>
+            <option value="ريسيل">ريسيل</option>
+          </select>
+        </div>
+      </div>
+      <div id="editResaleFieldsWrap" style="display:none;">
+        <div class="grid">
+          <div>
+            <label>اسم صاحب الوحدة الأصلي</label>
+            <input type="text" name="resaleOwnerName">
+          </div>
+          <div>
+            <label>رقم صاحب الوحدة</label>
+            <input type="text" name="resaleOwnerPhone">
+          </div>
+          <div>
+            <label>المبلغ المدفوع للمطور</label>
+            <input type="number" name="resalePaidAmount" placeholder="جنيه">
+          </div>
+          <div>
+            <label>الأوفر المطلوب</label>
+            <input type="number" name="resaleOverPrice" placeholder="جنيه">
+          </div>
+          <div>
+            <label>المتبقي على الوحدة</label>
+            <input type="number" name="resaleRemainingAmount" placeholder="جنيه">
+          </div>
+          <div>
+            <label>الفترة المتبقية في نظام السداد</label>
+            <input type="text" name="resaleRemainingPeriod" placeholder="مثال: 3 سنوات">
+          </div>
+          <div>
+            <label>تاريخ الشراء الأصلي</label>
+            <input type="text" name="resalePurchaseDate" placeholder="مثال: 2022">
+          </div>
+        </div>
+        <label>سبب البيع</label>
+        <input type="text" name="resaleReason" placeholder="مثال: سفر، تغيير سكن...">
+      </div>
+
       <div class="section-title">صور الوحدة</div>
       <div class="images-zone" id="editImagesZone" tabindex="0">
         <p>📋 الصق صورة (Ctrl+V) هنا، أو اسحب صورة، أو اختار من جهازك</p>
@@ -1542,7 +1593,8 @@
       maxPrice: document.getElementById('f_maxPrice').value,
       minArea: document.getElementById('f_minArea').value,
       maxArea: document.getElementById('f_maxArea').value,
-      exactArea: document.getElementById('f_exactArea').value
+      exactArea: document.getElementById('f_exactArea').value,
+      listingType: resaleMode ? 'ريسيل' : ''
     };
     try { localStorage.setItem('lastSearchFilters', JSON.stringify(filters)); } catch (e) {}
     return filters;
@@ -1694,6 +1746,21 @@
   });
 
   /* ---------- فتح شاشة إدخال الوحدة الجديدة - محمية بكلمة سر منفصلة تمامًا ---------- */
+  document.getElementById('resaleModeBtn').addEventListener('click', function() {
+    resaleMode = true;
+    document.getElementById('resaleModeBanner').style.display = 'flex';
+    document.querySelector('h1').textContent = '🏘 Resale Units - Digital Real Estate';
+    runSearch();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  document.getElementById('exitResaleModeBtn').addEventListener('click', function() {
+    resaleMode = false;
+    document.getElementById('resaleModeBanner').style.display = 'none';
+    document.querySelector('h1').textContent = '🔍 Search for units at Digital Real Estate';
+    runSearch();
+  });
+
   document.getElementById('addUnitFabBtn').addEventListener('click', function() {
     askForPin('كلمة سر فتح شاشة إضافة وحدة جديدة:', function(pin) {
       if (pin === null) return;
@@ -1735,13 +1802,14 @@
         paymentSchedule: u['Payment Schedule'],
         installmentYears: u['Installment Years'], deliveryDate: u['Delivery Date'],
         otherPaymentPlans: u['Other Payment Plans'] || 'لا', status: 'متاح',
-        notes: u['Notes']
-        // عمدًا من غير: ownerName, ownerPhone, agent (بيانات خاصة بالوحدة القديمة)
+        notes: u['Notes'], listingType: u['Listing Type'] || 'أولى'
+        // عمدًا من غير: ownerName, ownerPhone, agent, وتفاصيل مالك الريسيل الشخصية والمالية (بيانات خاصة بالوحدة القديمة بس)
       };
       Object.keys(fieldMap).forEach(name => {
         const el = editForm.elements[name];
         if (el) el.value = fieldMap[name] || '';
       });
+      document.getElementById('editResaleFieldsWrap').style.display = (fieldMap.listingType === 'ريسيل') ? 'block' : 'none';
       calcEditMonthlyInstallment();
 
       editCitySelect.value = u['City'] || '';
@@ -2349,6 +2417,7 @@
   window.toggleFavorite = toggleFavorite;
 
   let showFavoritesOnly = false;
+  let resaleMode = false;
   function updateFavCount() {
     const el = document.getElementById('favToggleBtn');
     if (el) el.textContent = '⭐ المفضلة (' + getFavorites().length + ')';
@@ -3636,6 +3705,10 @@
   let editModalMode = 'edit'; // 'edit' أو 'clone'
   let verifiedPin = null;
 
+  document.getElementById('editListingType').addEventListener('change', function() {
+    document.getElementById('editResaleFieldsWrap').style.display = (this.value === 'ريسيل') ? 'block' : 'none';
+  });
+
   /* ---------- حساب السعر بعد الخصم والمقدم والقسط الشهري التقريبي لحظيًا (فورم التعديل) ---------- */
   const editInstallmentFields = ['price', 'discountPercent', 'downPayment', 'downPaymentBase', 'paymentAmount', 'paymentCount', 'installmentYears'];
   const editInstallmentPreview = document.getElementById('editInstallmentPreview');
@@ -3822,12 +3895,18 @@
         paymentSchedule: u['Payment Schedule'],
         installmentYears: u['Installment Years'], deliveryDate: u['Delivery Date'],
         otherPaymentPlans: u['Other Payment Plans'] || 'لا', status: u['Status'],
-        ownerName: u['Owner Name'], ownerPhone: u['Owner Phone'], agent: u['Sales/Agent'], notes: u['Notes']
+        ownerName: u['Owner Name'], ownerPhone: u['Owner Phone'], agent: u['Sales/Agent'], notes: u['Notes'],
+        listingType: u['Listing Type'] || 'أولى',
+        resaleOwnerName: u['Resale Owner Name'], resaleOwnerPhone: u['Resale Owner Phone'],
+        resaleReason: u['Resale Reason'], resalePaidAmount: u['Resale Paid Amount'],
+        resaleOverPrice: u['Resale Over Price'], resaleRemainingAmount: u['Resale Remaining Amount'],
+        resaleRemainingPeriod: u['Resale Remaining Period'], resalePurchaseDate: u['Resale Purchase Date']
       };
       Object.keys(fieldMap).forEach(name => {
         const el = editForm.elements[name];
         if (el) el.value = fieldMap[name] || '';
       });
+      document.getElementById('editResaleFieldsWrap').style.display = (fieldMap.listingType === 'ريسيل') ? 'block' : 'none';
       calcEditMonthlyInstallment();
 
       // المدينة والمنطقة المترابطة
