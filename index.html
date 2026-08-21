@@ -944,6 +944,15 @@
   </div>
 </div>
 
+<!-- نافذة إدخال كلمة سر متمركزة (بديل عن prompt الافتراضي) -->
+<div class="admin-panel-overlay" id="pinPromptOverlay"></div>
+<div class="admin-panel" id="pinPromptModal" style="max-width:340px; text-align:center;">
+  <button class="close-panel" id="pinPromptCloseBtn">✕</button>
+  <h3 id="pinPromptTitle" style="margin-bottom:14px;">كلمة السر</h3>
+  <input type="password" id="pinPromptInput" placeholder="اكتب كلمة السر..." style="width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:8px; font-size:15px; text-align:center;">
+  <button type="button" id="pinPromptConfirmBtn" style="width:100%; margin-top:12px; padding:11px; border:none; border-radius:9px; background:var(--navy); color:#fff; font-weight:700; font-size:14px; cursor:pointer;">تأكيد</button>
+</div>
+
 <!-- مودال بروفايل المطور -->
 <div class="modal-overlay" id="developerProfileModal">
   <div class="modal-box" style="max-width:480px;">
@@ -1643,31 +1652,66 @@
 
   /* ---------- فتح شاشة إدخال الوحدة الجديدة - محمية بكلمة سر منفصلة تمامًا ---------- */
   document.getElementById('addUnitFabBtn').addEventListener('click', function() {
-    const pin = prompt('كلمة سر فتح شاشة إضافة وحدة جديدة:');
-    if (pin === null) return;
-    if (!pin.trim()) { alert('لازم تدخل كلمة السر'); return; }
+    askForPin('كلمة سر فتح شاشة إضافة وحدة جديدة:', function(pin) {
+      if (pin === null) return;
+      if (!pin.trim()) { showToast('لازم تدخل كلمة السر', 'error'); return; }
 
-    google.script.run.withSuccessHandler(function(isValid) {
-      if (!isValid) {
-        showToast('كلمة السر غير صحيحة', 'error');
-        return;
-      }
-      window.open('https://script.google.com/macros/s/AKfycby0Suh2iXdvCSy1N9G9e8u8VUjfHygiXe0owQyzUrHWcF_tIHMd7WnDZw2JtlXDkDDEWw/exec?page=entry', '_blank');
-    }).verifyDataEntryPin(pin);
+      google.script.run.withSuccessHandler(function(isValid) {
+        if (!isValid) {
+          showToast('كلمة السر غير صحيحة', 'error');
+          return;
+        }
+        window.open('https://script.google.com/macros/s/AKfycby0Suh2iXdvCSy1N9G9e8u8VUjfHygiXe0owQyzUrHWcF_tIHMd7WnDZw2JtlXDkDDEWw/exec?page=entry', '_blank');
+      }).verifyDataEntryPin(pin);
+    });
   });
 
   function cloneUnit(unitId) {
-    const pin = prompt('كلمة سر فتح شاشة الإدخال (لاستنساخ الوحدة):');
-    if (pin === null) return;
-    if (!pin.trim()) { alert('لازم تدخل كلمة السر'); return; }
+    editModalMode = 'clone';
+    currentEditUnitId = null; // مفيش وحدة بنعدّل عليها، إحنا بنعمل وحدة جديدة
+    document.getElementById('editUnitIdLabel').textContent = '(استنساخ من ' + unitId + ')';
+    document.querySelector('#editModal .modal-title').firstChild.textContent = 'إضافة وحدة جديدة (استنساخ) ';
+    editSaveBtn.textContent = 'إضافة كوحدة جديدة';
+    editDeleteBtn.style.display = 'none';
+    editMsg.style.display = 'none';
+    editModal.classList.add('open');
+    editForm.reset();
 
-    google.script.run.withSuccessHandler(function(isValid) {
-      if (!isValid) {
-        showToast('كلمة السر غير صحيحة', 'error');
-        return;
-      }
-      window.open('https://script.google.com/macros/s/AKfycby0Suh2iXdvCSy1N9G9e8u8VUjfHygiXe0owQyzUrHWcF_tIHMd7WnDZw2JtlXDkDDEWw/exec?page=entry&clone=' + encodeURIComponent(unitId), '_blank');
-    }).verifyDataEntryPin(pin);
+    google.script.run.withSuccessHandler(function(u) {
+      if (!u.success) { showToast(u.message, 'error'); closeEditModal(); return; }
+
+      const fieldMap = {
+        category: u['Category'], propertyType: u['Property Type'], developer: u['Developer Name'],
+        projectName: u['Project Name'], unitArea: u['Unit Area (sqm)'], landArea: u['Land Area (sqm)'],
+        gardenArea: u['Garden Area (sqm)'], terraceArea: u['Terrace Area (sqm)'], roofArea: u['Roof Area (sqm)'],
+        rooms: u['Rooms'], bathrooms: u['Bathrooms'], floor: u['Floor'], finishing: u['Finishing'],
+        view: u['View'], price: u['Price'], discountPercent: u['Discount Percentage'],
+        paymentMethod: u['Payment Method'], downPayment: u['Down Payment'],
+        downPaymentBase: u['Down Payment Base'] || 'بعد الخصم',
+        paymentAmount: u['Payment Amount'], paymentCount: u['Payment Count'],
+        paymentSchedule: u['Payment Schedule'],
+        installmentYears: u['Installment Years'], deliveryDate: u['Delivery Date'],
+        otherPaymentPlans: u['Other Payment Plans'] || 'لا', status: 'متاح',
+        notes: u['Notes']
+        // عمدًا من غير: ownerName, ownerPhone, agent (بيانات خاصة بالوحدة القديمة)
+      };
+      Object.keys(fieldMap).forEach(name => {
+        const el = editForm.elements[name];
+        if (el) el.value = fieldMap[name] || '';
+      });
+      calcEditMonthlyInstallment();
+
+      editCitySelect.value = u['City'] || '';
+      populateDistrictSelect(editDistrictSelect, u['City'], false, u['Area/District']);
+
+      // الصور عمدًا فاضية - الوحدة الجديدة صورها لازم تكون مختلفة ومحدثة
+      editUnitImages = [];
+      renderEditImagesPreview();
+
+      editMsg.className = '';
+      editMsg.textContent = '🧬 تم استنساخ بيانات الوحدة ' + unitId + ' - راجع كل حاجة (خصوصًا الدور والسعر) وضيف صور جديدة قبل الحفظ';
+      editMsg.style.display = 'block';
+    }).getUnitById(unitId);
   }
   window.cloneUnit = cloneUnit;
 
@@ -3549,6 +3593,7 @@
   const editCitySelect = document.getElementById('editCitySelect');
   const editDistrictSelect = document.getElementById('editDistrictSelect');
   let currentEditUnitId = null;
+  let editModalMode = 'edit'; // 'edit' أو 'clone'
   let verifiedPin = null;
 
   /* ---------- حساب السعر بعد الخصم والمقدم والقسط الشهري التقريبي لحظيًا (فورم التعديل) ---------- */
@@ -3695,24 +3740,29 @@
   }
 
   function askForEditPin(unitId) {
-    const pin = prompt("أدخل كلمة سر التعديل:");
-    if (pin === null) return; // المستخدم ضغط إلغاء
-    if (pin.trim() === '') { alert('لازم تدخل كلمة السر'); return; }
+    askForPin('أدخل كلمة سر التعديل:', function(pin) {
+      if (pin === null) return; // المستخدم دوس إلغاء
+      if (pin.trim() === '') { showToast('لازم تدخل كلمة السر', 'error'); return; }
 
-    google.script.run.withSuccessHandler(function(isValid) {
-      if (!isValid) {
-        showToast('كلمة السر غير صحيحة - غير مصرح لك بالتعديل', 'error');
-        return;
-      }
-      try { localStorage.setItem('adminPin', pin); } catch (e) {}
-      verifiedPin = pin;
-      loadUnitIntoEditForm(unitId);
-    }).verifyAdminPin(pin);
+      google.script.run.withSuccessHandler(function(isValid) {
+        if (!isValid) {
+          showToast('كلمة السر غير صحيحة - غير مصرح لك بالتعديل', 'error');
+          return;
+        }
+        try { localStorage.setItem('adminPin', pin); } catch (e) {}
+        verifiedPin = pin;
+        loadUnitIntoEditForm(unitId);
+      }).verifyAdminPin(pin);
+    });
   }
 
   function loadUnitIntoEditForm(unitId) {
+    editModalMode = 'edit';
     currentEditUnitId = unitId;
     document.getElementById('editUnitIdLabel').textContent = '(' + unitId + ')';
+    document.querySelector('#editModal .modal-title').firstChild.textContent = 'تعديل بيانات الوحدة ';
+    editSaveBtn.textContent = 'حفظ التعديلات';
+    editDeleteBtn.style.display = '';
     editMsg.style.display = 'none';
     editModal.classList.add('open');
     editForm.reset();
@@ -3854,15 +3904,41 @@
 
   editForm.addEventListener('submit', function(e) {
     e.preventDefault();
-    if (!currentEditUnitId) return;
+    if (editModalMode === 'edit' && !currentEditUnitId) return;
     editSaveBtn.disabled = true;
-    editSaveBtn.textContent = 'جاري الحفظ...';
+    editSaveBtn.textContent = editModalMode === 'clone' ? 'جاري الإضافة...' : 'جاري الحفظ...';
     editMsg.style.display = 'none';
 
     const data = {};
     new FormData(editForm).forEach((v, k) => data[k] = v);
-    data.pin = verifiedPin;
     data.images = editUnitImages.join(',');
+
+    if (editModalMode === 'clone') {
+      data.enteredBy = visitorName || '';
+      google.script.run
+        .withSuccessHandler(function(res) {
+          editSaveBtn.disabled = false;
+          editSaveBtn.textContent = 'إضافة كوحدة جديدة';
+          editMsg.className = res.success ? 'success' : 'error';
+          editMsg.textContent = res.message;
+          editMsg.style.display = 'block';
+          if (res.success) {
+            runSearch();
+            setTimeout(closeEditModal, 1200);
+          }
+        })
+        .withFailureHandler(function(err) {
+          editSaveBtn.disabled = false;
+          editSaveBtn.textContent = 'إضافة كوحدة جديدة';
+          editMsg.className = 'error';
+          editMsg.textContent = 'حدث خطأ: ' + err.message;
+          editMsg.style.display = 'block';
+        })
+        .confirmAddAsNewUnit(data);
+      return;
+    }
+
+    data.pin = verifiedPin;
 
     google.script.run
       .withSuccessHandler(function(res) {
@@ -4058,6 +4134,40 @@
   const adminPanel = document.getElementById('adminPanel');
   const liveCountValue = document.getElementById('liveCountValue');
   let adminPin = null;
+
+  /* ---------- نافذة كلمة سر متمركزة (بديل prompt) ---------- */
+  const pinPromptOverlay = document.getElementById('pinPromptOverlay');
+  const pinPromptModal = document.getElementById('pinPromptModal');
+  const pinPromptInput = document.getElementById('pinPromptInput');
+  let pinPromptCallback = null;
+
+  function askForPin(title, callback) {
+    document.getElementById('pinPromptTitle').textContent = title;
+    pinPromptInput.value = '';
+    pinPromptCallback = callback;
+    pinPromptOverlay.classList.add('open');
+    pinPromptModal.classList.add('open');
+    setTimeout(() => pinPromptInput.focus(), 100);
+  }
+
+  function closePinPrompt(resultValue) {
+    pinPromptOverlay.classList.remove('open');
+    pinPromptModal.classList.remove('open');
+    const cb = pinPromptCallback;
+    pinPromptCallback = null;
+    if (cb) cb(resultValue);
+  }
+
+  document.getElementById('pinPromptCloseBtn').addEventListener('click', () => closePinPrompt(null));
+  pinPromptOverlay.addEventListener('click', () => closePinPrompt(null));
+  document.getElementById('pinPromptConfirmBtn').addEventListener('click', function() {
+    closePinPrompt(pinPromptInput.value);
+  });
+  pinPromptInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') closePinPrompt(pinPromptInput.value);
+  });
+
+
   let isAdminUnlocked = false;
   let liveCountTimer = null;
 
@@ -4083,13 +4193,15 @@
   });
 
   function askForAdminPin() {
-    const pin = prompt('كلمة سر لوحة التحكم:');
-    if (pin === null) return;
-    google.script.run.withSuccessHandler(function(isValid) {
-      if (!isValid) { alert('كلمة السر غير صحيحة'); return; }
-      try { localStorage.setItem('adminPin', pin); } catch (e) {}
-      openAdminPanelWithPin(pin);
-    }).verifyAdminPin(pin);
+    askForPin('كلمة سر لوحة التحكم:', function(pin) {
+      if (pin === null) return;
+      if (!pin.trim()) { showToast('لازم تدخل كلمة السر', 'error'); return; }
+      google.script.run.withSuccessHandler(function(isValid) {
+        if (!isValid) { showToast('كلمة السر غير صحيحة', 'error'); return; }
+        try { localStorage.setItem('adminPin', pin); } catch (e) {}
+        openAdminPanelWithPin(pin);
+      }).verifyAdminPin(pin);
+    });
   }
 
   function openAdminPanelWithPin(pin) {
