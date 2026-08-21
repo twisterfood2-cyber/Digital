@@ -289,12 +289,12 @@
     }
     .icon-action-btn:hover { transform: translateY(-2px); opacity: 0.92; }
     .icon-action-btn svg { width: 16px; height: 16px; }
-    .icon-edit { background: var(--gold); color: #fff; }
-    .icon-whatsapp { background: #25D366; color: #fff; }
+    .icon-edit { background: var(--navy); color: #fff; }
+    .icon-whatsapp { background: var(--navy); color: #fff; }
     .icon-pdf { background: var(--navy); color: #fff; }
-    .icon-share-img { background: var(--navy-dark); color: #fff; }
-    .icon-similar { background: #f7f4ff; color: #7c4dff; border: 1.5px solid #7c4dff; }
-    .icon-clone { background: #fdf7ea; color: #6b5416; border: 1.5px solid var(--gold); }
+    .icon-share-img { background: var(--navy); color: #fff; }
+    .icon-similar { background: var(--navy); color: #fff; }
+    .icon-clone { background: var(--navy); color: #fff; }
     .loading, .empty { text-align: center; padding: 50px; color: var(--muted); font-size: 14px; }
 
     /* Skeleton Loading */
@@ -2524,7 +2524,7 @@
           </div>
           <div class="card-icon-row">
             <button type="button" class="icon-action-btn icon-edit" onclick="openEditModal('${u['Unit ID']}')" title="تعديل الوحدة">✏️</button>
-            <button type="button" class="icon-action-btn icon-whatsapp" onclick='shareOnWhatsApp(${JSON.stringify(u)})' title="مشاركة على واتساب"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2Zm5.8 14.03c-.24.68-1.4 1.32-1.93 1.36-.5.05-1.02.24-3.4-.71-2.88-1.15-4.73-4.06-4.87-4.25-.14-.19-1.17-1.56-1.17-2.97s.73-2.11 1-2.4c.24-.27.53-.34.7-.34h.5c.16 0 .38-.03.58.45.24.57.79 1.98.86 2.12.07.14.11.3.02.48-.09.19-.14.3-.28.46-.14.17-.29.37-.42.5-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.16-.19.68-.79.86-1.06.19-.28.37-.23.62-.14.26.09 1.63.77 1.91.91.28.14.47.21.53.33.07.12.07.68-.17 1.36Z"/></svg></button>
+            <button type="button" class="icon-action-btn icon-whatsapp" onclick='shareOnWhatsApp(${JSON.stringify(u)})' title="مشاركة على واتساب"><svg viewBox="0 0 24 24" fill="#ffffff" style="width:16px;height:16px;display:block;"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2Zm5.8 14.03c-.24.68-1.4 1.32-1.93 1.36-.5.05-1.02.24-3.4-.71-2.88-1.15-4.73-4.06-4.87-4.25-.14-.19-1.17-1.56-1.17-2.97s.73-2.11 1-2.4c.24-.27.53-.34.7-.34h.5c.16 0 .38-.03.58.45.24.57.79 1.98.86 2.12.07.14.11.3.02.48-.09.19-.14.3-.28.46-.14.17-.29.37-.42.5-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.16-.19.68-.79.86-1.06.19-.28.37-.23.62-.14.26.09 1.63.77 1.91.91.28.14.47.21.53.33.07.12.07.68-.17 1.36Z"/></svg></button>
             <button type="button" class="icon-action-btn icon-pdf" onclick='downloadUnitPDF(${JSON.stringify(u)}, this)' title="تصدير PDF">📄</button>
             ${IS_MOBILE_DEVICE ? `<button type="button" class="icon-action-btn icon-share-img" onclick='openShareImagesModal(${JSON.stringify(u)})' title="مشاركة نص + صور">🖼️</button>` : ''}
             <button type="button" class="icon-action-btn icon-similar" onclick='showSimilarUnits(${JSON.stringify(u)})' title="وحدات مشابهة">🔄</button>
