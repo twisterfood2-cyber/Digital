@@ -305,6 +305,8 @@
       background: var(--navy);
       cursor: pointer;
       transition: transform .12s, opacity .12s;
+      padding: 0 8px;
+      white-space: nowrap;
     }
     .share-img-row-btn:hover { transform: translateY(-2px); opacity: 0.92; }
     .loading, .empty { text-align: center; padding: 50px; color: var(--muted); font-size: 14px; }
@@ -2541,7 +2543,7 @@
             <button type="button" class="icon-action-btn" onclick='showSimilarUnits(${JSON.stringify(u)})' title="وحدات مشابهة">Similar</button>
             ${isAdminUnlocked ? `<button type="button" class="icon-action-btn" onclick="cloneUnit('${u['Unit ID']}')" title="استنساخ الوحدة (أدمن)">Clone</button>` : ''}
           </div>
-          ${IS_MOBILE_DEVICE ? `<button type="button" class="share-img-row-btn" onclick='openShareImagesModal(${JSON.stringify(u)})' title="مشاركة نص + صور">Photos</button>` : ''}
+          ${IS_MOBILE_DEVICE ? `<button type="button" class="share-img-row-btn" onclick='openShareImagesModal(${JSON.stringify(u)})' title="مشاركة نص + صور">Share Unit Details with Photos</button>` : ''}
           ${(u['Developer Name'] || u['Entered By']) ? `
           <div style="margin-top:8px; padding-top:8px; border-top:1px dashed var(--border); font-size:11px; color:var(--muted); display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px;">
             ${u['Developer Name'] ? `<span>🏗 المطور: <a href="javascript:void(0)" onclick='showDeveloperProfile(${JSON.stringify(u['Developer Name'])})' style="color:var(--navy); font-weight:800; text-decoration:underline; cursor:pointer;">${u['Developer Name']}</a></span>` : '<span></span>'}
