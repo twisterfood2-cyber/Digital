@@ -1430,7 +1430,7 @@
           </div>
           <div>
             <label>الأوفر المطلوب</label>
-            <input type="number" name="resaleOverPrice" placeholder="جنيه">
+            <input type="text" name="resaleOverPrice" placeholder="جنيه، أو اكتب 'بدون أوفر' مثلًا">
           </div>
           <div>
             <label>المتبقي على الوحدة</label>
@@ -1443,6 +1443,14 @@
           <div>
             <label>تاريخ الشراء الأصلي</label>
             <input type="text" name="resalePurchaseDate" placeholder="مثال: 2022">
+          </div>
+          <div>
+            <label>سعر المتر عند الشراء</label>
+            <input type="number" name="resalePricePerMeterPurchase" placeholder="جنيه/م²">
+          </div>
+          <div>
+            <label>سعر المتر الحالي في الشركة</label>
+            <input type="number" name="resaleCurrentPricePerMeter" placeholder="جنيه/م²">
           </div>
         </div>
         <label>سبب البيع</label>
@@ -2537,6 +2545,9 @@
         </div>` : '';
 
       const favPrice = getFavoritePrice(u['Unit ID']);
+      const resalePurchasePPM = Number(u['Resale Price Per Meter At Purchase']) || 0;
+      const resaleCurrentPPM = Number(u['Resale Current Price Per Meter']) || 0;
+      const resalePPMDiff = (resalePurchasePPM > 0 && resaleCurrentPPM > 0) ? (resaleCurrentPPM - resalePurchasePPM) : null;
       const currentPrice = Number(u['Price']) || 0;
       const priceDropped = favPrice && currentPrice > 0 && currentPrice < favPrice;
       const priceIncreased = favPrice && currentPrice > 0 && currentPrice > favPrice;
@@ -2586,8 +2597,11 @@
           <div class="resale-row-grid">
             ${u['Resale Paid Amount'] ? `<div class="resale-item"><span class="resale-label">المدفوع حتى الآن</span><span class="resale-value">${fmtNum(u['Resale Paid Amount'])} جنيه</span></div>` : ''}
             ${u['Resale Remaining Amount'] ? `<div class="resale-item"><span class="resale-label">المتبقي على الوحدة</span><span class="resale-value">${fmtNum(u['Resale Remaining Amount'])} جنيه</span></div>` : ''}
-            ${u['Resale Over Price'] ? `<div class="resale-item highlight"><span class="resale-label">الأوفر المطلوب</span><span class="resale-value">${fmtNum(u['Resale Over Price'])} جنيه</span></div>` : ''}
+            ${u['Resale Over Price'] ? `<div class="resale-item highlight"><span class="resale-label">الأوفر المطلوب</span><span class="resale-value">${u['Resale Over Price']}</span></div>` : ''}
             ${u['Resale Remaining Period'] ? `<div class="resale-item"><span class="resale-label">الفترة المتبقية للسداد</span><span class="resale-value">${u['Resale Remaining Period']}</span></div>` : ''}
+            ${resalePurchasePPM ? `<div class="resale-item"><span class="resale-label">سعر المتر عند الشراء</span><span class="resale-value">${fmtNum(resalePurchasePPM)} ج/م²</span></div>` : ''}
+            ${resaleCurrentPPM ? `<div class="resale-item"><span class="resale-label">سعر المتر الحالي بالشركة</span><span class="resale-value">${fmtNum(resaleCurrentPPM)} ج/م²</span></div>` : ''}
+            ${resalePPMDiff !== null ? `<div class="resale-item highlight"><span class="resale-label">فرق سعر المتر</span><span class="resale-value">${resalePPMDiff >= 0 ? '+' : ''}${fmtNum(resalePPMDiff)} ج/م²</span></div>` : ''}
           </div>
         </div>
         ` : ''}
@@ -3923,7 +3937,9 @@
         resaleOwnerName: u['Resale Owner Name'], resaleOwnerPhone: u['Resale Owner Phone'],
         resaleReason: u['Resale Reason'], resalePaidAmount: u['Resale Paid Amount'],
         resaleOverPrice: u['Resale Over Price'], resaleRemainingAmount: u['Resale Remaining Amount'],
-        resaleRemainingPeriod: u['Resale Remaining Period'], resalePurchaseDate: u['Resale Purchase Date']
+        resaleRemainingPeriod: u['Resale Remaining Period'], resalePurchaseDate: u['Resale Purchase Date'],
+        resalePricePerMeterPurchase: u['Resale Price Per Meter At Purchase'],
+        resaleCurrentPricePerMeter: u['Resale Current Price Per Meter']
       };
       Object.keys(fieldMap).forEach(name => {
         const el = editForm.elements[name];
