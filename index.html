@@ -1656,6 +1656,21 @@
     }).verifyDataEntryPin(pin);
   });
 
+  function cloneUnit(unitId) {
+    const pin = prompt('كلمة سر فتح شاشة الإدخال (لاستنساخ الوحدة):');
+    if (pin === null) return;
+    if (!pin.trim()) { alert('لازم تدخل كلمة السر'); return; }
+
+    google.script.run.withSuccessHandler(function(isValid) {
+      if (!isValid) {
+        showToast('كلمة السر غير صحيحة', 'error');
+        return;
+      }
+      window.open('https://script.google.com/macros/s/AKfycby0Suh2iXdvCSy1N9G9e8u8VUjfHygiXe0owQyzUrHWcF_tIHMd7WnDZw2JtlXDkDDEWw/exec?page=entry&clone=' + encodeURIComponent(unitId), '_blank');
+    }).verifyDataEntryPin(pin);
+  }
+  window.cloneUnit = cloneUnit;
+
   document.getElementById('priceStatsCloseBtn').addEventListener('click', () => priceStatsModal.classList.remove('open'));
   priceStatsModal.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
 
@@ -2446,6 +2461,10 @@
           <button type="button" class="similar-units-btn" onclick='showSimilarUnits(${JSON.stringify(u)})' style="width:100%; margin-top:8px; padding:9px; border:1.5px solid #7c4dff; border-radius:8px; background:#f7f4ff; color:#7c4dff; font-weight:700; font-size:12px; cursor:pointer;">
             🔄 وحدات مشابهة
           </button>
+          ${isAdminUnlocked ? `
+          <button type="button" onclick="cloneUnit('${u['Unit ID']}')" style="width:100%; margin-top:8px; padding:9px; border:1.5px solid var(--gold); border-radius:8px; background:#fdf7ea; color:#6b5416; font-weight:700; font-size:12px; cursor:pointer;">
+            🧬 استنساخ الوحدة (أدمن)
+          </button>` : ''}
           ${(u['Developer Name'] || u['Entered By']) ? `
           <div style="margin-top:8px; padding-top:8px; border-top:1px dashed var(--border); font-size:11px; color:var(--muted); display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px;">
             ${u['Developer Name'] ? `<span>🏗 المطور: <a href="javascript:void(0)" onclick='showDeveloperProfile(${JSON.stringify(u['Developer Name'])})' style="color:var(--navy); font-weight:800; text-decoration:underline; cursor:pointer;">${u['Developer Name']}</a></span>` : '<span></span>'}
@@ -3912,6 +3931,22 @@
     sendHeartbeat();
     setInterval(sendHeartbeat, 25000);
     loadCoverImage();
+    silentlyCheckAdminStatus();
+  }
+
+  // فحص صامت في الخلفية: لو كلمة سر الأدمن متحفوظة من قبل في الجهاز،
+  // نتأكد منها من غير ما نفتح لوحة التحكم، عشان زرار الاستنساخ يظهر تلقائيًا
+  function silentlyCheckAdminStatus() {
+    let savedPin = '';
+    try { savedPin = localStorage.getItem('adminPin') || ''; } catch (e) {}
+    if (!savedPin) return;
+    google.script.run.withSuccessHandler(function(isValid) {
+      if (isValid) {
+        adminPin = savedPin;
+        isAdminUnlocked = true;
+        renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
+      }
+    }).verifyAdminPin(savedPin);
   }
 
   /* ---------- بوابة دخول المستخدمين ---------- */
@@ -4023,6 +4058,7 @@
   const adminPanel = document.getElementById('adminPanel');
   const liveCountValue = document.getElementById('liveCountValue');
   let adminPin = null;
+  let isAdminUnlocked = false;
   let liveCountTimer = null;
 
   adminFab.addEventListener('click', function() {
@@ -4058,6 +4094,10 @@
 
   function openAdminPanelWithPin(pin) {
     adminPin = pin;
+    if (!isAdminUnlocked) {
+      isAdminUnlocked = true;
+      renderResults(sortUnits(lastResults, document.getElementById('f_sort').value)); // عشان زرار الاستنساخ يظهر فورًا
+    }
     adminPanel.classList.add('open');
     document.getElementById('adminPanelOverlay').classList.add('open');
     refreshLiveCount();
