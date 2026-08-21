@@ -2543,7 +2543,6 @@
             <button type="button" class="icon-action-btn" onclick='showSimilarUnits(${JSON.stringify(u)})' title="وحدات مشابهة">Similar</button>
             ${isAdminUnlocked ? `<button type="button" class="icon-action-btn" onclick="cloneUnit('${u['Unit ID']}')" title="استنساخ الوحدة (أدمن)">Clone</button>` : ''}
           </div>
-          ${IS_MOBILE_DEVICE ? `<button type="button" class="share-img-row-btn" onclick='openShareImagesModal(${JSON.stringify(u)})' title="مشاركة نص + صور">Share Unit Details with Photos</button>` : ''}
           ${(u['Developer Name'] || u['Entered By']) ? `
           <div style="margin-top:8px; padding-top:8px; border-top:1px dashed var(--border); font-size:11px; color:var(--muted); display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px;">
             ${u['Developer Name'] ? `<span>🏗 المطور: <a href="javascript:void(0)" onclick='showDeveloperProfile(${JSON.stringify(u['Developer Name'])})' style="color:var(--navy); font-weight:800; text-decoration:underline; cursor:pointer;">${u['Developer Name']}</a></span>` : '<span></span>'}
@@ -2622,6 +2621,12 @@
   }
 
   function shareOnWhatsApp(u) {
+    if (IS_MOBILE_DEVICE) {
+      // على الموبايل: نفتح نافذة اختيار الصور، وبعدها المشاركة بتشمل النص + الصور المختارة
+      openShareImagesModal(u);
+      return;
+    }
+    // على اللابتوب/الكمبيوتر: نص بس مباشرة على واتساب (Web Share API بالصور مش مدعومة كويس هنا)
     google.script.run.logUnitActivity(u['Unit ID'], u['Project Name'], 'WhatsApp');
     const lines = buildUnitShareText(u);
 
