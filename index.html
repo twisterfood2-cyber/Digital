@@ -3770,7 +3770,7 @@
       editDownPaymentValueHint.style.display = 'none';
     }
 
-    const paymentAmountRaw = (editForm.elements['paymentAmount'].value || '').trim();
+    const paymentAmountRaw = (editForm.elements['paymentAmount'].value || '').trim().replace(/٪/g, '%');
     let paymentAmount = 0;
     if (paymentAmountRaw.indexOf('%') !== -1) {
       paymentAmount = Math.round(priceAfterDiscount * ((parseFloat(paymentAmountRaw) || 0) / 100));
