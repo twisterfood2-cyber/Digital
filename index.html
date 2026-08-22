@@ -1426,59 +1426,6 @@
         </div>
       </div>
 
-      <div class="section-title">نوع العرض</div>
-      <div class="grid">
-        <div>
-          <label>نوع العرض</label>
-          <select name="listingType" id="editListingType">
-            <option value="أولى">أولى من المطور</option>
-            <option value="ريسيل">ريسيل</option>
-          </select>
-        </div>
-      </div>
-      <div id="editResaleFieldsWrap" style="display:none;">
-        <div class="grid">
-          <div>
-            <label>اسم صاحب الوحدة الأصلي</label>
-            <input type="text" name="resaleOwnerName">
-          </div>
-          <div>
-            <label>رقم صاحب الوحدة</label>
-            <input type="text" name="resaleOwnerPhone">
-          </div>
-          <div>
-            <label>المبلغ المدفوع للمطور</label>
-            <input type="number" name="resalePaidAmount" placeholder="جنيه">
-          </div>
-          <div>
-            <label>الأوفر المطلوب</label>
-            <input type="text" name="resaleOverPrice" placeholder="جنيه، أو اكتب 'بدون أوفر' مثلًا">
-          </div>
-          <div>
-            <label>المتبقي على الوحدة</label>
-            <input type="number" name="resaleRemainingAmount" placeholder="جنيه">
-          </div>
-          <div>
-            <label>الفترة المتبقية في نظام السداد</label>
-            <input type="text" name="resaleRemainingPeriod" placeholder="مثال: 3 سنوات">
-          </div>
-          <div>
-            <label>تاريخ الشراء الأصلي</label>
-            <input type="text" name="resalePurchaseDate" placeholder="مثال: 2022">
-          </div>
-          <div>
-            <label>سعر المتر عند الشراء</label>
-            <input type="number" name="resalePricePerMeterPurchase" placeholder="جنيه/م²">
-          </div>
-          <div>
-            <label>سعر المتر الحالي في الشركة</label>
-            <input type="number" name="resaleCurrentPricePerMeter" placeholder="جنيه/م²">
-          </div>
-        </div>
-        <label>سبب البيع</label>
-        <input type="text" name="resaleReason" placeholder="مثال: سفر، تغيير سكن...">
-      </div>
-
       <div class="section-title">صور الوحدة</div>
       <div class="images-zone" id="editImagesZone" tabindex="0">
         <p>📋 الصق صورة (Ctrl+V) هنا، أو اسحب صورة، أو اختار من جهازك</p>
@@ -1820,7 +1767,6 @@
     editMsg.className = '';
 
     populateDistrictSelect(editDistrictSelect, '', false);
-    document.getElementById('editResaleFieldsWrap').style.display = 'none';
 
     editUnitImages = [];
     renderEditImagesPreview();
@@ -1997,14 +1943,13 @@
         paymentSchedule: u['Payment Schedule'],
         installmentYears: u['Installment Years'], deliveryDate: u['Delivery Date'],
         otherPaymentPlans: u['Other Payment Plans'] || 'لا', status: 'متاح',
-        notes: u['Notes'], listingType: u['Listing Type'] || 'أولى'
-        // عمدًا من غير: ownerName, ownerPhone, agent, وتفاصيل مالك الريسيل الشخصية والمالية (بيانات خاصة بالوحدة القديمة بس)
+        notes: u['Notes']
+        // عمدًا من غير: ownerName, ownerPhone, agent (بيانات خاصة بالوحدة القديمة بس)
       };
       Object.keys(fieldMap).forEach(name => {
         const el = editForm.elements[name];
         if (el) el.value = fieldMap[name] || '';
       });
-      document.getElementById('editResaleFieldsWrap').style.display = (fieldMap.listingType === 'ريسيل') ? 'block' : 'none';
       calcEditMonthlyInstallment();
 
       editCitySelect.value = u['City'] || '';
@@ -3919,10 +3864,6 @@
   let editModalMode = 'edit'; // 'edit' أو 'clone'
   let verifiedPin = null;
 
-  document.getElementById('editListingType').addEventListener('change', function() {
-    document.getElementById('editResaleFieldsWrap').style.display = (this.value === 'ريسيل') ? 'block' : 'none';
-  });
-
   /* ---------- حساب السعر بعد الخصم والمقدم والقسط الشهري التقريبي لحظيًا (فورم التعديل) ---------- */
   const editInstallmentFields = ['price', 'discountPercent', 'downPayment', 'downPaymentBase', 'paymentAmount', 'paymentCount', 'installmentYears'];
   const editInstallmentPreview = document.getElementById('editInstallmentPreview');
@@ -4091,7 +4032,13 @@
     editSaveBtn.textContent = 'حفظ التعديلات';
     editDeleteBtn.style.display = '';
     editMsg.style.display = 'none';
-    document.getElementById('unitAddAiSection').style.display = 'none';
+    document.getElementById('unitAddAiSection').style.display = 'block';
+    document.getElementById('unitAddAiPasteText').value = '';
+    document.getElementById('unitAddAiFileInput').value = '';
+    unitAddAiPastedImageBase64 = null;
+    unitAddAiPastedImageMime = null;
+    document.getElementById('unitAddAiPastedImagePreview').style.display = 'none';
+    document.getElementById('unitAddAiExtractMsg').style.display = 'none';
     editModal.classList.add('open');
     editForm.reset();
 
@@ -4110,20 +4057,12 @@
         paymentSchedule: u['Payment Schedule'],
         installmentYears: u['Installment Years'], deliveryDate: u['Delivery Date'],
         otherPaymentPlans: u['Other Payment Plans'] || 'لا', status: u['Status'],
-        ownerName: u['Owner Name'], ownerPhone: u['Owner Phone'], agent: u['Sales/Agent'], notes: u['Notes'],
-        listingType: u['Listing Type'] || 'أولى',
-        resaleOwnerName: u['Resale Owner Name'], resaleOwnerPhone: u['Resale Owner Phone'],
-        resaleReason: u['Resale Reason'], resalePaidAmount: u['Resale Paid Amount'],
-        resaleOverPrice: u['Resale Over Price'], resaleRemainingAmount: u['Resale Remaining Amount'],
-        resaleRemainingPeriod: u['Resale Remaining Period'], resalePurchaseDate: u['Resale Purchase Date'],
-        resalePricePerMeterPurchase: u['Resale Price Per Meter At Purchase'],
-        resaleCurrentPricePerMeter: u['Resale Current Price Per Meter']
+        ownerName: u['Owner Name'], ownerPhone: u['Owner Phone'], agent: u['Sales/Agent'], notes: u['Notes']
       };
       Object.keys(fieldMap).forEach(name => {
         const el = editForm.elements[name];
         if (el) el.value = fieldMap[name] || '';
       });
-      document.getElementById('editResaleFieldsWrap').style.display = (fieldMap.listingType === 'ريسيل') ? 'block' : 'none';
       calcEditMonthlyInstallment();
 
       // المدينة والمنطقة المترابطة
