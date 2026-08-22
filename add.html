@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f2942">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Digital RE">
+  <style>
+    :root {
+      --navy: #0f2942;
+      --navy-dark: #0a1c2e;
+      --gold: #c9992e;
+      --gold-light: #f4e6c8;
+      --bg: #f3f4f7;
+      --card: #ffffff;
+      --border: #e2e5ea;
+      --text: #1c2530;
+      --muted: #6b7684;
+      --success-bg: #e3f3e9; --success-fg: #1e7145;
+      --error-bg: #fbe6e6; --error-fg: #b3261e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+      direction: rtl;
+      background:
+        radial-gradient(ellipse 1400px 650px at 50% 12%, rgba(224,234,239,0.95) 0%, rgba(180,199,211,0.5) 45%, transparent 75%),
+        linear-gradient(180deg, #c6d7df 0%, #a7bdca 20%, #7995a7 45%, #5c7488 72%, #4c6478 100%);
+      background-attachment: fixed;
+      margin: 0;
+      padding: 24px;
+      color: var(--text);
+    }
+    .container { max-width: 920px; margin: 0 auto; }
+    h1 {
+      font-size: 22px;
+      color: var(--navy);
+      font-weight: 800;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-header { margin-bottom: 4px; }
+    .brand-logo { max-width: 220px; height: auto; display: block; margin-bottom: 14px; }
+    h1::before {
+      content: "";
+      display: inline-block;
+      width: 6px;
+      height: 26px;
+      background: linear-gradient(180deg, var(--gold), var(--navy));
+      border-radius: 3px;
+    }
+    /* صورة الغلاف أعلى الصفحة */
+    .cover-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 920px;
+      margin: 0 auto 18px;
+      border-radius: 16px;
+      overflow: hidden;
+      display: none;
+      box-shadow: 0 4px 18px rgba(15,41,66,0.12);
+    }
+    .cover-wrap.has-image { display: block; }
+    .cover-wrap img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      display: block;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 28px;
+      box-shadow: 0 4px 18px rgba(15,41,66,0.07);
+      border-top: 4px solid var(--navy);
+    }
+    .section-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--navy);
+      margin: 22px 0 12px;
+      padding-bottom: 7px;
+      border-bottom: 2px solid var(--gold-light);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: var(--muted);
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      background: #fbfbfc;
+      color: var(--text);
+      transition: border-color .15s, background .15s;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--navy);
+      background: #fff;
+    }
+    textarea { resize: vertical; min-height: 70px; }
+    .btn-row { margin-top: 26px; display: flex; gap: 10px; }
+    button {
+      padding: 13px 26px;
+      border: none;
+      border-radius: 9px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity .15s, transform .1s;
+    }
+    button:active { transform: scale(0.98); }
+    #submitBtn { background: var(--navy); color: #fff; flex: 1; }
+    #submitBtn:hover { opacity: 0.92; }
+    #submitBtn:disabled { background: #9aa4ae; cursor: not-allowed; }
+    #resetBtn { background: var(--gold-light); color: #6b5416; }
+    #resetBtn:hover { opacity: 0.85; }
+    #msg {
+      margin-top: 16px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      display: none;
+      font-weight: 600;
+    }
+    #msg.success { background: var(--success-bg); color: var(--success-fg); display: block; }
+    #msg.error { background: var(--error-bg); color: var(--error-fg); display: block; }
+    .required::after { content: " *"; color: var(--gold); font-weight: 900; }
+
+    /* بوابة التحكم في الوصول */
+    .access-gate {
+      position: fixed; inset: 0; z-index: 2000;
+      background:
+        radial-gradient(ellipse 1400px 650px at 50% 12%, rgba(224,234,239,0.95) 0%, rgba(180,199,211,0.5) 45%, transparent 75%),
+        linear-gradient(180deg, #c6d7df 0%, #a7bdca 20%, #7995a7 45%, #5c7488 72%, #4c6478 100%);
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .access-gate-box {
+      max-width: 380px; width: 100%; background: #fff; border-radius: 16px; padding: 34px 28px;
+      text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.25); border-top: 4px solid var(--navy);
+    }
+    .access-gate-box .icon { font-size: 34px; margin-bottom: 14px; }
+    .access-gate-box h2 { font-size: 17px; color: var(--navy); margin-bottom: 8px; font-weight: 800; }
+    .access-gate-box p { font-size: 13px; color: var(--muted); line-height: 1.8; margin-bottom: 18px; }
+    .access-gate-box input {
+      width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 8px;
+      font-size: 14px; margin-bottom: 10px; text-align: center;
+    }
+    .access-gate-box button {
+      width: 100%; padding: 12px; border: none; border-radius: 9px; background: var(--navy);
+      color: #fff; font-weight: 700; font-size: 14px; cursor: pointer; margin-top: 4px;
+    }
+    .access-gate-box button:disabled { background: #9aa4ae; }
+    .access-gate-owner-link {
+      display: block; margin-top: 18px; font-size: 12px; color: var(--muted); text-decoration: underline; cursor: pointer;
+      background: none; border: none; width: auto; padding: 0; font-weight: 600;
+    }
+    .access-gate-status { font-size: 12px; margin-top: 10px; display: none; }
+    .access-gate-status.error { color: var(--error-fg); display: block; }
+    .access-gate-status.success { color: var(--success-fg); display: block; }
+
+    .installment-preview {
+      margin-top: 14px; background: var(--gold-light); color: #6b5416; padding: 12px 16px;
+      border-radius: 9px; font-size: 14px; font-weight: 600;
+    }
+    .installment-preview b { font-size: 16px; }
+
+    /* منطقة رفع صور الوحدة */
+    .images-zone {
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 22px;
+      text-align: center;
+      background: #fbfbfc;
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+    }
+    .images-zone:hover, .images-zone.drag-over, .images-zone:focus {
+      border-color: var(--navy);
+      background: #f2f6fa;
+      outline: none;
+    }
+    .images-zone p { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+    .images-choose-btn {
+      background: var(--navy); color: #fff; padding: 9px 20px;
+      border-radius: 8px; font-size: 13px; font-weight: 700; border: none; cursor: pointer;
+    }
+    .image-link-row { display: flex; gap: 8px; margin-top: 10px; }
+    .image-link-row input { flex: 1; }
+    .image-link-row button {
+      background: var(--gold-light); color: #6b5416; padding: 0 18px;
+      border-radius: 8px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; white-space: nowrap;
+    }
+    .images-preview {
+      display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px;
+    }
+    .image-thumb {
+      position: relative; width: 90px; height: 90px; border-radius: 8px; overflow: hidden;
+      border: 1px solid var(--border); cursor: grab; transition: transform .15s, opacity .15s, border-color .15s;
+    }
+    .image-thumb:active { cursor: grabbing; }
+    .image-thumb.dragging { opacity: 0.4; }
+    .image-thumb.drag-over { border: 2px dashed var(--gold); transform: scale(1.05); }
+    .image-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+    .image-thumb .remove-img {
+      position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%;
+      background: rgba(179,38,30,0.9); color: #fff; border: none; font-size: 12px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .image-thumb .uploading-overlay {
+      position: absolute; inset: 0; background: rgba(255,255,255,0.75);
+      display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--navy);
+    }
+  </style>
+</head>
+<body>
+
+<script>
+  /* ============================================================
+   * محوّل google.script.run - بيخلي كل الكود الموجود في الصفحة
+   * (المكتوب أصلاً عشان Google Apps Script) يشتغل من غير أي تعديل،
+   * بس بيتصل بالباب الجديد (doPost API) بدل الاتصال المباشر بجوجل.
+   * ============================================================ */
+  const EXEC_URL = "https://script.google.com/macros/s/AKfycby0Suh2iXdvCSy1N9G9e8u8VUjfHygiXe0owQyzUrHWcF_tIHMd7WnDZw2JtlXDkDDEWw/exec";
+
+  function callBackendAPI(action, params) {
+    return fetch(EXEC_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: action, params: params })
+    })
+      .then(function(r) { return r.text(); })
+      .then(function(t) {
+        try { return JSON.parse(t); }
+        catch (e) { throw new Error('رد غير صالح من السيرفر: ' + t.slice(0, 200)); }
+      });
+  }
+
+  function makeRunner(successHandler, failureHandler) {
+    return new Proxy({}, {
+      get: function(target, prop) {
+        if (prop === 'withSuccessHandler') {
+          return function(fn) { return makeRunner(fn, failureHandler); };
+        }
+        if (prop === 'withFailureHandler') {
+          return function(fn) { return makeRunner(successHandler, fn); };
+        }
+        if (prop === 'withUserObject') {
+          return function() { return makeRunner(successHandler, failureHandler); };
+        }
+        // أي اسم تاني بيتعامل معاه كاسم دالة في الباك اند
+        return function() {
+          const params = Array.prototype.slice.call(arguments);
+          callBackendAPI(prop, params)
+            .then(function(result) { if (successHandler) successHandler(result); })
+            .catch(function(err) { if (failureHandler) failureHandler(err); else console.error('API error:', err); });
+        };
+      }
+    });
+  }
+
+  window.google = { script: { run: makeRunner(null, null) } };
+</script>
+
+<!-- بوابة دخول المستخدمين - محدش يقدر يشوف أو يستخدم أي حاجة قبل ما يسجل دخول صحيح -->
+<div class="access-gate" id="loginGate">
+  <div class="access-gate-box">
+    <div class="icon">🔒</div>
+    <h2>الدخول لنظام Digital Real Estate</h2>
+    <p>الصفحة دي محمية - اكتب إيميلك وكلمة السر الخاصة بيك للدخول</p>
+    <input type="email" id="loginEmail" placeholder="الإيميل" autocomplete="username">
+    <input type="password" id="loginPassword" placeholder="كلمة السر" autocomplete="current-password">
+    <button id="loginBtn">دخول</button>
+    <div class="access-gate-status" id="loginStatus"></div>
+  </div>
+</div>
+
+<div class="container" id="mainContainer" style="display:none;">
+  <div class="cover-wrap" id="coverWrap">
+    <img id="coverImg" src="" alt="صورة الغلاف">
+  </div>
+  <h1>🏢 إدخال وحدة عقارية جديدة</h1>
+
+<div class="card" id="aiFillCard" style="border-top: 4px solid #7c4dff;">
+  <div class="section-title" style="color:#7c4dff;">🤖 تعبئة تلقائية بالذكاء الاصطناعي</div>
+  <p style="font-size:12px; color:var(--muted); margin:-4px 0 12px; line-height:1.7;">
+    الصق رسالة المطور (نص أو صورة بـ Ctrl+V)، أو ارفع صورة قايمة أسعار أو ملف PDF، والذكاء الاصطناعي هيملى الفورم تلقائيًا.
+    راجع البيانات كويس قبل ما تحفظ.
+  </p>
+  <textarea id="aiPasteText" placeholder="الصق نص الرسالة هنا (اختياري)..." style="min-height:90px;"></textarea>
+  <div id="aiImagePasteZone" tabindex="0" style="margin-top:10px; border:2px dashed #7c4dff; border-radius:10px; padding:16px; text-align:center; cursor:pointer; color:#7c4dff; font-size:13px; font-weight:600; background:#f7f4ff; outline:none;">
+    📋 دوس هنا وبعدين الصق صورة (Ctrl+V)
+  </div>
+  <div id="aiPastedImagePreview" style="display:none; margin-top:8px; position:relative; max-width:200px;">
+    <img id="aiPastedImageTag" style="width:100%; border-radius:8px; border:1px solid var(--border);">
+    <button type="button" id="aiPastedImageRemove" style="position:absolute; top:-8px; left:-8px; width:24px; height:24px; border-radius:50%; background:var(--error-fg); color:#fff; border:none; cursor:pointer; font-size:13px;">✕</button>
+  </div>
+  <input type="file" id="aiFileInput" accept="image/*,application/pdf" style="margin-top:8px;">
+
+  <button type="button" id="aiExtractBtn" style="width:100%; margin-top:10px; padding:12px; border:none; border-radius:9px; background:#7c4dff; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">
+    ✨ استخرج البيانات وابدأ التعبئة
+  </button>
+  <div id="aiExtractMsg" style="font-size:12px; margin-top:8px; display:none;"></div>
+</div>
+
+<div class="card">
+    <form id="unitForm">
+
+      <div class="section-title">بيانات أساسية</div>
+      <div class="grid">
+        <div>
+          <label class="required">تصنيف الوحدة</label>
+          <select name="category" id="categorySelect" required>
+            <option value="">اختر</option>
+            <option value="سكني">سكني</option>
+            <option value="تجاري">تجاري</option>
+            <option value="إداري">إداري</option>
+            <option value="فندقي">فندقي</option>
+          </select>
+        </div>
+        <div>
+          <label class="required">نوع العقار</label>
+          <select name="propertyType" id="propertyTypeSelect" required disabled>
+            <option value="">اختر التصنيف أولاً</option>
+          </select>
+        </div>
+        <div>
+          <label>اسم المطور العقاري</label>
+          <input type="text" name="developer" list="developerDatalist" placeholder="مثال: طلعت مصطفى" autocomplete="off">
+          <datalist id="developerDatalist"></datalist>
+        </div>
+      </div>
+
+      <div class="section-title">الموقع</div>
+      <div class="grid">
+        <div>
+          <label class="required">المدينة</label>
+          <select name="city" id="citySelect" required>
+            <option value="">اختر المدينة</option>
+          </select>
+        </div>
+        <div>
+          <label class="required">المنطقة</label>
+          <select name="district" id="districtSelect" required disabled>
+            <option value="">اختر المدينة أولاً</option>
+          </select>
+        </div>
+        <div>
+          <label>اسم المشروع</label>
+          <input type="text" name="projectName" list="projectDatalist" placeholder="مثال: هايد بارك" autocomplete="off">
+          <datalist id="projectDatalist"></datalist>
+          <button type="button" id="fetchLastSimilarBtn" style="margin-top:6px; width:100%; padding:8px; border:1.5px solid var(--border); border-radius:8px; background:var(--bg); color:var(--navy); font-weight:700; font-size:12px; cursor:pointer;">
+            🔄 جيب بيانات آخر وحدة مشابهة
+          </button>
+        </div>
+      </div>
+
+      <div class="section-title">تفاصيل الوحدة</div>
+      <div class="grid">
+        <div>
+          <label class="required">المساحة (م²)</label>
+          <input type="number" name="unitArea" required min="0" step="any">
+        </div>
+        <div>
+          <label>مساحة الأرض (م²) - للفيلات</label>
+          <input type="number" name="landArea" min="0" step="0.5">
+        </div>
+        <div>
+          <label>Garden Area (sqm)</label>
+          <input type="number" name="gardenArea" min="0" step="any">
+        </div>
+        <div>
+          <label>Terrace Area (sqm)</label>
+          <input type="number" name="terraceArea" min="0" step="any">
+        </div>
+        <div>
+          <label>Roof Area (sqm)</label>
+          <input type="number" name="roofArea" min="0" step="any">
+        </div>
+        <div>
+          <label>عدد الغرف</label>
+          <input type="number" name="rooms" min="0">
+        </div>
+        <div>
+          <label>عدد الحمامات</label>
+          <input type="number" name="bathrooms" min="0">
+        </div>
+        <div>
+          <label>الدور</label>
+          <input type="text" name="floor" placeholder="مثال: الثالث">
+        </div>
+        <div>
+          <label>التشطيب</label>
+          <select name="finishing">
+            <option value="">اختر</option>
+            <option value="سوبر لوكس">سوبر لوكس</option>
+            <option value="كامل التشطيب">كامل التشطيب</option>
+            <option value="نصف تشطيب">نصف تشطيب</option>
+            <option value="Flexi-Finished">Flexi-Finished (3/4 تشطيب)</option>
+            <option value="متشطب بالفرش">متشطب بالفرش</option>
+            <option value="متشطب بالفرش والتكييفات">متشطب بالفرش والتكييفات</option>
+            <option value="متشطب بالتكييفات">متشطب بالتكييفات</option>
+            <option value="بدون تشطيب">بدون تشطيب</option>
+          </select>
+        </div>
+        <div>
+          <label>الفيو</label>
+          <input type="text" name="view" placeholder="بحري / جاردن / على الشارع">
+        </div>
+      </div>
+
+      <div class="section-title">السعر وطريقة الدفع (بيع)</div>
+      <div class="grid">
+        <div>
+          <label class="required">السعر الأصلي (قبل الخصم) (جنيه)</label>
+          <input type="number" name="price" required min="0">
+        </div>
+        <div>
+          <label>نسبة الخصم %</label>
+          <input type="number" name="discountPercent" min="0" max="100" step="any" placeholder="مثال: 5">
+        </div>
+        <div>
+          <label>طريقة الدفع</label>
+          <select name="paymentMethod">
+            <option value="">اختر</option>
+            <option value="كاش">كاش</option>
+            <option value="تقسيط">تقسيط</option>
+            <option value="كاش أو تقسيط">كاش أو تقسيط</option>
+          </select>
+        </div>
+        <div>
+          <label>المقدم (نسبة %)</label>
+          <input type="number" name="downPayment" min="0" max="100" step="any" placeholder="مثال: 10">
+          <div id="downPaymentValueHint" style="font-size:12px; color:var(--muted); margin-top:5px; display:none;"></div>
+        </div>
+        <div>
+          <label>المقدم محسوب على</label>
+          <select name="downPaymentBase">
+            <option value="بعد الخصم" selected>السعر بعد الخصم</option>
+            <option value="قبل الخصم">السعر قبل الخصم</option>
+          </select>
+        </div>
+        <div>
+          <label>قيمة الدفعة (نسبة % أو قيمة)</label>
+          <input type="text" name="paymentAmount" placeholder="مثال: 5% أو 50000">
+          <div id="paymentAmountValueHint" style="font-size:12px; color:var(--muted); margin-top:5px; display:none;"></div>
+        </div>
+        <div>
+          <label>عدد الدفعات</label>
+          <input type="number" name="paymentCount" min="0" placeholder="مثال: 4">
+        </div>
+        <div>
+          <label>موعد الدفعات</label>
+          <input type="text" name="paymentSchedule" placeholder="مثال: كل 6 شهور">
+        </div>
+        <div>
+          <label>عدد سنوات التقسيط</label>
+          <input type="number" name="installmentYears" min="0" step="any">
+        </div>
+        <div>
+          <label>تاريخ التسليم</label>
+          <input type="text" name="deliveryDate" placeholder="مثال: 2027">
+        </div>
+        <div>
+          <label>أنظمة سداد أخرى</label>
+          <select name="otherPaymentPlans">
+            <option value="لا" selected>لا</option>
+            <option value="نعم">نعم</option>
+          </select>
+        </div>
+        <div>
+          <label>حالة الوحدة</label>
+          <select name="status">
+            <option value="متاح" selected>متاح</option>
+            <option value="محجوز">محجوز</option>
+            <option value="مباع">مباع</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="installment-preview" id="installmentPreview" style="display:none;">
+        <div>💰 السعر بعد الخصم: <b id="priceAfterDiscountValue">-</b> جنيه</div>
+        <div style="margin-top:4px;">💡 القسط الشهري التقريبي: <b id="monthlyInstallmentValue">-</b> جنيه/شهريًا</div>
+        <div style="margin-top:4px;">📅 القسط الربع سنوي التقريبي: <b id="quarterlyInstallmentValue">-</b> جنيه/كل 3 شهور</div>
+      </div>
+
+      <div class="section-title">صور الوحدة</div>
+      <div class="images-zone" id="imagesZone" tabindex="0">
+        <p>📋 الصق صورة (Ctrl+V) هنا، أو اسحب صورة، أو اختار من جهازك</p>
+        <input type="file" id="imagesFileInput" accept="image/*" multiple style="display:none;">
+        <button type="button" class="images-choose-btn" id="imagesChooseBtn">📁 اختيار صور من الجهاز</button>
+      </div>
+      <div class="image-link-row">
+        <input type="text" id="imageLinkInput" placeholder="أو الصق رابط صورة هنا (URL)">
+        <button type="button" id="addImageLinkBtn">إضافة رابط</button>
+      </div>
+      <div id="imagesPreview" class="images-preview"></div>
+      <p style="font-size:11px; color:var(--muted); margin-top:4px;">💡 تقدر تمسك أي صورة وتسحبها عشان تغيّر ترتيبها (الصورة الأولى بتبقى صورة الغلاف)</p>
+      <div id="imagesUploadMsg" style="font-size:12px; margin-top:6px;"></div>
+
+      <div class="section-title">ملاحظات</div>
+      <textarea name="notes" placeholder="أي تفاصيل إضافية عن الوحدة..."></textarea>
+
+      <div id="msg"></div>
+      <div class="btn-row">
+        <button type="submit" id="submitBtn">حفظ الوحدة</button>
+        <button type="reset" id="resetBtn">تفريغ الفورم</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- نافذة سؤال: نفس الوحدة (تحديث) ولا وحدة مختلفة (تسجيل جديد)؟ -->
+<div id="sameUnitModal" style="display:none; position:fixed; inset:0; background:rgba(10,20,30,0.55); z-index:2500; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:#fff; border-radius:16px; max-width:420px; width:100%; padding:28px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.25); border-top:4px solid var(--gold);">
+    <div style="font-size:34px; margin-bottom:14px;">🤔</div>
+    <h2 style="font-size:16px; color:var(--navy); margin-bottom:12px; font-weight:800;">دي نفس الوحدة ولا وحدة مختلفة؟</h2>
+    <p id="sameUnitModalText" style="font-size:13px; color:var(--muted); line-height:1.8; margin-bottom:20px;"></p>
+    <button type="button" id="sameUnitConfirmBtn" style="width:100%; padding:12px; border:none; border-radius:9px; background:var(--navy); color:#fff; font-weight:700; font-size:14px; cursor:pointer; margin-bottom:10px;">
+      ✅ نفس الوحدة - حدّث السعر والبيانات
+    </button>
+    <button type="button" id="sameUnitDifferentBtn" style="width:100%; padding:12px; border:none; border-radius:9px; background:var(--gold); color:#fff; font-weight:700; font-size:14px; cursor:pointer; margin-bottom:10px;">
+      🆕 وحدة مختلفة - سجّلها جديدة
+    </button>
+    <button type="button" id="sameUnitCancelBtn" style="width:100%; padding:10px; border:none; border-radius:9px; background:transparent; color:var(--muted); font-weight:600; font-size:13px; cursor:pointer; text-decoration:underline;">
+      إلغاء
+    </button>
+  </div>
+</div>
+
+<script>
+  // بيانات المدن والمناطق التابعة لها - مشتركة بين شاشة الإدخال وشاشة البحث
+  // تقدر تضيف/تعدّل أي مدينة أو منطقة من هنا وهتنعكس في الصفحتين تلقائيًا
+  const CITY_DISTRICTS = {
+    "القاهرة الجديدة": ["التسعين الجنوبي", "التسعين الشمالي", "التجمع الأول", "التجمع الخامس", "حي الأندلس", "حي اللوتس", "حي الياسمين", "حي النرجس الجديدة", "حي القرنفل", "حي المستثمرين الجنوبية", "حي المستثمرين الشمالية", "حي جاردينيا هايتس", "التجمع السادس", "بيت الوطن", "حدائق الأندلس", "شمال الرحاب", "جنوب السويس", "الحي التكميلي - بيت الوطن"],
+    "العاصمة الإدارية الجديدة": ["R7", "R8", "الحي السكني الثالث", "داون تاون", "الحي السكني الرابع", "الحي السكني الخامس", "حي المستثمرين", "الحي المالي", "الحي الإداري", "المدينة الطبية", "MU7", "MU12", "MU23"],
+    "الشيخ زايد": ["زايد الجديدة", "الحزام الأخضر", "زايد الأولى", "زايد الثانية"],
+    "6 أكتوبر": ["الحي المتميز", "الحي الأول", "الحي الثاني", "دريم لاند", "سفن ستارز", "أكتوبر بارك", "حدائق أكتوبر"],
+    "أكتوبر الجديدة": ["الحي الأول", "الحي الثالث", "بيت الوطن"],
+    "مدينة نصر": ["الحي السابع", "الحي العاشر", "مساكن شيراتون", "الحي الأول"],
+    "المعادي": ["المعادي الجديدة", "دجلة", "زهراء المعادي", "المعادي الخضراء"],
+    "مصر الجديدة": ["أرض الجولف", "هليوبوليس", "الماظة", "شيراتون"],
+    "الشروق": ["الحي الأول", "الحي الثالث", "الحي السابع", "طريق السويس"],
+    "مدينة بدر": ["الحي المتميز", "حدائق بدر"],
+    "مدينة المستقبل سيتي": ["مستقبل سيتي"],
+    "العبور": ["العبور", "الحي الأول", "الحي الثاني", "الحي الثالث", "جولف سيتي", "الحي الخامس", "العبور الجديدة"],
+    "الساحل الشمالي": ["الساحل القديم", "العلمين الجديدة", "سيدي عبد الرحمن", "رأس الحكمة", "سيدي حنيش", "مرسي مطروح"],
+    "العين السخنة": ["الجونة السخنة", "بورتو السخنة", "لافيستا", "ستيلا دي ماري", "مدينة الجلالة", "El Sokhna"]
+  };
+
+  // تعبئة قائمة المدن في أي select عنده id معيّن
+  function populateCitySelect(selectEl, includeAllOption) {
+    if (includeAllOption) {
+      const opt = document.createElement('option');
+      opt.value = ''; opt.textContent = 'الكل';
+      selectEl.appendChild(opt);
+    }
+    Object.keys(CITY_DISTRICTS).forEach(city => {
+      const opt = document.createElement('option');
+      opt.value = city; opt.textContent = city;
+      selectEl.appendChild(opt);
+    });
+  }
+
+  // تعبئة قائمة المناطق بناءً على المدينة المختارة
+  function populateDistrictSelect(districtEl, city, includeAllOption, selectedValue) {
+    districtEl.innerHTML = '';
+    if (!city || !CITY_DISTRICTS[city]) {
+      const opt = document.createElement('option');
+      opt.value = ''; opt.textContent = includeAllOption ? 'الكل' : 'اختر المدينة أولاً';
+      districtEl.appendChild(opt);
+      districtEl.disabled = !includeAllOption;
+      return;
+    }
+    if (includeAllOption) {
+      const optAll = document.createElement('option');
+      optAll.value = ''; optAll.textContent = 'الكل';
+      districtEl.appendChild(optAll);
+    } else {
+      const optChoose = document.createElement('option');
+      optChoose.value = ''; optChoose.textContent = 'اختر المنطقة';
+      districtEl.appendChild(optChoose);
+    }
+    CITY_DISTRICTS[city].forEach(d => {
+      const opt = document.createElement('option');
+      opt.value = d; opt.textContent = d;
+      districtEl.appendChild(opt);
+    });
+    districtEl.disabled = false;
+    if (selectedValue) districtEl.value = selectedValue;
+  }
+
+  const form = document.getElementById('unitForm');
+
+  /* ---------- اسم مدخل البيانات - بيتسأل مرة واحدة بس وبيتحفظ في الجهاز ---------- */
+  function getEnteredByName() {
+    let name = '';
+    try { name = localStorage.getItem('enteredByName') || ''; } catch (e) {}
+    if (!name) {
+      name = prompt('اكتب اسمك عشان يتسجل مين أضاف الوحدة (مرة واحدة بس، وهيتفتكر بعد كده):') || '';
+      name = name.trim();
+      if (name) {
+        try { localStorage.setItem('enteredByName', name); } catch (e) {}
+      }
+    }
+    return name;
+  }
+
+  const msg = document.getElementById('msg');
+  const submitBtn = document.getElementById('submitBtn');
+  const citySelect = document.getElementById('citySelect');
+  const districtSelect = document.getElementById('districtSelect');
+
+  /* ---------- ربط نوع العقار بالتصنيف المختار ---------- */
+  const CATEGORY_PROPERTY_TYPES = {
+    "سكني": ["Apartment", "Duplex", "Penthouse", "Studio", "Loft", "Villa", "Townhouse", "Twin House", "Chalet", "Land"],
+    "تجاري": ["Commercial Shop", "Showroom", "Pharmacy", "Warehouse", "Land"],
+    "إداري": ["Office", "Clinic", "Administrative Unit", "Lab", "Radiology Center", "Land"],
+    "فندقي": ["Hotel Unit", "Hotel Apartment"]
+  };
+  const categorySelect = document.getElementById('categorySelect');
+  const propertyTypeSelect = document.getElementById('propertyTypeSelect');
+
+  function populatePropertyTypeSelect(category, selectedValue) {
+    propertyTypeSelect.innerHTML = '';
+    const types = CATEGORY_PROPERTY_TYPES[category];
+    if (!category || !types) {
+      const opt = document.createElement('option');
+      opt.value = ''; opt.textContent = 'اختر التصنيف أولاً';
+      propertyTypeSelect.appendChild(opt);
+      propertyTypeSelect.disabled = true;
+      return;
+    }
+    const optChoose = document.createElement('option');
+    optChoose.value = ''; optChoose.textContent = 'اختر نوع العقار';
+    propertyTypeSelect.appendChild(optChoose);
+    types.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t; opt.textContent = t;
+      propertyTypeSelect.appendChild(opt);
+    });
+    propertyTypeSelect.disabled = false;
+    if (selectedValue) propertyTypeSelect.value = selectedValue;
+  }
+  categorySelect.addEventListener('change', function() {
+    populatePropertyTypeSelect(categorySelect.value);
+  });
+
+  populateCitySelect(citySelect, false);
+  citySelect.addEventListener('change', function() {
+    populateDistrictSelect(districtSelect, citySelect.value, false);
+  });
+
+  /* ---------- صورة الغلاف (نفس صورة شاشة البحث، بدون رفع تاني) ---------- */
+  function loadCoverImage() {
+    google.script.run.withSuccessHandler(function(url) {
+      if (url) {
+        document.getElementById('coverImg').src = url;
+        document.getElementById('coverWrap').classList.add('has-image');
+      }
+    }).getCoverImageUrl();
+  }
+
+  /* ---------- اقتراح ذكي: المطور → مشاريعه → المدينة والمنطقة تلقائيًا ---------- */
+  let devProjectMap = { developers: [], map: {} };
+  const developerInput = form.elements['developer'];
+  const projectNameInput = form.elements['projectName'];
+  const developerDatalist = document.getElementById('developerDatalist');
+  const projectDatalist = document.getElementById('projectDatalist');
+
+  function initFormData() {
+    loadCoverImage();
+    google.script.run.withSuccessHandler(function(res) {
+      devProjectMap = res;
+      developerDatalist.innerHTML = res.developers.map(d => `<option value="${d}">`).join('');
+    }).getDeveloperProjectMap();
+  }
+
+  /* ---------- تعبئة تلقائية بالذكاء الاصطناعي ---------- */
+  /* ---------- لصق صورة مباشرة (Ctrl+V) في قسم الذكاء الاصطناعي ---------- */
+  let aiPastedImageBase64 = null;
+  let aiPastedImageMime = null;
+
+  document.getElementById('aiImagePasteZone').addEventListener('focus', function() {
+    this.style.background = '#ece4ff';
+    this.textContent = '✅ جاهز - الصق الصورة دلوقتي (Ctrl+V)';
+  });
+  document.getElementById('aiImagePasteZone').addEventListener('blur', function() {
+    this.style.background = '#f7f4ff';
+    this.textContent = '📋 دوس هنا وبعدين الصق صورة (Ctrl+V)';
+  });
+  document.getElementById('aiImagePasteZone').addEventListener('paste', function(e) {
+    const items = (e.clipboardData || window.clipboardData).items;
+    for (const item of items) {
+      if (item.type.indexOf('image') === 0) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        const reader = new FileReader();
+        reader.onload = function() {
+          aiPastedImageBase64 = reader.result.split(',')[1];
+          aiPastedImageMime = file.type;
+          document.getElementById('aiPastedImageTag').src = reader.result;
+          document.getElementById('aiPastedImagePreview').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+        return;
+      }
+    }
+  });
+
+  document.getElementById('aiPastedImageRemove').addEventListener('click', function() {
+    aiPastedImageBase64 = null;
+    aiPastedImageMime = null;
+    document.getElementById('aiPastedImagePreview').style.display = 'none';
+  });
+
+  // نحتفظ بآخر نص/بيانات اتبعتت للذكاء الاصطناعي عشان لو الوحدة اتحفظت بنجاح
+  // نسجلها كمثال يتعلم منه النظام في المرات الجاية (تحسين مستمر)
+  let lastAiRawInputText = '';
+
+  document.getElementById('aiExtractBtn').addEventListener('click', function() {
+    const btn = this;
+    const msg = document.getElementById('aiExtractMsg');
+    const text = document.getElementById('aiPasteText').value.trim();
+    const fileInput = document.getElementById('aiFileInput');
+    const file = fileInput.files[0];
+
+    if (!text && !file && !aiPastedImageBase64) {
+      msg.style.display = 'block';
+      msg.style.color = 'var(--error-fg)';
+      msg.textContent = 'الصق نص أو صورة، أو ارفع صورة/PDF الأول';
+      return;
+    }
+
+    lastAiRawInputText = text || '(تم الاستخراج من صورة/ملف مرفق)';
+
+    btn.disabled = true;
+    btn.textContent = '⏳ جاري القراءة والاستخراج...';
+    msg.style.display = 'none';
+
+    function callExtract(fileBase64, mimeType) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          btn.disabled = false;
+          btn.textContent = '✨ استخرج البيانات وابدأ التعبئة';
+          if (!res.success) {
+            msg.style.display = 'block';
+            msg.style.color = 'var(--error-fg)';
+            msg.textContent = res.message;
+            return;
+          }
+          fillFormFromAI(res.data);
+          msg.style.display = 'block';
+          msg.style.color = 'var(--success-fg)';
+          msg.textContent = '✅ تم استخراج البيانات - راجعها كويس قبل الحفظ (خصوصًا خانات الدفعات)';
+        })
+        .withFailureHandler(function(err) {
+          btn.disabled = false;
+          btn.textContent = '✨ استخرج البيانات وابدأ التعبئة';
+          msg.style.display = 'block';
+          msg.style.color = 'var(--error-fg)';
+          msg.textContent = 'حدث خطأ: ' + err.message;
+        })
+        .extractUnitDataWithAI(text, fileBase64, mimeType);
+    }
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function() {
+        const base64Data = reader.result.split(',')[1];
+        callExtract(base64Data, file.type);
+      };
+      reader.readAsDataURL(file);
+    } else if (aiPastedImageBase64) {
+      callExtract(aiPastedImageBase64, aiPastedImageMime);
+    } else {
+      callExtract(null, null);
+    }
+  });
+
+  function fillFormFromAI(data) {
+    const fieldMap = {
+      category: 'category', propertyType: 'propertyType', developer: 'developer',
+      projectName: 'projectName', unitArea: 'unitArea', landArea: 'landArea',
+      gardenArea: 'gardenArea', terraceArea: 'terraceArea', roofArea: 'roofArea',
+      rooms: 'rooms', bathrooms: 'bathrooms', floor: 'floor', finishing: 'finishing',
+      view: 'view', price: 'price', discountPercent: 'discountPercent', paymentMethod: 'paymentMethod',
+      downPayment: 'downPayment', downPaymentBase: 'downPaymentBase', installmentYears: 'installmentYears',
+      otherPaymentPlans: 'otherPaymentPlans', deliveryDate: 'deliveryDate', notes: 'notes',
+      paymentAmount: 'paymentAmount', paymentCount: 'paymentCount', paymentSchedule: 'paymentSchedule'
+    };
+
+    Object.keys(fieldMap).forEach(key => {
+      const value = data[key];
+      if (!value) return;
+      const el = form.elements[fieldMap[key]];
+      if (!el) return;
+      el.value = value;
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+
+    // المدينة والمنطقة محتاجين معالجة خاصة عشان المنطقة تابعة للمدينة
+    if (data.city) {
+      const cityMatch = Object.keys(CITY_DISTRICTS).find(c => c === data.city || c.includes(data.city) || data.city.includes(c));
+      if (cityMatch) {
+        citySelect.value = cityMatch;
+        let districtMatch = '';
+        if (data.district) {
+          districtMatch = CITY_DISTRICTS[cityMatch].find(d =>
+            d === data.district || d.includes(data.district) || data.district.includes(d)) || '';
+        }
+        populateDistrictSelect(districtSelect, cityMatch, true, districtMatch);
+      }
+    }
+
+    // إعادة حساب الأقساط والمقدم بعد التعبئة
+    if (typeof calcMonthlyInstallment === 'function') calcMonthlyInstallment();
+  }
+
+  function refreshProjectSuggestions() {
+    const dev = developerInput.value.trim();
+    const projects = (devProjectMap.map[dev]) ? Object.keys(devProjectMap.map[dev]) : [];
+    projectDatalist.innerHTML = projects.map(p => `<option value="${p}">`).join('');
+  }
+
+  developerInput.addEventListener('input', refreshProjectSuggestions);
+  document.getElementById('fetchLastSimilarBtn').addEventListener('click', fetchLastSimilarUnitData);
+
+  // التعبئة الذكية بقت اختيارية بس (زرار يدوي) - عشان متتعارضش مع
+  // تعبئة الذكاء الاصطناعي اللي بتشتغل بنفس الأحداث على نفس الخانات
+  function fetchLastSimilarUnitData() {
+    const dev = developerInput.value.trim();
+    const proj = projectNameInput.value.trim();
+    if (!dev || !proj) {
+      alert('لازم تكتب اسم المطور واسم المشروع الأول');
+      return;
+    }
+    const info = devProjectMap.map[dev] && devProjectMap.map[dev][proj];
+    if (!info) {
+      alert('مفيش وحدة سابقة مسجلة بنفس المطور والمشروع دول');
+      return;
+    }
+    if (info.city) {
+      citySelect.value = info.city;
+      populateDistrictSelect(districtSelect, info.city, false, info.district);
+    }
+    const currentType = propertyTypeSelect.value;
+    if (!currentType) {
+      alert('اختار نوع العقار الأول عشان نجيب بيانات مطابقة');
+      return;
+    }
+    google.script.run.withSuccessHandler(function(typeDefaults) {
+      if (!typeDefaults) { alert('مفيش بيانات كفاية لنفس نوع العقار ده في المشروع'); return; }
+      if (typeDefaults.finishing) form.elements['finishing'].value = typeDefaults.finishing;
+      if (typeDefaults.view) form.elements['view'].value = typeDefaults.view;
+      if (typeDefaults.paymentMethod) form.elements['paymentMethod'].value = typeDefaults.paymentMethod;
+      if (typeDefaults.downPayment) form.elements['downPayment'].value = typeDefaults.downPayment;
+      if (typeDefaults.downPaymentBase) form.elements['downPaymentBase'].value = typeDefaults.downPaymentBase;
+      if (typeDefaults.installmentYears) form.elements['installmentYears'].value = typeDefaults.installmentYears;
+      if (typeDefaults.deliveryDate) form.elements['deliveryDate'].value = typeDefaults.deliveryDate;
+      if (typeDefaults.otherPaymentPlans) form.elements['otherPaymentPlans'].value = typeDefaults.otherPaymentPlans;
+      calcMonthlyInstallment();
+      showAutoFillNotice();
+    }).getProjectTypeDefaults(dev, proj, currentType);
+  }
+
+  function showAutoFillNotice() {
+    let notice = document.getElementById('autoFillNotice');
+    if (!notice) {
+      notice = document.createElement('div');
+      notice.id = 'autoFillNotice';
+      notice.style.cssText = 'background:var(--gold-light);color:#6b5416;padding:8px 12px;border-radius:8px;font-size:12px;font-weight:600;margin-top:8px;';
+      projectNameInput.parentElement.appendChild(notice);
+    }
+    notice.textContent = '✅ اتملت بيانات الدفع والتشطيب تلقائيًا من آخر وحدة بنفس المشروع والنوع - راجعها وعدّل اللي محتاج تغيير';
+    notice.style.display = 'block';
+    clearTimeout(window._autoFillNoticeTimer);
+    window._autoFillNoticeTimer = setTimeout(() => { notice.style.display = 'none'; }, 6000);
+  }
+
+  /* ---------- حساب السعر بعد الخصم والمقدم والقسط الشهري التقريبي لحظيًا ---------- */
+  const installmentFields = ['price', 'discountPercent', 'downPayment', 'downPaymentBase', 'paymentAmount', 'paymentCount', 'installmentYears'];
+  const installmentPreview = document.getElementById('installmentPreview');
+  const monthlyInstallmentValue = document.getElementById('monthlyInstallmentValue');
+  const priceAfterDiscountValue = document.getElementById('priceAfterDiscountValue');
+  const downPaymentValueHint = document.getElementById('downPaymentValueHint');
+
+  function calcMonthlyInstallment() {
+    const price = parseFloat(form.elements['price'].value) || 0;
+    const discountPercent = parseFloat(form.elements['discountPercent'].value) || 0;
+    const priceAfterDiscount = discountPercent > 0 ? Math.round(price - (price * discountPercent / 100)) : price;
+
+    const downPaymentPercent = parseFloat(form.elements['downPayment'].value) || 0;
+    const downPaymentBase = form.elements['downPaymentBase'].value === 'قبل الخصم' ? price : priceAfterDiscount;
+    const downPaymentValue = Math.round(downPaymentBase * (downPaymentPercent / 100));
+
+    if (downPaymentBase > 0 && downPaymentPercent > 0) {
+      downPaymentValueHint.textContent = '= ' + downPaymentValue.toLocaleString('en-US') + ' جنيه';
+      downPaymentValueHint.style.display = 'block';
+    } else {
+      downPaymentValueHint.style.display = 'none';
+    }
+
+    const paymentAmountRaw = (form.elements['paymentAmount'].value || '').trim().replace(/٪/g, '%');
+    let paymentAmount = 0;
+    if (paymentAmountRaw.indexOf('%') !== -1) {
+      paymentAmount = Math.round(priceAfterDiscount * ((parseFloat(paymentAmountRaw) || 0) / 100));
+    } else {
+      paymentAmount = parseFloat(paymentAmountRaw) || 0;
+    }
+    const paymentAmountValueHint = document.getElementById('paymentAmountValueHint');
+    if (paymentAmountRaw.indexOf('%') !== -1 && priceAfterDiscount > 0) {
+      paymentAmountValueHint.textContent = '= ' + paymentAmount.toLocaleString('en-US') + ' جنيه لكل دفعة';
+      paymentAmountValueHint.style.display = 'block';
+    } else {
+      paymentAmountValueHint.style.display = 'none';
+    }
+
+    const paymentCount = parseFloat(form.elements['paymentCount'].value) || 0;
+    const years = parseFloat(form.elements['installmentYears'].value) || 0;
+    const months = years * 12;
+
+    if (price > 0) {
+      priceAfterDiscountValue.textContent = priceAfterDiscount.toLocaleString('en-US');
+      if (months > 0) {
+        const remaining = priceAfterDiscount - downPaymentValue - (paymentAmount * paymentCount);
+        const monthly = Math.round(remaining / months);
+        monthlyInstallmentValue.textContent = monthly.toLocaleString('en-US');
+        document.getElementById('quarterlyInstallmentValue').textContent = (monthly * 3).toLocaleString('en-US');
+      } else {
+        monthlyInstallmentValue.textContent = '-';
+        document.getElementById('quarterlyInstallmentValue').textContent = '-';
+      }
+      installmentPreview.style.display = 'block';
+    } else {
+      installmentPreview.style.display = 'none';
+    }
+  }
+  installmentFields.forEach(name => {
+    form.elements[name].addEventListener('input', calcMonthlyInstallment);
+    form.elements[name].addEventListener('change', calcMonthlyInstallment);
+  });
+
+  /* ---------- إدارة صور الوحدة (رفع/لصق/رابط) ---------- */
+  let unitImages = []; // مصفوفة روابط الصور النهائية
+  let uploadingCount = 0;
+
+  const imagesZone = document.getElementById('imagesZone');
+  const imagesFileInput = document.getElementById('imagesFileInput');
+  const imagesChooseBtn = document.getElementById('imagesChooseBtn');
+  const imagesPreview = document.getElementById('imagesPreview');
+  const imagesUploadMsg = document.getElementById('imagesUploadMsg');
+  const imageLinkInput = document.getElementById('imageLinkInput');
+  const addImageLinkBtn = document.getElementById('addImageLinkBtn');
+
+  function renderImagesPreview() {
+    imagesPreview.innerHTML = unitImages.map((url, idx) => `
+      <div class="image-thumb" draggable="true" data-idx="${idx}">
+        <img src="${url}" alt="صورة الوحدة">
+        <button type="button" class="remove-img" onclick="removeUnitImage(${idx})">✕</button>
+      </div>
+    `).join('');
+    attachImageDragHandlers();
+  }
+
+  /* ---------- سحب وإفلات لإعادة ترتيب الصور ---------- */
+  let dragSrcIdx = null;
+
+  function attachImageDragHandlers() {
+    const thumbs = imagesPreview.querySelectorAll('.image-thumb');
+    thumbs.forEach(thumb => {
+      thumb.addEventListener('dragstart', function(e) {
+        dragSrcIdx = parseInt(this.dataset.idx, 10);
+        this.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      thumb.addEventListener('dragend', function() {
+        this.classList.remove('dragging');
+        thumbs.forEach(t => t.classList.remove('drag-over'));
+      });
+      thumb.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        this.classList.add('drag-over');
+      });
+      thumb.addEventListener('dragleave', function() {
+        this.classList.remove('drag-over');
+      });
+      thumb.addEventListener('drop', function(e) {
+        e.preventDefault();
+        const targetIdx = parseInt(this.dataset.idx, 10);
+        if (dragSrcIdx === null || dragSrcIdx === targetIdx) return;
+        const moved = unitImages.splice(dragSrcIdx, 1)[0];
+        unitImages.splice(targetIdx, 0, moved);
+        dragSrcIdx = null;
+        renderImagesPreview();
+      });
+      // دعم اللمس على الموبايل (السحب باللمس مش مدعوم افتراضيًا في HTML5 drag)
+      let touchStartIdx = null;
+      thumb.addEventListener('touchstart', function(e) {
+        touchStartIdx = parseInt(this.dataset.idx, 10);
+      }, { passive: true });
+      thumb.addEventListener('touchend', function(e) {
+        if (touchStartIdx === null) return;
+        const touch = e.changedTouches[0];
+        const el = document.elementFromPoint(touch.clientX, touch.clientY);
+        const targetThumb = el ? el.closest('.image-thumb') : null;
+        if (targetThumb) {
+          const targetIdx = parseInt(targetThumb.dataset.idx, 10);
+          if (targetIdx !== touchStartIdx) {
+            const moved = unitImages.splice(touchStartIdx, 1)[0];
+            unitImages.splice(targetIdx, 0, moved);
+            renderImagesPreview();
+          }
+        }
+        touchStartIdx = null;
+      });
+    });
+  }
+
+  function removeUnitImage(idx) {
+    unitImages.splice(idx, 1);
+    renderImagesPreview();
+  }
+  window.removeUnitImage = removeUnitImage; // متاحة لـ onclick
+
+  function addPlaceholderThumb() {
+    const div = document.createElement('div');
+    div.className = 'image-thumb';
+    div.innerHTML = '<div class="uploading-overlay">جاري الرفع...</div>';
+    imagesPreview.appendChild(div);
+    return div;
+  }
+
+  function uploadImageFile(file) {
+    if (!file.type.startsWith('image/')) return;
+    uploadingCount++;
+    const placeholder = addPlaceholderThumb();
+    imagesUploadMsg.textContent = '';
+
+    const reader = new FileReader();
+    reader.onload = function() {
+      const base64Data = reader.result.split(',')[1];
+      google.script.run
+        .withSuccessHandler(function(res) {
+          uploadingCount--;
+          placeholder.remove();
+          if (res.success) {
+            unitImages.push(res.url);
+            renderImagesPreview();
+          } else {
+            imagesUploadMsg.style.color = 'var(--gold)';
+            imagesUploadMsg.textContent = 'فشل رفع إحدى الصور: ' + res.message;
+          }
+        })
+        .withFailureHandler(function(err) {
+          uploadingCount--;
+          placeholder.remove();
+          imagesUploadMsg.style.color = 'var(--gold)';
+          imagesUploadMsg.textContent = 'حدث خطأ أثناء رفع الصورة: ' + err.message;
+        })
+        .uploadUnitImage(base64Data, file.type);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // اختيار من الجهاز
+  imagesChooseBtn.addEventListener('click', () => imagesFileInput.click());
+  imagesFileInput.addEventListener('change', function() {
+    Array.from(imagesFileInput.files).forEach(uploadImageFile);
+    imagesFileInput.value = '';
+  });
+
+  // السحب والإفلات
+  imagesZone.addEventListener('dragover', function(e) { e.preventDefault(); imagesZone.classList.add('drag-over'); });
+  imagesZone.addEventListener('dragleave', function() { imagesZone.classList.remove('drag-over'); });
+  imagesZone.addEventListener('drop', function(e) {
+    e.preventDefault();
+    imagesZone.classList.remove('drag-over');
+    Array.from(e.dataTransfer.files).forEach(uploadImageFile);
+  });
+
+  // اللصق المباشر (Ctrl+V)
+  imagesZone.addEventListener('paste', function(e) {
+    const items = (e.clipboardData || window.clipboardData).items;
+    for (const item of items) {
+      if (item.type.indexOf('image') === 0) {
+        uploadImageFile(item.getAsFile());
+      }
+    }
+  });
+
+  // إضافة رابط صورة خارجي مباشرة
+  addImageLinkBtn.addEventListener('click', function() {
+    const url = imageLinkInput.value.trim();
+    if (!url) return;
+    unitImages.push(url);
+    renderImagesPreview();
+    imageLinkInput.value = '';
+  });
+
+  let pendingUnitData = null;
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    if (uploadingCount > 0) {
+      msg.className = 'error';
+      msg.textContent = 'استنى لحد ما رفع الصور يخلص الأول';
+      msg.style.display = 'block';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "جاري الحفظ...";
+    msg.style.display = 'none';
+
+    const data = {};
+    new FormData(form).forEach((v, k) => data[k] = v);
+    data.images = unitImages.join(',');
+    data.enteredBy = getEnteredByName();
+    data.aiRawInput = lastAiRawInputText;
+
+    google.script.run
+      .withSuccessHandler(function(res) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "حفظ الوحدة";
+
+        if (res.possibleMatch) {
+          pendingUnitData = data;
+          showSameUnitModal(res);
+          return;
+        }
+
+        msg.className = res.success ? 'success' : 'error';
+        msg.textContent = res.message;
+        msg.style.display = 'block';
+        if (res.success) {
+          form.reset();
+          unitImages = [];
+          renderImagesPreview();
+          lastAiRawInputText = '';
+          aiPastedImageBase64 = null; aiPastedImageMime = null;
+          document.getElementById('aiPastedImagePreview').style.display = 'none';
+          document.getElementById('aiFileInput').value = '';
+        }
+      })
+      .withFailureHandler(function(err) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "حفظ الوحدة";
+        msg.className = 'error';
+        msg.textContent = "حدث خطأ: " + err.message;
+        msg.style.display = 'block';
+      })
+      .addUnit(data);
+  });
+
+  /* ---------- نافذة سؤال "نفس الوحدة ولا وحدة مختلفة؟" ---------- */
+  function showSameUnitModal(res) {
+    const modal = document.getElementById('sameUnitModal');
+    document.getElementById('sameUnitModalText').textContent = res.message;
+    modal.dataset.matchUnitId = res.matchUnitId;
+    modal.style.display = 'flex';
+  }
+
+  function closeSameUnitModal() {
+    document.getElementById('sameUnitModal').style.display = 'none';
+    pendingUnitData = null;
+  }
+
+  document.getElementById('sameUnitConfirmBtn').addEventListener('click', function() {
+    if (!pendingUnitData) return;
+    const dataToSend = pendingUnitData;
+    const matchUnitId = document.getElementById('sameUnitModal').dataset.matchUnitId;
+    closeSameUnitModal();
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "جاري التحديث...";
+
+    google.script.run
+      .withSuccessHandler(function(res) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "حفظ الوحدة";
+        msg.className = res.success ? 'success' : 'error';
+        msg.textContent = res.message;
+        msg.style.display = 'block';
+        if (res.success) {
+          form.reset();
+          unitImages = [];
+          renderImagesPreview();
+          lastAiRawInputText = '';
+          aiPastedImageBase64 = null; aiPastedImageMime = null;
+          document.getElementById('aiPastedImagePreview').style.display = 'none';
+          document.getElementById('aiFileInput').value = '';
+        }
+      })
+      .withFailureHandler(function(err) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "حفظ الوحدة";
+        msg.className = 'error';
+        msg.textContent = "حدث خطأ: " + err.message;
+        msg.style.display = 'block';
+      })
+      .confirmAddAsSameUnit(dataToSend, matchUnitId);
+  });
+
+  document.getElementById('sameUnitDifferentBtn').addEventListener('click', function() {
+    if (!pendingUnitData) return;
+    const dataToSend = pendingUnitData;
+    closeSameUnitModal();
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "جاري الحفظ...";
+
+    google.script.run
+      .withSuccessHandler(function(res) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "حفظ الوحدة";
+        msg.className = res.success ? 'success' : 'error';
+        msg.textContent = res.message;
+        msg.style.display = 'block';
+        if (res.success) {
+          form.reset();
+          unitImages = [];
+          renderImagesPreview();
+          lastAiRawInputText = '';
+          aiPastedImageBase64 = null; aiPastedImageMime = null;
+          document.getElementById('aiPastedImagePreview').style.display = 'none';
+          document.getElementById('aiFileInput').value = '';
+        }
+      })
+      .withFailureHandler(function(err) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "حفظ الوحدة";
+        msg.className = 'error';
+        msg.textContent = "حدث خطأ: " + err.message;
+        msg.style.display = 'block';
+      })
+      .confirmAddAsNewUnit(dataToSend);
+  });
+
+  document.getElementById('sameUnitCancelBtn').addEventListener('click', closeSameUnitModal);
+
+
+  form.addEventListener('reset', function() {
+    setTimeout(function() {
+      populateDistrictSelect(districtSelect, '', false);
+      unitImages = [];
+      renderImagesPreview();
+      installmentPreview.style.display = 'none';
+      downPaymentValueHint.style.display = 'none';
+
+      // تفريغ خانات الذكاء الاصطناعي كمان (مش جوه الفورم نفسه فمحتاجة تصفير يدوي)
+      document.getElementById('aiPasteText').value = '';
+      document.getElementById('aiFileInput').value = '';
+      aiPastedImageBase64 = null;
+      aiPastedImageMime = null;
+      document.getElementById('aiPastedImagePreview').style.display = 'none';
+      document.getElementById('aiExtractMsg').style.display = 'none';
+      lastAiRawInputText = '';
+    }, 0);
+  });
+
+  /* ---------- بوابة دخول المستخدمين ---------- */
+  function showApp() {
+    document.getElementById('loginGate').style.display = 'none';
+    document.getElementById('mainContainer').style.display = 'block';
+    initFormData();
+  }
+
+  function attemptLogin(email, password) {
+    const statusEl = document.getElementById('loginStatus');
+    const btn = document.getElementById('loginBtn');
+    btn.disabled = true; btn.textContent = 'جاري التحقق...';
+    statusEl.className = 'access-gate-status';
+    statusEl.style.display = 'none';
+
+    try { localStorage.setItem('loginEmail', email); } catch (e) {}
+
+    google.script.run
+      .withSuccessHandler(function(res) {
+        btn.disabled = false; btn.textContent = 'دخول';
+        if (res.success) {
+          try {
+            localStorage.setItem('loginEmail', email);
+            localStorage.setItem('loginPassword', password);
+          } catch (e) {}
+          showApp();
+        } else {
+          statusEl.className = 'access-gate-status error';
+          statusEl.textContent = res.message;
+        }
+      })
+      .withFailureHandler(function(err) {
+        btn.disabled = false; btn.textContent = 'دخول';
+        statusEl.className = 'access-gate-status error';
+        statusEl.textContent = 'حدث خطأ: ' + err.message;
+      })
+      .verifyUserAccess(email, password);
+  }
+
+  document.getElementById('loginBtn').addEventListener('click', function() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    if (!email || !password) {
+      const statusEl = document.getElementById('loginStatus');
+      statusEl.className = 'access-gate-status error';
+      statusEl.textContent = 'لازم تكتب الإيميل وكلمة السر';
+      return;
+    }
+    attemptLogin(email, password);
+  });
+  document.getElementById('loginPassword').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('loginBtn').click();
+  });
+  document.getElementById('loginEmail').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('loginPassword').focus();
+  });
+
+  // خانة الإيميل بتفضل متذكّرة دايمًا حتى لو الدخول التلقائي فشل أو كلمة السر مش محفوظة
+  (function prefillAndCheckSavedLogin() {
+    let savedEmail = '', savedPassword = '';
+    try {
+      savedEmail = localStorage.getItem('loginEmail') || '';
+      savedPassword = localStorage.getItem('loginPassword') || '';
+    } catch (e) {}
+    if (savedEmail) {
+      document.getElementById('loginEmail').value = savedEmail;
+    }
+    if (savedEmail && savedPassword) {
+      attemptLogin(savedEmail, savedPassword);
+    } else if (savedEmail) {
+      document.getElementById('loginPassword').focus();
+    }
+  })();
+</script>
+</body>
+</html>
