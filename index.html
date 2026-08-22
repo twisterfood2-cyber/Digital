@@ -1784,6 +1784,13 @@
   });
 
   document.getElementById('addUnitFabBtn').addEventListener('click', function() {
+    // لو الأدمن متحقق منه بالفعل (داخل بكلمة سر لوحة التحكم)، نفتح الفورم على طول
+    // من غير ما نطلب كلمة سر منفصلة تانية - أدمن يبقى أدمن، مش محتاج تأكيد إضافي
+    if (isAdminUnlocked) {
+      openAddUnitModal();
+      return;
+    }
+
     askForPin('كلمة سر فتح شاشة إضافة وحدة جديدة:', function(pin) {
       if (pin === null) return;
       if (!pin.trim()) { showToast('لازم تدخل كلمة السر', 'error'); return; }
