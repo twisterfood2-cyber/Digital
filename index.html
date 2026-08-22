@@ -2752,6 +2752,7 @@
             ${u['Roof Area (sqm)'] ? `<span class="spec-chip">🏠 روف ${u['Roof Area (sqm)']} م²</span>` : ''}
           </div>
         </div>
+        <div style="margin-top:auto;">
         ${u['Listing Type'] === 'ريسيل' ? `
         <div class="resale-current-box">
           <div class="resale-box-title">💰 الوضع المالي الحالي</div>
@@ -2779,6 +2780,7 @@
           ${u['Price per Meter'] ? `<div class="per-meter">${fmtNum(u['Price per Meter'])} ج/م²</div>` : ''}
         </div>
         `}
+        </div>
         <button type="button" class="toggle-details-btn" onclick="toggleUnitDetails(this)">
           <span class="label">عرض التفاصيل الكاملة</span><span class="chevron">▾</span>
         </button>
