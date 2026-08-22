@@ -1770,10 +1770,31 @@
           showToast('كلمة السر غير صحيحة', 'error');
           return;
         }
-        window.open('https://script.google.com/macros/s/AKfycby0Suh2iXdvCSy1N9G9e8u8VUjfHygiXe0owQyzUrHWcF_tIHMd7WnDZw2JtlXDkDDEWw/exec?page=entry', '_blank');
+        openAddUnitModal();
       }).verifyDataEntryPin(pin);
     });
   });
+
+  function openAddUnitModal() {
+    editModalMode = 'add';
+    currentEditUnitId = null;
+    editForm.reset();
+    document.getElementById('editUnitIdLabel').textContent = '';
+    document.querySelector('#editModal .modal-title').firstChild.textContent = 'إضافة وحدة جديدة ';
+    editSaveBtn.textContent = 'حفظ الوحدة الجديدة';
+    editDeleteBtn.style.display = 'none';
+    editMsg.style.display = 'none';
+    editMsg.className = '';
+
+    populateDistrictSelect(editDistrictSelect, '', false);
+    document.getElementById('editResaleFieldsWrap').style.display = 'none';
+
+    editUnitImages = [];
+    renderEditImagesPreview();
+
+    calcEditMonthlyInstallment();
+    editModal.classList.add('open');
+  }
 
   function cloneUnit(unitId) {
     editModalMode = 'clone';
@@ -4049,6 +4070,65 @@
     const data = {};
     new FormData(editForm).forEach((v, k) => data[k] = v);
     data.images = editUnitImages.join(',');
+
+    if (editModalMode === 'add') {
+      data.enteredBy = visitorName || '';
+      google.script.run
+        .withSuccessHandler(function(res) {
+          editSaveBtn.disabled = false;
+          editSaveBtn.textContent = 'حفظ الوحدة الجديدة';
+
+          if (res.possibleMatch) {
+            editMsg.className = '';
+            editMsg.style.display = 'block';
+            editMsg.innerHTML = `
+              <div style="margin-bottom:8px;">${res.message}</div>
+              <div style="display:flex; gap:8px;">
+                <button type="button" id="editSameUnitBtn" style="flex:1; padding:9px; border:none; border-radius:8px; background:var(--navy); color:#fff; font-weight:700; font-size:12px; cursor:pointer;">✅ نفس الوحدة - حدّث</button>
+                <button type="button" id="editDifferentUnitBtn" style="flex:1; padding:9px; border:none; border-radius:8px; background:var(--gold); color:#fff; font-weight:700; font-size:12px; cursor:pointer;">🆕 وحدة مختلفة</button>
+              </div>
+            `;
+            document.getElementById('editSameUnitBtn').addEventListener('click', function() {
+              editSaveBtn.disabled = true; editSaveBtn.textContent = 'جاري التحديث...';
+              google.script.run.withSuccessHandler(function(res2) {
+                editSaveBtn.disabled = false; editSaveBtn.textContent = 'حفظ الوحدة الجديدة';
+                editMsg.innerHTML = '';
+                editMsg.className = res2.success ? 'success' : 'error';
+                editMsg.textContent = res2.message;
+                if (res2.success) { runSearch(); setTimeout(closeEditModal, 1200); }
+              }).confirmAddAsSameUnit(data, res.matchUnitId);
+            });
+            document.getElementById('editDifferentUnitBtn').addEventListener('click', function() {
+              editSaveBtn.disabled = true; editSaveBtn.textContent = 'جاري الحفظ...';
+              google.script.run.withSuccessHandler(function(res2) {
+                editSaveBtn.disabled = false; editSaveBtn.textContent = 'حفظ الوحدة الجديدة';
+                editMsg.innerHTML = '';
+                editMsg.className = res2.success ? 'success' : 'error';
+                editMsg.textContent = res2.message;
+                if (res2.success) { runSearch(); setTimeout(closeEditModal, 1200); }
+              }).confirmAddAsNewUnit(data);
+            });
+            return;
+          }
+
+          editMsg.className = res.success ? 'success' : 'error';
+          editMsg.textContent = res.message;
+          editMsg.style.display = 'block';
+          if (res.success) {
+            runSearch();
+            setTimeout(closeEditModal, 1200);
+          }
+        })
+        .withFailureHandler(function(err) {
+          editSaveBtn.disabled = false;
+          editSaveBtn.textContent = 'حفظ الوحدة الجديدة';
+          editMsg.className = 'error';
+          editMsg.textContent = 'حدث خطأ: ' + err.message;
+          editMsg.style.display = 'block';
+        })
+        .addUnit(data);
+      return;
+    }
 
     if (editModalMode === 'clone') {
       data.enteredBy = visitorName || '';
