@@ -707,12 +707,7 @@
     <button type="button" class="top-action-btn top-action-calc" id="calcFabBtn">🧮 Your Quote</button>
     <button type="button" class="top-action-btn top-action-price" id="priceInfoFabBtn">📊 Price/m²</button>
     <button type="button" class="top-action-btn top-action-add" id="addUnitFabBtn">➕ Add Unit</button>
-    <button type="button" class="top-action-btn" id="resaleModeBtn">🏘 Resale Units</button>
-  </div>
-
-  <div id="resaleModeBanner" style="display:none; align-items:center; justify-content:space-between; gap:10px; background:#fdf7ea; border:1.5px solid var(--gold); border-radius:12px; padding:12px 16px; margin-bottom:16px;">
-    <span style="font-size:13px; font-weight:800; color:#6b5416;">🏘 إنت دلوقتي بتشوف وحدات الريسيل بس</span>
-    <button type="button" id="exitResaleModeBtn" style="padding:8px 14px; border:none; border-radius:8px; background:var(--navy); color:#fff; font-weight:700; font-size:12px; cursor:pointer; white-space:nowrap;">الرجوع للوحدات الأساسية</button>
+    <a href="https://resale-units.vercel.app/" target="_blank" class="top-action-btn" style="text-decoration:none; display:flex; align-items:center; justify-content:center;">🏘 Resale Units</a>
   </div>
 
 <div style="background:var(--bg); border:1.5px solid var(--navy); border-radius:14px; padding:16px; margin-bottom:16px;">
@@ -1763,22 +1758,6 @@
       lastPriceStats = res.districtStats;
       renderPriceStatsTable(lastPriceStats);
     }).getDistrictPriceStats();
-  });
-
-  /* ---------- فتح شاشة إدخال الوحدة الجديدة - محمية بكلمة سر منفصلة تمامًا ---------- */
-  document.getElementById('resaleModeBtn').addEventListener('click', function() {
-    resaleMode = true;
-    document.getElementById('resaleModeBanner').style.display = 'flex';
-    document.querySelector('h1').textContent = '🏘 Resale Units - Digital Real Estate';
-    runSearch();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
-
-  document.getElementById('exitResaleModeBtn').addEventListener('click', function() {
-    resaleMode = false;
-    document.getElementById('resaleModeBanner').style.display = 'none';
-    document.querySelector('h1').textContent = '🔍 Search for units at Digital Real Estate';
-    runSearch();
   });
 
   document.getElementById('addUnitFabBtn').addEventListener('click', function() {
