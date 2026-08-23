@@ -85,16 +85,16 @@
     .card {
       background: var(--card);
       border-radius: 14px;
-      padding: 28px;
+      padding: 18px;
       box-shadow: 0 4px 18px rgba(15,41,66,0.07);
       border-top: 4px solid var(--navy);
     }
     .section-title {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 800;
       color: var(--navy);
-      margin: 22px 0 12px;
-      padding-bottom: 7px;
+      margin: 12px 0 6px;
+      padding-bottom: 5px;
       border-bottom: 2px solid var(--gold-light);
       text-transform: uppercase;
       letter-spacing: 0.3px;
@@ -102,20 +102,20 @@
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 14px;
+      gap: 8px;
     }
     label {
       display: block;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
-      margin-bottom: 5px;
+      margin-bottom: 2px;
       color: var(--muted);
     }
     input, select, textarea {
       width: 100%;
-      padding: 10px 12px;
+      padding: 6px 10px;
       border: 1.5px solid var(--border);
-      border-radius: 8px;
+      border-radius: 7px;
       font-size: 14px;
       font-family: inherit;
       background: #fbfbfc;
@@ -127,8 +127,8 @@
       border-color: var(--navy);
       background: #fff;
     }
-    textarea { resize: vertical; min-height: 70px; }
-    .btn-row { margin-top: 26px; display: flex; gap: 10px; }
+    textarea { resize: vertical; min-height: 45px; }
+    .btn-row { margin-top: 14px; display: flex; gap: 10px; }
     button {
       padding: 13px 26px;
       border: none;
@@ -201,7 +201,7 @@
     .images-zone {
       border: 2px dashed var(--border);
       border-radius: 10px;
-      padding: 22px;
+      padding: 10px;
       text-align: center;
       background: #fbfbfc;
       cursor: pointer;
@@ -212,12 +212,12 @@
       background: #f2f6fa;
       outline: none;
     }
-    .images-zone p { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+    .images-zone p { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
     .images-choose-btn {
-      background: var(--navy); color: #fff; padding: 9px 20px;
-      border-radius: 8px; font-size: 13px; font-weight: 700; border: none; cursor: pointer;
+      background: var(--navy); color: #fff; padding: 6px 16px;
+      border-radius: 8px; font-size: 12px; font-weight: 700; border: none; cursor: pointer;
     }
-    .image-link-row { display: flex; gap: 8px; margin-top: 10px; }
+    .image-link-row { display: flex; gap: 8px; margin-top: 6px; }
     .image-link-row input { flex: 1; }
     .image-link-row button {
       background: var(--gold-light); color: #6b5416; padding: 0 18px;
@@ -227,7 +227,7 @@
       display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px;
     }
     .image-thumb {
-      position: relative; width: 90px; height: 90px; border-radius: 8px; overflow: hidden;
+      position: relative; width: 70px; height: 70px; border-radius: 8px; overflow: hidden;
       border: 1px solid var(--border); cursor: grab; transition: transform .15s, opacity .15s, border-color .15s;
     }
     .image-thumb:active { cursor: grabbing; }
@@ -313,26 +313,26 @@
   </div>
   <h1>🏢 إدخال وحدة عقارية جديدة</h1>
 
-<div class="card" id="aiFillCard" style="border-top: 4px solid #7c4dff;">
-  <div class="section-title" style="color:#7c4dff;">🤖 تعبئة تلقائية بالذكاء الاصطناعي</div>
-  <p style="font-size:12px; color:var(--muted); margin:-4px 0 12px; line-height:1.7;">
+<div class="card" id="aiFillCard" style="border-top: 4px solid #7c4dff; padding:14px;">
+  <div class="section-title" style="color:#7c4dff; margin-top:0;">🤖 تعبئة تلقائية بالذكاء الاصطناعي</div>
+  <p style="font-size:11px; color:var(--muted); margin:-4px 0 6px; line-height:1.5;">
     الصق رسالة المطور (نص أو صورة بـ Ctrl+V)، أو ارفع صورة قايمة أسعار أو ملف PDF، والذكاء الاصطناعي هيملى الفورم تلقائيًا.
     راجع البيانات كويس قبل ما تحفظ.
   </p>
-  <textarea id="aiPasteText" placeholder="الصق نص الرسالة هنا (اختياري)..." style="min-height:90px;"></textarea>
-  <div id="aiImagePasteZone" tabindex="0" style="margin-top:10px; border:2px dashed #7c4dff; border-radius:10px; padding:16px; text-align:center; cursor:pointer; color:#7c4dff; font-size:13px; font-weight:600; background:#f7f4ff; outline:none;">
+  <textarea id="aiPasteText" placeholder="الصق نص الرسالة هنا (اختياري)..." style="min-height:50px;"></textarea>
+  <div id="aiImagePasteZone" tabindex="0" style="margin-top:6px; border:2px dashed #7c4dff; border-radius:10px; padding:8px; text-align:center; cursor:pointer; color:#7c4dff; font-size:12px; font-weight:600; background:#f7f4ff; outline:none;">
     📋 دوس هنا وبعدين الصق صورة (Ctrl+V)
   </div>
-  <div id="aiPastedImagePreview" style="display:none; margin-top:8px; position:relative; max-width:200px;">
+  <div id="aiPastedImagePreview" style="display:none; margin-top:6px; position:relative; max-width:200px;">
     <img id="aiPastedImageTag" style="width:100%; border-radius:8px; border:1px solid var(--border);">
     <button type="button" id="aiPastedImageRemove" style="position:absolute; top:-8px; left:-8px; width:24px; height:24px; border-radius:50%; background:var(--error-fg); color:#fff; border:none; cursor:pointer; font-size:13px;">✕</button>
   </div>
-  <input type="file" id="aiFileInput" accept="image/*,application/pdf" style="margin-top:8px;">
+  <input type="file" id="aiFileInput" accept="image/*,application/pdf" style="margin-top:6px;">
 
-  <button type="button" id="aiExtractBtn" style="width:100%; margin-top:10px; padding:12px; border:none; border-radius:9px; background:#7c4dff; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">
+  <button type="button" id="aiExtractBtn" style="width:100%; margin-top:6px; padding:10px; border:none; border-radius:9px; background:#7c4dff; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">
     ✨ استخرج البيانات وابدأ التعبئة
   </button>
-  <div id="aiExtractMsg" style="font-size:12px; margin-top:8px; display:none;"></div>
+  <div id="aiExtractMsg" style="font-size:12px; margin-top:6px; display:none;"></div>
 </div>
 
 <div class="card">
