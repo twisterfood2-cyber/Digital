@@ -74,7 +74,7 @@
     .filters-card {
       background: var(--card);
       border-radius: 14px;
-      padding: 22px;
+      padding: 16px;
       box-shadow: 0 4px 18px rgba(15,41,66,0.07);
       margin-bottom: 22px;
       border-top: 4px solid var(--navy);
@@ -82,20 +82,20 @@
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 12px;
+      gap: 8px;
     }
     label {
       display: block;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
       color: var(--muted);
     }
     input, select {
       width: 100%;
-      padding: 9px 10px;
+      padding: 6px 9px;
       border: 1.5px solid var(--border);
-      border-radius: 8px;
+      border-radius: 7px;
       font-size: 13px;
       font-family: inherit;
       background: #fbfbfc;
@@ -228,7 +228,7 @@
     .unit-added { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
     .unit-info-block { min-height: 132px; }
     .unit-specs { display: flex; flex-wrap: wrap; gap: 8px; font-size: 12px; margin-bottom: 12px; min-height: 58px; align-content: flex-start; }
-    .spec-chip { background: var(--bg); padding: 4px 10px; border-radius: 6px; color: var(--text); font-weight: 600; }
+    .spec-chip { background: #f5e3ba; padding: 4px 10px; border-radius: 6px; color: var(--text); font-weight: 600; }
     .unit-price-box {
       background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%);
       border-radius: 12px; padding: 14px 16px; margin-bottom: 4px;
@@ -775,10 +775,6 @@
       <div>
         <label>التشطيب</label>
         <select id="f_finishing"><option value="">الكل</option></select>
-      </div>
-      <div>
-        <label>الحالة</label>
-        <select id="f_status"><option value="">الكل</option></select>
       </div>
       <div>
         <label>عدد الغرف</label>
@@ -1582,7 +1578,6 @@
       district: fDistrict.value,
       developer: document.getElementById('f_developer').value,
       finishing: document.getElementById('f_finishing').value,
-      status: document.getElementById('f_status').value,
       rooms: document.getElementById('f_rooms').value,
       minPrice: document.getElementById('f_minPrice').value,
       maxPrice: document.getElementById('f_maxPrice').value,
@@ -1619,7 +1614,6 @@
     if (saved.propertyType) document.getElementById('f_propertyType').value = saved.propertyType;
     if (saved.developer) document.getElementById('f_developer').value = saved.developer;
     if (saved.finishing) document.getElementById('f_finishing').value = saved.finishing;
-    if (saved.status) document.getElementById('f_status').value = saved.status;
   }
 
   let lastResults = [];
@@ -3565,7 +3559,6 @@
     if (filters.category) document.getElementById('f_category').value = filters.category;
     if (filters.propertyType) document.getElementById('f_propertyType').value = filters.propertyType;
     if (filters.finishing) document.getElementById('f_finishing').value = filters.finishing;
-    if (filters.status) document.getElementById('f_status').value = filters.status;
     if (filters.rooms) document.getElementById('f_rooms').value = filters.rooms;
     if (filters.minPrice) document.getElementById('f_minPrice').value = filters.minPrice;
     if (filters.maxPrice) document.getElementById('f_maxPrice').value = filters.maxPrice;
