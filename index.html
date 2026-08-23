@@ -1541,11 +1541,11 @@
     if (selectedValue) districtEl.value = selectedValue;
   }
 
-  const filterIds = ['category','propertyType','finishing','status'];
+  const filterIds = ['category','propertyType','finishing'];
 
   function loadFilterOptions() {
     google.script.run.withSuccessHandler(function(opts) {
-      const map = { category: opts.categories, propertyType: opts.propertyTypes, finishing: opts.finishing, status: opts.statuses };
+      const map = { category: opts.categories, propertyType: opts.propertyTypes, finishing: opts.finishing };
       filterIds.forEach(id => {
         const sel = document.getElementById('f_' + id);
         const values = (map[id] || []).slice().sort((a, b) => a.localeCompare(b, 'ar'));
