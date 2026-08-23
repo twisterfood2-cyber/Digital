@@ -585,41 +585,41 @@
     .modal-overlay.open { display: flex; }
     .modal-box {
       background: #fff; border-radius: 14px; width: 100%; max-width: 900px;
-      padding: 26px; box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+      padding: 18px; box-shadow: 0 10px 40px rgba(0,0,0,0.25);
     }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .modal-title { font-size: 18px; font-weight: 800; color: var(--navy); }
-    .modal-close { background: var(--bg); color: var(--muted); border-radius: 50%; width: 32px; height: 32px; font-size: 16px; padding: 0; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .modal-title { font-size: 17px; font-weight: 800; color: var(--navy); }
+    .modal-close { background: var(--bg); color: var(--muted); border-radius: 50%; width: 30px; height: 30px; font-size: 15px; padding: 0; }
     .section-title {
-      font-size: 13px; font-weight: 800; color: var(--navy); margin: 18px 0 10px;
-      padding-bottom: 6px; border-bottom: 2px solid var(--gold-light); text-transform: uppercase;
+      font-size: 12px; font-weight: 800; color: var(--navy); margin: 10px 0 6px;
+      padding-bottom: 4px; border-bottom: 2px solid var(--gold-light); text-transform: uppercase;
     }
-    #editMsg { margin-top: 14px; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; display: none; }
+    #editMsg { margin-top: 10px; padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; display: none; }
     #editMsg.success { background: var(--success-bg); color: var(--success-fg); display: block; }
     #editMsg.error { background: var(--error-bg); color: var(--error-fg); display: block; }
-    #editSaveBtn { background: var(--navy); color: #fff; width: 100%; margin-top: 18px; padding: 12px; }
+    #editSaveBtn { background: var(--navy); color: #fff; width: 100%; margin-top: 12px; padding: 10px; }
     #editSaveBtn:disabled { background: #9aa4ae; }
 
     .installment-preview {
-      margin-top: 14px; background: var(--gold-light); color: #6b5416; padding: 12px 16px;
-      border-radius: 9px; font-size: 14px; font-weight: 600;
+      margin-top: 8px; background: var(--gold-light); color: #6b5416; padding: 8px 14px;
+      border-radius: 9px; font-size: 13px; font-weight: 600;
     }
-    .installment-preview b { font-size: 16px; }
+    .installment-preview b { font-size: 15px; }
 
     /* منطقة رفع صور الوحدة (مطابقة لصفحة الإدخال) */
     .images-zone {
-      border: 2px dashed var(--border); border-radius: 10px; padding: 22px; text-align: center;
+      border: 2px dashed var(--border); border-radius: 10px; padding: 10px; text-align: center;
       background: #fbfbfc; cursor: pointer; transition: border-color .15s, background .15s;
     }
     .images-zone:hover, .images-zone.drag-over, .images-zone:focus { border-color: var(--navy); background: #f2f6fa; outline: none; }
-    .images-zone p { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
-    .images-choose-btn { background: var(--navy); color: #fff; padding: 9px 20px; border-radius: 8px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; }
-    .image-link-row { display: flex; gap: 8px; margin-top: 10px; }
+    .images-zone p { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .images-choose-btn { background: var(--navy); color: #fff; padding: 6px 16px; border-radius: 8px; font-size: 12px; font-weight: 700; border: none; cursor: pointer; }
+    .image-link-row { display: flex; gap: 8px; margin-top: 6px; }
     .image-link-row input { flex: 1; }
     .image-link-row button { background: var(--gold-light); color: #6b5416; padding: 0 18px; border-radius: 8px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; white-space: nowrap; }
-    .images-preview { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+    .images-preview { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
     .image-thumb {
-      position: relative; width: 90px; height: 90px; border-radius: 8px; overflow: hidden;
+      position: relative; width: 70px; height: 70px; border-radius: 8px; overflow: hidden;
       border: 1px solid var(--border); cursor: grab; transition: transform .15s, opacity .15s, border-color .15s;
     }
     .image-thumb:active { cursor: grabbing; }
@@ -1191,24 +1191,24 @@
       <div class="modal-title">تعديل بيانات الوحدة <span id="editUnitIdLabel"></span></div>
       <button class="modal-close" id="editCloseBtn">✕</button>
     </div>
-    <div id="unitAddAiSection" style="display:none; background:#f7f4ff; border:1.5px solid #7c4dff; border-radius:12px; padding:14px; margin-bottom:16px;">
-      <div class="section-title" style="color:#7c4dff; margin-bottom:6px;">🤖 تعبئة تلقائية بالذكاء الاصطناعي</div>
-      <p style="font-size:12px; color:var(--muted); margin:0 0 10px; line-height:1.7;">
+    <div id="unitAddAiSection" style="display:none; background:#f7f4ff; border:1.5px solid #7c4dff; border-radius:12px; padding:10px; margin-bottom:10px;">
+      <div class="section-title" style="color:#7c4dff; margin-bottom:4px; margin-top:0;">🤖 تعبئة تلقائية بالذكاء الاصطناعي</div>
+      <p style="font-size:11px; color:var(--muted); margin:0 0 6px; line-height:1.5;">
         الصق رسالة المطور، أو ارفع صورة/PDF، والذكاء الاصطناعي هيملى الفورم تلقائيًا تحت.
       </p>
-      <textarea id="unitAddAiPasteText" placeholder="الصق نص الرسالة هنا (اختياري)..." style="min-height:80px; width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit; font-size:13px;"></textarea>
-      <div id="unitAddAiImagePasteZone" tabindex="0" style="margin-top:8px; border:2px dashed #7c4dff; border-radius:10px; padding:14px; text-align:center; cursor:pointer; color:#7c4dff; font-size:12px; font-weight:600; background:#fff; outline:none;">
+      <textarea id="unitAddAiPasteText" placeholder="الصق نص الرسالة هنا (اختياري)..." style="min-height:50px; width:100%; padding:7px 10px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit; font-size:13px;"></textarea>
+      <div id="unitAddAiImagePasteZone" tabindex="0" style="margin-top:6px; border:2px dashed #7c4dff; border-radius:10px; padding:8px; text-align:center; cursor:pointer; color:#7c4dff; font-size:12px; font-weight:600; background:#fff; outline:none;">
         📋 دوس هنا وبعدين الصق صورة (Ctrl+V)
       </div>
-      <div id="unitAddAiPastedImagePreview" style="display:none; margin-top:8px; position:relative; max-width:180px;">
+      <div id="unitAddAiPastedImagePreview" style="display:none; margin-top:6px; position:relative; max-width:180px;">
         <img id="unitAddAiPastedImageTag" style="width:100%; border-radius:8px; border:1px solid var(--border);">
         <button type="button" id="unitAddAiPastedImageRemove" style="position:absolute; top:-8px; left:-8px; width:22px; height:22px; border-radius:50%; background:var(--error-fg); color:#fff; border:none; cursor:pointer; font-size:12px;">✕</button>
       </div>
-      <input type="file" id="unitAddAiFileInput" accept="image/*,application/pdf" style="margin-top:8px; width:100%; font-size:12px;">
-      <button type="button" id="unitAddAiExtractBtn" style="width:100%; margin-top:10px; padding:11px; border:none; border-radius:9px; background:#7c4dff; color:#fff; font-weight:700; font-size:13px; cursor:pointer;">
+      <input type="file" id="unitAddAiFileInput" accept="image/*,application/pdf" style="margin-top:6px; width:100%; font-size:12px;">
+      <button type="button" id="unitAddAiExtractBtn" style="width:100%; margin-top:6px; padding:9px; border:none; border-radius:9px; background:#7c4dff; color:#fff; font-weight:700; font-size:13px; cursor:pointer;">
         ✨ استخرج البيانات وابدأ التعبئة
       </button>
-      <div id="unitAddAiExtractMsg" style="font-size:12px; margin-top:8px; display:none;"></div>
+      <div id="unitAddAiExtractMsg" style="font-size:12px; margin-top:6px; display:none;"></div>
     </div>
 
     <form id="editForm">
@@ -1442,7 +1442,7 @@
       <div id="editImagesUploadMsg" style="font-size:12px; margin-top:6px;"></div>
 
       <div class="section-title">ملاحظات</div>
-      <textarea name="notes" style="width:100%; min-height:70px; padding:10px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit;"></textarea>
+      <textarea name="notes" style="width:100%; min-height:45px; padding:7px 10px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit;"></textarea>
 
       <div id="editMsg"></div>
       <button type="submit" id="editSaveBtn">حفظ التعديلات</button>
