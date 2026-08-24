@@ -331,7 +331,7 @@
     .loading, .empty { text-align: center; padding: 50px; color: var(--muted); font-size: 14px; }
 
     /* Skeleton Loading */
-    .skeleton-card { cursor: default; }
+    .skeleton-card { cursor: default; background: transparent; box-shadow: none; border-right: none; }
     .skel {
       background: linear-gradient(90deg, var(--bg) 25%, #e9ecef 37%, var(--bg) 63%);
       background-size: 400% 100%;
@@ -656,16 +656,31 @@
    * ============================================================ */
   const EXEC_URL = "https://script.google.com/macros/s/AKfycby0Suh2iXdvCSy1N9G9e8u8VUjfHygiXe0owQyzUrHWcF_tIHMd7WnDZw2JtlXDkDDEWw/exec";
 
-  function callBackendAPI(action, params) {
+  function callBackendAPI(action, params, retriesLeft) {
+    if (retriesLeft === undefined) retriesLeft = 2;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 ثانية أقصى انتظار
+
     return fetch(EXEC_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: action, params: params })
+      body: JSON.stringify({ action: action, params: params }),
+      signal: controller.signal
     })
-      .then(function(r) { return r.text(); })
+      .then(function(r) { clearTimeout(timeoutId); return r.text(); })
       .then(function(t) {
         try { return JSON.parse(t); }
         catch (e) { throw new Error('رد غير صالح من السيرفر: ' + t.slice(0, 200)); }
+      })
+      .catch(function(err) {
+        clearTimeout(timeoutId);
+        // لو فيه محاولات متبقية ومشكلة الاتصال شكلها مؤقتة (شبكة/انقطاع لحظي)، نعيد المحاولة تلقائيًا
+        if (retriesLeft > 0) {
+          return new Promise(function(resolve) { setTimeout(resolve, 900); })
+            .then(function() { return callBackendAPI(action, params, retriesLeft - 1); });
+        }
+        throw err;
       });
   }
 
