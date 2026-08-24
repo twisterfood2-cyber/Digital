@@ -640,8 +640,7 @@
   </style>
 </head>
 <body>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!-- jsPDF و html2canvas بيتحمّلوا عند الحاجة بس (وقت أول استخدام فعلي لزرار PDF/مقارنة)، مش من أول ما الصفحة تفتح - عشان التحميل الأول يبقى أخف وأسرع -->
 
 <script>
   /* ============================================================
@@ -1457,6 +1456,29 @@
 <script>
   // كشف الموبايل - عشان ميزات زي "مشاركة نص+صور" تظهر بس فين شغالة فعليًا
   const IS_MOBILE_DEVICE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+
+  /* ---------- تحميل مكتبات PDF عند الحاجة بس (مش من أول ما الصفحة تفتح) ---------- */
+  let pdfLibrariesPromise = null;
+  function loadPdfLibraries() {
+    if (pdfLibrariesPromise) return pdfLibrariesPromise;
+    if (window.jspdf && window.html2canvas) return Promise.resolve();
+
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
+
+    pdfLibrariesPromise = Promise.all([
+      loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'),
+      loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js')
+    ]);
+    return pdfLibrariesPromise;
+  }
 
   // زرار الرجوع لأعلى الصفحة - على كل الأجهزة، بيظهر لما تنزل تحت شوية
   (function() {
@@ -2293,6 +2315,7 @@
     const btn = this;
     const originalLabel = btn.textContent;
     btn.disabled = true; btn.textContent = '⏳ جاري التجهيز...';
+    await loadPdfLibraries();
 
     let agentName = '';
     let agentPhone = '';
@@ -3152,6 +3175,7 @@
   async function generateDevProfilePDF(agentName, agentPhone) {
     const btn = document.getElementById('devProfileExportPdfBtn');
     if (btn) { btn.disabled = true; btn.textContent = '⏳ جاري التجهيز...'; }
+    await loadPdfLibraries();
 
     try {
       const res = currentDevProfile;
@@ -3273,6 +3297,7 @@
     const originalLabel = btnEl.textContent;
     btnEl.disabled = true;
     btnEl.textContent = '⏳ جاري التجهيز...';
+    await loadPdfLibraries();
 
     try {
       const images = (u['Images'] || '').split(',').map(s => s.trim()).filter(Boolean);
@@ -3757,6 +3782,7 @@
 
     btn.disabled = true;
     btn.textContent = '⏳ جاري التجهيز...';
+    await loadPdfLibraries();
 
     let agentName = '', agentPhone = '';
     try {
