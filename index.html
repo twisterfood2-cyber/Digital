@@ -337,10 +337,16 @@
       background-size: 400% 100%;
       animation: skel-shimmer 1.4s ease infinite;
       border-radius: 6px;
-      margin-bottom: 10px;
     }
     .skel-cover { height: 160px; margin: -18px -18px 14px; border-radius: 14px 14px 0 0; }
-    .skel-line { height: 12px; }
+    .skel-line { height: 12px; margin-bottom: 10px; }
+    .skel-chips-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+    .skel-chip { height: 22px; width: 64px; border-radius: 20px; flex-shrink: 0; }
+    .skel-price-box { height: 108px; border-radius: 12px; margin-bottom: 10px; }
+    .skel-toggle-btn { height: 34px; border-radius: 8px; margin-bottom: 10px; }
+    .skel-icon-row { display: flex; gap: 6px; margin-bottom: 10px; }
+    .skel-icon-btn { height: 34px; flex: 1; border-radius: 8px; }
+    .skel-footer { height: 14px; width: 60%; }
     @keyframes skel-shimmer {
       0% { background-position: 100% 50%; }
       100% { background-position: 0 50%; }
@@ -3540,10 +3546,24 @@
     const card = `
       <div class="unit-card skeleton-card">
         <div class="skel skel-cover"></div>
-        <div class="skel skel-line" style="width:40%;"></div>
-        <div class="skel skel-line" style="width:70%; height:18px;"></div>
-        <div class="skel skel-line" style="width:55%;"></div>
-        <div class="skel skel-line" style="width:90%; height:60px;"></div>
+        <div class="skel skel-line" style="width:30%; height:11px;"></div>
+        <div class="skel skel-line" style="width:75%; height:19px;"></div>
+        <div class="skel-chips-row">
+          <div class="skel skel-chip"></div>
+          <div class="skel skel-chip" style="width:80px;"></div>
+          <div class="skel skel-chip" style="width:56px;"></div>
+          <div class="skel skel-chip" style="width:70px;"></div>
+        </div>
+        <div class="skel skel-price-box"></div>
+        <div class="skel skel-toggle-btn"></div>
+        <div class="skel-icon-row">
+          <div class="skel skel-icon-btn"></div>
+          <div class="skel skel-icon-btn"></div>
+          <div class="skel skel-icon-btn"></div>
+          <div class="skel skel-icon-btn"></div>
+          <div class="skel skel-icon-btn"></div>
+        </div>
+        <div class="skel skel-footer"></div>
       </div>`;
     return card.repeat(count || 6);
   }
