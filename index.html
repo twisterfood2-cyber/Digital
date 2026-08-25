@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0f2942">
@@ -3523,11 +3523,31 @@
     return card.repeat(count || 6);
   }
 
+  // تخزين مؤقت في المتصفح بس (مش على السيرفر) - لو نفس البحث اتكرر
+  // خلال 30 ثانية، نستخدم النسخة المحفوظة بدل ما نتصل بالسيرفر تاني
+  const clientSearchCache = {};
+  const CLIENT_CACHE_DURATION_MS = 30000;
+
+  function clearClientSearchCache() {
+    Object.keys(clientSearchCache).forEach(k => delete clientSearchCache[k]);
+  }
+
   function runSearch() {
+    const filters = collectFilters();
+    const cacheKey = JSON.stringify(filters);
+    const cached = clientSearchCache[cacheKey];
+
+    if (cached && (Date.now() - cached.time < CLIENT_CACHE_DURATION_MS)) {
+      lastResults = cached.units;
+      renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
+      return;
+    }
+
     document.getElementById('results').innerHTML = skeletonCardsHtml(6);
     google.script.run
       .withSuccessHandler(function(units) {
         lastResults = units;
+        clientSearchCache[cacheKey] = { units: units, time: Date.now() };
         renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
       })
       .withFailureHandler(function(err) {
@@ -3540,7 +3560,7 @@
           </div>`;
         document.getElementById('resultsCount').textContent = '';
       })
-      .searchUnits(collectFilters());
+      .searchUnits(filters);
   }
   window.runSearch = runSearch;
 
@@ -4270,7 +4290,7 @@
                 editMsg.innerHTML = '';
                 editMsg.className = res2.success ? 'success' : 'error';
                 editMsg.textContent = res2.message;
-                if (res2.success) { runSearch(); setTimeout(closeEditModal, 1200); }
+                if (res2.success) { clearClientSearchCache(); runSearch(); setTimeout(closeEditModal, 1200); }
               }).confirmAddAsSameUnit(data, res.matchUnitId);
             });
             document.getElementById('editDifferentUnitBtn').addEventListener('click', function() {
@@ -4280,7 +4300,7 @@
                 editMsg.innerHTML = '';
                 editMsg.className = res2.success ? 'success' : 'error';
                 editMsg.textContent = res2.message;
-                if (res2.success) { runSearch(); setTimeout(closeEditModal, 1200); }
+                if (res2.success) { clearClientSearchCache(); runSearch(); setTimeout(closeEditModal, 1200); }
               }).confirmAddAsNewUnit(data);
             });
             return;
@@ -4290,6 +4310,7 @@
           editMsg.textContent = res.message;
           editMsg.style.display = 'block';
           if (res.success) {
+            clearClientSearchCache();
             runSearch();
             setTimeout(closeEditModal, 1200);
           }
@@ -4315,6 +4336,7 @@
           editMsg.textContent = res.message;
           editMsg.style.display = 'block';
           if (res.success) {
+            clearClientSearchCache();
             runSearch();
             setTimeout(closeEditModal, 1200);
           }
@@ -4340,6 +4362,7 @@
         editMsg.textContent = res.message;
         editMsg.style.display = 'block';
         if (res.success) {
+          clearClientSearchCache();
           runSearch();
           setTimeout(closeEditModal, 900);
         }
@@ -4372,6 +4395,7 @@
         editMsg.textContent = res.message;
         editMsg.style.display = 'block';
         if (res.success) {
+          clearClientSearchCache();
           runSearch();
           setTimeout(closeEditModal, 900);
         }
@@ -4410,7 +4434,7 @@
 
     setTimeout(function() {
       sendHeartbeat();
-      setInterval(sendHeartbeat, 25000);
+      setInterval(sendHeartbeat, 45000);
     }, 1500);
   }
 
