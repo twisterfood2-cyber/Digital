@@ -4393,12 +4393,25 @@
 
   function unlockApp() {
     visitorName = getVisitorName();
-    loadFilterOptions();
+
+    // البحث الأساسي بيشتغل الأول لوحده (الأهم للسيلز)، وباقي الطلبات
+    // بتتوزع بعده بفواصل زمنية بسيطة - عشان متتزاحمش كلها مع بعض على
+    // السيرفر في نفس اللحظة (كانت بتسبب بطء وتعليق وقت الدخول)
     runSearch();
-    sendHeartbeat();
-    setInterval(sendHeartbeat, 25000);
-    loadCoverImage();
-    silentlyCheckAdminStatus();
+
+    setTimeout(function() {
+      loadFilterOptions();
+    }, 500);
+
+    setTimeout(function() {
+      loadCoverImage();
+      silentlyCheckAdminStatus();
+    }, 1000);
+
+    setTimeout(function() {
+      sendHeartbeat();
+      setInterval(sendHeartbeat, 25000);
+    }, 1500);
   }
 
   // فحص صامت في الخلفية: لو كلمة سر الأدمن متحفوظة من قبل في الجهاز،
