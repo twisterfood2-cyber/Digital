@@ -3540,27 +3540,31 @@
     if (cached && (Date.now() - cached.time < CLIENT_CACHE_DURATION_MS)) {
       lastResults = cached.units;
       renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
-      return;
+      return Promise.resolve();
     }
 
     document.getElementById('results').innerHTML = skeletonCardsHtml(6);
-    google.script.run
-      .withSuccessHandler(function(units) {
-        lastResults = units;
-        clientSearchCache[cacheKey] = { units: units, time: Date.now() };
-        renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
-      })
-      .withFailureHandler(function(err) {
-        document.getElementById('results').innerHTML = `
-          <div class="empty-state">
-            <div class="icon">⚠️</div>
-            <h3>حصل خطأ أثناء تحميل النتائج</h3>
-            <p>${err && err.message ? err.message : 'جرّب تحدّث الصفحة، ولو المشكلة استمرت كلّم المسؤول عن النظام'}</p>
-            <button type="button" onclick="runSearch()">إعادة المحاولة</button>
-          </div>`;
-        document.getElementById('resultsCount').textContent = '';
-      })
-      .searchUnits(filters);
+    return new Promise(function(resolve) {
+      google.script.run
+        .withSuccessHandler(function(units) {
+          lastResults = units;
+          clientSearchCache[cacheKey] = { units: units, time: Date.now() };
+          renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
+          resolve();
+        })
+        .withFailureHandler(function(err) {
+          document.getElementById('results').innerHTML = `
+            <div class="empty-state">
+              <div class="icon">⚠️</div>
+              <h3>حصل خطأ أثناء تحميل النتائج</h3>
+              <p>${err && err.message ? err.message : 'جرّب تحدّث الصفحة، ولو المشكلة استمرت كلّم المسؤول عن النظام'}</p>
+              <button type="button" onclick="runSearch()">إعادة المحاولة</button>
+            </div>`;
+          document.getElementById('resultsCount').textContent = '';
+          resolve();
+        })
+        .searchUnits(filters);
+    });
   }
   window.runSearch = runSearch;
 
@@ -4418,14 +4422,14 @@
   function unlockApp() {
     visitorName = getVisitorName();
 
-    // البحث الأساسي بيشتغل الأول لوحده (الأهم للسيلز)، وباقي الطلبات
-    // بتتوزع بعده بفواصل زمنية بسيطة - عشان متتزاحمش كلها مع بعض على
-    // السيرفر في نفس اللحظة (كانت بتسبب بطء وتعليق وقت الدخول)
-    runSearch();
-
-    setTimeout(function() {
+    // البحث الأساسي بيشتغل الأول لوحده (الأهم للسيلز)، وبعد ما نتيجته
+    // ترجع فعليًا (نجاح أو فشل) بنبدأ تحميل قوائم الفلاتر - بدل تأخير
+    // ثابت 500ms كان ممكن يخلي getFilterOptions() يتصادف مع لسه البحث
+    // الأول بيقرأ الشيت، فيعمل قراءة مستقلة تانية بدل ما يستفيد من نفس
+    // الـ snapshot اللي البحث الأول جهزه
+    runSearch().then(function() {
       loadFilterOptions();
-    }, 500);
+    });
 
     setTimeout(function() {
       loadCoverImage();
