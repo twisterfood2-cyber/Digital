@@ -1546,22 +1546,26 @@
 
   const filterIds = ['category','propertyType','finishing'];
 
-  function loadFilterOptions() {
-    google.script.run.withSuccessHandler(function(opts) {
-      const map = { category: opts.categories, propertyType: opts.propertyTypes, finishing: opts.finishing };
-      filterIds.forEach(id => {
-        const sel = document.getElementById('f_' + id);
-        const values = (map[id] || []).slice().sort((a, b) => a.localeCompare(b, 'ar'));
-        values.forEach(val => {
-          const opt = document.createElement('option');
-          opt.value = val; opt.textContent = val;
-          sel.appendChild(opt);
-        });
+  // بيطبّق بيانات قوائم الفلاتر على الواجهة - منفصلة عشان تتستخدم سواء
+  // جايه من getFilterOptions() لوحدها أو من الطلب المجمّع الأول بعد الدخول
+  function applyFilterOptionsToUI(opts) {
+    const map = { category: opts.categories, propertyType: opts.propertyTypes, finishing: opts.finishing };
+    filterIds.forEach(id => {
+      const sel = document.getElementById('f_' + id);
+      const values = (map[id] || []).slice().sort((a, b) => a.localeCompare(b, 'ar'));
+      values.forEach(val => {
+        const opt = document.createElement('option');
+        opt.value = val; opt.textContent = val;
+        sel.appendChild(opt);
       });
-      const developerValues = (opts.developers || []).slice().sort((a, b) => a.localeCompare(b, 'ar'));
-      document.getElementById('f_developerDatalist').innerHTML = developerValues.map(v => `<option value="${v}">`).join('');
-      restoreDropdownFilters();
-    }).getFilterOptions();
+    });
+    const developerValues = (opts.developers || []).slice().sort((a, b) => a.localeCompare(b, 'ar'));
+    document.getElementById('f_developerDatalist').innerHTML = developerValues.map(v => `<option value="${v}">`).join('');
+    restoreDropdownFilters();
+  }
+
+  function loadFilterOptions() {
+    google.script.run.withSuccessHandler(applyFilterOptionsToUI).getFilterOptions();
   }
 
   // فلاتر المدينة والمنطقة المترابطة
@@ -4424,9 +4428,35 @@
     // getVisitorName() (اللي ممكن تفتح نافذة prompt() بتوقف الصفحة كلها
     // لحد ما حد يرد عليها) بقت مؤجلة تحت مع باقي المهام غير الحرجة، عشان
     // متأخرش أول ظهور لنتائج البحث الحقيقية للسيلز
-    runSearch().then(function() {
-      loadFilterOptions();
-    });
+    //
+    // أول تحميل للصفحة بيستخدم استدعاء واحد مجمّع (getInitialSearchData)
+    // بدل نداءين منفصلين لـ searchUnits() و getFilterOptions() - عشان
+    // نضمن إن الشيت بيتقرا مرة واحدة بس وبيتشارك في بناء نتيجة البحث
+    // الافتراضي وقوائم الفلاتر مع بعض، من غير رحلة شبكة تانية منفصلة.
+    // أي بحث تاني بعد كده (يدوي، بفلاتر مختلفة) لسه بيستخدم runSearch()
+    // العادية بالظبط زي ما هي.
+    document.getElementById('results').innerHTML = skeletonCardsHtml(6);
+    google.script.run
+      .withSuccessHandler(function(data) {
+        lastResults = data.units;
+        const filters = collectFilters();
+        const cacheKey = JSON.stringify(filters);
+        clientSearchCache[cacheKey] = { units: data.units, time: Date.now() };
+        renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
+        applyFilterOptionsToUI(data.filterOptions);
+      })
+      .withFailureHandler(function(err) {
+        document.getElementById('results').innerHTML = `
+          <div class="empty-state">
+            <div class="icon">⚠️</div>
+            <h3>حصل خطأ أثناء تحميل النتائج</h3>
+            <p>${err && err.message ? err.message : 'جرّب تحدّث الصفحة، ولو المشكلة استمرت كلّم المسؤول عن النظام'}</p>
+            <button type="button" onclick="runSearch()">إعادة المحاولة</button>
+          </div>`;
+        document.getElementById('resultsCount').textContent = '';
+        loadFilterOptions(); // شبكة أمان - لو الطلب المجمّع فشل، قوائم الفلاتر تتحمل لوحدها على الأقل
+      })
+      .getInitialSearchData();
 
     setTimeout(function() {
       visitorName = getVisitorName();
