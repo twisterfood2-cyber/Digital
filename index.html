@@ -1624,6 +1624,11 @@
   }
 
   let lastResults = [];
+  // بتبقى true بس لما استجابة تحميل البيانات الأول بعد الدخول توصل فعليًا
+  // وتتخزن نتيجة حقيقية - عشان أي إعادة رسم تانية (زي فحص الأدمن الصامت)
+  // متعملش renderResults() على lastResults وهي لسه [] الافتراضية قبل ما
+  // الطلب الأول يخلص، فيظهر غلط رسالة "مفيش وحدات مطابقة"
+  let initialResultsReady = false;
 
   /* ---------- نظام Toast (بدل alert التقليدي) ---------- */
   function showToast(message, type) {
@@ -4438,10 +4443,25 @@
     document.getElementById('results').innerHTML = skeletonCardsHtml(6);
     google.script.run
       .withSuccessHandler(function(data) {
+        // لازم نتأكد إن الرد فعلاً شكله سليم قبل ما نعتبره نتيجة حقيقية -
+        // رد ناقص أو غير متوقع مينفعش نتعامل معه على إنه "صفر نتائج"
+        if (!data || !Array.isArray(data.units)) {
+          document.getElementById('results').innerHTML = `
+            <div class="empty-state">
+              <div class="icon">⚠️</div>
+              <h3>حصل خطأ أثناء تحميل النتائج</h3>
+              <p>جرّب تحدّث الصفحة، ولو المشكلة استمرت كلّم المسؤول عن النظام</p>
+              <button type="button" onclick="runSearch()">إعادة المحاولة</button>
+            </div>`;
+          document.getElementById('resultsCount').textContent = '';
+          loadFilterOptions();
+          return;
+        }
         lastResults = data.units;
         const filters = collectFilters();
         const cacheKey = JSON.stringify(filters);
         clientSearchCache[cacheKey] = { units: data.units, time: Date.now() };
+        initialResultsReady = true;
         renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
         applyFilterOptionsToUI(data.filterOptions);
       })
@@ -4480,7 +4500,13 @@
       if (isValid) {
         adminPin = savedPin;
         isAdminUnlocked = true;
-        renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
+        // لو نتيجة التحميل الأول لسه ما وصلتش، متعملش إعادة رسم دلوقتي -
+        // ده بيمنع ظهور رسالة "مفيش نتائج" غلط لما lastResults لسه []
+        // الافتراضية. الرسم الحقيقي اللي هيجي من getInitialSearchData()
+        // هيعكس isAdminUnlocked صح من غير ما نحتاج نرسم هنا خالص
+        if (initialResultsReady) {
+          renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
+        }
       }
     }).verifyAdminPin(savedPin);
   }
