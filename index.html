@@ -729,6 +729,39 @@
       box-shadow: inset 0 -2px 0 0 var(--gold);
     }
 
+    /* ===== unified primary navigation: البحث / إدخال وحدة / الإحصائيات والمخزون ===== */
+    #appNav {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin: 0 0 12px; padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-gold);
+    }
+    #appNav .app-nav-btn { max-width: none; }
+    /* "إضافة وحدة" moved into #appNav — its button + handler are kept for reuse, just hidden here */
+    #topActionBar #addUnitFabBtn { display: none; }
+
+    #statsView { display: none; }
+    #statsFrame {
+      box-sizing: border-box;
+      width: 100%;
+      min-height: calc(100vh - 210px);
+      border: 1px solid var(--border-gold);
+      border-radius: var(--radius-lg);
+      background: var(--page-bg);
+      box-shadow: var(--shadow-card);
+      display: block;
+    }
+    /* view switch: hide search-only chrome, keep #appNav + #statsView */
+    body.app-view-stats .cover-wrap,
+    body.app-view-stats .site-header,
+    body.app-view-stats #topActionBar,
+    body.app-view-stats .ai-search-panel,
+    body.app-view-stats .filters-card,
+    body.app-view-stats #resultsCount,
+    body.app-view-stats #results,
+    body.app-view-stats #compareBar,
+    body.app-view-stats #scrollTopBtn { display: none !important; }
+    body.app-view-stats #statsView { display: block; }
+
     .price-stats-search {
       width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);
       font-size: 14px; margin-bottom: 14px;
@@ -1088,6 +1121,9 @@
       .site-tagline { font-size: 12.5px; }
       #topActionBar { gap: 8px; margin-bottom: 14px; }
       .top-action-btn { min-width: calc(50% - 4px); max-width: none; font-size: 12px; padding: 10px 12px; }
+      #appNav { gap: 6px; }
+      #appNav .app-nav-btn { min-width: calc(50% - 4px); font-size: 12px; }
+      #statsFrame { min-height: calc(100vh - 168px); }
       .grid { grid-template-columns: 1fr 1fr; gap: 10px 12px; }
       .results-grid { grid-template-columns: 1fr; gap: 14px; }
       /* single column: cards no longer share a row, so drop the reserved footer
@@ -1245,6 +1281,12 @@
     <p class="site-tagline">اعثر على الوحدة المناسبة، قارن الأسعار، واحسب خطة السداد — كل ذلك في مكان واحد.</p>
   </header>
 
+  <nav id="appNav" aria-label="أقسام التطبيق">
+    <button type="button" class="top-action-btn app-nav-btn is-active" id="navSearchBtn" data-app-view="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span>البحث</span></button>
+    <button type="button" class="top-action-btn app-nav-btn" id="navAddUnitBtn" data-app-view="add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>إدخال وحدة</span></button>
+    <button type="button" class="top-action-btn app-nav-btn" id="navStatsBtn" data-app-view="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span>الإحصائيات والمخزون</span></button>
+  </nav>
+
   <div id="topActionBar">
     <button type="button" class="top-action-btn top-action-admin" id="adminFab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>لوحة الإدارة</span></button>
     <button type="button" class="top-action-btn top-action-calc" id="calcFabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/><line x1="16" y1="18" x2="16" y2="18"/></svg><span>عرض السعر</span></button>
@@ -1366,6 +1408,10 @@
     <h3>ابدأ البحث عن وحدتك المثالية</h3>
     <p>استخدم البحث الذكي أو الفلاتر بالأعلى للوصول إلى الوحدات والمشروعات التي تناسب احتياجك وميزانيتك.</p>
   </div></div>
+
+  <section id="statsView" aria-label="لوحة الإحصائيات والمخزون">
+    <iframe id="statsFrame" title="لوحة إحصائيات المخزون" loading="lazy" referrerpolicy="no-referrer"></iframe>
+  </section>
 </div>
 
 <div id="toastContainer" class="toast-container"></div>
@@ -1626,7 +1672,7 @@
 
   <button type="button" class="small-btn" id="openUsersModalBtn" style="margin-top:12px;"><svg class="ico" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 5.2a3.5 3.5 0 0 1 0 6.8M18 20a6.5 6.5 0 0 0-3.2-5.6"/></svg> إدارة المستخدمين</button>
   <button type="button" class="small-btn" id="openDevProfilesModalBtn" style="margin-top:8px;"><svg class="ico" viewBox="0 0 24 24"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></svg> إدارة بيانات المطورين</button>
-  <a href="https://script.google.com/macros/s/AKfycby0Suh2iXdvCSy1N9G9e8u8VUjfHygiXe0owQyzUrHWcF_tIHMd7WnDZw2JtlXDkDDEWw/exec?page=dashboard" target="_blank" class="small-btn" style="display:block; text-align:center; text-decoration:none; margin-top:8px;"><svg class="ico" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg> لوحة الإحصائيات</a>
+  <button type="button" id="adminPanelStatsBtn" class="small-btn" style="display:block; width:100%; text-align:center; margin-top:8px;"><svg class="ico" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg> لوحة الإحصائيات</button>
 </div>
 
 <!-- مودال إدارة المستخدمين -->
@@ -2326,6 +2372,7 @@
     // لو الأدمن متحقق منه بالفعل (داخل بكلمة سر لوحة التحكم)، نفتح الفورم على طول
     // من غير ما نطلب كلمة سر منفصلة تانية - أدمن يبقى أدمن، مش محتاج تأكيد إضافي
     if (isAdminUnlocked) {
+      unitWritePin = adminPin; // كلمة السر اللي هتتبعت للسيرفر مع عملية الحفظ (تحقّق سيرفر-سايد)
       openAddUnitModal();
       return;
     }
@@ -2339,6 +2386,7 @@
           showToast('كلمة السر غير صحيحة', 'error');
           return;
         }
+        unitWritePin = pin; // كلمة السر اللي هتتبعت للسيرفر مع عملية الحفظ (تحقّق سيرفر-سايد)
         openAddUnitModal();
       }).verifyDataEntryPin(pin);
     });
@@ -2507,6 +2555,7 @@
 
   function cloneUnit(unitId) {
     editModalMode = 'clone';
+    unitWritePin = adminPin; // الاستنساخ متاح للأدمن فقط - نبعت كلمة سره للتحقق سيرفر-سايد
     currentEditUnitId = null; // مفيش وحدة بنعدّل عليها، إحنا بنعمل وحدة جديدة
     document.getElementById('editUnitIdLabel').textContent = '(استنساخ من ' + unitId + ')';
     document.querySelector('#editModal .modal-title').firstChild.textContent = 'إضافة وحدة جديدة (استنساخ) ';
@@ -4502,6 +4551,7 @@
   let currentEditUnitId = null;
   let editModalMode = 'edit'; // 'edit' أو 'clone'
   let verifiedPin = null;
+  let unitWritePin = null; // كلمة سر (إدخال بيانات أو أدمن) تُرسل للسيرفر للتحقّق قبل حفظ/إضافة وحدة
 
   /* ---------- حساب السعر بعد الخصم والمقدم والقسط الشهري التقريبي لحظيًا (فورم التعديل) ---------- */
   const editInstallmentFields = ['price', 'discountPercent', 'downPayment', 'downPaymentBase', 'paymentAmount', 'paymentCount', 'installmentYears'];
@@ -4865,6 +4915,7 @@
     editModal.classList.remove('open');
     currentEditUnitId = null;
     verifiedPin = null;
+    unitWritePin = null;
   }
 
   document.getElementById('editCloseBtn').addEventListener('click', closeEditModal);
@@ -4882,6 +4933,8 @@
     const data = {};
     new FormData(editForm).forEach((v, k) => data[k] = v);
     data.images = editUnitImages.join(',');
+    // إضافة/استنساخ وحدة: نرفق كلمة السر اللي اتحققنا منها عشان السيرفر يتأكد من التفويض قبل أي كتابة
+    if (editModalMode === 'add' || editModalMode === 'clone') data.pin = unitWritePin;
 
     if (editModalMode === 'add') {
       data.enteredBy = visitorName || '';
@@ -5647,6 +5700,88 @@
         document.getElementById('devProfileLogoInput').value.trim()
       );
   });
+
+  /* ============================================================
+   * التنقّل الموحّد داخل نفس النافذة: البحث / إدخال وحدة / الإحصائيات والمخزون
+   * - "إدخال وحدة" يمرّ بنفس بوابة كلمة السر والمودال الحاليين (#addUnitFabBtn) — من غير تكرار للمنطق.
+   * - "الإحصائيات والمخزون" تُعرض داخل إطار معزول يحمّل صفحة لوحة الإحصائيات نفسها.
+   *   التحقّق يحصل مرّة واحدة فقط داخل الإطار: شاشة قفل Dashboard.html نفسها +
+   *   تحقّق server-side في getDashboardStats/verifyAdminPin وكل دوال اللوحة.
+   *   مفيش تحقّق تاني هنا في الـ shell (كان بيسبب طلب كلمة السر مرتين).
+   *   ملاحظة: الإطار على أصل (origin) مختلف عن الـ shell، فمفيش طريقة آمنة لمشاركة
+   *   حالة الدخول بينهم من غير تمرير كلمة السر عبر الحدود — وده ممنوع أمنيًا.
+   * - التنقّل عبر hash (#stats) عشان أزرار رجوع/تقديم المتصفح تشتغل من غير ما نلمس راوتنج Apps Script (?page=...).
+   * ============================================================ */
+  (function initUnifiedNav() {
+    var DASHBOARD_URL = 'https://script.google.com/macros/s/AKfycby0Suh2iXdvCSy1N9G9e8u8VUjfHygiXe0owQyzUrHWcF_tIHMd7WnDZw2JtlXDkDDEWw/exec?page=dashboard';
+    var navSearchBtn  = document.getElementById('navSearchBtn');
+    var navAddUnitBtn = document.getElementById('navAddUnitBtn');
+    var navStatsBtn   = document.getElementById('navStatsBtn');
+    var statsFrame    = document.getElementById('statsFrame');
+    var editModalEl   = document.getElementById('editModal');
+    if (!navSearchBtn || !navStatsBtn || !statsFrame) return;
+
+    function setActiveNav(view) {
+      [navSearchBtn, navAddUnitBtn, navStatsBtn].forEach(function (b) {
+        if (b) b.classList.toggle('is-active', b.getAttribute('data-app-view') === view);
+      });
+    }
+    function showSearchView() {
+      document.body.classList.remove('app-view-stats');
+      if (!(editModalEl && editModalEl.classList.contains('open'))) setActiveNav('search');
+      window.scrollTo(0, 0);
+    }
+    function showStatsView() {
+      // تحميل الإطار عند أول فتح فقط — لحد ما يتفتح، Dashboard.html مش بيتحمّل أصلاً
+      if (!statsFrame.getAttribute('src')) statsFrame.setAttribute('src', DASHBOARD_URL);
+      document.body.classList.add('app-view-stats');
+      if (!(editModalEl && editModalEl.classList.contains('open'))) setActiveNav('stats');
+      window.scrollTo(0, 0);
+    }
+
+    function goToStatsHash() {
+      if (location.hash !== '#stats') location.hash = 'stats'; else route();
+    }
+    function goToSearchHash() {
+      if (location.hash) history.pushState('', document.title, location.pathname + location.search);
+      route();
+    }
+
+    // مزامنة العرض مع الـ hash — تشمل زراري الرجوع/التقديم والوصول المباشر لـ #stats.
+    // التفويض نفسه محصور جوا الإطار + السيرفر، مش هنا.
+    function route() {
+      if (location.hash === '#stats') showStatsView();
+      else showSearchView();
+    }
+
+    navSearchBtn.addEventListener('click', goToSearchHash);
+    navStatsBtn.addEventListener('click', goToStatsHash);
+    navAddUnitBtn.addEventListener('click', function () {
+      var addBtn = document.getElementById('addUnitFabBtn');
+      if (addBtn) addBtn.click(); // نفس البوابة + المودال الحاليين بالظبط
+    });
+
+    var adminPanelStatsBtn = document.getElementById('adminPanelStatsBtn');
+    if (adminPanelStatsBtn) {
+      adminPanelStatsBtn.addEventListener('click', function () {
+        if (typeof closeAdminPanel === 'function') closeAdminPanel();
+        goToStatsHash();
+      });
+    }
+
+    window.addEventListener('hashchange', route);
+    window.addEventListener('popstate', route);
+
+    // حالة "إدخال وحدة" النشِطة أثناء فتح مودال الإضافة/الاستنساخ
+    if (editModalEl && 'MutationObserver' in window) {
+      new MutationObserver(function () {
+        if (editModalEl.classList.contains('open')) setActiveNav('add');
+        else setActiveNav(document.body.classList.contains('app-view-stats') ? 'stats' : 'search');
+      }).observe(editModalEl, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    route(); // أول تحميل: يعرض #stats لو موجود (والإطار بيطلب كلمة السر بنفسه) وإلا يعرض البحث
+  })();
 </script>
 </body>
 </html>

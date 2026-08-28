@@ -469,6 +469,7 @@
     <p>الصفحة دي محمية - اكتب إيميلك وكلمة السر الخاصة بيك للدخول</p>
     <input type="email" id="loginEmail" placeholder="الإيميل" autocomplete="username">
     <input type="password" id="loginPassword" placeholder="كلمة السر" autocomplete="current-password">
+    <input type="password" id="loginDataEntryPin" placeholder="كلمة سر إدخال الوحدات" autocomplete="off" style="display:none;">
     <button id="loginBtn">دخول</button>
     <div class="access-gate-status" id="loginStatus"></div>
   </div>
@@ -1322,6 +1323,7 @@
     data.images = unitImages.join(',');
     data.enteredBy = getEnteredByName();
     data.aiRawInput = lastAiRawInputText;
+    data.pin = dataEntryPin; // للتحقّق server-side قبل أي كتابة (addUnit/confirmAddAsNewUnit/confirmAddAsSameUnit)
 
     google.script.run
       .withSuccessHandler(function(res) {
@@ -1464,10 +1466,62 @@
   });
 
   /* ---------- بوابة دخول المستخدمين ---------- */
+  // كلمة سر إدخال الوحدات بعد التحقق منها — تُرسل للسيرفر مع كل عملية حفظ للتحقّق server-side.
+  // مش بتتخزن في localStorage/sessionStorage ولا بتظهر في الـ URL.
+  let dataEntryPin = null;
+
   function showApp() {
     document.getElementById('loginGate').style.display = 'none';
     document.getElementById('mainContainer').style.display = 'block';
     initFormData();
+  }
+
+  // بعد نجاح verifyUserAccess: نطلب كلمة سر إدخال الوحدات (خطوة تانية داخل نفس البوابة)
+  function showDataEntryPinStep() {
+    const statusEl = document.getElementById('loginStatus');
+    document.getElementById('loginEmail').style.display = 'none';
+    document.getElementById('loginPassword').style.display = 'none';
+    const pinEl = document.getElementById('loginDataEntryPin');
+    pinEl.style.display = '';
+    document.getElementById('loginBtn').textContent = 'فتح شاشة الإدخال';
+    statusEl.className = 'access-gate-status';
+    statusEl.style.display = 'block';
+    statusEl.style.color = 'var(--text-muted)';
+    statusEl.textContent = 'اكتب كلمة سر إدخال الوحدات عشان تفتح الشاشة';
+    setTimeout(function() { pinEl.focus(); }, 50);
+  }
+  function inDataEntryPinStep() {
+    return document.getElementById('loginDataEntryPin').style.display !== 'none';
+  }
+
+  function submitDataEntryPin() {
+    const statusEl = document.getElementById('loginStatus');
+    const btn = document.getElementById('loginBtn');
+    const pin = document.getElementById('loginDataEntryPin').value.trim();
+    statusEl.style.color = '';
+    if (!pin) {
+      statusEl.className = 'access-gate-status error';
+      statusEl.textContent = 'لازم تكتب كلمة سر إدخال الوحدات';
+      return;
+    }
+    btn.disabled = true; btn.textContent = 'جاري التحقق...';
+    google.script.run
+      .withSuccessHandler(function(isValid) {
+        btn.disabled = false; btn.textContent = 'فتح شاشة الإدخال';
+        if (!isValid) {
+          statusEl.className = 'access-gate-status error';
+          statusEl.textContent = 'كلمة سر إدخال الوحدات غير صحيحة';
+          return;
+        }
+        dataEntryPin = pin;
+        showApp();
+      })
+      .withFailureHandler(function(err) {
+        btn.disabled = false; btn.textContent = 'فتح شاشة الإدخال';
+        statusEl.className = 'access-gate-status error';
+        statusEl.textContent = 'حدث خطأ: ' + err.message;
+      })
+      .verifyDataEntryPin(pin);
   }
 
   function attemptLogin(email, password) {
@@ -1487,7 +1541,8 @@
             localStorage.setItem('loginEmail', email);
             localStorage.setItem('loginPassword', password);
           } catch (e) {}
-          showApp();
+          // حساب المستخدم صحيح — لكن الوصول لإدخال الوحدات لسه محتاج كلمة سر الإدخال
+          showDataEntryPinStep();
         } else {
           statusEl.className = 'access-gate-status error';
           statusEl.textContent = res.message;
@@ -1502,6 +1557,7 @@
   }
 
   document.getElementById('loginBtn').addEventListener('click', function() {
+    if (inDataEntryPinStep()) { submitDataEntryPin(); return; }
     const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value;
     if (!email || !password) {
@@ -1517,6 +1573,9 @@
   });
   document.getElementById('loginEmail').addEventListener('keydown', function(e) {
     if (e.key === 'Enter') document.getElementById('loginPassword').focus();
+  });
+  document.getElementById('loginDataEntryPin').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('loginBtn').click();
   });
 
   // خانة الإيميل بتفضل متذكّرة دايمًا حتى لو الدخول التلقائي فشل أو كلمة السر مش محفوظة
