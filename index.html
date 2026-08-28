@@ -688,8 +688,7 @@
       display: block;
     }
 
-    /* شريط الإجراءات العلوي - تنقّل خفيف يذوب في خلفية الكحلي الداكن مع نص ذهبي */
-    #topActionBar { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 14px; }
+    /* أزرار التنقّل - نص ذهبي يذوب في خلفية الكحلي الداكن (يُعاد استخدامها في #appNav) */
     .top-action-btn {
       display: inline-flex;
       align-items: center;
@@ -729,31 +728,37 @@
       box-shadow: inset 0 -2px 0 0 var(--gold);
     }
 
-    /* ===== unified primary navigation: البحث / إدخال وحدة / الإحصائيات والمخزون ===== */
+    /* ===== unified primary navigation — 7 buttons in ONE row on desktop ===== */
+    /* البحث / عرض السعر / سعر المتر / إدخال وحدة / وحدات إعادة البيع / الإحصائيات والمخزون / لوحة الإدارة */
     #appNav {
-      display: flex; flex-wrap: wrap; gap: 8px;
-      margin: 0 0 12px; padding-bottom: 12px;
+      display: flex;
+      flex-wrap: nowrap;                 /* never a second row */
+      gap: 6px;
+      margin: 0 0 12px;
+      padding-bottom: 12px;
       border-bottom: 1px solid var(--border-gold);
+      overflow-x: auto;                  /* small screens: horizontal scroll, not a 2nd row */
+      overflow-y: hidden;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
     }
-    #appNav .app-nav-btn { max-width: none; }
-    /* "إضافة وحدة" moved into #appNav — its button + handler are kept for reuse, just hidden here */
-    #topActionBar #addUnitFabBtn { display: none; }
+    #appNav::-webkit-scrollbar { display: none; }
+    #appNav .app-nav-btn {
+      flex: 1 1 auto;
+      min-width: max-content;            /* fills the row on desktop, never shrinks the label */
+      max-width: none;
+      white-space: nowrap;
+      padding: 8px 11px;
+      font-size: 12.5px;
+      gap: 6px;
+    }
+    #appNav .app-nav-btn svg { width: 15px; height: 15px; }
 
-    #statsView { display: none; }
-    #statsFrame {
-      box-sizing: border-box;
-      width: 100%;
-      min-height: calc(100vh - 210px);
-      border: 1px solid var(--border-gold);
-      border-radius: var(--radius-lg);
-      background: var(--page-bg);
-      box-shadow: var(--shadow-card);
-      display: block;
-    }
+    /* ===== "الإحصائيات والمخزون" — inline in-document view (NOT an iframe) ===== */
+    #statsView { display: none; max-width: 1120px; margin: 0 auto; }
     /* view switch: hide search-only chrome, keep #appNav + #statsView */
     body.app-view-stats .cover-wrap,
     body.app-view-stats .site-header,
-    body.app-view-stats #topActionBar,
     body.app-view-stats .ai-search-panel,
     body.app-view-stats .filters-card,
     body.app-view-stats #resultsCount,
@@ -761,6 +766,104 @@
     body.app-view-stats #compareBar,
     body.app-view-stats #scrollTopBtn { display: none !important; }
     body.app-view-stats #statsView { display: block; }
+
+    /* ---- dashboard styles, all scoped under #statsView so nothing leaks into Search ---- */
+    #statsView h1 {
+      font-size: 22px; font-weight: 700; color: var(--text-light);
+      margin: 4px 0 14px; line-height: 1.3;
+      padding-right: 13px; border-right: 3px solid var(--gold);
+    }
+    /* internal lock screen kept in DOM as a fallback but never shown — the shell drives auth */
+    #statsView .lock-screen { display: none !important; }
+    #statsView #dashboardContent { display: none; }
+    #statsView .refresh-btn {
+      background: var(--navy); color: var(--gold-soft);
+      border: 1px solid var(--border-gold); border-radius: var(--radius-sm);
+      padding: 9px 18px; font-size: 13px; font-weight: 700; cursor: pointer;
+      margin-bottom: 12px;
+      transition: background-color var(--ease), border-color var(--ease);
+    }
+    #statsView .refresh-btn:hover { background: var(--navy-deep); border-color: rgba(201,154,46,0.5); }
+    #statsView .kpi-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(172px, 1fr));
+      gap: 12px; margin-bottom: 14px;
+    }
+    #statsView .kpi-card {
+      background: var(--glass-card);
+      -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+      border: 1px solid var(--border-gold); border-radius: var(--radius-md);
+      padding: 15px 16px; box-shadow: var(--shadow-card);
+      display: flex; flex-direction: column; justify-content: center; min-height: 96px;
+    }
+    #statsView .kpi-card.available { border-color: rgba(127,211,163,0.32); }
+    #statsView .kpi-card.reserved  { border-color: rgba(230,201,120,0.40); }
+    #statsView .kpi-card.sold      { border-color: rgba(233,144,138,0.34); }
+    #statsView .kpi-value { font-size: 26px; font-weight: 800; color: var(--gold-soft); line-height: 1.15; letter-spacing: 0.3px; }
+    #statsView .kpi-card.available .kpi-value { color: var(--ok); }
+    #statsView .kpi-card.sold      .kpi-value { color: var(--danger); }
+    #statsView .kpi-label { font-size: 12px; color: var(--text-muted); margin-top: 3px; font-weight: 600; line-height: 1.4; }
+    #statsView .section {
+      background: var(--glass-panel);
+      -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+      border: 1px solid var(--border-gold); border-top: 2px solid var(--gold);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px; margin-bottom: 12px; box-shadow: var(--shadow-card);
+    }
+    #statsView .section h3 {
+      font-size: 13px; font-weight: 800; letter-spacing: 0.5px; color: var(--gold-soft);
+      margin: 0 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border-gold);
+    }
+    #statsView .bar-row { margin-bottom: 10px; }
+    #statsView .bar-row:last-child { margin-bottom: 0; }
+    #statsView .bar-label {
+      display: flex; justify-content: space-between; gap: 12px;
+      font-size: 12px; margin-bottom: 5px; color: var(--text-light);
+    }
+    #statsView .bar-label b { color: var(--gold-soft); font-weight: 700; white-space: nowrap; }
+    #statsView .bar-track { background: rgba(255,255,255,0.06); border-radius: 999px; height: 9px; overflow: hidden; }
+    #statsView .bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--gold-dark), var(--gold-soft)); }
+    #statsView table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    #statsView th, #statsView td { padding: 9px 8px; text-align: right; border-bottom: 1px solid var(--line-dark); }
+    #statsView th { color: var(--text-muted); font-weight: 700; }
+    #statsView td { color: var(--text-light); }
+    #statsView td.num { font-weight: 700; color: var(--gold-soft); }
+    #statsView tbody tr:last-child td { border-bottom: none; }
+    #statsView .empty-note { color: var(--text-muted); font-size: 13px; text-align: center; padding: 18px; }
+    #statsView .chart-select {
+      width: 100%; padding: 9px 12px;
+      border: 1px solid var(--border-gold); border-radius: var(--radius-sm);
+      font-size: 13px; margin-bottom: 12px;
+      background: var(--navy-deep); color: var(--text-light); color-scheme: dark;
+      transition: border-color var(--ease), box-shadow var(--ease);
+    }
+    #statsView .chart-select:focus {
+      outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,154,46,0.16);
+    }
+    #statsView .chart-wrap {
+      position: relative; height: 240px;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--line-dark);
+      border-radius: var(--radius-sm); padding: 8px;
+    }
+    #statsView .chart-summary { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+    #statsView .chart-summary .stat {
+      background: rgba(255,255,255,0.04); border: 1px solid var(--line-dark);
+      border-radius: var(--radius-sm); padding: 9px 14px; flex: 1; min-width: 132px;
+    }
+    #statsView .chart-summary .stat .lbl { font-size: 11px; color: var(--text-muted); }
+    #statsView .chart-summary .stat .val { font-size: 15px; font-weight: 800; color: var(--gold-soft); margin-top: 2px; }
+    #statsView .chart-summary .stat.up .val { color: var(--danger); }
+    #statsView .chart-summary .stat.down .val { color: var(--ok); }
+    @media (max-width: 640px) {
+      #statsView h1 { font-size: 20px; padding-right: 11px; }
+      #statsView .section { padding: 14px; }
+      #statsView .kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      #statsView .kpi-value { font-size: 23px; }
+      #statsView #districtTable, #statsView #mostRequestedTable { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      #statsView .chart-summary .stat { min-width: 100%; }
+    }
+    @media (max-width: 380px) {
+      #statsView .kpi-grid { grid-template-columns: 1fr; }
+    }
 
     .price-stats-search {
       width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);
@@ -1119,11 +1222,9 @@
       .site-header { flex-direction: column; align-items: stretch; row-gap: 6px; margin-bottom: 16px; padding-bottom: 12px; }
       .site-header h1 { font-size: 20px; padding-right: 11px; }
       .site-tagline { font-size: 12.5px; }
-      #topActionBar { gap: 8px; margin-bottom: 14px; }
       .top-action-btn { min-width: calc(50% - 4px); max-width: none; font-size: 12px; padding: 10px 12px; }
-      #appNav { gap: 6px; }
-      #appNav .app-nav-btn { min-width: calc(50% - 4px); font-size: 12px; }
-      #statsFrame { min-height: calc(100vh - 168px); }
+      /* #appNav stays ONE row on mobile too — it scrolls horizontally (see base rule) */
+      #appNav .app-nav-btn { font-size: 12px; padding: 8px 10px; min-width: max-content; }
       .grid { grid-template-columns: 1fr 1fr; gap: 10px 12px; }
       .results-grid { grid-template-columns: 1fr; gap: 14px; }
       /* single column: cards no longer share a row, so drop the reserved footer
@@ -1202,6 +1303,16 @@
 <body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!-- Chart.js: used by the inline "الإحصائيات والمخزون" view (price-history line chart) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+  /* dark-theme defaults for Chart.js so axis ticks / grid lines stay readable on the navy panels */
+  if (window.Chart) {
+    Chart.defaults.color = 'rgba(234,240,246,0.72)';
+    Chart.defaults.borderColor = 'rgba(255,255,255,0.10)';
+    Chart.defaults.font.family = "'Cairo','Segoe UI',Tahoma,Arial,sans-serif";
+  }
+</script>
 
 <script>
   /* ============================================================
@@ -1281,19 +1392,18 @@
     <p class="site-tagline">اعثر على الوحدة المناسبة، قارن الأسعار، واحسب خطة السداد — كل ذلك في مكان واحد.</p>
   </header>
 
+  <!-- ===== الشريط الموحّد: 7 أزرار في صف واحد (RTL: يمين ← يسار) ===== -->
   <nav id="appNav" aria-label="أقسام التطبيق">
     <button type="button" class="top-action-btn app-nav-btn is-active" id="navSearchBtn" data-app-view="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span>البحث</span></button>
+    <button type="button" class="top-action-btn app-nav-btn top-action-calc" id="calcFabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/><line x1="16" y1="18" x2="16" y2="18"/></svg><span>عرض السعر</span></button>
+    <button type="button" class="top-action-btn app-nav-btn top-action-price" id="priceInfoFabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>سعر المتر</span></button>
     <button type="button" class="top-action-btn app-nav-btn" id="navAddUnitBtn" data-app-view="add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>إدخال وحدة</span></button>
+    <a href="https://resale-units.vercel.app/" target="_blank" rel="noopener" class="top-action-btn app-nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg><span>وحدات إعادة البيع</span></a>
     <button type="button" class="top-action-btn app-nav-btn" id="navStatsBtn" data-app-view="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span>الإحصائيات والمخزون</span></button>
+    <button type="button" class="top-action-btn app-nav-btn top-action-admin" id="adminFab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>لوحة الإدارة</span></button>
   </nav>
-
-  <div id="topActionBar">
-    <button type="button" class="top-action-btn top-action-admin" id="adminFab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>لوحة الإدارة</span></button>
-    <button type="button" class="top-action-btn top-action-calc" id="calcFabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/><line x1="16" y1="18" x2="16" y2="18"/></svg><span>عرض السعر</span></button>
-    <button type="button" class="top-action-btn top-action-price" id="priceInfoFabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>سعر المتر</span></button>
-    <button type="button" class="top-action-btn top-action-add" id="addUnitFabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>إضافة وحدة</span></button>
-    <a href="https://resale-units.vercel.app/" target="_blank" class="top-action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg><span>وحدات إعادة البيع</span></a>
-  </div>
+  <!-- زر بوابة كلمة سر إدخال الوحدة — مخفي، بيتفعّل من زر "إدخال وحدة" في الشريط أعلاه -->
+  <button type="button" class="top-action-btn top-action-add" id="addUnitFabBtn" hidden style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>إضافة وحدة</span></button>
 
 <div class="ai-search-panel">
   <div class="ai-search-head">
@@ -1409,8 +1519,78 @@
     <p>استخدم البحث الذكي أو الفلاتر بالأعلى للوصول إلى الوحدات والمشروعات التي تناسب احتياجك وميزانيتك.</p>
   </div></div>
 
+  <!-- ===== عرض "الإحصائيات والمخزون" — مدمج داخل نفس الصفحة (مش iframe) ===== -->
   <section id="statsView" aria-label="لوحة الإحصائيات والمخزون">
-    <iframe id="statsFrame" title="لوحة إحصائيات المخزون" loading="lazy" referrerpolicy="no-referrer"></iframe>
+    <h1>لوحة إحصائيات المخزون</h1>
+
+    <div class="lock-screen" id="lockScreen">
+      <div class="icon">🔒</div>
+      <h2>الصفحة دي محمية بكلمة سر لوحة التحكم</h2>
+      <input type="password" id="pinInput" placeholder="كلمة السر">
+      <button id="unlockBtn">دخول</button>
+      <div class="error-msg" id="lockError">كلمة السر غير صحيحة</div>
+    </div>
+
+    <div id="dashboardContent">
+      <button class="refresh-btn" id="refreshBtn">🔄 تحديث الإحصائيات</button>
+
+      <div class="kpi-grid" id="kpiGrid"></div>
+
+      <div class="section">
+        <h3>الوحدات حسب التصنيف</h3>
+        <div id="categoryBars"></div>
+      </div>
+
+      <div class="section">
+        <h3>أكتر المطورين تكرارًا</h3>
+        <div id="developerBars"></div>
+      </div>
+
+      <div class="section">
+        <h3>تتبع تغيّر سعر المتر لمشروع معيّن</h3>
+        <select class="chart-select" id="priceHistoryProjectSelect">
+          <option value="">اختر مشروع...</option>
+        </select>
+        <div id="priceHistoryContent">
+          <div class="empty-note">اختار مشروع من القائمة فوق عشان تشوف تطور سعر المتر بتاعه</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>متوسط سعر المتر لكل منطقة (حسب نوع العقار)</h3>
+        <table id="districtTable">
+          <thead>
+            <tr><th>المنطقة</th><th>نوع العقار</th><th>عدد الوحدات</th><th>متوسط السعر</th></tr>
+          </thead>
+          <tbody id="districtTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="section">
+        <h3>سجل نشاط إدخال الوحدات لكل موظف</h3>
+        <select class="chart-select" id="activityEmployeeSelect">
+          <option value="">اختر موظف...</option>
+        </select>
+        <div id="activityMonthNav" style="display:none; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px;">
+          <button type="button" id="activityPrevMonth" style="background:rgba(255,255,255,0.06); color:var(--text-light); border:1px solid var(--line-dark); padding:8px 14px; border-radius:var(--radius-sm); font-weight:700; cursor:pointer;">◀ الشهر السابق</button>
+          <b id="activityMonthLabel" style="color:var(--gold-soft); font-size:14px;"></b>
+          <button type="button" id="activityNextMonth" style="background:rgba(255,255,255,0.06); color:var(--text-light); border:1px solid var(--line-dark); padding:8px 14px; border-radius:var(--radius-sm); font-weight:700; cursor:pointer;">الشهر التالي ▶</button>
+        </div>
+        <div id="activityContent">
+          <div class="empty-note">اختار موظف من القائمة فوق عشان تشوف سجل نشاطه</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>الأكتر طلبًا (تصدير PDF ومشاركة واتساب)</h3>
+        <table id="mostRequestedTable">
+          <thead>
+            <tr><th>رقم الوحدة</th><th>المشروع</th><th>PDF</th><th>واتساب</th><th>الإجمالي</th></tr>
+          </thead>
+          <tbody id="mostRequestedTableBody"></tbody>
+        </table>
+      </div>
+    </div>
   </section>
 </div>
 
@@ -5702,29 +5882,32 @@
   });
 
   /* ============================================================
-   * التنقّل الموحّد داخل نفس النافذة: البحث / إدخال وحدة / الإحصائيات والمخزون
-   * - "إدخال وحدة" يمرّ بنفس بوابة كلمة السر والمودال الحاليين (#addUnitFabBtn) — من غير تكرار للمنطق.
-   * - "الإحصائيات والمخزون" تُعرض داخل إطار معزول يحمّل صفحة لوحة الإحصائيات نفسها.
-   *   التحقّق يحصل مرّة واحدة فقط داخل الإطار: شاشة قفل Dashboard.html نفسها +
-   *   تحقّق server-side في getDashboardStats/verifyAdminPin وكل دوال اللوحة.
-   *   مفيش تحقّق تاني هنا في الـ shell (كان بيسبب طلب كلمة السر مرتين).
-   *   ملاحظة: الإطار على أصل (origin) مختلف عن الـ shell، فمفيش طريقة آمنة لمشاركة
-   *   حالة الدخول بينهم من غير تمرير كلمة السر عبر الحدود — وده ممنوع أمنيًا.
-   * - التنقّل عبر hash (#stats) عشان أزرار رجوع/تقديم المتصفح تشتغل من غير ما نلمس راوتنج Apps Script (?page=...).
+   * التنقّل الموحّد داخل نفس النافذة (SPA): البحث / إدخال وحدة / الإحصائيات والمخزون
+   * - كل الأقسام تعرض داخل نفس المستند — مفيش iframe.
+   * - "إدخال وحدة" يمرّ بنفس بوابة كلمة السر والمودال الحاليين (#addUnitFabBtn).
+   * - "الإحصائيات والمخزون" عرض مدمج (#statsView) في نفس الصفحة. التفويض:
+   *     · الـ shell يطلب كلمة سر لوحة التحكم مرّة واحدة (askForPin + verifyAdminPin)
+   *       أو يستخدم جلسة الأدمن المفتوحة بالفعل.
+   *     · بعد التحقق: window.__aqarStatsUnlock(pin) بيحط الـ pin في متغيّر مؤقت
+   *       جوّه الـ IIFE بتاع اللوحة (مش localStorage / مش URL / مش HTML ظاهر)،
+   *       وكل نداء بيانات للوحة بيبعت الـ pin، والسيرفر بيتحقق منه في كل مرة
+   *       (getDashboardStats / getMostRequestedUnits / ... كلها بتفحص ADMIN_PIN).
+   * - التنقّل عبر hash (#stats) — client-side بحت، مش بيلمس راوتنج Apps Script (?page=...).
    * ============================================================ */
   (function initUnifiedNav() {
-    var DASHBOARD_URL = 'https://script.google.com/macros/s/AKfycby0Suh2iXdvCSy1N9G9e8u8VUjfHygiXe0owQyzUrHWcF_tIHMd7WnDZw2JtlXDkDDEWw/exec?page=dashboard';
     var navSearchBtn  = document.getElementById('navSearchBtn');
     var navAddUnitBtn = document.getElementById('navAddUnitBtn');
     var navStatsBtn   = document.getElementById('navStatsBtn');
-    var statsFrame    = document.getElementById('statsFrame');
     var editModalEl   = document.getElementById('editModal');
-    if (!navSearchBtn || !navStatsBtn || !statsFrame) return;
+    if (!navSearchBtn || !navStatsBtn) return;
 
     function setActiveNav(view) {
       [navSearchBtn, navAddUnitBtn, navStatsBtn].forEach(function (b) {
         if (b) b.classList.toggle('is-active', b.getAttribute('data-app-view') === view);
       });
+    }
+    function statsUnlocked() {
+      return !!(window.__aqarStatsUnlocked && window.__aqarStatsUnlocked());
     }
     function showSearchView() {
       document.body.classList.remove('app-view-stats');
@@ -5732,11 +5915,26 @@
       window.scrollTo(0, 0);
     }
     function showStatsView() {
-      // تحميل الإطار عند أول فتح فقط — لحد ما يتفتح، Dashboard.html مش بيتحمّل أصلاً
-      if (!statsFrame.getAttribute('src')) statsFrame.setAttribute('src', DASHBOARD_URL);
       document.body.classList.add('app-view-stats');
       if (!(editModalEl && editModalEl.classList.contains('open'))) setActiveNav('stats');
       window.scrollTo(0, 0);
+    }
+
+    // بوابة كلمة سر لوحة التحكم (نفس آلية لوحة التحكم الموجودة)
+    function unlockStatsThen(onOk) {
+      if (statsUnlocked()) { onOk(); return; }
+      if (typeof isAdminUnlocked !== 'undefined' && isAdminUnlocked && adminPin) {
+        window.__aqarStatsUnlock(adminPin); onOk(); return;
+      }
+      askForPin('كلمة سر لوحة التحكم:', function (pin) {
+        if (pin === null) return;
+        if (!pin.trim()) { showToast('لازم تدخل كلمة السر', 'error'); return; }
+        google.script.run.withSuccessHandler(function (isValid) {
+          if (!isValid) { showToast('كلمة السر غير صحيحة', 'error'); return; }
+          window.__aqarStatsUnlock(pin);
+          onOk();
+        }).verifyAdminPin(pin);
+      });
     }
 
     function goToStatsHash() {
@@ -5746,16 +5944,22 @@
       if (location.hash) history.pushState('', document.title, location.pathname + location.search);
       route();
     }
+    function openStats() {
+      unlockStatsThen(goToStatsHash);
+    }
 
-    // مزامنة العرض مع الـ hash — تشمل زراري الرجوع/التقديم والوصول المباشر لـ #stats.
-    // التفويض نفسه محصور جوا الإطار + السيرفر، مش هنا.
+    // مزامنة العرض مع الـ hash — رجوع/تقديم/تحديث والوصول المباشر لـ #stats.
     function route() {
-      if (location.hash === '#stats') showStatsView();
-      else showSearchView();
+      if (location.hash === '#stats') {
+        if (statsUnlocked()) { showStatsView(); }
+        else { showSearchView(); unlockStatsThen(showStatsView); }
+      } else {
+        showSearchView();
+      }
     }
 
     navSearchBtn.addEventListener('click', goToSearchHash);
-    navStatsBtn.addEventListener('click', goToStatsHash);
+    navStatsBtn.addEventListener('click', openStats);
     navAddUnitBtn.addEventListener('click', function () {
       var addBtn = document.getElementById('addUnitFabBtn');
       if (addBtn) addBtn.click(); // نفس البوابة + المودال الحاليين بالظبط
@@ -5765,7 +5969,7 @@
     if (adminPanelStatsBtn) {
       adminPanelStatsBtn.addEventListener('click', function () {
         if (typeof closeAdminPanel === 'function') closeAdminPanel();
-        goToStatsHash();
+        openStats();
       });
     }
 
@@ -5780,7 +5984,304 @@
       }).observe(editModalEl, { attributes: true, attributeFilter: ['class'] });
     }
 
-    route(); // أول تحميل: يعرض #stats لو موجود (والإطار بيطلب كلمة السر بنفسه) وإلا يعرض البحث
+    route(); // أول تحميل: لو الـ hash = #stats يطلب كلمة السر ثم يعرض اللوحة، غير كده يعرض البحث
+  })();
+
+  /* ============================================================
+   * منطق لوحة "الإحصائيات والمخزون" — منقول حرفيًا من Dashboard.html
+   * وملفوف في IIFE عشان كل متغيّراته/دوالّه (fmtNum, renderStats, currentPin ...)
+   * تفضل محليّة ومتصادمش مع أي شيء في صفحة البحث. IDs متطابقة ومفيش تعارض.
+   * تعديلان فقط: (1) شِلنا استدعاء checkSavedAdminPin التلقائي عشان اللوحة
+   * ماتحمّلش بيانات على كل فتح للصفحة، (2) أضفنا window.__aqarStatsUnlock/
+   * __aqarStatsUnlocked كجسر مع الـ shell.
+   * ============================================================ */
+  (function statsDashboardModule() {
+    let currentPin = null;
+
+    function fmtNum(n) {
+      if (n === null || n === undefined || n === '') return '-';
+      return Number(n).toLocaleString('en-US');
+    }
+
+    document.getElementById('unlockBtn').addEventListener('click', tryUnlock);
+    document.getElementById('pinInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') tryUnlock();
+    });
+
+    function unlockDashboard(pin) {
+      currentPin = pin;
+      document.getElementById('lockScreen').style.display = 'none';
+      document.getElementById('dashboardContent').style.display = 'block';
+      loadStats();
+    }
+
+    function tryUnlock() {
+      const pin = document.getElementById('pinInput').value;
+      if (!pin) return;
+      google.script.run.withSuccessHandler(function(isValid) {
+        if (!isValid) {
+          document.getElementById('lockError').style.display = 'block';
+          return;
+        }
+        unlockDashboard(pin);
+      }).verifyAdminPin(pin);
+    }
+
+    // جسر مع الـ shell: الـ shell بيتحقق من كلمة السر ثم بيمرّرها هنا (مؤقتًا في الذاكرة فقط)
+    window.__aqarStatsUnlock = function(pin) {
+      if (currentPin) { return; }        // اتفتحت قبل كده
+      unlockDashboard(pin);
+    };
+    window.__aqarStatsUnlocked = function() { return !!currentPin; };
+
+    document.getElementById('refreshBtn').addEventListener('click', loadStats);
+
+    function loadStats() {
+      google.script.run.withSuccessHandler(renderStats).getDashboardStats(currentPin);
+      loadPriceHistoryProjects();
+      loadEntryActivityLog();
+      loadMostRequested();
+    }
+
+    /* ---------- الأكتر طلبًا ---------- */
+    function loadMostRequested() {
+      const tbody = document.getElementById('mostRequestedTableBody');
+      tbody.innerHTML = '<tr><td colspan="5" class="empty-note">جاري التحميل...</td></tr>';
+      google.script.run.withSuccessHandler(function(res) {
+        if (!res.success) { tbody.innerHTML = '<tr><td colspan="5" class="empty-note">' + res.message + '</td></tr>'; return; }
+        if (!res.units.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-note">لا توجد بيانات بعد</td></tr>'; return; }
+        tbody.innerHTML = res.units.map(u => `
+          <tr>
+            <td>${u.unitId}</td>
+            <td>${u.projectName || '-'}</td>
+            <td class="num">${u.pdfCount}</td>
+            <td class="num">${u.whatsappCount}</td>
+            <td class="num">${u.total}</td>
+          </tr>
+        `).join('');
+      }).getMostRequestedUnits(currentPin);
+    }
+
+    /* ---------- تتبع تغيّر سعر المتر ---------- */
+    let priceHistoryChart = null;
+
+    function loadPriceHistoryProjects() {
+      google.script.run.withSuccessHandler(function(res) {
+        if (!res.success) return;
+        const select = document.getElementById('priceHistoryProjectSelect');
+        const currentValue = select.value;
+        select.innerHTML = '<option value="">اختر مشروع...</option>' +
+          res.projects.map(p => `<option value="${p}">${p}</option>`).join('');
+        if (currentValue && res.projects.indexOf(currentValue) !== -1) select.value = currentValue;
+      }).getPriceHistoryProjects(currentPin);
+    }
+
+    document.getElementById('priceHistoryProjectSelect').addEventListener('change', function() {
+      const project = this.value;
+      const content = document.getElementById('priceHistoryContent');
+      if (!project) {
+        content.innerHTML = '<div class="empty-note">اختار مشروع من القائمة فوق عشان تشوف تطور سعر المتر بتاعه</div>';
+        return;
+      }
+      content.innerHTML = '<div class="empty-note">جاري التحميل...</div>';
+      google.script.run.withSuccessHandler(function(res) {
+        if (!res.success) { content.innerHTML = '<div class="empty-note">' + res.message + '</div>'; return; }
+        renderPriceHistoryChart(res.points);
+      }).getPriceHistoryForProject(currentPin, project);
+    });
+
+    function renderPriceHistoryChart(points) {
+      const content = document.getElementById('priceHistoryContent');
+      if (!points || points.length === 0) {
+        content.innerHTML = '<div class="empty-note">مفيش سجل تغيرات أسعار للمشروع ده لسه</div>';
+        return;
+      }
+
+      const first = points[0];
+      const last = points[points.length - 1];
+      const diff = last.newPricePerMeter - first.newPricePerMeter;
+      const diffPercent = first.newPricePerMeter > 0 ? ((diff / first.newPricePerMeter) * 100).toFixed(1) : 0;
+      const trendCls = diff > 0 ? 'up' : (diff < 0 ? 'down' : '');
+      const trendIcon = diff > 0 ? '📈' : (diff < 0 ? '📉' : '➖');
+
+      content.innerHTML = `
+        <div class="chart-wrap"><canvas id="priceHistoryCanvas"></canvas></div>
+        <div class="chart-summary">
+          <div class="stat"><div class="lbl">عدد التغيرات المرصودة</div><div class="val">${points.length}</div></div>
+          <div class="stat"><div class="lbl">أول سعر متر مرصود</div><div class="val">${fmtNum(first.newPricePerMeter)} ج/م²</div></div>
+          <div class="stat"><div class="lbl">آخر سعر متر مرصود</div><div class="val">${fmtNum(last.newPricePerMeter)} ج/م²</div></div>
+          <div class="stat ${trendCls}"><div class="lbl">التغيّر الكلي</div><div class="val">${trendIcon} ${diffPercent}%</div></div>
+        </div>
+      `;
+
+      const ctx = document.getElementById('priceHistoryCanvas').getContext('2d');
+      if (priceHistoryChart) priceHistoryChart.destroy();
+      priceHistoryChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: points.map(p => p.date),
+          datasets: [{
+            label: 'سعر المتر (جنيه)',
+            data: points.map(p => p.newPricePerMeter),
+            borderColor: '#c9992e',
+            backgroundColor: 'rgba(201,153,46,0.12)',
+            borderWidth: 2.5,
+            tension: 0.25,
+            fill: true,
+            pointBackgroundColor: '#0f2942',
+            pointRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { ticks: { callback: v => Number(v).toLocaleString('en-US') } }
+          }
+        }
+      });
+    }
+
+    function renderStats(res) {
+      if (!res.success) { showToast(res.message || 'تعذّر تحميل الإحصائيات', 'error'); return; }
+
+      // KPI Cards
+      const statusOrder = [
+        { key: 'متاح', label: 'متاح', cls: 'available' },
+        { key: 'محجوز', label: 'محجوز', cls: 'reserved' },
+        { key: 'مباع', label: 'مباع', cls: 'sold' }
+      ];
+      let kpiHtml = `
+        <div class="kpi-card">
+          <div class="kpi-value">${fmtNum(res.total)}</div>
+          <div class="kpi-label">إجمالي الوحدات</div>
+        </div>`;
+      statusOrder.forEach(s => {
+        kpiHtml += `
+        <div class="kpi-card ${s.cls}">
+          <div class="kpi-value">${fmtNum(res.byStatus[s.key] || 0)}</div>
+          <div class="kpi-label">${s.label}</div>
+        </div>`;
+      });
+      kpiHtml += `
+        <div class="kpi-card">
+          <div class="kpi-value">${fmtNum(res.totalAvailableValue)}</div>
+          <div class="kpi-label">إجمالي قيمة الوحدات المتاحة (جنيه)</div>
+        </div>`;
+      document.getElementById('kpiGrid').innerHTML = kpiHtml;
+
+      // Category bars
+      const categories = Object.keys(res.byCategory);
+      const maxCategory = Math.max(...categories.map(c => res.byCategory[c]), 1);
+      document.getElementById('categoryBars').innerHTML = categories.length ? categories.map(c => `
+        <div class="bar-row">
+          <div class="bar-label"><span>${c}</span><b>${res.byCategory[c]}</b></div>
+          <div class="bar-track"><div class="bar-fill" style="width:${(res.byCategory[c] / maxCategory * 100)}%"></div></div>
+        </div>
+      `).join('') : '<div class="empty-note">لا توجد بيانات بعد</div>';
+
+      // Developer bars
+      const maxDev = Math.max(...res.topDevelopers.map(d => d.count), 1);
+      document.getElementById('developerBars').innerHTML = res.topDevelopers.length ? res.topDevelopers.map(d => `
+        <div class="bar-row">
+          <div class="bar-label"><span>${d.name}</span><b>${d.count} وحدة</b></div>
+          <div class="bar-track"><div class="bar-fill" style="width:${(d.count / maxDev * 100)}%"></div></div>
+        </div>
+      `).join('') : '<div class="empty-note">لا توجد بيانات بعد</div>';
+
+      // District table
+      document.getElementById('districtTableBody').innerHTML = res.districtStats.length ? res.districtStats.map(d => `
+        <tr>
+          <td>${d.name}</td>
+          <td>${d.propertyType}</td>
+          <td>${d.count}</td>
+          <td class="num">${d.avgPricePerMeter !== null ? fmtNum(d.avgPricePerMeter) + ' ج/م²' : (d.avgPrice !== null ? fmtNum(d.avgPrice) + ' جنيه (سعر إجمالي)' : '-')}</td>
+        </tr>
+      `).join('') : '<tr><td colspan="4" class="empty-note">لا توجد بيانات بعد</td></tr>';
+    }
+
+    /* ---------- سجل نشاط إدخال الوحدات لكل موظف ---------- */
+    let allActivityEntries = [];
+    let activityViewDate = new Date();
+
+    function loadEntryActivityLog() {
+      google.script.run.withSuccessHandler(function(res) {
+        if (!res.success) return;
+        allActivityEntries = res.entries;
+        const select = document.getElementById('activityEmployeeSelect');
+        const currentValue = select.value;
+        select.innerHTML = '<option value="">اختر موظف...</option>' +
+          res.employees.map(e => `<option value="${e}">${e}</option>`).join('');
+        if (currentValue && res.employees.indexOf(currentValue) !== -1) select.value = currentValue;
+      }).getEntryActivityLog(currentPin);
+    }
+
+    const MONTH_NAMES_AR = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+
+    function renderActivityReport() {
+      const employee = document.getElementById('activityEmployeeSelect').value;
+      const content = document.getElementById('activityContent');
+      const nav = document.getElementById('activityMonthNav');
+
+      if (!employee) {
+        nav.style.display = 'none';
+        content.innerHTML = '<div class="empty-note">اختار موظف من القائمة فوق عشان تشوف سجل نشاطه</div>';
+        return;
+      }
+
+      nav.style.display = 'flex';
+      const year = activityViewDate.getFullYear();
+      const month = activityViewDate.getMonth() + 1;
+      document.getElementById('activityMonthLabel').textContent = MONTH_NAMES_AR[month - 1] + ' ' + year;
+
+      const monthEntries = allActivityEntries.filter(e => e.enteredBy === employee && e.year === year && e.month === month);
+
+      if (!monthEntries.length) {
+        content.innerHTML = '<div class="empty-note">مفيش وحدات مسجلة للموظف ده في الشهر ده</div>';
+        return;
+      }
+
+      const byDay = {};
+      monthEntries.forEach(e => {
+        if (!byDay[e.day]) byDay[e.day] = { day: e.day, dateLabel: e.dateLabel, count: 0 };
+        byDay[e.day].count++;
+      });
+      const days = Object.values(byDay).sort((a, b) => b.day - a.day);
+
+      let html = `
+        <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); margin-bottom:20px;">
+          <div class="kpi-card">
+            <div class="kpi-value">${monthEntries.length}</div>
+            <div class="kpi-label">إجمالي وحدات الشهر</div>
+          </div>
+          <div class="kpi-card available">
+            <div class="kpi-value">${days.length}</div>
+            <div class="kpi-label">عدد أيام النشاط</div>
+          </div>
+        </div>
+        <table>
+          <thead><tr><th>التاريخ</th><th>عدد الوحدات المُضافة</th></tr></thead>
+          <tbody>
+            ${days.map(d => `<tr><td>${d.dateLabel}</td><td class="num">${d.count}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      `;
+      content.innerHTML = html;
+    }
+
+    document.getElementById('activityEmployeeSelect').addEventListener('change', function() {
+      activityViewDate = new Date();
+      renderActivityReport();
+    });
+    document.getElementById('activityPrevMonth').addEventListener('click', function() {
+      activityViewDate.setMonth(activityViewDate.getMonth() - 1);
+      renderActivityReport();
+    });
+    document.getElementById('activityNextMonth').addEventListener('click', function() {
+      activityViewDate.setMonth(activityViewDate.getMonth() + 1);
+      renderActivityReport();
+    });
   })();
 </script>
 </body>
