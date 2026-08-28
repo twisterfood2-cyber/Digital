@@ -6042,8 +6042,9 @@
     navSearchBtn.addEventListener('click', goToSearchHash);
     navStatsBtn.addEventListener('click', openStats);
     navAddUnitBtn.addEventListener('click', function () {
-      var addBtn = document.getElementById('addUnitFabBtn');
-      if (addBtn) addBtn.click(); // نفس البوابة + المودال الحاليين بالظبط
+      // "إدخال وحدة" صفحة كاملة مستقلة — تنقّل عادي في نفس التبويب (مش مودال / مش iframe / مش تبويب جديد).
+      // صفحة add.html عندها بوابة الدخول + كلمة سر الإدخال الخاصة بيها، فالحماية محفوظة.
+      window.location.href = 'https://aqardigital.vercel.app/add.html';
     });
 
     var adminPanelStatsBtn = document.getElementById('adminPanelStatsBtn');
