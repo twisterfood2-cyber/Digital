@@ -8,155 +8,263 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0f2942">
+  <meta name="theme-color" content="#0A1C2F">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Digital RE">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f2942'/%3E%3Ctext x='50' y='68' font-family='Arial, sans-serif' font-size='55' font-weight='900' fill='%23c9992e' text-anchor='middle'%3ED%3C/text%3E%3C/svg%3E">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f2942'/%3E%3Ctext x='50' y='68' font-family='Arial, sans-serif' font-size='55' font-weight='900' fill='%23c9992e' text-anchor='middle'%3ED%3C/text%3E%3C/svg%3E">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230A1C2F'/%3E%3Ctext x='50' y='68' font-family='Arial, sans-serif' font-size='55' font-weight='900' fill='%23C99A2E' text-anchor='middle'%3ED%3C/text%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230A1C2F'/%3E%3Ctext x='50' y='68' font-family='Arial, sans-serif' font-size='55' font-weight='900' fill='%23C99A2E' text-anchor='middle'%3ED%3C/text%3E%3C/svg%3E">
   <style>
     :root {
-      --navy: #0f2942;
-      --navy-dark: #0a1c2e;
-      --gold: #c9992e;
-      --gold-light: #f4e6c8;
-      --bg: #f3f4f7;
-      --card: #ffffff;
-      --border: #e2e5ea;
-      --text: #1c2530;
-      --muted: #6b7684;
-      --success-bg: #e3f3e9; --success-fg: #1e7145;
-      --error-bg: #fbe6e6; --error-fg: #b3261e;
+      /* navy family */
+      --navy: #0A1C2F;
+      --navy-deep: #061321;
+      --navy-dark: #081727;
+      --navy-soft: #14344F;
+      /* gold accent family */
+      --gold: #C99A2E;
+      --gold-soft: #E6C978;
+      --gold-dark: #A77A18;
+      --gold-light: #DDB85A;              /* kept for back-compat; not a cream fill */
+      /* neutrals & text */
+      --white: #FFFFFF;
+      --off-white: #F7F6F2;
+      --bg: #F1EFE8;                      /* kept for back-compat */
+      --card: #FFFFFF;                    /* kept for back-compat */
+      --text: #10253A;                    /* dark text on light surfaces */
+      --text-light: #EAF0F6;              /* light text on dark surfaces */
+      --text-muted: #9CA9B7;              /* muted light text on dark surfaces */
+      --muted: #5E6B7A;                   /* muted text on light surfaces */
+      /* lines & borders */
+      --border: rgba(16,37,58,0.14);
+      --border-gold: rgba(201,154,46,0.28);
+      --line-dark: rgba(255,255,255,0.10);
+      /* environment */
+      --page-bg: #0D2438;
+      /* glass surfaces */
+      --glass-card: rgba(20,43,67,0.74);
+      --glass-strong: rgba(6,19,33,0.76);
+      --glass-panel: rgba(19,42,63,0.72);
+      /* status */
+      --success-bg: #E4F1E9; --success-fg: #1E6E45;
+      --error-bg: #F7E4E4;   --error-fg: #B0271F;
+      /* system scale */
+      --radius-sm: 8px;
+      --radius-md: 13px;
+      --radius-lg: 16px;
+      --shadow-soft: 0 10px 30px rgba(0,0,0,0.18);
+      --shadow-card: 0 6px 20px rgba(4,12,22,0.26);
+      --ease: 180ms ease;
     }
     * { box-sizing: border-box; }
+    button, input, select, textarea, optgroup, option { font-family: inherit; }
     body {
       font-family: 'Cairo', 'Segoe UI', Tahoma, Arial, sans-serif;
       direction: rtl;
       background:
-        linear-gradient(180deg, rgba(10,28,46,0.88) 0%, rgba(15,41,66,0.85) 55%, rgba(18,55,84,0.85) 100%),
+        repeating-linear-gradient(45deg, rgba(201,154,46,0.035) 0px, rgba(201,154,46,0.035) 1px, transparent 1px, transparent 72px),
+        repeating-linear-gradient(-45deg, rgba(201,154,46,0.035) 0px, rgba(201,154,46,0.035) 1px, transparent 1px, transparent 72px),
+        radial-gradient(ellipse 1200px 560px at 50% -4%, rgba(221,184,90,0.09) 0%, transparent 68%),
+        radial-gradient(ellipse 1400px 900px at 50% 120%, rgba(4,10,18,0.24) 0%, transparent 70%),
+        linear-gradient(180deg, rgba(16,43,66,0.88) 0%, rgba(13,36,56,0.90) 45%, rgba(10,30,49,0.90) 100%),
         url('city-bg.png');
-      background-size: auto, cover;
-      background-position: center, center;
-      background-repeat: no-repeat, no-repeat;
+      background-size: auto, auto, auto, auto, auto, cover;
+      background-position: center, center, center, center, center, center;
+      background-repeat: repeat, repeat, no-repeat, no-repeat, no-repeat, no-repeat;
       background-attachment: fixed;
+      background-color: var(--page-bg);
       margin: 0;
-      padding: 24px;
-      color: var(--text);
+      padding: 28px 24px 44px;
+      color: var(--text-light);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
     .container { max-width: 920px; margin: 0 auto; }
+
+    /* ===== page heading — same treatment as index.html ===== */
     h1 {
-      font-size: 22px;
-      color: var(--navy);
-      font-weight: 800;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-light);
+      margin: 4px 0 20px;
+      line-height: 1.3;
+      padding-right: 13px;
+      border-right: 3px solid var(--gold);
     }
-    .brand-header { margin-bottom: 4px; }
-    .brand-logo { max-width: 220px; height: auto; display: block; margin-bottom: 14px; }
-    h1::before {
-      content: "";
-      display: inline-block;
-      width: 6px;
-      height: 26px;
-      background: linear-gradient(180deg, var(--gold), var(--navy));
-      border-radius: 3px;
-    }
-    /* صورة الغلاف أعلى الصفحة */
+
+    /* cover image strip */
     .cover-wrap {
-      position: relative;
-      width: 100%;
-      max-width: 920px;
-      margin: 0 auto 18px;
-      border-radius: 16px;
-      overflow: hidden;
-      display: none;
-      box-shadow: 0 4px 18px rgba(15,41,66,0.12);
+      position: relative; width: 100%; max-width: 920px; margin: 0 auto 18px;
+      border-radius: var(--radius-lg); border: 1px solid var(--border-gold);
+      overflow: hidden; display: none; box-shadow: var(--shadow-soft);
     }
     .cover-wrap.has-image { display: block; }
-    .cover-wrap img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-      display: block;
-    }
+    .cover-wrap img { width: 100%; height: 200px; object-fit: cover; display: block; }
+
+    /* ===== panels — dark navy glass, same language as index.html ===== */
     .card {
-      background: var(--card);
-      border-radius: 14px;
-      padding: 18px;
-      box-shadow: 0 4px 18px rgba(15,41,66,0.07);
-      border-top: 4px solid var(--navy);
+      background: var(--glass-panel);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-gold);
+      border-top: 2px solid var(--gold);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 16px;
     }
+    .card:last-child { margin-bottom: 0; }
+
+    /* AI import console — deep glass, like index.html's AI search panel */
+    #aiFillCard { background: var(--glass-strong); }
+    .ico {
+      display: inline-block; vertical-align: -0.14em;
+      fill: none; stroke: currentColor; stroke-width: 2;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+    #aiFillCard .ai-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    #aiFillCard .ai-head .ico { width: 15px; height: 15px; color: var(--gold-soft); flex: none; }
+    #aiFillCard .ai-head .section-title { margin: 0; padding: 0; border: 0; }
+    #aiFillCard > p { color: var(--text-muted); }
+    #aiFillCard textarea {
+      background: rgba(255,255,255,0.05);
+      color: var(--text-light);
+      border: 1px solid rgba(201,154,46,0.22);
+    }
+    #aiFillCard textarea::placeholder { color: var(--text-muted); }
+    #aiFillCard textarea:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201,154,46,0.16);
+      background: rgba(255,255,255,0.07);
+    }
+    #aiFillCard input[type="file"] {
+      color-scheme: dark;
+      color: var(--text-light);
+      font-size: 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(201,154,46,0.22);
+      padding: 8px 10px;
+    }
+    #aiImagePasteZone {
+      margin-top: 8px;
+      border: 1.5px dashed var(--border-gold);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      color: var(--gold-soft);
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255,255,255,0.04);
+      outline: none;
+      transition: border-color var(--ease), background-color var(--ease);
+    }
+    #aiImagePasteZone:hover, #aiImagePasteZone:focus {
+      border-color: var(--gold);
+      background: rgba(201,154,46,0.08);
+    }
+    #aiExtractBtn {
+      width: 100%;
+      margin-top: 10px;
+      padding: 11px;
+      border: 1px solid var(--border-gold);
+      border-radius: var(--radius-sm);
+      background: var(--navy);
+      color: var(--gold-soft);
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color var(--ease), border-color var(--ease);
+    }
+    #aiExtractBtn:hover { background: var(--navy-deep); border-color: rgba(201,154,46,0.5); }
+    #aiExtractMsg { font-size: 12px; margin-top: 8px; font-weight: 600; }
+    /* AI extract feedback: JS writes inline color var(--error-fg)/var(--success-fg)
+       (tuned for light surfaces); on this dark console force readable tints */
+    #aiExtractMsg[style*="error-fg"]   { color: #E9908A !important; }
+    #aiExtractMsg[style*="success-fg"] { color: #7FD3A3 !important; }
+
+    /* ===== section headers + field labels on dark panels ===== */
     .section-title {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 800;
-      color: var(--navy);
-      margin: 12px 0 6px;
-      padding-bottom: 5px;
-      border-bottom: 2px solid var(--gold-light);
+      letter-spacing: 0.6px;
       text-transform: uppercase;
-      letter-spacing: 0.3px;
+      color: var(--gold-soft);
+      margin: 22px 0 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border-gold);
     }
+    form > .section-title:first-of-type { margin-top: 2px; }
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 8px;
+      gap: 12px 14px;
     }
     label {
       display: block;
-      font-size: 12px;
-      font-weight: 600;
-      margin-bottom: 2px;
-      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      margin-bottom: 5px;
+      color: var(--text-muted);
     }
+    .required::after { content: " *"; color: var(--gold); font-weight: 800; }
+
+    /* ===== inputs — light + crisp for data entry (readability first) ===== */
     input, select, textarea {
       width: 100%;
-      padding: 6px 10px;
-      border: 1.5px solid var(--border);
-      border-radius: 7px;
+      padding: 9px 11px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
       font-size: 14px;
       font-family: inherit;
-      background: #fbfbfc;
+      background: var(--white);
       color: var(--text);
-      transition: border-color .15s, background .15s;
+      transition: border-color var(--ease), box-shadow var(--ease);
     }
+    input::placeholder, textarea::placeholder { color: #A9B2BD; }
     input:focus, select:focus, textarea:focus {
       outline: none;
-      border-color: var(--navy);
-      background: #fff;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201,154,46,0.16);
+      background: var(--white);
     }
     textarea { resize: vertical; min-height: 45px; }
-    .btn-row { margin-top: 14px; display: flex; gap: 10px; }
+
+    /* ===== buttons ===== */
+    .btn-row { margin-top: 18px; display: flex; gap: 10px; }
     button {
-      padding: 13px 26px;
+      padding: 12px 24px;
       border: none;
-      border-radius: 9px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: opacity .15s, transform .1s;
-    }
-    button:active { transform: scale(0.98); }
-    #submitBtn { background: var(--navy); color: #fff; flex: 1; }
-    #submitBtn:hover { opacity: 0.92; }
-    #submitBtn:disabled { background: #9aa4ae; cursor: not-allowed; }
-    #resetBtn { background: var(--gold-light); color: #6b5416; }
-    #resetBtn:hover { opacity: 0.85; }
-    #msg {
-      margin-top: 16px;
-      padding: 12px 16px;
-      border-radius: 8px;
+      border-radius: var(--radius-sm);
       font-size: 14px;
-      display: none;
-      font-weight: 600;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      cursor: pointer;
+      transition: background-color var(--ease), border-color var(--ease), transform var(--ease), opacity var(--ease);
+    }
+    button:active { transform: translateY(1px); }
+    #submitBtn {
+      background: var(--navy); color: var(--gold-soft);
+      border: 1px solid var(--border-gold); flex: 1;
+    }
+    #submitBtn:hover { background: var(--navy-deep); border-color: rgba(201,154,46,0.5); }
+    #submitBtn:disabled {
+      background: rgba(255,255,255,0.12); color: rgba(234,240,246,0.5);
+      border-color: transparent; cursor: not-allowed;
+    }
+    #resetBtn { background: rgba(255,255,255,0.06); color: var(--text-light); border: 1px solid rgba(255,255,255,0.14); }
+    #resetBtn:hover { background: rgba(255,255,255,0.1); }
+
+    #msg {
+      margin-top: 16px; padding: 12px 16px; border-radius: var(--radius-sm);
+      font-size: 14px; display: none; font-weight: 600;
     }
     #msg.success { background: var(--success-bg); color: var(--success-fg); display: block; }
-    #msg.error { background: var(--error-bg); color: var(--error-fg); display: block; }
-    .required::after { content: " *"; color: var(--gold); font-weight: 900; }
+    #msg.error   { background: var(--error-bg);   color: var(--error-fg);   display: block; }
 
-    /* بوابة التحكم في الوصول */
+    /* ===== access gate — same treatment as index.html ===== */
     .access-gate {
       position: fixed; inset: 0; z-index: 2000;
       background:
@@ -168,21 +276,28 @@
       display: flex; align-items: center; justify-content: center; padding: 20px;
     }
     .access-gate-box {
-      max-width: 380px; width: 100%; background: #fff; border-radius: 16px; padding: 34px 28px;
-      text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.25); border-top: 4px solid var(--navy);
+      max-width: 380px; width: 100%; background: var(--off-white); border-radius: var(--radius-lg);
+      padding: 36px 30px; text-align: center; box-shadow: var(--shadow-soft);
+      border: 1px solid var(--border-gold); border-top: 2px solid var(--gold);
     }
-    .access-gate-box .icon { font-size: 34px; margin-bottom: 14px; }
-    .access-gate-box h2 { font-size: 17px; color: var(--navy); margin-bottom: 8px; font-weight: 800; }
+    .access-gate-box .icon { color: var(--gold); margin-bottom: 14px; line-height: 0; }
+    .access-gate-box .icon svg {
+      width: 32px; height: 32px; display: inline-block;
+      fill: none; stroke: currentColor; stroke-width: 2;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+    .access-gate-box h2 { font-size: 16.5px; color: var(--navy); margin-bottom: 8px; font-weight: 700; letter-spacing: 0.2px; }
     .access-gate-box p { font-size: 13px; color: var(--muted); line-height: 1.8; margin-bottom: 18px; }
     .access-gate-box input {
-      width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 8px;
+      width: 100%; padding: 11px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm);
       font-size: 14px; margin-bottom: 10px; text-align: center;
     }
     .access-gate-box button {
-      width: 100%; padding: 12px; border: none; border-radius: 9px; background: var(--navy);
-      color: #fff; font-weight: 700; font-size: 14px; cursor: pointer; margin-top: 4px;
+      width: 100%; padding: 12px; border: 1px solid var(--border-gold); border-radius: var(--radius-sm);
+      background: var(--navy); color: var(--gold-soft); font-weight: 700; font-size: 14px; cursor: pointer; margin-top: 4px;
     }
-    .access-gate-box button:disabled { background: #9aa4ae; }
+    .access-gate-box button:hover { background: var(--navy-deep); }
+    .access-gate-box button:disabled { background: #9aa4ae; color: #fff; border-color: transparent; }
     .access-gate-owner-link {
       display: block; margin-top: 18px; font-size: 12px; color: var(--muted); text-decoration: underline; cursor: pointer;
       background: none; border: none; width: auto; padding: 0; font-weight: 600;
@@ -191,44 +306,46 @@
     .access-gate-status.error { color: var(--error-fg); display: block; }
     .access-gate-status.success { color: var(--success-fg); display: block; }
 
+    /* ===== installment preview — subtle gold tint on dark ===== */
     .installment-preview {
-      margin-top: 14px; background: var(--gold-light); color: #6b5416; padding: 12px 16px;
-      border-radius: 9px; font-size: 14px; font-weight: 600;
+      margin-top: 16px; background: rgba(201,154,46,0.10); color: var(--gold-soft);
+      border: 1px solid var(--border-gold); padding: 12px 16px;
+      border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; line-height: 1.7;
     }
-    .installment-preview b { font-size: 16px; }
+    .installment-preview b { font-size: 15px; color: var(--text-light); }
 
-    /* منطقة رفع صور الوحدة */
+    /* ===== images zone ===== */
     .images-zone {
-      border: 2px dashed var(--border);
-      border-radius: 10px;
-      padding: 10px;
+      border: 1.5px dashed var(--border-gold);
+      border-radius: var(--radius-sm);
+      padding: 14px;
       text-align: center;
-      background: #fbfbfc;
+      background: rgba(255,255,255,0.04);
       cursor: pointer;
-      transition: border-color .15s, background .15s;
+      transition: border-color var(--ease), background-color var(--ease);
     }
     .images-zone:hover, .images-zone.drag-over, .images-zone:focus {
-      border-color: var(--navy);
-      background: #f2f6fa;
+      border-color: var(--gold);
+      background: rgba(201,154,46,0.07);
       outline: none;
     }
-    .images-zone p { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .images-zone p { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
     .images-choose-btn {
-      background: var(--navy); color: #fff; padding: 6px 16px;
-      border-radius: 8px; font-size: 12px; font-weight: 700; border: none; cursor: pointer;
+      background: var(--navy); color: var(--gold-soft); padding: 7px 16px;
+      border-radius: var(--radius-sm); font-size: 12px; font-weight: 700;
+      border: 1px solid var(--border-gold); cursor: pointer;
     }
-    .image-link-row { display: flex; gap: 8px; margin-top: 6px; }
+    .image-link-row { display: flex; gap: 8px; margin-top: 8px; }
     .image-link-row input { flex: 1; }
     .image-link-row button {
-      background: var(--gold-light); color: #6b5416; padding: 0 18px;
-      border-radius: 8px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; white-space: nowrap;
+      background: rgba(255,255,255,0.06); color: var(--text-light); padding: 0 18px;
+      border-radius: var(--radius-sm); font-size: 13px; font-weight: 700;
+      border: 1px solid rgba(255,255,255,0.14); cursor: pointer; white-space: nowrap;
     }
-    .images-preview {
-      display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px;
-    }
+    .images-preview { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
     .image-thumb {
-      position: relative; width: 70px; height: 70px; border-radius: 8px; overflow: hidden;
-      border: 1px solid var(--border); cursor: grab; transition: transform .15s, opacity .15s, border-color .15s;
+      position: relative; width: 70px; height: 70px; border-radius: var(--radius-sm); overflow: hidden;
+      border: 1px solid var(--line-dark); cursor: grab; transition: transform .15s, opacity .15s, border-color .15s;
     }
     .image-thumb:active { cursor: grabbing; }
     .image-thumb.dragging { opacity: 0.4; }
@@ -236,12 +353,22 @@
     .image-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
     .image-thumb .remove-img {
       position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%;
-      background: rgba(179,38,30,0.9); color: #fff; border: none; font-size: 12px; cursor: pointer;
+      background: rgba(176,39,31,0.92); color: #fff; border: none; font-size: 12px; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
     }
     .image-thumb .uploading-overlay {
-      position: absolute; inset: 0; background: rgba(255,255,255,0.75);
-      display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--navy);
+      position: absolute; inset: 0; background: rgba(6,19,33,0.7);
+      display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-light);
+    }
+
+    /* ===== responsive ===== */
+    @media (max-width: 640px) {
+      body { padding: 18px 14px 40px; }
+      h1 { font-size: 21px; padding-right: 11px; }
+      .card { padding: 16px; }
+      .grid { grid-template-columns: 1fr; }
+      .btn-row { flex-wrap: wrap; }
+      .btn-row #submitBtn { flex: 1 1 100%; }
     }
   </style>
 </head>
@@ -297,7 +424,7 @@
 <!-- بوابة دخول المستخدمين - محدش يقدر يشوف أو يستخدم أي حاجة قبل ما يسجل دخول صحيح -->
 <div class="access-gate" id="loginGate">
   <div class="access-gate-box">
-    <div class="icon">🔒</div>
+    <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
     <h2>الدخول لنظام Digital Real Estate</h2>
     <p>الصفحة دي محمية - اكتب إيميلك وكلمة السر الخاصة بيك للدخول</p>
     <input type="email" id="loginEmail" placeholder="الإيميل" autocomplete="username">
@@ -311,28 +438,31 @@
   <div class="cover-wrap" id="coverWrap">
     <img id="coverImg" src="" alt="صورة الغلاف">
   </div>
-  <h1>🏢 إدخال وحدة عقارية جديدة</h1>
+  <h1>إدخال وحدة عقارية جديدة</h1>
 
-<div class="card" id="aiFillCard" style="border-top: 4px solid #7c4dff; padding:14px;">
-  <div class="section-title" style="color:#7c4dff; margin-top:0;">🤖 تعبئة تلقائية بالذكاء الاصطناعي</div>
-  <p style="font-size:11px; color:var(--muted); margin:-4px 0 6px; line-height:1.5;">
+<div class="card" id="aiFillCard">
+  <div class="ai-head">
+    <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"/><path d="m18.5 14 .8 2.4 2.4.8-2.4.8-.8 2.4-.8-2.4-2.4-.8 2.4-.8Z"/></svg>
+    <span class="section-title">تعبئة تلقائية بالذكاء الاصطناعي</span>
+  </div>
+  <p style="font-size:11px; margin:0 0 8px; line-height:1.6;">
     الصق رسالة المطور (نص أو صورة بـ Ctrl+V)، أو ارفع صورة قايمة أسعار أو ملف PDF، والذكاء الاصطناعي هيملى الفورم تلقائيًا.
     راجع البيانات كويس قبل ما تحفظ.
   </p>
   <textarea id="aiPasteText" placeholder="الصق نص الرسالة هنا (اختياري)..." style="min-height:50px;"></textarea>
-  <div id="aiImagePasteZone" tabindex="0" style="margin-top:6px; border:2px dashed #7c4dff; border-radius:10px; padding:8px; text-align:center; cursor:pointer; color:#7c4dff; font-size:12px; font-weight:600; background:#f7f4ff; outline:none;">
+  <div id="aiImagePasteZone" tabindex="0">
     📋 دوس هنا وبعدين الصق صورة (Ctrl+V)
   </div>
-  <div id="aiPastedImagePreview" style="display:none; margin-top:6px; position:relative; max-width:200px;">
-    <img id="aiPastedImageTag" style="width:100%; border-radius:8px; border:1px solid var(--border);">
+  <div id="aiPastedImagePreview" style="display:none; margin-top:8px; position:relative; max-width:200px;">
+    <img id="aiPastedImageTag" style="width:100%; border-radius:8px; border:1px solid var(--line-dark);">
     <button type="button" id="aiPastedImageRemove" style="position:absolute; top:-8px; left:-8px; width:24px; height:24px; border-radius:50%; background:var(--error-fg); color:#fff; border:none; cursor:pointer; font-size:13px;">✕</button>
   </div>
-  <input type="file" id="aiFileInput" accept="image/*,application/pdf" style="margin-top:6px;">
+  <input type="file" id="aiFileInput" accept="image/*,application/pdf" style="margin-top:8px;">
 
-  <button type="button" id="aiExtractBtn" style="width:100%; margin-top:6px; padding:10px; border:none; border-radius:9px; background:#7c4dff; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">
-    ✨ استخرج البيانات وابدأ التعبئة
+  <button type="button" id="aiExtractBtn">
+    استخرج البيانات وابدأ التعبئة
   </button>
-  <div id="aiExtractMsg" style="font-size:12px; margin-top:6px; display:none;"></div>
+  <div id="aiExtractMsg" style="font-size:12px; margin-top:8px; display:none;"></div>
 </div>
 
 <div class="card">
@@ -381,7 +511,7 @@
           <label>اسم المشروع</label>
           <input type="text" name="projectName" list="projectDatalist" placeholder="مثال: هايد بارك" autocomplete="off">
           <datalist id="projectDatalist"></datalist>
-          <button type="button" id="fetchLastSimilarBtn" style="margin-top:6px; width:100%; padding:8px; border:1.5px solid var(--border); border-radius:8px; background:var(--bg); color:var(--navy); font-weight:700; font-size:12px; cursor:pointer;">
+          <button type="button" id="fetchLastSimilarBtn" style="margin-top:6px; width:100%; padding:9px; border:1px solid rgba(255,255,255,0.14); border-radius:var(--radius-sm); background:rgba(255,255,255,0.06); color:var(--text-light); font-weight:700; font-size:12px; cursor:pointer;">
             🔄 جيب بيانات آخر وحدة مشابهة
           </button>
         </div>
@@ -463,7 +593,7 @@
         <div>
           <label>المقدم (نسبة %)</label>
           <input type="number" name="downPayment" min="0" max="100" step="any" placeholder="مثال: 10">
-          <div id="downPaymentValueHint" style="font-size:12px; color:var(--muted); margin-top:5px; display:none;"></div>
+          <div id="downPaymentValueHint" style="font-size:12px; color:var(--text-muted); margin-top:5px; display:none;"></div>
         </div>
         <div>
           <label>المقدم محسوب على</label>
@@ -475,7 +605,7 @@
         <div>
           <label>قيمة الدفعة (نسبة % أو قيمة)</label>
           <input type="text" name="paymentAmount" placeholder="مثال: 5% أو 50000">
-          <div id="paymentAmountValueHint" style="font-size:12px; color:var(--muted); margin-top:5px; display:none;"></div>
+          <div id="paymentAmountValueHint" style="font-size:12px; color:var(--text-muted); margin-top:5px; display:none;"></div>
         </div>
         <div>
           <label>عدد الدفعات</label>
@@ -527,7 +657,7 @@
         <button type="button" id="addImageLinkBtn">إضافة رابط</button>
       </div>
       <div id="imagesPreview" class="images-preview"></div>
-      <p style="font-size:11px; color:var(--muted); margin-top:4px;">💡 تقدر تمسك أي صورة وتسحبها عشان تغيّر ترتيبها (الصورة الأولى بتبقى صورة الغلاف)</p>
+      <p style="font-size:11px; color:var(--text-muted); margin-top:4px;">💡 تقدر تمسك أي صورة وتسحبها عشان تغيّر ترتيبها (الصورة الأولى بتبقى صورة الغلاف)</p>
       <div id="imagesUploadMsg" style="font-size:12px; margin-top:6px;"></div>
 
       <div class="section-title">ملاحظات</div>
@@ -543,18 +673,17 @@
 </div>
 
 <!-- نافذة سؤال: نفس الوحدة (تحديث) ولا وحدة مختلفة (تسجيل جديد)؟ -->
-<div id="sameUnitModal" style="display:none; position:fixed; inset:0; background:rgba(10,20,30,0.55); z-index:2500; align-items:center; justify-content:center; padding:20px;">
-  <div style="background:#fff; border-radius:16px; max-width:420px; width:100%; padding:28px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.25); border-top:4px solid var(--gold);">
-    <div style="font-size:34px; margin-bottom:14px;">🤔</div>
-    <h2 style="font-size:16px; color:var(--navy); margin-bottom:12px; font-weight:800;">دي نفس الوحدة ولا وحدة مختلفة؟</h2>
+<div id="sameUnitModal" style="display:none; position:fixed; inset:0; background:rgba(4,12,22,0.66); -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px); z-index:2500; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:var(--off-white); border-radius:var(--radius-lg); max-width:420px; width:100%; padding:26px; text-align:center; box-shadow:var(--shadow-soft); border:1px solid var(--border-gold); border-top:2px solid var(--gold);">
+    <h2 style="font-size:16px; color:var(--navy); margin:0 0 12px; font-weight:700; letter-spacing:0.2px;">دي نفس الوحدة ولا وحدة مختلفة؟</h2>
     <p id="sameUnitModalText" style="font-size:13px; color:var(--muted); line-height:1.8; margin-bottom:20px;"></p>
-    <button type="button" id="sameUnitConfirmBtn" style="width:100%; padding:12px; border:none; border-radius:9px; background:var(--navy); color:#fff; font-weight:700; font-size:14px; cursor:pointer; margin-bottom:10px;">
-      ✅ نفس الوحدة - حدّث السعر والبيانات
+    <button type="button" id="sameUnitConfirmBtn" style="width:100%; padding:12px; border:1px solid var(--border-gold); border-radius:var(--radius-sm); background:var(--navy); color:var(--gold-soft); font-weight:700; font-size:14px; cursor:pointer; margin-bottom:10px;">
+      نفس الوحدة - حدّث السعر والبيانات
     </button>
-    <button type="button" id="sameUnitDifferentBtn" style="width:100%; padding:12px; border:none; border-radius:9px; background:var(--gold); color:#fff; font-weight:700; font-size:14px; cursor:pointer; margin-bottom:10px;">
-      🆕 وحدة مختلفة - سجّلها جديدة
+    <button type="button" id="sameUnitDifferentBtn" style="width:100%; padding:12px; border:1px solid var(--border-gold); border-radius:var(--radius-sm); background:var(--gold); color:var(--navy-deep); font-weight:700; font-size:14px; cursor:pointer; margin-bottom:10px;">
+      وحدة مختلفة - سجّلها جديدة
     </button>
-    <button type="button" id="sameUnitCancelBtn" style="width:100%; padding:10px; border:none; border-radius:9px; background:transparent; color:var(--muted); font-weight:600; font-size:13px; cursor:pointer; text-decoration:underline;">
+    <button type="button" id="sameUnitCancelBtn" style="width:100%; padding:10px; border:none; border-radius:var(--radius-sm); background:transparent; color:var(--muted); font-weight:600; font-size:13px; cursor:pointer; text-decoration:underline;">
       إلغاء
     </button>
   </div>
@@ -714,11 +843,11 @@
   let aiPastedImageMime = null;
 
   document.getElementById('aiImagePasteZone').addEventListener('focus', function() {
-    this.style.background = '#ece4ff';
+    this.style.background = '';
     this.textContent = '✅ جاهز - الصق الصورة دلوقتي (Ctrl+V)';
   });
   document.getElementById('aiImagePasteZone').addEventListener('blur', function() {
-    this.style.background = '#f7f4ff';
+    this.style.background = '';
     this.textContent = '📋 دوس هنا وبعدين الصق صورة (Ctrl+V)';
   });
   document.getElementById('aiImagePasteZone').addEventListener('paste', function(e) {
@@ -902,7 +1031,7 @@
     if (!notice) {
       notice = document.createElement('div');
       notice.id = 'autoFillNotice';
-      notice.style.cssText = 'background:var(--gold-light);color:#6b5416;padding:8px 12px;border-radius:8px;font-size:12px;font-weight:600;margin-top:8px;';
+      notice.style.cssText = 'background:rgba(201,154,46,0.14);color:var(--gold-soft);border:1px solid var(--border-gold);padding:8px 12px;border-radius:8px;font-size:12px;font-weight:600;margin-top:8px;';
       projectNameInput.parentElement.appendChild(notice);
     }
     notice.textContent = '✅ اتملت بيانات الدفع والتشطيب تلقائيًا من آخر وحدة بنفس المشروع والنوع - راجعها وعدّل اللي محتاج تغيير';
