@@ -461,7 +461,18 @@
        flex spacer, so the whole pricing + actions block stays together at the card
        bottom. A second auto margin here would split the free space and float the
        price box into the middle. */
-    .card-actions-bottom { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line-dark); }
+    /* Reserve a constant height for the whole bottom block (status select + icon row
+       + optional developer/owner footer). The developer/owner row (.card-provenance)
+       is optional AND wraps to 2 lines for long names, so without a reserve its
+       height varies ~0/30/57px between cards. Because the card's single flex spacer
+       (margin-top:auto on the price wrapper) sits ABOVE the price box, that variance
+       would push the price box top up/down between cards in the same row. Reserving
+       the worst realistic case (status 43 + icon row 44 + 2-line footer 57 + own
+       padding/border ~32 ≈ 176) makes the price box top, its bottom, the details
+       button, the status control and the action buttons all align per row.
+       Content taller than this still expands (no clipping). Reset on mobile where
+       cards are a single column and there is nothing to align against. */
+    .card-actions-bottom { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line-dark); min-height: 176px; }
     .status-select {
       flex: 1; padding: 8px 10px; font-size: 12px; font-weight: 600; border-radius: var(--radius-sm);
       background: rgba(6,19,33,0.55); color: var(--text-light); border: 1px solid var(--line-dark);
@@ -1079,6 +1090,9 @@
       .top-action-btn { min-width: calc(50% - 4px); max-width: none; font-size: 12px; padding: 10px 12px; }
       .grid { grid-template-columns: 1fr 1fr; gap: 10px 12px; }
       .results-grid { grid-template-columns: 1fr; gap: 14px; }
+      /* single column: cards no longer share a row, so drop the reserved footer
+         height to avoid empty space under cards without a developer/owner row */
+      .card-actions-bottom { min-height: 0; }
       .ai-search-panel { padding: 14px; }
       .ai-search-head { display: flex; margin-bottom: 4px; }
       .ai-search-desc { display: block; padding-right: 0; margin-bottom: 2px; }
