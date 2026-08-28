@@ -773,6 +773,43 @@
        margin-top so it sits neatly under the shared header/nav */
     body.app-view-stats #statsView > h1 { margin-top: 0; }
 
+    /* ===== "إدخال وحدة" — inline page view, SAME pattern as the Statistics view =====
+       The shared cover banner + .site-header + 7-button #appNav stay visible; only the
+       Search-specific tools/results are hidden. The existing Add-Unit form (#editModal,
+       already in the shell) is relocated by JS into #mainContainer and shown here as a
+       normal in-flow page section instead of a small fixed modal. No new form, no iframe,
+       no redesign. */
+    body.app-view-add .ai-search-panel,
+    body.app-view-add .filters-card,
+    body.app-view-add #resultsCount,
+    body.app-view-add #results,
+    body.app-view-add #compareBar,
+    body.app-view-add #scrollTopBtn,
+    body.app-view-add #statsView { display: none !important; }
+    /* present #editModal as a full-width in-flow section under the header/nav (not a modal) */
+    body.app-view-add #editModal {
+      position: static;
+      display: block;
+      inset: auto;
+      background: none;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      padding: 0;
+      overflow: visible;
+      z-index: auto;
+      max-width: 1120px;
+      margin: 0 auto;
+      pointer-events: none;              /* clicks on the empty edges do nothing (no accidental close) */
+    }
+    body.app-view-add #editModal .modal-box {
+      max-width: none;
+      width: 100%;
+      margin: 0;
+      pointer-events: auto;
+    }
+    /* it's a page now, not a dialog — the × close control is not shown here (use the nav) */
+    body.app-view-add #editModal .modal-close { display: none; }
+
     /* ---- dashboard styles, all scoped under #statsView so nothing leaks into Search ---- */
     #statsView h1 {
       font-size: 22px; font-weight: 700; color: var(--text-light);
@@ -5980,7 +6017,19 @@
     var navAddUnitBtn = document.getElementById('navAddUnitBtn');
     var navStatsBtn   = document.getElementById('navStatsBtn');
     var editModalEl   = document.getElementById('editModal');
+    var mainContainerEl = document.getElementById('mainContainer');
     if (!navSearchBtn || !navStatsBtn) return;
+
+    // "إدخال وحدة" view — SAME pattern as the Statistics view.
+    // Relocate the shared Add-Unit form (#editModal) into #mainContainer so it can render
+    // as an in-flow page section under the header/nav when app-view-add is active. As a
+    // fixed modal (edit/clone from a search card) it is viewport-positioned regardless of
+    // its DOM parent, so this move is safe and changes nothing about that use.
+    if (mainContainerEl && editModalEl && editModalEl.parentElement !== mainContainerEl) {
+      mainContainerEl.appendChild(editModalEl);
+    }
+    var addVerifiedPin = null;   // data-entry PIN (or admin PIN) verified this session — kept in memory only
+    var addUnlockedFlag = false;
 
     function setActiveNav(view) {
       [navSearchBtn, navAddUnitBtn, navStatsBtn].forEach(function (b) {
@@ -5990,14 +6039,34 @@
     function statsUnlocked() {
       return !!(window.__aqarStatsUnlocked && window.__aqarStatsUnlocked());
     }
+    function addUnlocked() { return addUnlockedFlag; }
+
+    function leaveAddView() {
+      if (!document.body.classList.contains('app-view-add')) return;
+      if (editModalEl && editModalEl.classList.contains('open') && typeof closeEditModal === 'function') {
+        closeEditModal();
+      }
+      document.body.classList.remove('app-view-add');
+    }
     function showSearchView() {
       document.body.classList.remove('app-view-stats');
-      if (!(editModalEl && editModalEl.classList.contains('open'))) setActiveNav('search');
+      leaveAddView();
+      setActiveNav('search');
       window.scrollTo(0, 0);
     }
     function showStatsView() {
+      leaveAddView();
       document.body.classList.add('app-view-stats');
-      if (!(editModalEl && editModalEl.classList.contains('open'))) setActiveNav('stats');
+      setActiveNav('stats');
+      window.scrollTo(0, 0);
+    }
+    function showAddView() {
+      document.body.classList.remove('app-view-stats');
+      document.body.classList.add('app-view-add');
+      // existing helper — puts #editModal into ADD mode: fresh form + visible AI section + .open
+      if (typeof openAddUnitModal === 'function') openAddUnitModal();
+      if (typeof unitWritePin !== 'undefined') unitWritePin = addVerifiedPin; // keep the save authorised server-side
+      setActiveNav('add');
       window.scrollTo(0, 0);
     }
 
@@ -6018,22 +6087,44 @@
       });
     }
 
+    // بوابة كلمة سر إدخال الوحدة (نفس آلية الزر القديم #addUnitFabBtn — verifyDataEntryPin)
+    function unlockAddThen(onOk) {
+      if (addUnlocked()) { onOk(); return; }
+      if (typeof isAdminUnlocked !== 'undefined' && isAdminUnlocked && adminPin) {
+        addVerifiedPin = adminPin; addUnlockedFlag = true; onOk(); return;
+      }
+      askForPin('كلمة سر فتح شاشة إضافة وحدة جديدة:', function (pin) {
+        if (pin === null) return;
+        if (!pin.trim()) { showToast('لازم تدخل كلمة السر', 'error'); return; }
+        google.script.run.withSuccessHandler(function (isValid) {
+          if (!isValid) { showToast('كلمة السر غير صحيحة', 'error'); return; }
+          addVerifiedPin = pin; addUnlockedFlag = true;
+          onOk();
+        }).verifyDataEntryPin(pin);
+      });
+    }
+
     function goToStatsHash() {
       if (location.hash !== '#stats') location.hash = 'stats'; else route();
+    }
+    function goToAddHash() {
+      if (location.hash !== '#add') location.hash = 'add'; else route();
     }
     function goToSearchHash() {
       if (location.hash) history.pushState('', document.title, location.pathname + location.search);
       route();
     }
-    function openStats() {
-      unlockStatsThen(goToStatsHash);
-    }
+    function openStats() { unlockStatsThen(goToStatsHash); }
+    function openAdd()   { unlockAddThen(goToAddHash); }
 
-    // مزامنة العرض مع الـ hash — رجوع/تقديم/تحديث والوصول المباشر لـ #stats.
+    // مزامنة العرض مع الـ hash — رجوع/تقديم/تحديث والوصول المباشر لـ #stats أو #add.
     function route() {
       if (location.hash === '#stats') {
         if (statsUnlocked()) { showStatsView(); }
         else { showSearchView(); unlockStatsThen(showStatsView); }
+      } else if (location.hash === '#add') {
+        if (addUnlocked()) { showAddView(); }
+        else { showSearchView(); unlockAddThen(showAddView); }
       } else {
         showSearchView();
       }
@@ -6041,11 +6132,7 @@
 
     navSearchBtn.addEventListener('click', goToSearchHash);
     navStatsBtn.addEventListener('click', openStats);
-    navAddUnitBtn.addEventListener('click', function () {
-      // "إدخال وحدة" صفحة كاملة مستقلة — تنقّل عادي في نفس التبويب (مش مودال / مش iframe / مش تبويب جديد).
-      // صفحة add.html عندها بوابة الدخول + كلمة سر الإدخال الخاصة بيها، فالحماية محفوظة.
-      window.location.href = 'https://aqardigital.vercel.app/add.html';
-    });
+    navAddUnitBtn.addEventListener('click', openAdd);
 
     var adminPanelStatsBtn = document.getElementById('adminPanelStatsBtn');
     if (adminPanelStatsBtn) {
@@ -6058,15 +6145,16 @@
     window.addEventListener('hashchange', route);
     window.addEventListener('popstate', route);
 
-    // حالة "إدخال وحدة" النشِطة أثناء فتح مودال الإضافة/الاستنساخ
+    // حالة الزر النشِط: "إدخال وحدة" وأنت في عرض الإضافة أو مودال الإضافة/الاستنساخ مفتوح
     if (editModalEl && 'MutationObserver' in window) {
       new MutationObserver(function () {
-        if (editModalEl.classList.contains('open')) setActiveNav('add');
-        else setActiveNav(document.body.classList.contains('app-view-stats') ? 'stats' : 'search');
+        if (document.body.classList.contains('app-view-add')) { setActiveNav('add'); return; }
+        if (editModalEl.classList.contains('open')) { setActiveNav('add'); return; }
+        setActiveNav(document.body.classList.contains('app-view-stats') ? 'stats' : 'search');
       }).observe(editModalEl, { attributes: true, attributeFilter: ['class'] });
     }
 
-    route(); // أول تحميل: لو الـ hash = #stats يطلب كلمة السر ثم يعرض اللوحة، غير كده يعرض البحث
+    route(); // أول تحميل: #stats / #add يطلبوا كلمة السر ثم يعرضوا القسم، غير كده البحث
   })();
 
   /* ============================================================
