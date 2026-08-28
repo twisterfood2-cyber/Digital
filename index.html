@@ -4656,10 +4656,18 @@
 
   document.getElementById('compareGoBtn').addEventListener('click', openCompareModal);
 
-  function buildCompareRows(units) {
+  /* imageResolver (اختياري): تُمرَّر فقط من مسار تصدير الـ PDF. لو موجودة بترجع
+     data: URL جاهزة (base64) للصورة عشان html2canvas يقدر يلتقطها (صور Google Drive
+     cross-origin ومش بتتلقط مباشرة). لو مش ممرَّرة → السلوك على الشاشة زي ما هو
+     بالظبط (getThumbUrl + loading="lazy"). */
+  function buildCompareRows(units, imageResolver) {
     const rows = [
       { label: 'الصورة', get: u => {
         const imgs = (u['Images'] || '').split(',').map(s => s.trim()).filter(Boolean);
+        if (imageResolver) {
+          const dataUrl = imageResolver(u);
+          return dataUrl ? `<img src="${dataUrl}" style="width:100%;height:90px;object-fit:cover;border-radius:8px;">` : '-';
+        }
         return imgs[0] ? `<img src="${getThumbUrl(imgs[0])}" style="width:100%;height:90px;object-fit:cover;border-radius:8px;" loading="lazy">` : '-';
       }},
       { label: 'نوع العقار', get: u => u['Property Type'] || '-' },
@@ -4749,8 +4757,30 @@
     } catch (e) {}
 
     try {
-      const visibleRows = buildCompareRows(units);
+      /* --------- 1) نجهّز صور الوحدات كـ data: URL قبل بناء نسخة التصدير ---------
+         صور Google Drive (thumbnail?id=...) cross-origin بدون CORS headers، فـ
+         html2canvas مش بيقدر يلتقطها. نفس الحل المستخدم في generateUnitPDF /
+         downloadUnitPDF: السيرفر (getUnitImageBase64) بيجيب الصورة ويرجّعها base64. */
+      const firstImgUrls = units.map(u => {
+        const imgs = (u['Images'] || '').split(',').map(s => s.trim()).filter(Boolean);
+        return imgs[0] || null;
+      });
+      const resolvedImgs = await Promise.all(
+        firstImgUrls.map(url => url ? fetchImageAsDataUrl(url) : Promise.resolve(null))
+      );
+      const imgMap = new Map();
+      units.forEach((u, i) => imgMap.set(u, resolvedImgs[i] || null));
+
+      /* نفس صفوف/جدول الشاشة بالظبط — الفرق الوحيد إن صف "الصورة" بيستخدم الـ
+         data: URL (نسخة التصدير فقط). مسار الشاشة openCompareModal مش بيتغيّر. */
+      const visibleRows = buildCompareRows(units, u => imgMap.get(u));
       const tableHtml = buildCompareTableHtml(units, visibleRows);
+
+      /* --------- 2) نفس خلفية الشاشة (navy غامق) بدل الأبيض ---------
+         .compare-table معمولة لسطح navy غامق (نص فاتح var(--text-light)، عناوين
+         ذهبية var(--gold-soft)). على خلفية بيضاء بتبقى شبه مختفية. --page-bg هو
+         نفس النيفي اللي وراء المقارنة على الشاشة. التعديل ده على نسخة التصدير فقط. */
+      const EXPORT_BG = '#0D2438'; // = var(--page-bg)
 
       const pageDiv = document.createElement('div');
       pageDiv.style.position = 'absolute';
@@ -4759,14 +4789,15 @@
       pageDiv.style.width = '720px';
       pageDiv.style.fontFamily = "'Segoe UI', Tahoma, Arial, sans-serif";
       pageDiv.style.direction = 'rtl';
-      pageDiv.style.background = '#ffffff';
+      pageDiv.style.background = EXPORT_BG;
+      pageDiv.style.color = '#EAF0F6';
 
       pageDiv.innerHTML = `
         <div style="background:#0f2942;padding:18px 24px;">
           <div style="color:#fff;font-size:18px;font-weight:800;">مقارنة الوحدات - Digital Real Estate</div>
           <div style="color:#c9992e;font-size:12px;margin-top:4px;">${units.length} وحدات - ${new Date().toLocaleDateString('en-GB')}</div>
         </div>
-        <div style="padding:18px 24px;">${tableHtml}</div>
+        <div style="padding:18px 24px;background:${EXPORT_BG};">${tableHtml}</div>
         <div style="background:#0f2942;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;">
           <span style="font-size:12px;color:#fff;font-weight:700;">${agentName || 'Digital Real Estate Team'}${agentPhone ? ' — ' : ''}<span style="color:#ecd08c;">${agentPhone || ''}</span></span>
           <span style="font-size:9px;color:#9fb0c2;white-space:nowrap;">Contact Info</span>
@@ -4774,9 +4805,27 @@
       `;
       document.body.appendChild(pageDiv);
 
-      await new Promise(resolve => setTimeout(resolve, 400));
+      /* --------- 3) ننتظر تحميل كل الصور فعليًا قبل ما نبدأ الالتقاط ---------
+         الآلية الحقيقية: انتظار حدث load/error + فحص complete/naturalWidth لكل
+         صورة (مش مجرد setTimeout ثابت). decode() خطوة تكميلية best-effort
+         و *مش* مسموح لها توقف التصدير (بتتعمل race مع مهلة قصيرة عشان بعض
+         المتصفحات بتسيب decode() معلّقة على عنصر خارج الشاشة).
+         الـ 80ms في الآخر مهلة استقرار للخطوط/الـ layout بس. */
+      const domImgs = Array.from(pageDiv.querySelectorAll('img'));
+      await Promise.all(domImgs.map(img => {
+        if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+        return new Promise(res => {
+          img.addEventListener('load', res, { once: true });
+          img.addEventListener('error', res, { once: true });
+        });
+      }));
+      const capped = p => Promise.race([p, new Promise(r => setTimeout(r, 500))]);
+      await Promise.all(domImgs.map(img =>
+        (img.decode ? capped(img.decode().catch(() => {})) : Promise.resolve())
+      ));
+      await new Promise(resolve => setTimeout(resolve, 80));
 
-      const canvas = await html2canvas(pageDiv, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+      const canvas = await html2canvas(pageDiv, { scale: 2, useCORS: true, backgroundColor: EXPORT_BG });
       document.body.removeChild(pageDiv);
 
       const { jsPDF } = window.jspdf;
@@ -4803,7 +4852,8 @@
 
         const sliceImgHeight = (sliceHeightPx * imgWidth) / canvas.width;
         if (!first) pdf.addPage();
-        pdf.addImage(pageCanvas.toDataURL('image/jpeg', 0.92), 'JPEG', margin, margin, imgWidth, sliceImgHeight);
+        // جودة أعلى (0.95) عشان النص فوق الخلفية النيفي الغامقة يفضل واضح من غير آرتيفاكتس
+        pdf.addImage(pageCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, margin, imgWidth, sliceImgHeight);
 
         renderedPx += sliceHeightPx;
         first = false;
