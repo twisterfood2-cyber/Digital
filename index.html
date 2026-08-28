@@ -38,11 +38,14 @@
       --border: rgba(16,37,58,0.14);        /* hairline on light */
       --border-gold: rgba(201,154,46,0.28); /* subtle gold hairline */
       --line-dark: rgba(255,255,255,0.10);  /* hairline on dark glass */
+      /* environment */
+      --page-bg: #0D2438;                    /* refined deep premium navy under the city image */
       /* glass surfaces */
       --glass: rgba(10,28,47,0.55);          /* recessive glass — nav pills that dissolve into the bg */
       --glass-card: rgba(20,43,67,0.74);     /* elevated glass — unit cards, sit above the page bg */
       --glass-strong: rgba(6,19,33,0.76);    /* deep glass — AI console, toasts, bars */
-      --glass-light: rgba(232,238,244,0.9);  /* cool light glass — structured filter panel */
+      --glass-panel: rgba(19,42,63,0.72);    /* structured dark glass — filter panel */
+      --input-dark: rgba(27,52,74,0.6);      /* input surface on dark panels (~#1B344A) */
       /* status */
       --success-bg: #E4F1E9; --success-fg: #1E6E45;
       --warn-bg: #F7EED9; --warn-fg: #7A5600;
@@ -63,16 +66,17 @@
       font-family: 'Cairo', 'Segoe UI', Tahoma, Arial, sans-serif;
       direction: rtl;
       background:
-        repeating-linear-gradient(45deg, rgba(201,154,46,0.04) 0px, rgba(201,154,46,0.04) 1px, transparent 1px, transparent 72px),
-        repeating-linear-gradient(-45deg, rgba(201,154,46,0.04) 0px, rgba(201,154,46,0.04) 1px, transparent 1px, transparent 72px),
-        radial-gradient(ellipse 1200px 560px at 50% -4%, rgba(221,184,90,0.10) 0%, transparent 68%),
-        radial-gradient(ellipse 1400px 900px at 50% 120%, rgba(0,0,0,0.45) 0%, transparent 70%),
-        linear-gradient(180deg, rgba(6,19,33,0.92) 0%, rgba(10,28,47,0.88) 45%, rgba(15,41,66,0.86) 100%),
+        repeating-linear-gradient(45deg, rgba(201,154,46,0.035) 0px, rgba(201,154,46,0.035) 1px, transparent 1px, transparent 72px),
+        repeating-linear-gradient(-45deg, rgba(201,154,46,0.035) 0px, rgba(201,154,46,0.035) 1px, transparent 1px, transparent 72px),
+        radial-gradient(ellipse 1200px 560px at 50% -4%, rgba(221,184,90,0.09) 0%, transparent 68%),
+        radial-gradient(ellipse 1400px 900px at 50% 120%, rgba(4,10,18,0.24) 0%, transparent 70%),
+        linear-gradient(180deg, rgba(16,43,66,0.88) 0%, rgba(13,36,56,0.90) 45%, rgba(10,30,49,0.90) 100%),
         url('city-bg.png');
       background-size: auto, auto, auto, auto, auto, cover;
       background-position: center, center, center, center, center, center;
       background-repeat: repeat, repeat, no-repeat, no-repeat, no-repeat, no-repeat;
       background-attachment: fixed;
+      background-color: var(--page-bg);
       margin: 0;
       padding: 28px 24px 44px;
       color: var(--text-light);
@@ -158,15 +162,31 @@
     #nlSearchMsg[style*="error-fg"] { color: #E9908A !important; }
     #nlSearchMsg[style*="success-fg"] { color: #7FD3A3 !important; }
 
+    /* structured filter panel — dark navy glass, sibling of the AI console */
     .filters-card {
-      background: var(--glass-light);
-      -webkit-backdrop-filter: blur(10px);
-      backdrop-filter: blur(10px);
+      background: var(--glass-panel);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
       border: 1px solid var(--border-gold);
       border-radius: var(--radius-lg);
       padding: 20px;
-      box-shadow: var(--shadow-soft);
+      box-shadow: var(--shadow-card);
       margin-bottom: 20px;
+    }
+    .filters-card label { color: var(--text-muted); }
+    .filters-card input,
+    .filters-card select {
+      background: var(--input-dark);
+      color: var(--text-light);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .filters-card select { color-scheme: dark; }
+    .filters-card input::placeholder { color: var(--text-muted); }
+    .filters-card input:focus,
+    .filters-card select:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201,154,46,0.16);
+      background: rgba(27,52,74,0.78);
     }
     .grid {
       display: grid;
@@ -217,11 +237,11 @@
       border: 1px solid var(--border-gold); padding: 10px 28px;
     }
     #searchBtn:hover { background: var(--navy-deep); border-color: rgba(201,154,46,0.5); transform: translateY(-1px); }
-    #clearBtn { background: rgba(10,28,47,0.06); color: var(--navy); border: 1px solid var(--border); }
-    #clearBtn:hover { background: rgba(10,28,47,0.11); }
-    .fav-toggle-btn { background: transparent; color: var(--navy); border: 1px solid var(--border-gold); }
-    .fav-toggle-btn:hover { background: rgba(201,154,46,0.10); }
-    .fav-toggle-btn.active { background: var(--navy); color: var(--gold-soft); border-color: var(--navy); }
+    #clearBtn { background: rgba(255,255,255,0.06); color: var(--text-light); border: 1px solid rgba(255,255,255,0.14); }
+    #clearBtn:hover { background: rgba(255,255,255,0.1); }
+    .fav-toggle-btn { background: transparent; color: var(--gold-soft); border: 1px solid var(--border-gold); }
+    .fav-toggle-btn:hover { background: rgba(201,154,46,0.12); }
+    .fav-toggle-btn.active { background: var(--navy); color: var(--gold-soft); border-color: var(--gold); }
     #resultsCount { font-size: 12px; color: rgba(234,240,246,0.72); margin: 14px 2px; font-weight: 600; letter-spacing: 0.3px; }
     .results-grid {
       display: grid;
@@ -399,12 +419,6 @@
     .toggle-details-btn:hover { background: rgba(255,255,255,0.09); border-color: var(--border-gold); }
     .toggle-details-btn .chevron { transition: transform .2s; font-size: 10px; }
     .toggle-details-btn.open .chevron { transform: rotate(180deg); }
-    /* نفس الزر داخل بطاقة الفلاتر الفاتحة يحتاج معالجة فاتحة */
-    .filters-card .toggle-details-btn {
-      background: rgba(10,28,47,0.05); color: var(--navy);
-      border: 1px solid var(--border); font-weight: 700;
-    }
-    .filters-card .toggle-details-btn:hover { background: rgba(10,28,47,0.09); border-color: var(--border-gold); }
     .unit-extra {
       font-size: 12px; color: rgba(234,240,246,0.72); line-height: 1.85;
       margin-top: 9px;
