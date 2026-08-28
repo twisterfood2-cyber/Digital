@@ -757,8 +757,10 @@
     /* ===== "الإحصائيات والمخزون" — inline in-document view (NOT an iframe) ===== */
     #statsView { display: none; max-width: 1120px; margin: 0 auto; }
     /* view switch: hide search-only chrome, keep #appNav + #statsView */
+    /* Bug #3 fix: the shared site header (.site-header) + nav (#appNav) stay visible on
+       the Statistics view — only the Search-specific content is hidden, so Statistics
+       looks like another native section of the same site (same header everywhere). */
     body.app-view-stats .cover-wrap,
-    body.app-view-stats .site-header,
     body.app-view-stats .ai-search-panel,
     body.app-view-stats .filters-card,
     body.app-view-stats #resultsCount,
@@ -766,6 +768,9 @@
     body.app-view-stats #compareBar,
     body.app-view-stats #scrollTopBtn { display: none !important; }
     body.app-view-stats #statsView { display: block; }
+    /* the inline dashboard already provides its own section heading — drop its own <h1>
+       margin-top so it sits neatly under the shared header/nav */
+    body.app-view-stats #statsView > h1 { margin-top: 0; }
 
     /* ---- dashboard styles, all scoped under #statsView so nothing leaks into Search ---- */
     #statsView h1 {
@@ -1028,6 +1033,81 @@
     .section-title {
       font-size: 11px; font-weight: 800; letter-spacing: 0.6px; color: var(--navy); margin: 14px 0 8px;
       padding-bottom: 5px; border-bottom: 1px solid var(--border-gold); text-transform: uppercase;
+    }
+
+    /* ============================================================
+     * Bug #1 & #2: "عرض السعر" (#calcModal) و "سعر المتر" (#priceStatsModal).
+     * الموقع لما اتعمله redesign اتظبط #editModal و #compareModal لكن اتنسي المودالين
+     * دول فضلوا بالتصميم الفاتح القديم. هنا بنلبسهم *نفس* نظام #editModal/#compareModal
+     * بالظبط (نفس التوكنز) عشان يبانوا جزء أصلي من نفس الموقع. visual layer فقط،
+     * scoped على المودالين دول — أي مودال تاني مش بيتأثر. المنطق/الحسابات/الـ IDs زي ما هي.
+     * ============================================================ */
+    #calcModal .modal-box,
+    #priceStatsModal .modal-box {
+      background: var(--glass-panel);
+      color: var(--text-light);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-card);
+    }
+    #calcModal .modal-header,
+    #priceStatsModal .modal-header { border-bottom-color: var(--line-dark); }
+    #calcModal .modal-title,
+    #priceStatsModal .modal-title { color: var(--text-light); }
+    #calcModal .modal-close,
+    #priceStatsModal .modal-close {
+      background: rgba(255,255,255,0.06); color: var(--text-light);
+      border-color: rgba(255,255,255,0.14);
+    }
+    #calcModal .modal-close:hover,
+    #priceStatsModal .modal-close:hover { background: rgba(255,255,255,0.12); }
+    #calcModal .section-title,
+    #priceStatsModal .section-title { color: var(--gold-soft); }
+    #calcModal label,
+    #priceStatsModal label { color: var(--text-muted); }
+    #calcModal input, #calcModal select, #calcModal textarea,
+    #priceStatsModal input, #priceStatsModal select, #priceStatsModal textarea {
+      background: var(--input-dark) !important;
+      color: var(--text-light) !important;
+      border: 1px solid rgba(255,255,255,0.12) !important;
+    }
+    #calcModal select, #priceStatsModal select { color-scheme: dark; }
+    #calcModal input::placeholder, #calcModal textarea::placeholder,
+    #priceStatsModal input::placeholder { color: var(--text-muted) !important; }
+    #calcModal input:focus, #calcModal select:focus, #calcModal textarea:focus,
+    #priceStatsModal input:focus, #priceStatsModal select:focus {
+      border-color: var(--gold) !important;
+      box-shadow: 0 0 0 3px rgba(201,154,46,0.16) !important;
+    }
+    /* calculator result panel (same language as #editModal .installment-preview) */
+    #calcModal .calc-results {
+      background: var(--glass-card); border: 1px solid var(--border-gold);
+    }
+    #calcModal .calc-result-row { border-bottom-color: var(--line-dark); color: var(--text-light); }
+    #calcModal .calc-result-row b { color: var(--gold-soft); }
+    #calcModal .calc-result-row.highlight { background: rgba(201,154,46,0.16); }
+    #calcModal .calc-result-row.highlight b { color: var(--gold-soft); }
+    /* AI auto-fill panel + image/paste zones inside the calculator (matches #editModal #unitAddAiSection) */
+    #calcModal .ai-fill-panel { background: var(--glass-strong); border-color: var(--border-gold); }
+    #calcModal .ai-fill-panel .section-title { color: var(--gold-soft); }
+    #calcModal .ai-fill-panel p { color: var(--text-muted) !important; }
+    #calcModal #calcAiExtractMsg, #calcModal #calcImagesUploadMsg { color: var(--text-muted); }
+    #calcModal .ai-paste-zone,
+    #calcModal .images-zone {
+      background: rgba(255,255,255,0.04); border-color: var(--border-gold); color: var(--gold-soft);
+    }
+    #calcModal .images-zone p { color: var(--text-muted); }
+    #calcModal .image-link-row button {
+      background: rgba(255,255,255,0.06); color: var(--text-light); border-color: rgba(255,255,255,0.14);
+    }
+    /* "سعر المتر" search box + district cards (cards are built in renderPriceStatsTable) */
+    #priceStatsModal .price-stats-search {
+      background: var(--input-dark); color: var(--text-light);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    #priceStatsModal .price-stats-search::placeholder { color: var(--text-muted); }
+    #priceStatsModal .price-stats-search:focus {
+      outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,154,46,0.16);
     }
     #editMsg { margin-top: 10px; padding: 8px 12px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; display: none; }
     #editMsg.success { background: var(--success-bg); color: var(--success-fg); display: block; }
@@ -2469,7 +2549,7 @@
 
     if (!rows.length) {
       const empty = document.createElement('div');
-      empty.style.cssText = 'text-align:center; color:#6b7684; padding:24px; font-size:13px;';
+      empty.style.cssText = 'text-align:center; color:var(--text-muted); padding:24px; font-size:13px;';
       empty.textContent = 'مفيش بيانات مطابقة';
       content.appendChild(empty);
       return;
@@ -2488,7 +2568,7 @@
 
     districtOrder.forEach(district => {
       const card = document.createElement('div');
-      card.style.cssText = 'background:var(--white); border:1px solid var(--border); border-radius:14px; overflow:hidden; box-shadow:var(--shadow-soft);';
+      card.style.cssText = 'background:var(--glass-card); border:1px solid var(--border-gold); border-radius:14px; overflow:hidden; box-shadow:var(--shadow-card);';
 
       const header = document.createElement('div');
       header.style.cssText = 'background:var(--navy); padding:12px 16px; border-right:3px solid var(--gold);';
@@ -2507,21 +2587,21 @@
           : (t.avgPrice !== null ? fmtNum(t.avgPrice) + ' ج (إجمالي)' : '-');
 
         const row = document.createElement('div');
-        row.style.cssText = 'display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid #eef0f2;';
+        row.style.cssText = 'display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--line-dark);';
 
         const left = document.createElement('div');
         const typeSpan = document.createElement('span');
         typeSpan.textContent = t.propertyType;
-        typeSpan.style.cssText = 'font-size:13px; color:#1c2530; font-weight:700;';
+        typeSpan.style.cssText = 'font-size:13px; color:var(--text-light); font-weight:700;';
         const countSpan = document.createElement('span');
         countSpan.textContent = ' (' + t.count + ' وحدة)';
-        countSpan.style.cssText = 'font-size:11px; color:#6b7684; font-weight:400;';
+        countSpan.style.cssText = 'font-size:11px; color:var(--text-muted); font-weight:400;';
         left.appendChild(typeSpan);
         left.appendChild(countSpan);
 
         const right = document.createElement('span');
         right.textContent = valueLabel;
-        right.style.cssText = 'font-size:14px; font-weight:800; color:#6b5416; white-space:nowrap;';
+        right.style.cssText = 'font-size:14px; font-weight:800; color:var(--gold-soft); white-space:nowrap;';
 
         row.appendChild(left);
         row.appendChild(right);
@@ -2540,9 +2620,9 @@
 
   document.getElementById('priceInfoFabBtn').addEventListener('click', function() {
     priceStatsModal.classList.add('open');
-    document.getElementById('priceStatsContent').innerHTML = '<div style="text-align:center; color:var(--muted); padding:24px;">جاري التحميل...</div>';
+    document.getElementById('priceStatsContent').innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:24px;">جاري التحميل...</div>';
     google.script.run.withSuccessHandler(function(res) {
-      if (!res.success) { document.getElementById('priceStatsContent').innerHTML = '<div style="text-align:center; color:var(--muted); padding:24px;">حصل خطأ في التحميل</div>'; return; }
+      if (!res.success) { document.getElementById('priceStatsContent').innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:24px;">حصل خطأ في التحميل</div>'; return; }
       lastPriceStats = res.districtStats;
       renderPriceStatsTable(lastPriceStats);
     }).getDistrictPriceStats();
