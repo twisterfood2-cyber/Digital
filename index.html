@@ -757,10 +757,11 @@
     /* ===== "الإحصائيات والمخزون" — inline in-document view (NOT an iframe) ===== */
     #statsView { display: none; max-width: 1120px; margin: 0 auto; }
     /* view switch: hide search-only chrome, keep #appNav + #statsView */
-    /* Bug #3 fix: the shared site header (.site-header) + nav (#appNav) stay visible on
-       the Statistics view — only the Search-specific content is hidden, so Statistics
-       looks like another native section of the same site (same header everywhere). */
-    body.app-view-stats .cover-wrap,
+    /* The full shared site header stays visible on the Statistics view — the premium
+       cover banner (.cover-wrap), the site title/tagline (.site-header) AND the 7-button
+       nav (#appNav) — exactly as on the Search / Add Unit pages. Only the Search-specific
+       tools/results below the header are hidden. Same header markup, CSS and assets are
+       reused (no second header). */
     body.app-view-stats .ai-search-panel,
     body.app-view-stats .filters-card,
     body.app-view-stats #resultsCount,
