@@ -3,8 +3,8 @@
   "short_name": "Digital RE",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#0f2942",
-  "theme_color": "#0f2942",
+  "background_color": "#0A1C2F",
+  "theme_color": "#0A1C2F",
   "icons": [
     {
       "src": "icon.svg",

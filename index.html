@@ -8,33 +8,29 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0f2942">
+  <meta name="theme-color" content="#0A1C2F">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Digital RE">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f2942'/%3E%3Ctext x='50' y='68' font-family='Arial, sans-serif' font-size='55' font-weight='900' fill='%23c9992e' text-anchor='middle'%3ED%3C/text%3E%3C/svg%3E">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f2942'/%3E%3Ctext x='50' y='68' font-family='Arial, sans-serif' font-size='55' font-weight='900' fill='%23c9992e' text-anchor='middle'%3ED%3C/text%3E%3C/svg%3E">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230A1C2F'/%3E%3Ctext x='50' y='68' font-family='Arial, sans-serif' font-size='55' font-weight='900' fill='%23C99A2E' text-anchor='middle'%3ED%3C/text%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230A1C2F'/%3E%3Ctext x='50' y='68' font-family='Arial, sans-serif' font-size='55' font-weight='900' fill='%23C99A2E' text-anchor='middle'%3ED%3C/text%3E%3C/svg%3E">
   <style>
     :root {
       /* navy family */
       --navy: #0A1C2F;
       --navy-deep: #061321;
       --navy-dark: #081727;
-      --navy-mid: #0F2942;
       --navy-soft: #14344F;
       /* gold accent family */
       --gold: #C99A2E;
-      --gold-light: #DDB85A;
       --gold-soft: #E6C978;
       --gold-dark: #A77A18;
       /* neutrals & text */
       --white: #FFFFFF;
       --off-white: #F7F6F2;
       --bg: #F1EFE8;               /* light working-surface base */
-      --card: rgba(255,255,255,0.96);
       --text: #10253A;            /* dark text on light surfaces */
-      --text-dark: #10253A;
       --text-light: #EAF0F6;      /* light text on dark surfaces */
       --text-muted: #9CA9B7;      /* muted light text on dark surfaces */
       --muted: #5E6B7A;           /* muted text on light surfaces */
@@ -83,19 +79,52 @@
       text-rendering: optimizeLegibility;
     }
     .container { max-width: 1240px; margin: 0 auto; }
-    h1 {
-      font-size: 20px;
-      color: var(--text-light);
-      font-weight: 700;
-      letter-spacing: 0.2px;
-      margin: 6px 0 20px;
-      display: flex;
-      align-items: center;
-      gap: 11px;
+    h1 { font-size: 20px; color: var(--text-light); font-weight: 700; margin: 6px 0 20px; }
+
+    /* ===== site header / brand lockup ===== */
+    .site-header {
+      margin: 2px 0 22px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border-gold);
     }
-    h1 svg { width: 18px; height: 18px; color: var(--gold); flex: none; }
-    .brand-header { margin-bottom: 4px; }
-    .brand-logo { max-width: 220px; height: auto; display: block; margin-bottom: 14px; }
+    .site-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      direction: ltr;
+      margin-bottom: 16px;
+    }
+    .site-brand-mark { width: 34px; height: 34px; flex: none; display: block; }
+    .site-brand-mark svg { width: 100%; height: 100%; display: block; }
+    .site-brand-text {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      color: var(--gold-soft);
+      line-height: 1;
+    }
+    .site-brand-text span { color: var(--text-light); font-weight: 500; margin-left: 5px; }
+    .site-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gold-soft);
+      opacity: 0.9;
+      margin: 0 0 8px;
+    }
+    .site-header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-light);
+      margin: 0 0 8px;
+      line-height: 1.3;
+    }
+    .site-tagline {
+      font-size: 13.5px;
+      color: rgba(234,240,246,0.68);
+      margin: 0;
+      line-height: 1.7;
+      max-width: 620px;
+    }
     .filters-card {
       background: var(--glass-light);
       -webkit-backdrop-filter: blur(10px);
@@ -113,7 +142,7 @@
     }
     label {
       display: block;
-      font-size: 10.5px;
+      font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.4px;
       text-transform: uppercase;
@@ -160,12 +189,13 @@
     .fav-toggle-btn { background: transparent; color: var(--navy); border: 1px solid var(--border-gold); }
     .fav-toggle-btn:hover { background: rgba(201,154,46,0.10); }
     .fav-toggle-btn.active { background: var(--navy); color: var(--gold-soft); border-color: var(--navy); }
-    #resultsCount { font-size: 12.5px; color: rgba(234,240,246,0.72); margin: 14px 2px; font-weight: 600; letter-spacing: 0.3px; }
+    #resultsCount { font-size: 12px; color: rgba(234,240,246,0.72); margin: 14px 2px; font-weight: 600; letter-spacing: 0.3px; }
     .results-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       gap: 18px;
       direction: rtl;
+      align-items: start;
     }
     .unit-card {
       background: var(--glass);
@@ -215,7 +245,13 @@
     }
     .compare-checkbox input { width: 15px; height: 15px; cursor: pointer; accent-color: var(--gold); }
     .unit-card.status-محجوز { border-right-color: var(--gold); }
-    .unit-card.status-مباع { border-right-color: rgba(176,39,31,0.85); opacity: 0.66; }
+    .unit-card.status-مباع {
+      border-right-color: rgba(176,39,31,0.85);
+      background: rgba(8,20,34,0.62);
+    }
+    .unit-card.status-مباع .unit-cover img { filter: grayscale(0.85) brightness(0.72); }
+    .unit-card.status-مباع .unit-price-box,
+    .unit-card.status-مباع .spec-chip { opacity: 0.78; }
 
     /* صورة غلاف الوحدة أعلى الكارت */
     .unit-cover {
@@ -273,20 +309,21 @@
     .lightbox-prev { right: 20px; }
     .lightbox-next { left: 20px; }
 
-    .unit-id { font-size: 11.5px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px; }
+    .unit-id { font-size: 12px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px; }
     .unit-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 2px 0 12px; padding: 2px 38px 0 44px; }
     .status-badge {
-      font-size: 10.5px; padding: 3px 9px; border-radius: 6px; font-weight: 700; letter-spacing: 0.3px;
+      font-size: 11px; padding: 3px 9px; border-radius: 6px; font-weight: 700; letter-spacing: 0.3px;
       background: rgba(30,110,69,0.16); color: #7FD3A3; border: 1px solid rgba(30,110,69,0.32);
     }
     .status-badge.محجوز { background: rgba(201,154,46,0.16); color: var(--gold-soft); border-color: rgba(201,154,46,0.35); }
     .status-badge.مباع { background: rgba(176,39,31,0.16); color: #E9908A; border-color: rgba(176,39,31,0.35); }
-    .unit-title { font-size: 15.5px; font-weight: 700; letter-spacing: 0.2px; margin-bottom: 5px; color: var(--text-light); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .unit-loc { font-size: 12.5px; color: rgba(234,240,246,0.82); font-weight: 600; margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .unit-added { font-size: 10.5px; color: var(--text-muted); margin-bottom: 12px; }
+    .unit-title { font-size: 15px; font-weight: 700; letter-spacing: 0.2px; margin-bottom: 5px; color: var(--text-light); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .unit-loc { font-size: 12px; color: rgba(234,240,246,0.82); font-weight: 600; margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .unit-added { font-size: 11px; color: var(--text-muted); margin-bottom: 12px; }
     .unit-info-block { min-height: 132px; }
     .unit-specs { display: flex; flex-wrap: wrap; gap: 7px; font-size: 12px; margin-bottom: 12px; min-height: 58px; align-content: flex-start; }
     .spec-chip {
+      display: inline-flex; align-items: center;
       background: rgba(201,154,46,0.12); color: var(--gold-soft);
       border: 1px solid rgba(201,154,46,0.22);
       padding: 4px 9px; border-radius: 6px; font-weight: 600; font-size: 11px;
@@ -299,13 +336,13 @@
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       text-align: center; overflow: hidden;
     }
-    .unit-price-box .old-price { text-decoration: line-through; color: rgba(234,240,246,0.5); font-size: 12.5px; font-weight: 600; line-height: 1.4; }
+    .unit-price-box .old-price { text-decoration: line-through; color: rgba(234,240,246,0.5); font-size: 12px; font-weight: 600; line-height: 1.4; }
     .unit-price-box .discount-tag {
-      background: var(--gold); color: var(--navy-deep); font-size: 10.5px; font-weight: 800;
+      background: var(--gold); color: var(--navy-deep); font-size: 11px; font-weight: 800;
       padding: 2px 10px; border-radius: 999px; margin-right: 8px; line-height: 1.6;
     }
     .unit-price-box .final-price { font-size: 21px; font-weight: 800; color: var(--gold-soft); letter-spacing: 0.3px; margin-top: 2px; line-height: 1.3; }
-    .unit-price-box .per-meter { font-size: 11.5px; font-weight: 600; color: rgba(234,240,246,0.72); margin-top: 3px; line-height: 1.4; }
+    .unit-price-box .per-meter { font-size: 12px; font-weight: 600; color: rgba(234,240,246,0.72); margin-top: 3px; line-height: 1.4; }
 
     /* كارت الوضع المالي الحالي لوحدات الريسيل */
     .resale-current-box {
@@ -313,16 +350,16 @@
       border: 1px solid rgba(30,110,69,0.4);
       border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 8px;
     }
-    .resale-box-title { font-size: 11.5px; font-weight: 800; letter-spacing: 0.3px; color: var(--text-light); margin-bottom: 8px; }
+    .resale-box-title { font-size: 12px; font-weight: 800; letter-spacing: 0.3px; color: var(--text-light); margin-bottom: 8px; }
     .resale-row-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; }
     .resale-item { display: flex; flex-direction: column; gap: 1px; }
     .resale-current-box .resale-label { font-size: 10px; color: rgba(234,240,246,0.72); }
-    .resale-current-box .resale-value { font-size: 13.5px; font-weight: 800; color: var(--text-light); }
+    .resale-current-box .resale-value { font-size: 13px; font-weight: 800; color: var(--text-light); }
     .resale-current-box .resale-item.highlight .resale-value { color: var(--gold-soft); }
     .toggle-details-btn {
       width: 100%; background: rgba(255,255,255,0.05); color: var(--gold-soft);
       border: 1px solid var(--line-dark); border-radius: var(--radius-sm);
-      padding: 9px; font-size: 11.5px; font-weight: 600; cursor: pointer; margin-top: 10px;
+      padding: 9px; font-size: 12px; font-weight: 600; cursor: pointer; margin-top: 10px;
       display: flex; align-items: center; justify-content: center; gap: 6px;
       transition: background-color var(--ease), border-color var(--ease);
     }
@@ -347,15 +384,13 @@
     .unit-extra b { color: var(--text-light); font-weight: 700; }
     .card-actions { display: flex; gap: 8px; margin-top: 12px; }
     .card-actions-bottom { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--line-dark); }
-    .card-actions-bottom > div[style] { border-top-color: var(--line-dark) !important; color: var(--text-muted) !important; }
-    .card-actions-bottom > div[style] a[style] { color: var(--gold-soft) !important; }
     .status-select {
-      flex: 1; padding: 8px 10px; font-size: 11.5px; font-weight: 600; border-radius: var(--radius-sm);
+      flex: 1; padding: 8px 10px; font-size: 12px; font-weight: 600; border-radius: var(--radius-sm);
       background: rgba(6,19,33,0.55); color: var(--text-light); border: 1px solid var(--line-dark);
       color-scheme: dark;
     }
     .edit-btn {
-      padding: 8px 14px; font-size: 11.5px; font-weight: 700; border-radius: var(--radius-sm);
+      padding: 8px 14px; font-size: 12px; font-weight: 700; border-radius: var(--radius-sm);
       background: var(--navy); color: var(--gold-soft); border: 1px solid var(--border-gold); white-space: nowrap;
     }
     .edit-btn:hover { background: var(--navy-deep); }
@@ -448,7 +483,7 @@
       box-shadow: var(--shadow-card);
     }
     .empty-state .icon { font-size: 40px; margin-bottom: 14px; opacity: 0.85; }
-    .empty-state h3 { font-size: 15.5px; color: var(--text-light); font-weight: 700; margin-bottom: 8px; }
+    .empty-state h3 { font-size: 15px; color: var(--text-light); font-weight: 700; margin-bottom: 8px; }
     .empty-state p { font-size: 13px; color: var(--text-muted); margin-bottom: 18px; line-height: 1.8; }
     .empty-state button {
       background: var(--navy); color: var(--gold-soft); border: 1px solid var(--border-gold);
@@ -573,7 +608,7 @@
       -webkit-backdrop-filter: blur(8px);
       backdrop-filter: blur(8px);
       color: var(--gold-soft);
-      font-size: 12.5px;
+      font-size: 13px;
       letter-spacing: 0.3px;
       font-weight: 700;
       line-height: 1;
@@ -687,7 +722,7 @@
       border: 1px solid var(--border-gold); border-top: 2px solid var(--gold);
     }
     .access-gate-box .icon { font-size: 32px; margin-bottom: 14px; }
-    .access-gate-box h2 { font-size: 16.5px; color: var(--navy); margin-bottom: 8px; font-weight: 700; letter-spacing: 0.2px; }
+    .access-gate-box h2 { font-size: 16px; color: var(--navy); margin-bottom: 8px; font-weight: 700; letter-spacing: 0.2px; }
     .access-gate-box p { font-size: 13px; color: var(--muted); line-height: 1.8; margin-bottom: 18px; }
     .access-gate-box input {
       width: 100%; padding: 11px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm);
@@ -776,6 +811,149 @@
     }
     #editDeleteBtn:hover { background: var(--error-bg); }
     #editDeleteBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* ===== inline SVG UI icon system (replaces emoji glyphs) ===== */
+    .ico {
+      width: 1em; height: 1em; flex: none;
+      display: inline-block; vertical-align: -0.14em;
+      fill: none; stroke: currentColor; stroke-width: 2;
+      stroke-linecap: round; stroke-linejoin: round;
+      pointer-events: none;
+    }
+    .ico-fill { fill: currentColor; stroke: none; }
+    .modal-title .ico { width: 17px; height: 17px; vertical-align: -0.22em; margin-left: 8px; color: var(--gold); }
+    .section-title .ico { width: 13px; height: 13px; vertical-align: -0.1em; margin-left: 6px; }
+    .spec-chip .ico { width: 13px; height: 13px; margin-left: 5px; }
+    .unit-loc .ico, .unit-added .ico { width: 13px; height: 13px; margin-left: 5px; color: var(--text-muted); }
+    .resale-box-title .ico { width: 13px; height: 13px; margin-left: 6px; color: var(--gold-soft); }
+    .price-drop-badge .ico { width: 13px; height: 13px; margin-left: 5px; }
+    .card-provenance .ico { width: 13px; height: 13px; margin-left: 5px; }
+    .unit-extra .ico { width: 13px; height: 13px; margin-left: 5px; vertical-align: -0.1em; color: var(--gold-soft); }
+    .icon svg { width: 1em; height: 1em; display: inline-block; }
+    #favToggleBtn .ico { width: 14px; height: 14px; margin-left: 6px; vertical-align: -0.16em; }
+    .top-action-btn .ico, .btn-inline-ico { margin-left: 7px; }
+    .modal-close .ico { width: 15px; height: 15px; vertical-align: -0.18em; margin: 0; }
+    #scrollTopBtn .ico { width: 18px; height: 18px; vertical-align: -0.24em; margin: 0; }
+    .access-req-item button .ico { width: 12px; height: 12px; margin-left: 4px; vertical-align: -0.1em; }
+    .small-btn .ico { width: 14px; height: 14px; margin-left: 6px; vertical-align: -0.16em; }
+    .compare-bar .ico { width: 15px; height: 15px; margin-left: 6px; vertical-align: -0.18em; }
+
+    /* ===== card provenance row (moved off inline styles) ===== */
+    .card-provenance {
+      margin-top: 8px; padding-top: 8px;
+      border-top: 1px dashed var(--line-dark);
+      font-size: 11px; color: var(--text-muted);
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px;
+    }
+    .card-provenance a { color: var(--gold-soft); font-weight: 700; text-decoration: underline; cursor: pointer; }
+
+    /* ===== conditional card header padding: only reserve gutter when there is no cover image ===== */
+    .unit-card:has(.unit-cover) .unit-top { padding: 2px 0 0; }
+
+    /* ===== AI auto-fill panel — navy/gold, replaces the old purple accent ===== */
+    .ai-fill-panel {
+      background: rgba(201,154,46,0.06);
+      border: 1px solid var(--border-gold);
+      border-radius: var(--radius-sm);
+      padding: 14px; margin-bottom: 16px;
+    }
+    .ai-fill-panel .section-title { color: var(--gold-dark); margin-top: 0; }
+    .ai-paste-zone {
+      margin-top: 8px; border: 1.5px dashed var(--border-gold); border-radius: var(--radius-sm);
+      padding: 14px; text-align: center; cursor: pointer; color: var(--gold-dark);
+      font-size: 12px; font-weight: 600; background: var(--white); outline: none;
+      transition: border-color var(--ease), background-color var(--ease);
+    }
+    .ai-paste-zone:hover, .ai-paste-zone:focus { border-color: var(--gold); background: rgba(201,154,46,0.07); }
+    .ai-paste-zone.is-armed { border-color: var(--gold); background: rgba(201,154,46,0.1); color: var(--gold-dark); }
+    .ai-extract-btn {
+      width: 100%; margin-top: 10px; padding: 11px;
+      border: 1px solid var(--border-gold); border-radius: var(--radius-sm);
+      background: var(--navy); color: var(--gold-soft);
+      font-weight: 700; font-size: 13px; cursor: pointer;
+      transition: background-color var(--ease), border-color var(--ease);
+    }
+    .ai-extract-btn:hover { background: var(--navy-deep); border-color: rgba(201,154,46,0.5); }
+
+    /* ===== modal interior rhythm ===== */
+    .modal-box .section-title:first-of-type { margin-top: 2px; }
+    .modal-box .grid + .section-title,
+    .modal-box .images-preview + .section-title,
+    .modal-box .calc-results + .section-title { margin-top: 22px; }
+    .modal-box .grid { row-gap: 14px; }
+
+    /* ===== responsive breakpoints ===== */
+    @media (max-width: 640px) {
+      body { padding: 18px 14px 40px; }
+      h1 { font-size: 19px; margin: 4px 0 16px; }
+      .site-header { margin-bottom: 18px; padding-bottom: 14px; }
+      .site-header h1 { font-size: 21px; }
+      .site-tagline { font-size: 13px; }
+      #topActionBar { gap: 8px; margin-bottom: 16px; }
+      .top-action-btn { min-width: calc(50% - 4px); max-width: none; font-size: 12px; padding: 10px 12px; }
+      .grid { grid-template-columns: 1fr 1fr; gap: 10px 12px; }
+      .results-grid { grid-template-columns: 1fr; gap: 14px; }
+      .filters-card { padding: 16px; }
+      .modal-overlay { padding: 20px 10px; }
+      .modal-box { padding: 16px; }
+      .compare-bar { flex-wrap: wrap; gap: 10px; padding: 12px 16px; font-size: 13px; }
+    }
+    @media (max-width: 420px) {
+      .top-action-btn { min-width: calc(50% - 4px); font-size: 11px; padding: 10px 8px; gap: 6px; }
+      .top-action-btn svg { width: 15px; height: 15px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    /* ===== icon fine-tuning ===== */
+    .close-panel .ico { width: 14px; height: 14px; vertical-align: -0.2em; }
+    .empty-state .icon { color: var(--gold-soft); }
+    .access-gate-box .icon { color: var(--gold); }
+    .fav-btn .ico { width: 15px; height: 15px; }
+    .unit-loc .ico, .unit-added .ico { vertical-align: -0.18em; }
+    .resale-box-title { display: flex; align-items: center; }
+    .card-provenance { justify-content: flex-start; gap: 6px 18px; }
+    .card-provenance span { display: inline-flex; align-items: center; }
+    .images-choose-btn .ico { width: 13px; height: 13px; margin-left: 5px; vertical-align: -0.1em; }
+    .ai-extract-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* ===== pre-search state (shown before the first search; replaced by results) ===== */
+    .pre-search-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 54px 30px;
+      background: var(--glass);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--line-dark);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+    }
+    .pre-search-mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: 1px solid var(--border-gold);
+      background: rgba(201,154,46,0.08);
+      color: var(--gold-soft);
+      margin-bottom: 16px;
+    }
+    .pre-search-mark .ico { width: 24px; height: 24px; }
+    .pre-search-state h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-light);
+      margin: 0 0 8px;
+    }
+    .pre-search-state p {
+      font-size: 13px;
+      color: rgba(234,240,246,0.66);
+      line-height: 1.8;
+      margin: 0 auto;
+      max-width: 460px;
+    }
   </style>
 </head>
 <body>
@@ -841,7 +1019,7 @@
 <!-- بوابة دخول المستخدمين - محدش يقدر يشوف أو يستخدم أي حاجة قبل ما يسجل دخول صحيح -->
 <div class="access-gate" id="loginGate">
   <div class="access-gate-box">
-    <div class="icon">🔒</div>
+    <div class="icon"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
     <h2>الدخول لنظام Digital Real Estate</h2>
     <p>الصفحة دي محمية - اكتب إيميلك وكلمة السر الخاصة بيك للدخول</p>
     <input type="email" id="loginEmail" placeholder="الإيميل" autocomplete="username">
@@ -855,14 +1033,24 @@
   <div class="cover-wrap" id="coverWrap">
     <img id="coverImg" src="" alt="صورة الغلاف">
   </div>
-  <h1><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search for units at Digital Real Estate</h1>
+  <header class="site-header">
+    <div class="site-brand">
+      <span class="site-brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40" fill="none"><rect x="1.25" y="1.25" width="37.5" height="37.5" rx="10" fill="#0A1C2F" stroke="#C99A2E" stroke-width="1.5"/><path d="M14 12h6.5a8 8 0 0 1 0 16H14z" stroke="#E6C978" stroke-width="2.5" stroke-linejoin="round"/></svg>
+      </span>
+      <span class="site-brand-text">AqAR<span>Digital</span></span>
+    </div>
+    <p class="site-eyebrow">منصة العقارات الرقمية</p>
+    <h1>ابحث عن وحدتك العقارية</h1>
+    <p class="site-tagline">اعثر على الوحدة المناسبة، قارن الأسعار، واحسب خطة السداد — كل ذلك في مكان واحد.</p>
+  </header>
 
   <div id="topActionBar">
-    <button type="button" class="top-action-btn top-action-admin" id="adminFab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Admin Panel</span></button>
-    <button type="button" class="top-action-btn top-action-calc" id="calcFabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/><line x1="16" y1="18" x2="16" y2="18"/></svg><span>Your Quote</span></button>
-    <button type="button" class="top-action-btn top-action-price" id="priceInfoFabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>Price/m²</span></button>
-    <button type="button" class="top-action-btn top-action-add" id="addUnitFabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>Add Unit</span></button>
-    <a href="https://resale-units.vercel.app/" target="_blank" class="top-action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg><span>Resale Units</span></a>
+    <button type="button" class="top-action-btn top-action-admin" id="adminFab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>لوحة الإدارة</span></button>
+    <button type="button" class="top-action-btn top-action-calc" id="calcFabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/><line x1="16" y1="18" x2="16" y2="18"/></svg><span>عرض السعر</span></button>
+    <button type="button" class="top-action-btn top-action-price" id="priceInfoFabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>سعر المتر</span></button>
+    <button type="button" class="top-action-btn top-action-add" id="addUnitFabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>إضافة وحدة</span></button>
+    <a href="https://resale-units.vercel.app/" target="_blank" class="top-action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg><span>وحدات إعادة البيع</span></a>
   </div>
 
 <div style="background:var(--glass-light); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); border:1px solid var(--border-gold); border-radius:var(--radius-lg); padding:18px; margin-bottom:16px; box-shadow:var(--shadow-soft);">
@@ -969,21 +1157,25 @@
     <div class="btn-row">
       <button id="searchBtn">بحث</button>
       <button id="clearBtn">مسح الفلاتر</button>
-      <button type="button" id="favToggleBtn" class="fav-toggle-btn">⭐ المفضلة (0)</button>
+      <button type="button" id="favToggleBtn" class="fav-toggle-btn"><svg class="ico ico-fill" viewBox="0 0 24 24"><path d="m12 3 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.8 6.2 21l1.1-6.5L2.6 9.8l6.5-.9Z"/></svg><span id="favToggleLabel">المفضلة (0)</span></button>
     </div>
   </div>
 
   <div id="resultsCount"></div>
-  <div id="results" class="results-grid"></div>
+  <div id="results" class="results-grid"><div class="pre-search-state">
+    <span class="pre-search-mark" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/><path d="M2 22h20"/></svg></span>
+    <h3>ابدأ البحث عن وحدتك المثالية</h3>
+    <p>استخدم البحث الذكي أو الفلاتر بالأعلى للوصول إلى الوحدات والمشروعات التي تناسب احتياجك وميزانيتك.</p>
+  </div></div>
 </div>
 
 <div id="toastContainer" class="toast-container"></div>
 
 <!-- شريط المقارنة العائم -->
-<button type="button" id="scrollTopBtn" title="ارجع لأعلى">⬆</button>
+<button type="button" id="scrollTopBtn" title="ارجع لأعلى" aria-label="ارجع لأعلى"><svg class="ico" viewBox="0 0 24 24"><path d="M12 20V5M6 11l6-6 6 6"/></svg></button>
 
 <div class="compare-bar" id="compareBar">
-  <span>📊 هتقارن <b id="compareCount">0</b> وحدات</span>
+  <span><svg class="ico" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>هتقارن <b id="compareCount">0</b> وحدات</span>
   <button type="button" id="compareGoBtn" disabled>عرض المقارنة</button>
   <button type="button" id="compareClearBtn" class="clear-link">إلغاء</button>
 </div>
@@ -993,10 +1185,10 @@
   <div class="modal-box" style="max-width:900px; overflow-x:auto;">
     <div class="modal-header">
       <div class="modal-title">مقارنة الوحدات</div>
-      <button class="modal-close" id="compareModalCloseBtn">✕</button>
+      <button class="modal-close" id="compareModalCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
-    <button type="button" id="compareExportPdfBtn" style="margin-bottom:14px; padding:10px 18px; border:none; border-radius:9px; background:var(--navy); color:#fff; font-weight:700; font-size:13px; cursor:pointer;">
-      📄 تصدير مقارنة PDF
+    <button type="button" id="compareExportPdfBtn" style="margin-bottom:14px; padding:10px 18px; border:none; border-radius:9px; background:var(--navy); color:var(--gold-soft); font-weight:700; font-size:13px; cursor:pointer;">
+      تصدير مقارنة PDF
     </button>
     <div id="compareModalContent"></div>
   </div>
@@ -1006,26 +1198,26 @@
 <div class="modal-overlay" id="calcModal">
   <div class="modal-box" style="max-width:520px;">
     <div class="modal-header">
-      <div class="modal-title">🧮 حاسبة السعر والتقسيط</div>
-      <button class="modal-close" id="calcModalCloseBtn">✕</button>
+      <div class="modal-title"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg>حاسبة السعر والتقسيط</div>
+      <button class="modal-close" id="calcModalCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
 
-    <div style="background:#f7f4ff; border:1.5px solid #7c4dff; border-radius:12px; padding:14px; margin-bottom:16px;">
-      <div class="section-title" style="color:#7c4dff; margin-bottom:6px;">🤖 تعبئة تلقائية بالذكاء الاصطناعي</div>
+    <div class="ai-fill-panel">
+      <div class="section-title" style="margin-bottom:6px;"><svg class="ico" viewBox="0 0 24 24"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"/><path d="m18.5 14 .8 2.4 2.4.8-2.4.8-.8 2.4-.8-2.4-2.4-.8 2.4-.8Z"/></svg>تعبئة تلقائية بالذكاء الاصطناعي</div>
       <p style="font-size:12px; color:var(--muted); margin:0 0 10px; line-height:1.7;">
         الصق رسالة المطور، أو ارفع صورة/PDF، والذكاء الاصطناعي هيملى الحاسبة تلقائيًا. راجع البيانات كويس قبل ما تصدّر.
       </p>
-      <textarea id="calcAiPasteText" placeholder="الصق نص الرسالة هنا (اختياري)..." style="min-height:80px; width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit; font-size:13px;"></textarea>
-      <div id="calcAiImagePasteZone" tabindex="0" style="margin-top:8px; border:2px dashed #7c4dff; border-radius:10px; padding:14px; text-align:center; cursor:pointer; color:#7c4dff; font-size:12px; font-weight:600; background:#fff; outline:none;">
-        📋 دوس هنا وبعدين الصق صورة (Ctrl+V)
+      <textarea id="calcAiPasteText" placeholder="الصق نص الرسالة هنا (اختياري)..." style="min-height:80px; width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:13px;"></textarea>
+      <div id="calcAiImagePasteZone" class="ai-paste-zone" tabindex="0">
+        دوس هنا وبعدين الصق صورة (Ctrl+V)
       </div>
       <div id="calcAiPastedImagePreview" style="display:none; margin-top:8px; position:relative; max-width:180px;">
         <img id="calcAiPastedImageTag" style="width:100%; border-radius:8px; border:1px solid var(--border);">
-        <button type="button" id="calcAiPastedImageRemove" style="position:absolute; top:-8px; left:-8px; width:22px; height:22px; border-radius:50%; background:var(--error-fg); color:#fff; border:none; cursor:pointer; font-size:12px;">✕</button>
+        <button type="button" id="calcAiPastedImageRemove" style="position:absolute; top:-8px; left:-8px; width:22px; height:22px; border-radius:50%; background:var(--error-fg); color:#fff; border:none; cursor:pointer; font-size:12px;"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
       </div>
       <input type="file" id="calcAiFileInput" accept="image/*,application/pdf" style="margin-top:8px; width:100%; font-size:12px;">
-      <button type="button" id="calcAiExtractBtn" style="width:100%; margin-top:10px; padding:11px; border:none; border-radius:9px; background:#7c4dff; color:#fff; font-weight:700; font-size:13px; cursor:pointer;">
-        ✨ استخرج البيانات وابدأ التعبئة
+      <button type="button" id="calcAiExtractBtn" class="ai-extract-btn">
+        استخرج البيانات وابدأ التعبئة
       </button>
       <div id="calcAiExtractMsg" style="font-size:12px; margin-top:8px; display:none;"></div>
     </div>
@@ -1059,15 +1251,15 @@
         <input type="text" id="calcFloor" placeholder="مثال: الثالث">
       </div>
       <div>
-        <label>Garden Area (sqm)</label>
+        <label>مساحة الحديقة (م²)</label>
         <input type="number" id="calcGardenArea" min="0" step="any">
       </div>
       <div>
-        <label>Terrace Area (sqm)</label>
+        <label>مساحة التراس (م²)</label>
         <input type="number" id="calcTerraceArea" min="0" step="any">
       </div>
       <div>
-        <label>Roof Area (sqm)</label>
+        <label>مساحة السطح (م²)</label>
         <input type="number" id="calcRoofArea" min="0" step="any">
       </div>
       <div>
@@ -1082,9 +1274,9 @@
 
     <div class="section-title">صور الوحدة (اختياري)</div>
     <div class="images-zone" id="calcImagesZone" tabindex="0">
-      <p>📋 الصق صورة (Ctrl+V) هنا، أو اسحب صورة، أو اختار من جهازك</p>
+      <p>الصق صورة (Ctrl+V) هنا، أو اسحب صورة، أو اختار من جهازك</p>
       <input type="file" id="calcImagesFileInput" accept="image/*" multiple style="display:none;">
-      <button type="button" class="images-choose-btn" id="calcImagesChooseBtn">📁 اختيار صور من الجهاز</button>
+      <button type="button" class="images-choose-btn" id="calcImagesChooseBtn"><svg class="ico" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg> اختيار صور من الجهاز</button>
     </div>
     <div id="calcImagesPreview" class="images-preview"></div>
     <div id="calcImagesUploadMsg" style="font-size:12px; margin-top:6px;"></div>
@@ -1121,7 +1313,7 @@
     </div>
 
     <div class="section-title">ملاحظات</div>
-    <textarea id="calcNotes" placeholder="أي تفاصيل إضافية عن العرض..." style="width:100%; min-height:60px; padding:10px 12px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit; font-size:14px;"></textarea>
+    <textarea id="calcNotes" placeholder="أي تفاصيل إضافية عن العرض..." style="width:100%; min-height:60px; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:14px;"></textarea>
 
     <div class="calc-results" id="calcResults">
       <div class="calc-result-row"><span>السعر بعد الخصم</span><b id="calcResPriceAfterDiscount">-</b></div>
@@ -1133,7 +1325,7 @@
       <div class="calc-result-row highlight"><span>القسط الربع سنوي التقريبي</span><b id="calcResQuarterly">-</b></div>
     </div>
 
-    <button type="button" id="calcExportBtn" style="width:100%; margin-top:16px; padding:13px; border:none; border-radius:9px; background:var(--navy); color:#fff; font-weight:700; font-size:14px; cursor:pointer;">📄 تصدير النتيجة PDF</button>
+    <button type="button" id="calcExportBtn" style="width:100%; margin-top:16px; padding:13px; border:none; border-radius:9px; background:var(--navy); color:var(--gold-soft); font-weight:700; font-size:14px; cursor:pointer;">تصدير النتيجة PDF</button>
   </div>
 </div>
 
@@ -1141,12 +1333,12 @@
 <div class="modal-overlay" id="shareImagesModal">
   <div class="modal-box" style="max-width:480px;">
     <div class="modal-header">
-      <div class="modal-title">🖼️ مشاركة نص + صور</div>
-      <button class="modal-close" id="shareImagesCloseBtn">✕</button>
+      <div class="modal-title"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>مشاركة نص + صور</div>
+      <button class="modal-close" id="shareImagesCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
     <div id="shareImagesContent" style="max-height:55vh; overflow-y:auto;"></div>
-    <button type="button" id="shareImagesConfirmBtn" style="width:100%; margin-top:14px; padding:12px; border:none; border-radius:9px; background:var(--navy); color:#fff; font-weight:700; font-size:14px; cursor:pointer;">
-      📤 مشاركة
+    <button type="button" id="shareImagesConfirmBtn" style="width:100%; margin-top:14px; padding:12px; border:none; border-radius:9px; background:var(--navy); color:var(--gold-soft); font-weight:700; font-size:14px; cursor:pointer;">
+      مشاركة
     </button>
   </div>
 </div>
@@ -1154,18 +1346,18 @@
 <!-- نافذة إدخال كلمة سر متمركزة (بديل عن prompt الافتراضي) -->
 <div class="admin-panel-overlay" id="pinPromptOverlay"></div>
 <div class="admin-panel" id="pinPromptModal" style="max-width:340px; text-align:center;">
-  <button class="close-panel" id="pinPromptCloseBtn">✕</button>
+  <button class="close-panel" id="pinPromptCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
   <h3 id="pinPromptTitle" style="margin-bottom:14px;">كلمة السر</h3>
-  <input type="password" id="pinPromptInput" placeholder="اكتب كلمة السر..." style="width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:8px; font-size:15px; text-align:center;">
-  <button type="button" id="pinPromptConfirmBtn" style="width:100%; margin-top:12px; padding:11px; border:none; border-radius:9px; background:var(--navy); color:#fff; font-weight:700; font-size:14px; cursor:pointer;">تأكيد</button>
+  <input type="password" id="pinPromptInput" placeholder="اكتب كلمة السر..." style="width:100%; padding:12px 14px; border:1px solid var(--border); border-radius:8px; font-size:15px; text-align:center;">
+  <button type="button" id="pinPromptConfirmBtn" style="width:100%; margin-top:12px; padding:11px; border:none; border-radius:9px; background:var(--navy); color:var(--gold-soft); font-weight:700; font-size:14px; cursor:pointer;">تأكيد</button>
 </div>
 
 <!-- مودال بروفايل المطور -->
 <div class="modal-overlay" id="developerProfileModal">
   <div class="modal-box" style="max-width:480px;">
     <div class="modal-header">
-      <div class="modal-title" id="devProfileTitle">🏗 Developer Profile</div>
-      <button class="modal-close" id="devProfileCloseBtn">✕</button>
+      <div class="modal-title" id="devProfileTitle">Developer Profile</div>
+      <button class="modal-close" id="devProfileCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
     <div id="devProfileContent" style="max-height:65vh; overflow-y:auto;"></div>
   </div>
@@ -1175,8 +1367,8 @@
 <div class="modal-overlay" id="similarUnitsModal">
   <div class="modal-box" style="max-width:600px;">
     <div class="modal-header">
-      <div class="modal-title">🔄 وحدات مشابهة</div>
-      <button class="modal-close" id="similarUnitsCloseBtn">✕</button>
+      <div class="modal-title"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.3"/><path d="M21 4v5h-5"/></svg>وحدات مشابهة</div>
+      <button class="modal-close" id="similarUnitsCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
     <div id="similarUnitsContent" style="max-height:65vh; overflow-y:auto;"></div>
   </div>
@@ -1186,8 +1378,8 @@
 <div class="modal-overlay" id="priceStatsModal">
   <div class="modal-box" style="max-width:640px;">
     <div class="modal-header">
-      <div class="modal-title">📊 متوسط سعر المتر لكل منطقة</div>
-      <button class="modal-close" id="priceStatsCloseBtn">✕</button>
+      <div class="modal-title"><svg class="ico" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>متوسط سعر المتر لكل منطقة</div>
+      <button class="modal-close" id="priceStatsCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
     <input type="text" class="price-stats-search" id="priceStatsSearchInput" placeholder="دوّر على منطقة...">
     <div id="priceStatsContent" style="max-height:65vh; overflow-y:auto;"></div>
@@ -1197,7 +1389,7 @@
 <!-- صندوق عرض صور الوحدة المكبر -->
 <div class="lightbox-overlay" id="lightboxOverlay">
 
-  <button class="lightbox-close" id="lightboxCloseBtn">✕</button>
+  <button class="lightbox-close" id="lightboxCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
   <button class="lightbox-nav lightbox-prev" id="lightboxPrevBtn">›</button>
   <img id="lightboxImg" src="" alt="صورة الوحدة">
   <button class="lightbox-nav lightbox-next" id="lightboxNextBtn">‹</button>
@@ -1208,20 +1400,20 @@
   <div class="modal-box" style="max-width:380px;">
     <div class="modal-header">
       <div class="modal-title">بياناتك قبل التصدير</div>
-      <button class="modal-close" id="pdfContactCloseBtn">✕</button>
+      <button class="modal-close" id="pdfContactCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
     <p style="font-size:13px; color:var(--muted); margin-bottom:14px;">هتظهر بياناتك دي في أسفل ملف الـ PDF كبيانات تواصل مع العميل.</p>
     <label style="display:block; font-size:13px; font-weight:600; margin-bottom:5px;">اسمك</label>
-    <input type="text" id="pdfAgentName" placeholder="مثال: أحمد محمد" style="width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:8px; font-size:14px; margin-bottom:12px;">
+    <input type="text" id="pdfAgentName" placeholder="مثال: أحمد محمد" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:14px; margin-bottom:12px;">
     <label style="display:block; font-size:13px; font-weight:600; margin-bottom:5px;">رقم تليفونك</label>
-    <input type="text" id="pdfAgentPhone" placeholder="مثال: 01000000000" style="width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:8px; font-size:14px; margin-bottom:16px;">
-    <button type="button" id="pdfContactConfirmBtn" style="width:100%; padding:12px; border:none; border-radius:9px; background:var(--navy); color:#fff; font-weight:700; font-size:14px; cursor:pointer;">تصدير الملف</button>
+    <input type="text" id="pdfAgentPhone" placeholder="مثال: 01000000000" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:14px; margin-bottom:16px;">
+    <button type="button" id="pdfContactConfirmBtn" style="width:100%; padding:12px; border:none; border-radius:9px; background:var(--navy); color:var(--gold-soft); font-weight:700; font-size:14px; cursor:pointer;">تصدير الملف</button>
   </div>
 </div>
 
 <div class="admin-panel-overlay" id="adminPanelOverlay"></div>
 <div class="admin-panel" id="adminPanel">
-  <button class="close-panel" id="adminPanelClose">✕</button>
+  <button class="close-panel" id="adminPanelClose" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
   <h3>لوحة التحكم</h3>
   <div class="live-count">
     <span class="live-dot"></span>
@@ -1233,17 +1425,17 @@
   <button class="small-btn" id="coverUploadBtn">رفع الصورة</button>
   <div id="coverMsg"></div>
 
-  <button type="button" class="small-btn" id="openUsersModalBtn" style="margin-top:12px; background:var(--navy); color:#fff;">👥 إدارة المستخدمين</button>
-  <button type="button" class="small-btn" id="openDevProfilesModalBtn" style="margin-top:8px; background:#7c4dff; color:#fff;">🏗 إدارة بيانات المطورين</button>
-  <a href="https://script.google.com/macros/s/AKfycby0Suh2iXdvCSy1N9G9e8u8VUjfHygiXe0owQyzUrHWcF_tIHMd7WnDZw2JtlXDkDDEWw/exec?page=dashboard" target="_blank" class="small-btn" style="display:block; text-align:center; text-decoration:none; margin-top:8px;">📊 لوحة الإحصائيات</a>
+  <button type="button" class="small-btn" id="openUsersModalBtn" style="margin-top:12px;"><svg class="ico" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 5.2a3.5 3.5 0 0 1 0 6.8M18 20a6.5 6.5 0 0 0-3.2-5.6"/></svg> إدارة المستخدمين</button>
+  <button type="button" class="small-btn" id="openDevProfilesModalBtn" style="margin-top:8px;"><svg class="ico" viewBox="0 0 24 24"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></svg> إدارة بيانات المطورين</button>
+  <a href="https://script.google.com/macros/s/AKfycby0Suh2iXdvCSy1N9G9e8u8VUjfHygiXe0owQyzUrHWcF_tIHMd7WnDZw2JtlXDkDDEWw/exec?page=dashboard" target="_blank" class="small-btn" style="display:block; text-align:center; text-decoration:none; margin-top:8px;"><svg class="ico" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg> لوحة الإحصائيات</a>
 </div>
 
 <!-- مودال إدارة المستخدمين -->
 <div class="modal-overlay" id="usersModal">
   <div class="modal-box" style="max-width:480px;">
     <div class="modal-header">
-      <div class="modal-title">👥 إدارة المستخدمين</div>
-      <button class="modal-close" id="usersModalCloseBtn">✕</button>
+      <div class="modal-title"><svg class="ico" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 5.2a3.5 3.5 0 0 1 0 6.8M18 20a6.5 6.5 0 0 0-3.2-5.6"/></svg>إدارة المستخدمين</div>
+      <button class="modal-close" id="usersModalCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
 
     <div class="section-title">إضافة مستخدم جديد</div>
@@ -1261,7 +1453,7 @@
         <input type="text" id="newUserPassword" placeholder="كلمة سر خاصة بيه">
       </div>
     </div>
-    <button type="button" id="addUserBtn" style="width:100%; margin-top:12px; padding:11px; border:none; border-radius:9px; background:var(--navy); color:#fff; font-weight:700; font-size:14px; cursor:pointer;">إضافة المستخدم</button>
+    <button type="button" id="addUserBtn" style="width:100%; margin-top:12px; padding:11px; border:none; border-radius:9px; background:var(--navy); color:var(--gold-soft); font-weight:700; font-size:14px; cursor:pointer;">إضافة المستخدم</button>
     <div id="addUserMsg" style="font-size:12px; margin-top:8px;"></div>
 
     <div class="section-title">المستخدمون الحاليون</div>
@@ -1273,19 +1465,19 @@
 <div class="modal-overlay" id="devProfilesModal">
   <div class="modal-box" style="max-width:520px;">
     <div class="modal-header">
-      <div class="modal-title">🏗 إدارة بيانات المطورين</div>
-      <button class="modal-close" id="devProfilesModalCloseBtn">✕</button>
+      <div class="modal-title"><svg class="ico" viewBox="0 0 24 24"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></svg>إدارة بيانات المطورين</div>
+      <button class="modal-close" id="devProfilesModalCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
 
-    <div style="background:#f7f4ff; border:1.5px solid #7c4dff; border-radius:12px; padding:14px; margin-bottom:16px;">
-      <div class="section-title" style="color:#7c4dff; margin-bottom:6px;">🤖 تعبئة تلقائية بالذكاء الاصطناعي</div>
+    <div class="ai-fill-panel">
+      <div class="section-title" style="margin-bottom:6px;"><svg class="ico" viewBox="0 0 24 24"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"/><path d="m18.5 14 .8 2.4 2.4.8-2.4.8-.8 2.4-.8-2.4-2.4-.8 2.4-.8Z"/></svg>تعبئة تلقائية بالذكاء الاصطناعي</div>
       <p style="font-size:12px; color:var(--muted); margin:0 0 10px; line-height:1.7;">
         الصق نص عن الشركة، أو ارفع ملف بروشور/PDF، والذكاء الاصطناعي هيملى البيانات تلقائيًا تحت.
       </p>
-      <textarea id="devAiPasteText" placeholder="الصق نص عن الشركة هنا (اختياري)..." style="min-height:70px; width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit; font-size:13px;"></textarea>
+      <textarea id="devAiPasteText" placeholder="الصق نص عن الشركة هنا (اختياري)..." style="min-height:70px; width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:13px;"></textarea>
       <input type="file" id="devAiFileInput" accept="image/*,application/pdf" style="margin-top:8px; width:100%; font-size:12px;">
-      <button type="button" id="devAiExtractBtn" style="width:100%; margin-top:10px; padding:10px; border:none; border-radius:9px; background:#7c4dff; color:#fff; font-weight:700; font-size:13px; cursor:pointer;">
-        ✨ استخرج البيانات وابدأ التعبئة
+      <button type="button" id="devAiExtractBtn" class="ai-extract-btn">
+        استخرج البيانات وابدأ التعبئة
       </button>
       <div id="devAiExtractMsg" style="font-size:12px; margin-top:8px; display:none;"></div>
     </div>
@@ -1311,13 +1503,13 @@
       </div>
     </div>
     <label style="margin-top:10px; display:block;">نبذة عن الشركة</label>
-    <textarea id="devProfileDescInput" placeholder="نبذة مختصرة عن تاريخ الشركة..." style="min-height:70px; width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit; font-size:13px;"></textarea>
+    <textarea id="devProfileDescInput" placeholder="نبذة مختصرة عن تاريخ الشركة..." style="min-height:70px; width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:13px;"></textarea>
     <label style="margin-top:10px; display:block;">أعمال سابقة</label>
-    <textarea id="devProfileWorksInput" placeholder="أهم المشاريع السابقة للشركة..." style="min-height:70px; width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit; font-size:13px;"></textarea>
+    <textarea id="devProfileWorksInput" placeholder="أهم المشاريع السابقة للشركة..." style="min-height:70px; width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:13px;"></textarea>
 
     <div style="display:flex; gap:8px; margin-top:12px;">
-      <button type="button" id="saveDevProfileBtn" style="flex:2; padding:11px; border:none; border-radius:9px; background:#7c4dff; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">حفظ بيانات المطور</button>
-      <button type="button" id="clearDevProfileFormBtn" style="flex:1; padding:11px; border:1.5px solid var(--border); border-radius:9px; background:#fff; color:var(--muted); font-weight:700; font-size:13px; cursor:pointer;">🗑 تفريغ</button>
+      <button type="button" id="saveDevProfileBtn" style="flex:2; padding:11px; border:1px solid var(--border-gold); border-radius:9px; background:var(--navy); color:var(--gold-soft); font-weight:700; font-size:14px; cursor:pointer;">حفظ بيانات المطور</button>
+      <button type="button" id="clearDevProfileFormBtn" style="flex:1; padding:11px; border:1px solid var(--border); border-radius:9px; background:#fff; color:var(--muted); font-weight:700; font-size:13px; cursor:pointer;"><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13M9 7V4h6v3"/></svg> تفريغ</button>
     </div>
     <div id="saveDevProfileMsg" style="font-size:12px; margin-top:8px;"></div>
 
@@ -1331,24 +1523,24 @@
   <div class="modal-box">
     <div class="modal-header">
       <div class="modal-title">تعديل بيانات الوحدة <span id="editUnitIdLabel"></span></div>
-      <button class="modal-close" id="editCloseBtn">✕</button>
+      <button class="modal-close" id="editCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
-    <div id="unitAddAiSection" style="display:none; background:#f7f4ff; border:1.5px solid #7c4dff; border-radius:12px; padding:10px; margin-bottom:10px;">
-      <div class="section-title" style="color:#7c4dff; margin-bottom:4px; margin-top:0;">🤖 تعبئة تلقائية بالذكاء الاصطناعي</div>
+    <div id="unitAddAiSection" class="ai-fill-panel" style="display:none; padding:10px;">
+      <div class="section-title" style="margin-bottom:4px; margin-top:0;"><svg class="ico" viewBox="0 0 24 24"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"/><path d="m18.5 14 .8 2.4 2.4.8-2.4.8-.8 2.4-.8-2.4-2.4-.8 2.4-.8Z"/></svg>تعبئة تلقائية بالذكاء الاصطناعي</div>
       <p style="font-size:11px; color:var(--muted); margin:0 0 6px; line-height:1.5;">
         الصق رسالة المطور، أو ارفع صورة/PDF، والذكاء الاصطناعي هيملى الفورم تلقائيًا تحت.
       </p>
-      <textarea id="unitAddAiPasteText" placeholder="الصق نص الرسالة هنا (اختياري)..." style="min-height:50px; width:100%; padding:7px 10px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit; font-size:13px;"></textarea>
-      <div id="unitAddAiImagePasteZone" tabindex="0" style="margin-top:6px; border:2px dashed #7c4dff; border-radius:10px; padding:8px; text-align:center; cursor:pointer; color:#7c4dff; font-size:12px; font-weight:600; background:#fff; outline:none;">
-        📋 دوس هنا وبعدين الصق صورة (Ctrl+V)
+      <textarea id="unitAddAiPasteText" placeholder="الصق نص الرسالة هنا (اختياري)..." style="min-height:50px; width:100%; padding:7px 10px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:13px;"></textarea>
+      <div id="unitAddAiImagePasteZone" class="ai-paste-zone" tabindex="0" style="margin-top:6px; padding:8px;">
+        دوس هنا وبعدين الصق صورة (Ctrl+V)
       </div>
       <div id="unitAddAiPastedImagePreview" style="display:none; margin-top:6px; position:relative; max-width:180px;">
         <img id="unitAddAiPastedImageTag" style="width:100%; border-radius:8px; border:1px solid var(--border);">
-        <button type="button" id="unitAddAiPastedImageRemove" style="position:absolute; top:-8px; left:-8px; width:22px; height:22px; border-radius:50%; background:var(--error-fg); color:#fff; border:none; cursor:pointer; font-size:12px;">✕</button>
+        <button type="button" id="unitAddAiPastedImageRemove" style="position:absolute; top:-8px; left:-8px; width:22px; height:22px; border-radius:50%; background:var(--error-fg); color:#fff; border:none; cursor:pointer; font-size:12px;"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
       </div>
       <input type="file" id="unitAddAiFileInput" accept="image/*,application/pdf" style="margin-top:6px; width:100%; font-size:12px;">
-      <button type="button" id="unitAddAiExtractBtn" style="width:100%; margin-top:6px; padding:9px; border:none; border-radius:9px; background:#7c4dff; color:#fff; font-weight:700; font-size:13px; cursor:pointer;">
-        ✨ استخرج البيانات وابدأ التعبئة
+      <button type="button" id="unitAddAiExtractBtn" class="ai-extract-btn" style="margin-top:6px; padding:9px; font-size:13px;">
+        استخرج البيانات وابدأ التعبئة
       </button>
       <div id="unitAddAiExtractMsg" style="font-size:12px; margin-top:6px; display:none;"></div>
     </div>
@@ -1436,15 +1628,15 @@
           <input type="number" name="landArea" min="0" step="0.5">
         </div>
         <div>
-          <label>Garden Area (sqm)</label>
+          <label>مساحة الحديقة (م²)</label>
           <input type="number" name="gardenArea" min="0" step="any">
         </div>
         <div>
-          <label>Terrace Area (sqm)</label>
+          <label>مساحة التراس (م²)</label>
           <input type="number" name="terraceArea" min="0" step="any">
         </div>
         <div>
-          <label>Roof Area (sqm)</label>
+          <label>مساحة السطح (م²)</label>
           <input type="number" name="roofArea" min="0" step="any">
         </div>
         <div>
@@ -1549,9 +1741,9 @@
       </div>
 
       <div class="installment-preview" id="editInstallmentPreview" style="display:none;">
-        <div>💰 السعر بعد الخصم: <b id="editPriceAfterDiscountValue">-</b> جنيه</div>
-        <div style="margin-top:4px;">💡 القسط الشهري التقريبي: <b id="editMonthlyInstallmentValue">-</b> جنيه/شهريًا</div>
-        <div style="margin-top:4px;">📅 القسط الربع سنوي التقريبي: <b id="editQuarterlyInstallmentValue">-</b> جنيه/كل 3 شهور</div>
+        <div><svg class="ico" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h13v4"/><path d="M3 7v10a2 2 0 0 0 2 2h15V7H5"/><path d="M16 13h.01"/></svg> السعر بعد الخصم: <b id="editPriceAfterDiscountValue">-</b> جنيه</div>
+        <div style="margin-top:4px;"><svg class="ico" viewBox="0 0 24 24"><path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2v.3h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2Z"/></svg> القسط الشهري التقريبي: <b id="editMonthlyInstallmentValue">-</b> جنيه/شهريًا</div>
+        <div style="margin-top:4px;"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg> القسط الربع سنوي التقريبي: <b id="editQuarterlyInstallmentValue">-</b> جنيه/كل 3 شهور</div>
       </div>
 
       <div class="section-title">بيانات المالك والمسؤول</div>
@@ -1565,16 +1757,16 @@
           <input type="text" name="ownerPhone">
         </div>
         <div>
-          <label>الموظف المسؤول (Sales)</label>
+          <label>الموظف المسؤول</label>
           <input type="text" name="agent">
         </div>
       </div>
 
       <div class="section-title">صور الوحدة</div>
       <div class="images-zone" id="editImagesZone" tabindex="0">
-        <p>📋 الصق صورة (Ctrl+V) هنا، أو اسحب صورة، أو اختار من جهازك</p>
+        <p>الصق صورة (Ctrl+V) هنا، أو اسحب صورة، أو اختار من جهازك</p>
         <input type="file" id="editImagesFileInput" accept="image/*" multiple style="display:none;">
-        <button type="button" class="images-choose-btn" id="editImagesChooseBtn">📁 اختيار صور من الجهاز</button>
+        <button type="button" class="images-choose-btn" id="editImagesChooseBtn"><svg class="ico" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg> اختيار صور من الجهاز</button>
       </div>
       <div class="image-link-row">
         <input type="text" id="editImageLinkInput" placeholder="أو الصق رابط صورة هنا (URL)">
@@ -1584,11 +1776,11 @@
       <div id="editImagesUploadMsg" style="font-size:12px; margin-top:6px;"></div>
 
       <div class="section-title">ملاحظات</div>
-      <textarea name="notes" style="width:100%; min-height:45px; padding:7px 10px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit;"></textarea>
+      <textarea name="notes" style="width:100%; min-height:45px; padding:7px 10px; border:1px solid var(--border); border-radius:8px; font-family:inherit;"></textarea>
 
       <div id="editMsg"></div>
       <button type="submit" id="editSaveBtn">حفظ التعديلات</button>
-      <button type="button" id="editDeleteBtn">🗑 مسح الوحدة نهائيًا</button>
+      <button type="button" id="editDeleteBtn">مسح الوحدة نهائيًا</button>
     </form>
   </div>
 </div>
@@ -1596,6 +1788,53 @@
 <script>
   // كشف الموبايل - عشان ميزات زي "مشاركة نص+صور" تظهر بس فين شغالة فعليًا
   const IS_MOBILE_DEVICE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+
+  /* ============================================================
+   * أيقونات SVG بنفس لغة شريط التنقّل العلوي - بتحل محل الإيموچي
+   * كأيقونات واجهة. viewBox موحّد 24×24، stroke=currentColor.
+   * ============================================================ */
+  const ICON = {
+    pin:      '<svg class="ico" viewBox="0 0 24 24"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+    clock:    '<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>',
+    area:     '<svg class="ico" viewBox="0 0 24 24"><path d="M3 21V3h18"/><path d="M3 21h18"/><path d="M8 21v-4M13 21v-8M18 21v-12"/></svg>',
+    bed:      '<svg class="ico" viewBox="0 0 24 24"><path d="M3 18V7M3 12h15a3 3 0 0 1 3 3v3M21 18v-3M3 15h18"/><path d="M6.5 12V9.5A1.5 1.5 0 0 1 8 8h3a1.5 1.5 0 0 1 1.5 1.5V12"/></svg>',
+    bath:     '<svg class="ico" viewBox="0 0 24 24"><path d="M4 13V6.5A2.5 2.5 0 0 1 6.5 4a2.4 2.4 0 0 1 2.2 1.5"/><path d="M4 13h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4Z"/><path d="M7 20l-1 2M18 20l1 2M7 6h3"/></svg>',
+    floor:    '<svg class="ico" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="1"/><path d="M5 9h14M5 15h14M10 21v-3h4v3"/></svg>',
+    brush:    '<svg class="ico" viewBox="0 0 24 24"><path d="M4 21s1.5-1 2.5-3 .2-3 2-4.5"/><path d="M13.5 13 20 6.5a2.1 2.1 0 0 0-3-3L10.5 10"/><path d="M8 14a3 3 0 0 1 3 3c0 2-2 3-4 3-.7 0-1.5-.2-2-.5"/></svg>',
+    tree:     '<svg class="ico" viewBox="0 0 24 24"><path d="M12 22v-5"/><path d="M12 17a6 6 0 0 0 4.2-10.3A5 5 0 0 0 12 4a5 5 0 0 0-4.2 2.7A6 6 0 0 0 12 17Z"/></svg>',
+    terrace:  '<svg class="ico" viewBox="0 0 24 24"><path d="M12 3v18M8 21h8"/><path d="M3.5 12a8.5 8.5 0 0 1 17 0Z"/></svg>',
+    roof:     '<svg class="ico" viewBox="0 0 24 24"><path d="m3 12 9-8 9 8"/><path d="M5 10v11h14V10"/><path d="M10 21v-6h4v6"/></svg>',
+    wallet:   '<svg class="ico" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h13v4"/><path d="M3 7v10a2 2 0 0 0 2 2h15V7H5"/><path d="M16 13h.01"/></svg>',
+    trendDown:'<svg class="ico" viewBox="0 0 24 24"><path d="M22 17 13.5 8.5l-5 5L2 7"/><path d="M16 17h6v-6"/></svg>',
+    trendUp:  '<svg class="ico" viewBox="0 0 24 24"><path d="M22 7 13.5 15.5l-5-5L2 17"/><path d="M16 7h6v6"/></svg>',
+    building: '<svg class="ico" viewBox="0 0 24 24"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></svg>',
+    user:     '<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>',
+    users:    '<svg class="ico" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 5.2a3.5 3.5 0 0 1 0 6.8M18 20a6.5 6.5 0 0 0-3.2-5.6"/></svg>',
+    check:    '<svg class="ico" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>',
+    camera:   '<svg class="ico" viewBox="0 0 24 24"><path d="M3 8a2 2 0 0 1 2-2h2l1.5-2h7L15 6h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><circle cx="12" cy="12.5" r="3.5"/></svg>',
+    search:   '<svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+    alert:    '<svg class="ico" viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h16.9a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></svg>',
+    refresh:  '<svg class="ico" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.3"/><path d="M21 4v5h-5"/></svg>',
+    chart:    '<svg class="ico" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>',
+    calc:     '<svg class="ico" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg>',
+    image:    '<svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>',
+    share:    '<svg class="ico" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>',
+    file:     '<svg class="ico" viewBox="0 0 24 24"><path d="M14 3v5h5"/><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M9 13h6M9 17h6"/></svg>',
+    clipboard:'<svg class="ico" viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="4" rx="1"/><path d="M9 5H6a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3"/></svg>',
+    folder:   '<svg class="ico" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>',
+    trash:    '<svg class="ico" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13M9 7V4h6v3"/></svg>',
+    edit:     '<svg class="ico" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+    ban:      '<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/></svg>',
+    lock:     '<svg class="ico" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>',
+    star:     '<svg class="ico ico-fill" viewBox="0 0 24 24"><path d="m12 3 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.8 6.2 21l1.1-6.5L2.6 9.8l6.5-.9Z"/></svg>',
+    arrowUp:  '<svg class="ico" viewBox="0 0 24 24"><path d="M12 20V5M6 11l6-6 6 6"/></svg>',
+    x:        '<svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+    award:    '<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="9" r="6"/><path d="M9 14.5 8 22l4-2 4 2-1-7.5"/></svg>',
+    info:     '<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>',
+    calendar: '<svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+    bulb:     '<svg class="ico" viewBox="0 0 24 24"><path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2v.3h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2Z"/></svg>',
+    sparkle:  '<svg class="ico" viewBox="0 0 24 24"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"/><path d="m18.5 14 .8 2.4 2.4.8-2.4.8-.8 2.4-.8-2.4-2.4-.8 2.4-.8Z"/></svg>'
+  };
 
   // زرار الرجوع لأعلى الصفحة - على كل الأجهزة، بيظهر لما تنزل تحت شوية
   (function() {
@@ -1824,12 +2063,12 @@
 
     districtOrder.forEach(district => {
       const card = document.createElement('div');
-      card.style.cssText = 'background:#ffffff; border:1px solid #e2e5ea; border-radius:14px; overflow:hidden; box-shadow:0 3px 12px rgba(15,41,66,0.1);';
+      card.style.cssText = 'background:var(--white); border:1px solid var(--border); border-radius:14px; overflow:hidden; box-shadow:var(--shadow-soft);';
 
       const header = document.createElement('div');
-      header.style.cssText = 'background:#0f2942; padding:12px 16px; border-right:5px solid #c9992e;';
-      header.textContent = '📍 ' + district;
-      header.style.color = '#ffffff';
+      header.style.cssText = 'background:var(--navy); padding:12px 16px; border-right:3px solid var(--gold);';
+      header.textContent = district;
+      header.style.color = 'var(--gold-soft)';
       header.style.fontWeight = '800';
       header.style.fontSize = '14px';
       card.appendChild(header);
@@ -1940,12 +2179,12 @@
   let unitAddAiPastedImageMime = null;
 
   document.getElementById('unitAddAiImagePasteZone').addEventListener('focus', function() {
-    this.style.background = '#ece4ff';
-    this.textContent = '✅ جاهز - الصق الصورة دلوقتي (Ctrl+V)';
+    this.classList.add('is-armed');
+    this.textContent = 'جاهز - الصق الصورة دلوقتي (Ctrl+V)';
   });
   document.getElementById('unitAddAiImagePasteZone').addEventListener('blur', function() {
-    this.style.background = '#fff';
-    this.textContent = '📋 دوس هنا وبعدين الصق صورة (Ctrl+V)';
+    this.classList.remove('is-armed');
+    this.textContent = 'دوس هنا وبعدين الصق صورة (Ctrl+V)';
   });
   document.getElementById('unitAddAiImagePasteZone').addEventListener('paste', function(e) {
     const items = (e.clipboardData || window.clipboardData).items;
@@ -1986,14 +2225,14 @@
     }
 
     btn.disabled = true;
-    btn.textContent = '⏳ جاري القراءة والاستخراج...';
+    btn.textContent = 'جاري القراءة والاستخراج...';
     msg.style.display = 'none';
 
     function callExtract(fileBase64, mimeType) {
       google.script.run
         .withSuccessHandler(function(res) {
           btn.disabled = false;
-          btn.textContent = '✨ استخرج البيانات وابدأ التعبئة';
+          btn.textContent = 'استخرج البيانات وابدأ التعبئة';
           if (!res.success) {
             msg.style.display = 'block';
             msg.style.color = 'var(--error-fg)';
@@ -2003,11 +2242,11 @@
           fillEditFormFromAI(res.data);
           msg.style.display = 'block';
           msg.style.color = 'var(--success-fg)';
-          msg.textContent = '✅ تم استخراج البيانات - راجعها كويس قبل الحفظ (وضيف الصور)';
+          msg.textContent = 'تم استخراج البيانات - راجعها كويس قبل الحفظ (وضيف الصور)';
         })
         .withFailureHandler(function(err) {
           btn.disabled = false;
-          btn.textContent = '✨ استخرج البيانات وابدأ التعبئة';
+          btn.textContent = 'استخرج البيانات وابدأ التعبئة';
           msg.style.display = 'block';
           msg.style.color = 'var(--error-fg)';
           msg.textContent = 'حدث خطأ: ' + err.message;
@@ -2111,7 +2350,7 @@
       renderEditImagesPreview();
 
       editMsg.className = '';
-      editMsg.textContent = '🧬 تم استنساخ بيانات الوحدة ' + unitId + ' - راجع كل حاجة (خصوصًا الدور والسعر) وضيف صور جديدة قبل الحفظ';
+      editMsg.textContent = 'تم استنساخ بيانات الوحدة ' + unitId + ' - راجع كل حاجة (خصوصًا الدور والسعر) وضيف صور جديدة قبل الحفظ';
       editMsg.style.display = 'block';
     }).getUnitById(unitId);
   }
@@ -2162,12 +2401,12 @@
   let calcAiPastedImageMime = null;
 
   document.getElementById('calcAiImagePasteZone').addEventListener('focus', function() {
-    this.style.background = '#ece4ff';
-    this.textContent = '✅ جاهز - الصق الصورة دلوقتي (Ctrl+V)';
+    this.classList.add('is-armed');
+    this.textContent = 'جاهز - الصق الصورة دلوقتي (Ctrl+V)';
   });
   document.getElementById('calcAiImagePasteZone').addEventListener('blur', function() {
-    this.style.background = '#fff';
-    this.textContent = '📋 دوس هنا وبعدين الصق صورة (Ctrl+V)';
+    this.classList.remove('is-armed');
+    this.textContent = 'دوس هنا وبعدين الصق صورة (Ctrl+V)';
   });
   document.getElementById('calcAiImagePasteZone').addEventListener('paste', function(e) {
     const items = (e.clipboardData || window.clipboardData).items;
@@ -2208,14 +2447,14 @@
     }
 
     btn.disabled = true;
-    btn.textContent = '⏳ جاري القراءة والاستخراج...';
+    btn.textContent = 'جاري القراءة والاستخراج...';
     msg.style.display = 'none';
 
     function callExtract(fileBase64, mimeType) {
       google.script.run
         .withSuccessHandler(function(res) {
           btn.disabled = false;
-          btn.textContent = '✨ استخرج البيانات وابدأ التعبئة';
+          btn.textContent = 'استخرج البيانات وابدأ التعبئة';
           if (!res.success) {
             msg.style.display = 'block';
             msg.style.color = 'var(--error-fg)';
@@ -2225,11 +2464,11 @@
           fillCalcFormFromAI(res.data);
           msg.style.display = 'block';
           msg.style.color = 'var(--success-fg)';
-          msg.textContent = '✅ تم استخراج البيانات - راجعها كويس قبل التصدير';
+          msg.textContent = 'تم استخراج البيانات - راجعها كويس قبل التصدير';
         })
         .withFailureHandler(function(err) {
           btn.disabled = false;
-          btn.textContent = '✨ استخرج البيانات وابدأ التعبئة';
+          btn.textContent = 'استخرج البيانات وابدأ التعبئة';
           msg.style.display = 'block';
           msg.style.color = 'var(--error-fg)';
           msg.textContent = 'حدث خطأ: ' + err.message;
@@ -2363,7 +2602,7 @@
     calcImagesPreview.innerHTML = calcImages.map((url, idx) => `
       <div class="image-thumb">
         <img src="${url}" alt="صورة الوحدة">
-        <button type="button" class="remove-img" onclick="removeCalcImage(${idx})">✕</button>
+        <button type="button" class="remove-img" onclick="removeCalcImage(${idx})">${ICON.x}</button>
       </div>
     `).join('');
   }
@@ -2440,7 +2679,7 @@
     }
     const btn = this;
     const originalLabel = btn.textContent;
-    btn.disabled = true; btn.textContent = '⏳ جاري التجهيز...';
+    btn.disabled = true; btn.textContent = 'جاري التجهيز...';
 
     let agentName = '';
     let agentPhone = '';
@@ -2483,15 +2722,15 @@
 
         <div style="padding:18px 20px 4px;">
           <div style="font-size:18px;font-weight:700;color:#0f2942;">${title}</div>
-          ${r.city ? `<div style="font-size:12px;color:#0f2942;font-weight:700;margin-top:4px;">📍 ${r.city}${r.district ? ' - ' + r.district : ''}</div>` : ''}
+          ${r.city ? `<div style="font-size:12px;color:#0f2942;font-weight:700;margin-top:4px;">${r.city}${r.district ? ' - ' + r.district : ''}</div>` : ''}
         </div>
 
         <div style="display:flex;flex-wrap:wrap;gap:6px;padding:12px 20px;">
-          ${r.unitArea ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">📐 ${fmtNum(r.unitArea)} م²</span>` : ''}
-          ${r.floor ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">🏢 دور ${r.floor}</span>` : ''}
-          ${r.gardenArea ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">🌳 حديقة ${fmtNum(r.gardenArea)} م²</span>` : ''}
-          ${r.terraceArea ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">🏝 تراس ${fmtNum(r.terraceArea)} م²</span>` : ''}
-          ${r.roofArea ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">🏠 روف ${fmtNum(r.roofArea)} م²</span>` : ''}
+          ${r.unitArea ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">${fmtNum(r.unitArea)} م²</span>` : ''}
+          ${r.floor ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">دور ${r.floor}</span>` : ''}
+          ${r.gardenArea ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">حديقة ${fmtNum(r.gardenArea)} م²</span>` : ''}
+          ${r.terraceArea ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">تراس ${fmtNum(r.terraceArea)} م²</span>` : ''}
+          ${r.roofArea ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">روف ${fmtNum(r.roofArea)} م²</span>` : ''}
         </div>
 
         <div style="margin:6px 20px 0;padding:14px 16px;background:#faf6ec;border-radius:10px;">
@@ -2662,7 +2901,7 @@
 
       const fileLabel = (r.projectName || r.developer || 'عرض-سعر').replace(/[^a-zA-Z0-9أ-ي\- ]/g, '').trim() || 'عرض-سعر';
       pdf.save('Digital Real Estate - ' + fileLabel + '.pdf');
-      showToast('✅ تم تصدير الملف بنجاح', 'success');
+      showToast('تم تصدير الملف بنجاح', 'success');
     } catch (err) {
       showToast('حدث خطأ أثناء التصدير: ' + err.message, 'error');
     } finally {
@@ -2695,7 +2934,7 @@
     if (idx === -1) {
       favs.push({ id: unitId, price: Number(currentPrice) || null });
       if (btnEl) btnEl.classList.add('active');
-      showToast('⭐ تمت إضافة الوحدة للمفضلة', 'success');
+      showToast('تمت إضافة الوحدة للمفضلة', 'success');
     } else {
       favs.splice(idx, 1);
       if (btnEl) btnEl.classList.remove('active');
@@ -2710,8 +2949,8 @@
   let showFavoritesOnly = false;
   let resaleMode = false;
   function updateFavCount() {
-    const el = document.getElementById('favToggleBtn');
-    if (el) el.textContent = '⭐ المفضلة (' + getFavorites().length + ')';
+    const el = document.getElementById('favToggleLabel');
+    if (el) el.textContent = 'المفضلة (' + getFavorites().length + ')';
   }
 
   function sortUnits(units, sortBy) {
@@ -2800,7 +3039,7 @@
     if (units.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
-          <div class="icon">🔍</div>
+          <div class="icon">${ICON.search}</div>
           <h3>مفيش وحدات مطابقة لبحثك</h3>
           <p>جرّب توسّع نطاق السعر أو المساحة، أو امسح بعض الفلاتر وحاول تاني</p>
           <button type="button" onclick="document.getElementById('clearBtn').click()">مسح كل الفلاتر</button>
@@ -2812,7 +3051,7 @@
       const coverHtml = images.length > 0 ? `
         <div class="unit-cover" onclick='openLightbox(${JSON.stringify(images)}, 0)'>
           <img src="${getThumbUrl(images[0])}" alt="صورة الوحدة" loading="lazy" decoding="async">
-          ${images.length > 1 ? `<span class="img-count-badge">📷 ${images.length} صور</span>` : ''}
+          ${images.length > 1 ? `<span class="img-count-badge">${ICON.camera} ${images.length} صور</span>` : ''}
         </div>` : '';
 
       const favPrice = getFavoritePrice(u['Unit ID']);
@@ -2826,12 +3065,12 @@
       if (priceDropped) {
         priceDropBadge = `
         <div class="price-drop-badge" title="السعر نزل من ${fmtNum(favPrice)} لـ ${fmtNum(currentPrice)} جنيه">
-          🔻 نزل السعر ${fmtNum(favPrice - currentPrice)} جنيه
+          ${ICON.trendDown} نزل السعر ${fmtNum(favPrice - currentPrice)} جنيه
         </div>`;
       } else if (priceIncreased) {
         priceDropBadge = `
         <div class="price-drop-badge price-up-badge" title="السعر زاد من ${fmtNum(favPrice)} لـ ${fmtNum(currentPrice)} جنيه">
-          🔺 زاد السعر ${fmtNum(currentPrice - favPrice)} جنيه
+          ${ICON.trendUp} زاد السعر ${fmtNum(currentPrice - favPrice)} جنيه
         </div>`;
       }
 
@@ -2839,7 +3078,7 @@
       <div class="unit-card status-${u['Status']}">
         ${coverHtml}
         ${priceDropBadge}
-        <button type="button" class="fav-btn ${isFavorite(u['Unit ID']) ? 'active' : ''}" onclick="toggleFavorite('${u['Unit ID']}', this, ${currentPrice})" title="إضافة للمفضلة">★</button>
+        <button type="button" class="fav-btn ${isFavorite(u['Unit ID']) ? 'active' : ''}" onclick="toggleFavorite('${u['Unit ID']}', this, ${currentPrice})" title="إضافة للمفضلة">${ICON.star}</button>
         <label class="compare-checkbox" title="إضافة للمقارنة">
           <input type="checkbox" ${compareList.indexOf(u['Unit ID']) !== -1 ? 'checked' : ''} onchange="toggleCompare('${u['Unit ID']}', this)">
         </label>
@@ -2849,23 +3088,23 @@
         </div>
         <div class="unit-info-block">
           <div class="unit-title">${u['Property Type']} - ${u['Project Name'] || u['City']}</div>
-          <div class="unit-loc">📍 ${u['City']} - ${u['Area/District']}</div>
-          <div class="unit-added">🕒 أُضيفت في ${u['Date Added']}${u['Last Updated'] ? ' - آخر تحديث: ' + u['Last Updated'] : ''}</div>
+          <div class="unit-loc">${ICON.pin} ${u['City']} - ${u['Area/District']}</div>
+          <div class="unit-added">${ICON.clock} أُضيفت في ${u['Date Added']}${u['Last Updated'] ? ' - آخر تحديث: ' + u['Last Updated'] : ''}</div>
           <div class="unit-specs">
-            <span class="spec-chip">📐 ${u['Unit Area (sqm)']} م²</span>
-            ${u['Rooms'] ? `<span class="spec-chip">🛏 ${u['Rooms']} غرف</span>` : ''}
-            ${u['Bathrooms'] ? `<span class="spec-chip">🚿 ${u['Bathrooms']} حمام</span>` : ''}
-            ${u['Floor'] ? `<span class="spec-chip">🏢 دور ${u['Floor']}</span>` : ''}
-            ${u['Finishing'] ? `<span class="spec-chip">🎨 ${u['Finishing']}</span>` : ''}
-            ${u['Garden Area (sqm)'] ? `<span class="spec-chip">🌳 حديقة ${u['Garden Area (sqm)']} م²</span>` : ''}
-            ${u['Terrace Area (sqm)'] ? `<span class="spec-chip">🏝 تراس ${u['Terrace Area (sqm)']} م²</span>` : ''}
-            ${u['Roof Area (sqm)'] ? `<span class="spec-chip">🏠 روف ${u['Roof Area (sqm)']} م²</span>` : ''}
+            <span class="spec-chip">${ICON.area} ${u['Unit Area (sqm)']} م²</span>
+            ${u['Rooms'] ? `<span class="spec-chip">${ICON.bed} ${u['Rooms']} غرف</span>` : ''}
+            ${u['Bathrooms'] ? `<span class="spec-chip">${ICON.bath} ${u['Bathrooms']} حمام</span>` : ''}
+            ${u['Floor'] ? `<span class="spec-chip">${ICON.floor} دور ${u['Floor']}</span>` : ''}
+            ${u['Finishing'] ? `<span class="spec-chip">${ICON.brush} ${u['Finishing']}</span>` : ''}
+            ${u['Garden Area (sqm)'] ? `<span class="spec-chip">${ICON.tree} حديقة ${u['Garden Area (sqm)']} م²</span>` : ''}
+            ${u['Terrace Area (sqm)'] ? `<span class="spec-chip">${ICON.terrace} تراس ${u['Terrace Area (sqm)']} م²</span>` : ''}
+            ${u['Roof Area (sqm)'] ? `<span class="spec-chip">${ICON.roof} روف ${u['Roof Area (sqm)']} م²</span>` : ''}
           </div>
         </div>
         <div style="margin-top:auto;">
         ${u['Listing Type'] === 'ريسيل' ? `
         <div class="resale-current-box">
-          <div class="resale-box-title">💰 الوضع المالي الحالي</div>
+          <div class="resale-box-title">${ICON.wallet} الوضع المالي الحالي</div>
           <div class="resale-row-grid">
             ${u['Resale Paid Amount'] ? `<div class="resale-item"><span class="resale-label">المدفوع حتى الآن</span><span class="resale-value">${fmtNum(u['Resale Paid Amount'])} جنيه</span></div>` : ''}
             ${u['Resale Remaining Amount'] ? `<div class="resale-item"><span class="resale-label">المتبقي على الوحدة</span><span class="resale-value">${fmtNum(u['Resale Remaining Amount'])} جنيه</span></div>` : ''}
@@ -2901,7 +3140,7 @@
           ${u['Monthly Installment'] ? `<div><b>القسط الشهري التقريبي:</b> ${fmtNum(u['Monthly Installment'])} جنيه/شهريًا</div>` : ''}
           ${u['Monthly Installment'] ? `<div><b>القسط الربع سنوي التقريبي:</b> ${fmtNum(Number(u['Monthly Installment']) * 3)} جنيه/كل 3 شهور</div>` : ''}
           ${u['View'] ? `<div><b>الفيو:</b> ${u['View']}</div>` : ''}
-          ${u['Other Payment Plans'] === 'نعم' ? `<div><b>✅ متاح أنظمة سداد أخرى</b></div>` : ''}
+          ${u['Other Payment Plans'] === 'نعم' ? `<div><b>${ICON.check} متاح أنظمة سداد أخرى</b></div>` : ''}
           ${u['Delivery Date'] ? `<div><b>التسليم:</b> ${u['Delivery Date']}</div>` : ''}
           ${u['Owner Phone'] ? `<div><b>هاتف المالك:</b> ${u['Owner Phone']}</div>` : ''}
           ${u['Sales/Agent'] ? `<div><b>المسؤول:</b> ${u['Sales/Agent']}</div>` : ''}
@@ -2916,16 +3155,16 @@
             </select>
           </div>
           <div class="card-icon-row">
-            <button type="button" class="icon-action-btn" onclick="openEditModal('${u['Unit ID']}')" title="تعديل الوحدة">Edit</button>
-            <button type="button" class="icon-action-btn" onclick='shareOnWhatsApp(${JSON.stringify(u)})' title="مشاركة على واتساب">WhatsApp</button>
+            <button type="button" class="icon-action-btn" onclick="openEditModal('${u['Unit ID']}')" title="تعديل الوحدة">تعديل</button>
+            <button type="button" class="icon-action-btn" onclick='shareOnWhatsApp(${JSON.stringify(u)})' title="مشاركة على واتساب">واتساب</button>
             <button type="button" class="icon-action-btn" onclick='downloadUnitPDF(${JSON.stringify(u)}, this)' title="تصدير PDF">PDF</button>
-            <button type="button" class="icon-action-btn" onclick='showSimilarUnits(${JSON.stringify(u)})' title="وحدات مشابهة">Similar</button>
-            ${isAdminUnlocked ? `<button type="button" class="icon-action-btn" onclick="cloneUnit('${u['Unit ID']}')" title="استنساخ الوحدة (أدمن)">Clone</button>` : ''}
+            <button type="button" class="icon-action-btn" onclick='showSimilarUnits(${JSON.stringify(u)})' title="وحدات مشابهة">مشابهة</button>
+            ${isAdminUnlocked ? `<button type="button" class="icon-action-btn" onclick="cloneUnit('${u['Unit ID']}')" title="استنساخ الوحدة (أدمن)">نسخ</button>` : ''}
           </div>
           ${(u['Developer Name'] || u['Entered By']) ? `
-          <div style="margin-top:8px; padding-top:8px; border-top:1px dashed var(--border); font-size:11px; color:var(--muted); display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px;">
-            ${u['Developer Name'] ? `<span>🏗 المطور: <a href="javascript:void(0)" onclick='showDeveloperProfile(${JSON.stringify(u['Developer Name'])})' style="color:var(--navy); font-weight:800; text-decoration:underline; cursor:pointer;">${u['Developer Name']}</a></span>` : '<span></span>'}
-            ${u['Entered By'] ? `<span>👤 أضافها: ${u['Entered By']}</span>` : ''}
+          <div class="card-provenance">
+            ${u['Developer Name'] ? `<span>${ICON.building} المطور: <a href="javascript:void(0)" onclick='showDeveloperProfile(${JSON.stringify(u['Developer Name'])})'>${u['Developer Name']}</a></span>` : '<span></span>'}
+            ${u['Entered By'] ? `<span>${ICON.user} أضافها: ${u['Entered By']}</span>` : ''}
           </div>` : ''}
         </div>
       </div>`;
@@ -3040,7 +3279,7 @@
             </label>
           `).join('')}
         </div>
-        <div id="shareImagesPrepStatus" style="font-size:11px; color:var(--muted); margin-top:10px; text-align:center;">⏳ جاري تجهيز الصور في الخلفية...</div>
+        <div id="shareImagesPrepStatus" style="font-size:11px; color:var(--muted); margin-top:10px; text-align:center;">جاري تجهيز الصور في الخلفية...</div>
       `;
 
       // نجهّز كل الصور مقدمًا في الخلفية وانت لسه بتختار، عشان لحظة "مشاركة" تبقى فورية
@@ -3052,7 +3291,7 @@
           readyCount++;
           const statusEl = document.getElementById('shareImagesPrepStatus');
           if (statusEl) {
-            statusEl.textContent = readyCount === images.length ? '✅ الصور جاهزة للمشاركة' : `⏳ جاري تجهيز الصور (${readyCount}/${images.length})...`;
+            statusEl.textContent = readyCount === images.length ? 'الصور جاهزة للمشاركة' : `جاري تجهيز الصور (${readyCount}/${images.length})...`;
           }
         });
       });
@@ -3078,7 +3317,7 @@
     const notReady = selectedUrls.filter(url => !shareImagesCache[url]);
     if (notReady.length > 0) {
       btn.disabled = true;
-      btn.textContent = '⏳ استنى ثانية، الصور لسه بتتجهز...';
+      btn.textContent = 'استنى ثانية، الصور لسه بتتجهز...';
       await Promise.all(notReady.map(url => fetchImageAsDataUrl(url).then(dataUrl => { shareImagesCache[url] = dataUrl; })));
     }
 
@@ -3100,7 +3339,7 @@
       if (files.length > 0 && navigator.canShare && navigator.canShare({ files: files })) {
         shareData.files = files;
       } else if (files.length > 0) {
-        showToast('⚠️ الجهاز ده مش بيدعم مشاركة الصور، هتتشارك التفاصيل بس', 'error');
+        showToast('الجهاز ده مش بيدعم مشاركة الصور، هتتشارك التفاصيل بس', 'error');
       }
 
       google.script.run.logUnitActivity(shareImagesUnit['Unit ID'], shareImagesUnit['Project Name'], 'WhatsApp');
@@ -3112,7 +3351,7 @@
       }
     } finally {
       btn.disabled = false;
-      btn.textContent = '📤 مشاركة';
+      btn.textContent = 'مشاركة';
     }
   });
 
@@ -3190,7 +3429,7 @@
   let currentDevProfile = null;
 
   function showDeveloperProfile(developerName) {
-    document.getElementById('devProfileTitle').textContent = '🏗 ' + developerName;
+    document.getElementById('devProfileTitle').textContent = developerName;
     developerProfileModal.classList.add('open');
     const content = document.getElementById('devProfileContent');
     content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:24px;">جاري التحميل...</div>';
@@ -3200,7 +3439,7 @@
       .withSuccessHandler(function(res) {
         if (!res.success) { content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:24px;">حصل خطأ في التحميل</div>'; return; }
         if (!res.found) {
-          content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:24px; line-height:1.8;">لسه معندناش بيانات مسجلة عن المطور ده.<br>تقدر تضيفها من لوحة التحكم ⚙</div>';
+          content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:24px; line-height:1.8;">لسه معندناش بيانات مسجلة عن المطور ده.<br>تقدر تضيفها من لوحة التحكم</div>';
           return;
         }
         currentDevProfile = res;
@@ -3220,23 +3459,23 @@
           <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px; height:16px;"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2Zm5.8 14.03c-.24.68-1.4 1.32-1.93 1.36-.5.05-1.02.24-3.4-.71-2.88-1.15-4.73-4.06-4.87-4.25-.14-.19-1.17-1.56-1.17-2.97s.73-2.11 1-2.4c.24-.27.53-.34.7-.34h.5c.16 0 .38-.03.58.45.24.57.79 1.98.86 2.12.07.14.11.3.02.48-.09.19-.14.3-.28.46-.14.17-.29.37-.42.5-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.16-.19.68-.79.86-1.06.19-.28.37-.23.62-.14.26.09 1.63.77 1.91.91.28.14.47.21.53.33.07.12.07.68-.17 1.36Z"/></svg>
           واتساب
         </button>
-        <button type="button" id="devProfileExportPdfBtn" style="flex:1; padding:11px; border:none; border-radius:9px; background:var(--navy); color:#fff; font-weight:700; font-size:13px; cursor:pointer;">
-          📄 تصدير PDF
+        <button type="button" id="devProfileExportPdfBtn" style="flex:1; padding:11px; border:none; border-radius:9px; background:var(--navy); color:var(--gold-soft); font-weight:700; font-size:13px; cursor:pointer;">
+          تصدير PDF
         </button>
       </div>` : '';
 
     return `
-      <div style="background:linear-gradient(135deg, #0f2942 0%, #1a3a5c 100%); border-radius:16px; padding:22px 18px; margin-bottom:16px; text-align:center; position:relative; overflow:hidden;">
-        <div style="position:absolute; top:-30px; left:-30px; width:100px; height:100px; background:rgba(201,153,46,0.12); border-radius:50%;"></div>
-        <div style="position:absolute; bottom:-40px; right:-20px; width:120px; height:120px; background:rgba(201,153,46,0.08); border-radius:50%;"></div>
+      <div style="background:linear-gradient(155deg, var(--navy-soft) 0%, var(--navy-deep) 100%); border:1px solid var(--border-gold); border-radius:16px; padding:22px 18px; margin-bottom:16px; text-align:center; position:relative; overflow:hidden;">
+        <div style="position:absolute; top:-30px; left:-30px; width:100px; height:100px; background:rgba(201,154,46,0.12); border-radius:50%;"></div>
+        <div style="position:absolute; bottom:-40px; right:-20px; width:120px; height:120px; background:rgba(201,154,46,0.08); border-radius:50%;"></div>
         ${res.logoUrl ? `<img src="${res.logoUrl}" style="max-width:130px; max-height:70px; object-fit:contain; margin-bottom:10px; position:relative;">` : ''}
-        <div style="color:#fff; font-size:18px; font-weight:800; position:relative;">${res.developerName}</div>
-        ${res.foundedYear ? `<div style="color:#c9992e; font-size:12px; font-weight:700; margin-top:4px; position:relative;">تأسست عام ${res.foundedYear}</div>` : ''}
+        <div style="color:var(--text-light); font-size:18px; font-weight:800; position:relative;">${res.developerName}</div>
+        ${res.foundedYear ? `<div style="color:var(--gold-soft); font-size:12px; font-weight:700; margin-top:4px; position:relative;">تأسست عام ${res.foundedYear}</div>` : ''}
       </div>
 
       ${res.ownerName ? `
-      <div style="display:flex; align-items:center; gap:12px; background:var(--bg); border-radius:12px; padding:14px 16px; margin-bottom:12px;">
-        <div style="width:38px; height:38px; border-radius:50%; background:#c9992e; color:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">👤</div>
+      <div style="display:flex; align-items:center; gap:12px; background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-bottom:12px;">
+        <div style="width:38px; height:38px; border-radius:50%; background:var(--navy); color:var(--gold-soft); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">${ICON.user}</div>
         <div>
           <div style="color:var(--muted); font-size:11px; font-weight:700;">صاحب الشركة</div>
           <div style="color:var(--navy); font-size:14px; font-weight:800;">${res.ownerName}</div>
@@ -3244,14 +3483,14 @@
       </div>` : ''}
 
       ${res.description ? `
-      <div style="border-right:3px solid #c9992e; background:var(--bg); border-radius:0 12px 12px 0; padding:14px 16px; margin-bottom:12px;">
-        <div style="color:#c9992e; font-size:12px; font-weight:800; margin-bottom:6px; display:flex; align-items:center; gap:6px;">📋 نبذة عن الشركة</div>
+      <div style="border-right:3px solid var(--gold); background:var(--bg); border-radius:0 12px 12px 0; padding:14px 16px; margin-bottom:12px;">
+        <div style="color:var(--gold-dark); font-size:12px; font-weight:800; margin-bottom:6px; display:flex; align-items:center; gap:6px;">${ICON.info} نبذة عن الشركة</div>
         <div style="color:var(--text); font-size:13px; line-height:1.9; white-space:pre-wrap;">${res.description}</div>
       </div>` : ''}
 
       ${res.previousWorks ? `
-      <div style="border-right:3px solid #0f2942; background:var(--bg); border-radius:0 12px 12px 0; padding:14px 16px; margin-bottom:16px;">
-        <div style="color:var(--navy); font-size:12px; font-weight:800; margin-bottom:6px; display:flex; align-items:center; gap:6px;">🏆 أعمال سابقة</div>
+      <div style="border-right:3px solid var(--navy); background:var(--bg); border-radius:0 12px 12px 0; padding:14px 16px; margin-bottom:16px;">
+        <div style="color:var(--navy); font-size:12px; font-weight:800; margin-bottom:6px; display:flex; align-items:center; gap:6px;">${ICON.award} أعمال سابقة</div>
         <div style="color:var(--text); font-size:13px; line-height:1.9; white-space:pre-wrap;">${res.previousWorks}</div>
       </div>` : ''}
 
@@ -3299,7 +3538,7 @@
 
   async function generateDevProfilePDF(agentName, agentPhone) {
     const btn = document.getElementById('devProfileExportPdfBtn');
-    if (btn) { btn.disabled = true; btn.textContent = '⏳ جاري التجهيز...'; }
+    if (btn) { btn.disabled = true; btn.textContent = 'جاري التجهيز...'; }
 
     try {
       const res = currentDevProfile;
@@ -3350,11 +3589,11 @@
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', margin, margin, imgWidth, imgHeight);
       pdf.save(res.developerName + ' Profile.pdf');
-      showToast('✅ تم تصدير الملف بنجاح', 'success');
+      showToast('تم تصدير الملف بنجاح', 'success');
     } catch (err) {
       showToast('حصل خطأ أثناء التصدير: ' + err.message, 'error');
     } finally {
-      if (btn) { btn.disabled = false; btn.textContent = '📄 تصدير PDF'; }
+      if (btn) { btn.disabled = false; btn.textContent = 'تصدير PDF'; }
     }
   }
 
@@ -3371,7 +3610,7 @@
       const images = u['Images'] ? u['Images'].split(',').map(s => s.trim()).filter(Boolean) : [];
       const coverImg = images.length > 0 ? images[0] : '';
       return `
-        <div style="display:flex; gap:12px; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:10px; align-items:center;">
+        <div style="display:flex; gap:12px; background:var(--white); border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:10px; align-items:center;">
           ${coverImg ? `<img src="${getThumbUrl(coverImg)}" style="width:70px; height:70px; border-radius:8px; object-fit:cover; flex-shrink:0;" loading="lazy">` : `<div style="width:70px; height:70px; border-radius:8px; background:var(--bg); flex-shrink:0; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:11px;">لا صورة</div>`}
           <div style="flex:1; min-width:0;">
             <div style="font-weight:800; color:var(--navy); font-size:13px;">${u['Property Type'] || ''} - ${u['Unit Area (sqm)'] || '-'} م²</div>
@@ -3420,7 +3659,7 @@
   async function generateUnitPDF(u, btnEl, agentName, agentPhone) {
     const originalLabel = btnEl.textContent;
     btnEl.disabled = true;
-    btnEl.textContent = '⏳ جاري التجهيز...';
+    btnEl.textContent = 'جاري التجهيز...';
 
     try {
       const images = (u['Images'] || '').split(',').map(s => s.trim()).filter(Boolean);
@@ -3465,18 +3704,18 @@
 
         <div style="padding:18px 20px 4px;">
           <div style="font-size:18px;font-weight:700;color:#0f2942;">${u['Property Type']}${u['Project Name'] ? ' - ' + u['Project Name'] : ''}</div>
-          <div style="font-size:12px;color:#0f2942;font-weight:700;margin-top:4px;">📍 ${u['City']} - ${u['Area/District']}</div>
+          <div style="font-size:12px;color:#0f2942;font-weight:700;margin-top:4px;">${u['City']} - ${u['Area/District']}</div>
         </div>
 
         <div style="display:flex;flex-wrap:wrap;gap:6px;padding:12px 20px;">
-          <span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">📐 ${u['Unit Area (sqm)']} م²</span>
-          ${u['Rooms'] ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">🛏 ${u['Rooms']} غرف</span>` : ''}
-          ${u['Bathrooms'] ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">🚿 ${u['Bathrooms']} حمام</span>` : ''}
-          ${u['Floor'] ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">🏢 دور ${u['Floor']}</span>` : ''}
-          ${u['Finishing'] ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">🎨 ${u['Finishing']}</span>` : ''}
-          ${u['Garden Area (sqm)'] ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">🌳 حديقة ${u['Garden Area (sqm)']} م²</span>` : ''}
-          ${u['Terrace Area (sqm)'] ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">🏝 تراس ${u['Terrace Area (sqm)']} م²</span>` : ''}
-          ${u['Roof Area (sqm)'] ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">🏠 روف ${u['Roof Area (sqm)']} م²</span>` : ''}
+          <span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">${u['Unit Area (sqm)']} م²</span>
+          ${u['Rooms'] ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">${u['Rooms']} غرف</span>` : ''}
+          ${u['Bathrooms'] ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">${u['Bathrooms']} حمام</span>` : ''}
+          ${u['Floor'] ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">دور ${u['Floor']}</span>` : ''}
+          ${u['Finishing'] ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">${u['Finishing']}</span>` : ''}
+          ${u['Garden Area (sqm)'] ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">حديقة ${u['Garden Area (sqm)']} م²</span>` : ''}
+          ${u['Terrace Area (sqm)'] ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">تراس ${u['Terrace Area (sqm)']} م²</span>` : ''}
+          ${u['Roof Area (sqm)'] ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">روف ${u['Roof Area (sqm)']} م²</span>` : ''}
         </div>
 
         <div style="margin:6px 20px 0;padding:14px 16px;background:#faf6ec;border-radius:10px;">
@@ -3710,7 +3949,7 @@
         .withFailureHandler(function(err) {
           document.getElementById('results').innerHTML = `
             <div class="empty-state">
-              <div class="icon">⚠️</div>
+              <div class="icon">${ICON.alert}</div>
               <h3>حصل خطأ أثناء تحميل النتائج</h3>
               <p>${err && err.message ? err.message : 'جرّب تحدّث الصفحة، ولو المشكلة استمرت كلّم المسؤول عن النظام'}</p>
               <button type="button" onclick="runSearch()">إعادة المحاولة</button>
@@ -3764,13 +4003,13 @@
     }
 
     btn.disabled = true;
-    btn.textContent = '⏳ جاري الفهم...';
+    btn.textContent = 'جاري الفهم...';
     msg.style.display = 'none';
 
     google.script.run
       .withSuccessHandler(function(res) {
         btn.disabled = false;
-        btn.textContent = '🔍 بحث';
+        btn.textContent = 'بحث';
         if (!res.success) {
           msg.style.display = 'block';
           msg.style.color = 'var(--error-fg)';
@@ -3781,11 +4020,11 @@
         runSearch();
         msg.style.display = 'block';
         msg.style.color = 'var(--success-fg)';
-        msg.textContent = '✅ تم فهم طلبك وتطبيق الفلاتر المناسبة';
+        msg.textContent = 'تم فهم طلبك وتطبيق الفلاتر المناسبة';
       })
       .withFailureHandler(function(err) {
         btn.disabled = false;
-        btn.textContent = '🔍 بحث';
+        btn.textContent = 'بحث';
         msg.style.display = 'block';
         msg.style.color = 'var(--error-fg)';
         msg.textContent = 'حدث خطأ: ' + err.message;
@@ -3812,8 +4051,8 @@
         const fav = favs.find(f => f.id === u['Unit ID']);
         return fav && fav.price && Number(u['Price']) > 0 && Number(u['Price']) > fav.price;
       }).length;
-      if (droppedCount > 0) showToast('🔻 ' + droppedCount + ' من وحداتك المفضلة نزل سعرها', 'success');
-      if (increasedCount > 0) showToast('🔺 ' + increasedCount + ' من وحداتك المفضلة زاد سعرها', 'error');
+      if (droppedCount > 0) showToast(droppedCount + ' من وحداتك المفضلة نزل سعرها', 'success');
+      if (increasedCount > 0) showToast(increasedCount + ' من وحداتك المفضلة زاد سعرها', 'error');
     }
   });
   updateFavCount();
@@ -3886,7 +4125,7 @@
       { label: 'فترة السداد', get: u => u['Installment Years'] ? u['Installment Years'] + ' سنة' : '-' },
       { label: 'القسط الشهري', get: u => u['Monthly Installment'] ? fmtNum(u['Monthly Installment']) + ' جنيه' : '-' },
       { label: 'القسط الربع سنوي', get: u => u['Monthly Installment'] ? fmtNum(Number(u['Monthly Installment']) * 3) + ' جنيه' : '-' },
-      { label: 'أنظمة سداد أخرى', get: u => u['Other Payment Plans'] === 'نعم' ? '✅ متاح' : '-' },
+      { label: 'أنظمة سداد أخرى', get: u => u['Other Payment Plans'] === 'نعم' ? 'متاح' : '-' },
       { label: 'التسليم', get: u => u['Delivery Date'] || '-' },
       { label: 'ملاحظات', get: u => u['Notes'] || '-' }
     ];
@@ -3935,7 +4174,7 @@
     if (units.length < 2) { showToast('محتاج وحدتين على الأقل للمقارنة', 'error'); return; }
 
     btn.disabled = true;
-    btn.textContent = '⏳ جاري التجهيز...';
+    btn.textContent = 'جاري التجهيز...';
 
     let agentName = '', agentPhone = '';
     try {
@@ -3958,7 +4197,7 @@
 
       pageDiv.innerHTML = `
         <div style="background:#0f2942;padding:18px 24px;">
-          <div style="color:#fff;font-size:18px;font-weight:800;">📊 مقارنة الوحدات - Digital Real Estate</div>
+          <div style="color:#fff;font-size:18px;font-weight:800;">مقارنة الوحدات - Digital Real Estate</div>
           <div style="color:#c9992e;font-size:12px;margin-top:4px;">${units.length} وحدات - ${new Date().toLocaleDateString('en-GB')}</div>
         </div>
         <div style="padding:18px 24px;">${tableHtml}</div>
@@ -4005,12 +4244,12 @@
       }
 
       pdf.save('مقارنة وحدات - ' + units.length + ' وحدات.pdf');
-      showToast('✅ تم تصدير ملف المقارنة بنجاح', 'success');
+      showToast('تم تصدير ملف المقارنة بنجاح', 'success');
     } catch (err) {
       showToast('حصل خطأ أثناء التصدير: ' + err.message, 'error');
     } finally {
       btn.disabled = false;
-      btn.textContent = '📄 تصدير مقارنة PDF';
+      btn.textContent = 'تصدير مقارنة PDF';
     }
   }
 
@@ -4162,7 +4401,7 @@
           if (typeDefaults.deliveryDate) editForm.elements['deliveryDate'].value = typeDefaults.deliveryDate;
           if (typeDefaults.otherPaymentPlans) editForm.elements['otherPaymentPlans'].value = typeDefaults.otherPaymentPlans;
           calcEditMonthlyInstallment();
-          showToast('✅ اتملت بيانات الدفع والتشطيب تلقائيًا من آخر وحدة بنفس المشروع والنوع', 'info');
+          showToast('اتملت بيانات الدفع والتشطيب تلقائيًا من آخر وحدة بنفس المشروع والنوع', 'info');
         }).getProjectTypeDefaults(dev, proj, currentType);
       }
     }
@@ -4271,7 +4510,7 @@
     editImagesPreview.innerHTML = editUnitImages.map((url, idx) => `
       <div class="image-thumb" draggable="true" data-idx="${idx}">
         <img src="${url}" alt="صورة الوحدة">
-        <button type="button" class="remove-img" onclick="removeEditUnitImage(${idx})">✕</button>
+        <button type="button" class="remove-img" onclick="removeEditUnitImage(${idx})">${ICON.x}</button>
       </div>
     `).join('');
     attachEditImageDragHandlers();
@@ -4438,8 +4677,8 @@
             editMsg.innerHTML = `
               <div style="margin-bottom:8px;">${res.message}</div>
               <div style="display:flex; gap:8px;">
-                <button type="button" id="editSameUnitBtn" style="flex:1; padding:9px; border:none; border-radius:8px; background:var(--navy); color:#fff; font-weight:700; font-size:12px; cursor:pointer;">✅ نفس الوحدة - حدّث</button>
-                <button type="button" id="editDifferentUnitBtn" style="flex:1; padding:9px; border:none; border-radius:8px; background:var(--gold); color:#fff; font-weight:700; font-size:12px; cursor:pointer;">🆕 وحدة مختلفة</button>
+                <button type="button" id="editSameUnitBtn" style="flex:1; padding:9px; border:none; border-radius:8px; background:var(--navy); color:var(--gold-soft); font-weight:700; font-size:12px; cursor:pointer;">نفس الوحدة - حدّث</button>
+                <button type="button" id="editDifferentUnitBtn" style="flex:1; padding:9px; border:none; border-radius:8px; background:var(--gold); color:var(--navy-deep); font-weight:700; font-size:12px; cursor:pointer;">وحدة مختلفة</button>
               </div>
             `;
             document.getElementById('editSameUnitBtn').addEventListener('click', function() {
@@ -4549,7 +4788,7 @@
     google.script.run
       .withSuccessHandler(function(res) {
         editDeleteBtn.disabled = false;
-        editDeleteBtn.textContent = '🗑 مسح الوحدة نهائيًا';
+        editDeleteBtn.textContent = 'مسح الوحدة نهائيًا';
         editMsg.className = res.success ? 'success' : 'error';
         editMsg.textContent = res.message;
         editMsg.style.display = 'block';
@@ -4561,7 +4800,7 @@
       })
       .withFailureHandler(function(err) {
         editDeleteBtn.disabled = false;
-        editDeleteBtn.textContent = '🗑 مسح الوحدة نهائيًا';
+        editDeleteBtn.textContent = 'مسح الوحدة نهائيًا';
         editMsg.className = 'error';
         editMsg.textContent = 'حدث خطأ: ' + err.message;
         editMsg.style.display = 'block';
@@ -4595,7 +4834,7 @@
         if (!data || !Array.isArray(data.units)) {
           document.getElementById('results').innerHTML = `
             <div class="empty-state">
-              <div class="icon">⚠️</div>
+              <div class="icon">${ICON.alert}</div>
               <h3>حصل خطأ أثناء تحميل النتائج</h3>
               <p>جرّب تحدّث الصفحة، ولو المشكلة استمرت كلّم المسؤول عن النظام</p>
               <button type="button" onclick="runSearch()">إعادة المحاولة</button>
@@ -4615,7 +4854,7 @@
       .withFailureHandler(function(err) {
         document.getElementById('results').innerHTML = `
           <div class="empty-state">
-            <div class="icon">⚠️</div>
+            <div class="icon">${ICON.alert}</div>
             <h3>حصل خطأ أثناء تحميل النتائج</h3>
             <p>${err && err.message ? err.message : 'جرّب تحدّث الصفحة، ولو المشكلة استمرت كلّم المسؤول عن النظام'}</p>
             <button type="button" onclick="runSearch()">إعادة المحاولة</button>
@@ -4866,7 +5105,7 @@
         if (res.visitors && res.visitors.length > 0) {
           listDiv.innerHTML = res.visitors.map(v => {
             const label = v.name ? v.name : (v.email ? v.email : 'زائر بدون اسم');
-            return '👤 ' + label + (v.email ? ' <span style="opacity:.6">(' + v.email + ')</span>' : '');
+            return ICON.user + ' ' + label + (v.email ? ' <span style="opacity:.6">(' + v.email + ')</span>' : '');
           }).join('<br>');
         } else {
           listDiv.innerHTML = '';
@@ -4939,8 +5178,8 @@
         <div class="name">${u.name || '(بدون اسم)'}</div>
         <div class="meta">${u.email} - أُضيف في ${u.addedDate}</div>
         <div class="actions">
-          <button type="button" class="${u.status === 'نشط' ? 'reject-btn' : 'approve-btn'}" onclick="toggleUserStatus('${u.email}', '${u.status === 'نشط' ? 'معطل' : 'نشط'}')">${u.status === 'نشط' ? '⛔ إيقاف' : '✅ تفعيل'}</button>
-          <button type="button" class="reject-btn" onclick="removeUserAccount('${u.email}')">🗑 حذف</button>
+          <button type="button" class="${u.status === 'نشط' ? 'reject-btn' : 'approve-btn'}" onclick="toggleUserStatus('${u.email}', '${u.status === 'نشط' ? 'معطل' : 'نشط'}')">${u.status === 'نشط' ? ICON.ban + ' إيقاف' : ICON.check + ' تفعيل'}</button>
+          <button type="button" class="reject-btn" onclick="removeUserAccount('${u.email}')">${ICON.trash} حذف</button>
         </div>
       </div>
     `).join('');
@@ -4950,7 +5189,7 @@
     if (!adminPin) return;
     google.script.run.withSuccessHandler(function(res) {
       if (!res.success) { showToast(res.message, 'error'); return; }
-      showToast(newStatus === 'نشط' ? '✅ تم تفعيل المستخدم' : '⛔ تم إيقاف صلاحية المستخدم', 'success');
+      showToast(newStatus === 'نشط' ? 'تم تفعيل المستخدم' : 'تم إيقاف صلاحية المستخدم', 'success');
       loadUsersList();
     }).setUserStatus(email, newStatus, adminPin);
   }
@@ -5048,14 +5287,14 @@
     }
 
     btn.disabled = true;
-    btn.textContent = '⏳ جاري الاستخراج...';
+    btn.textContent = 'جاري الاستخراج...';
     msg.style.display = 'none';
 
     function callExtract(fileBase64, mimeType) {
       google.script.run
         .withSuccessHandler(function(res) {
           btn.disabled = false;
-          btn.textContent = '✨ استخرج البيانات وابدأ التعبئة';
+          btn.textContent = 'استخرج البيانات وابدأ التعبئة';
           if (!res.success) {
             msg.style.display = 'block';
             msg.style.color = 'var(--error-fg)';
@@ -5070,11 +5309,11 @@
           if (d.previousWorks) document.getElementById('devProfileWorksInput').value = d.previousWorks;
           msg.style.display = 'block';
           msg.style.color = 'var(--success-fg)';
-          msg.textContent = '✅ تم استخراج البيانات - راجعها قبل الحفظ';
+          msg.textContent = 'تم استخراج البيانات - راجعها قبل الحفظ';
         })
         .withFailureHandler(function(err) {
           btn.disabled = false;
-          btn.textContent = '✨ استخرج البيانات وابدأ التعبئة';
+          btn.textContent = 'استخرج البيانات وابدأ التعبئة';
           msg.style.display = 'block';
           msg.style.color = 'var(--error-fg)';
           msg.textContent = 'حدث خطأ: ' + err.message;
@@ -5114,8 +5353,8 @@
         <div class="name">${p.developerName}</div>
         <div class="meta">${p.ownerName || 'بدون اسم صاحب شركة'}${p.foundedYear ? ' - تأسست ' + p.foundedYear : ''}</div>
         <div class="actions">
-          <button type="button" class="approve-btn" onclick='editDevProfile(${JSON.stringify(p)})'>✏️ تعديل</button>
-          <button type="button" class="reject-btn" onclick="removeDevProfile('${p.developerName.replace(/'/g, "\\'")}')">🗑 حذف</button>
+          <button type="button" class="approve-btn" onclick='editDevProfile(${JSON.stringify(p)})'>${ICON.edit} تعديل</button>
+          <button type="button" class="reject-btn" onclick="removeDevProfile('${p.developerName.replace(/'/g, "\\'")}')">${ICON.trash} حذف</button>
         </div>
       </div>
     `).join('');
