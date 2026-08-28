@@ -80,6 +80,18 @@
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
     }
+    /* premium glass depth: softens ONLY the city background behind the UI.
+       Sits at z-index -1, so page content (form panels, text, inputs) stays crisp. */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background: rgba(13, 36, 56, 0.08);
+      -webkit-backdrop-filter: blur(4px);
+      backdrop-filter: blur(4px);
+    }
     .container { max-width: 920px; margin: 0 auto; }
 
     /* ===== page heading — same treatment as index.html ===== */
