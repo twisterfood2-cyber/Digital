@@ -469,23 +469,40 @@
       display: block;
     }
 
-    /* زرار لوحة التحكم - صغير في الركن، مالوش شكل واضح كتير عشان مش لكل حد */
+    /* شريط الإجراءات العلوي - تنقّل خفيف يذوب في خلفية الكحلي الداكن مع نص ذهبي */
     .top-action-btn {
-      border: none;
-      border-radius: 12px;
-      padding: 10px 12px;
-      font-size: 20px;
-      letter-spacing: 0.5px;
-      font-weight: 900;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 10px 14px;
+      min-height: 40px;
+      border: 1px solid rgba(201,153,46,0.22);
+      border-radius: 8px;
+      background: rgba(10,28,46,0.55);
+      -webkit-backdrop-filter: blur(6px);
+      backdrop-filter: blur(6px);
+      color: var(--gold);
+      font-size: 13px;
+      letter-spacing: 0.2px;
+      font-weight: 700;
+      line-height: 1;
       cursor: pointer;
-      background: #f5e3ba;
-      color: var(--navy);
-      transition: transform .15s, box-shadow .15s;
-      box-shadow: 0 6px 16px rgba(15,41,66,0.16), 0 2px 4px rgba(15,41,66,0.08);
-      border-bottom: 3px solid var(--gold);
+      text-decoration: none;
+      transition: background-color .18s ease, border-color .18s ease, transform .18s ease;
     }
-    .top-action-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 22px rgba(15,41,66,0.22), 0 3px 6px rgba(15,41,66,0.1); }
-    .top-action-btn:active { transform: translateY(-1px); }
+    .top-action-btn svg { width: 16px; height: 16px; flex: none; display: block; }
+    .top-action-btn:hover {
+      background: rgba(10,28,46,0.82);
+      border-color: rgba(201,153,46,0.45);
+      transform: translateY(-1px);
+    }
+    .top-action-btn:active { transform: translateY(0); background: rgba(7,20,34,0.9); }
+    .top-action-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+    .top-action-btn.is-active {
+      border-color: rgba(201,153,46,0.55);
+      box-shadow: inset 0 -2px 0 0 var(--gold);
+    }
 
     .price-stats-search {
       width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px;
@@ -731,12 +748,12 @@
   </div>
   <h1>🔍 Search for units at Digital Real Estate</h1>
 
-  <div id="topActionBar" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-bottom:16px;">
-    <button type="button" class="top-action-btn top-action-admin" id="adminFab">⚙ Admin Panel</button>
-    <button type="button" class="top-action-btn top-action-calc" id="calcFabBtn">🧮 Your Quote</button>
-    <button type="button" class="top-action-btn top-action-price" id="priceInfoFabBtn">📊 Price/m²</button>
-    <button type="button" class="top-action-btn top-action-add" id="addUnitFabBtn">➕ Add Unit</button>
-    <a href="https://resale-units.vercel.app/" target="_blank" class="top-action-btn" style="text-decoration:none; display:flex; align-items:center; justify-content:center;">🏘 Resale Units</a>
+  <div id="topActionBar" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;">
+    <button type="button" class="top-action-btn top-action-admin" id="adminFab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Admin Panel</span></button>
+    <button type="button" class="top-action-btn top-action-calc" id="calcFabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/><line x1="16" y1="18" x2="16" y2="18"/></svg><span>Your Quote</span></button>
+    <button type="button" class="top-action-btn top-action-price" id="priceInfoFabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>Price/m²</span></button>
+    <button type="button" class="top-action-btn top-action-add" id="addUnitFabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>Add Unit</span></button>
+    <a href="https://resale-units.vercel.app/" target="_blank" class="top-action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg><span>Resale Units</span></a>
   </div>
 
 <div style="background:var(--bg); border:1.5px solid var(--navy); border-radius:14px; padding:16px; margin-bottom:16px;">
