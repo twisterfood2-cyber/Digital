@@ -268,7 +268,13 @@
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       gap: 18px;
       direction: rtl;
-      align-items: start;
+      /* stretch = each card fills its own grid row's track height, so cards that
+         share a row end at the same bottom. Rows are sized independently
+         (grid-auto-rows: auto), so this is equal-height PER ROW, not a global
+         fixed height. The card's own flex column + margin-top:auto on the price
+         wrapper keeps content naturally sized and pins the pricing/actions block
+         to the bottom. */
+      align-items: stretch;
     }
     .unit-card {
       background: var(--glass-card);
@@ -450,7 +456,12 @@
     .unit-extra.open { display: block; }
     .unit-extra b { color: var(--text-light); font-weight: 700; }
     .card-actions { display: flex; gap: 8px; margin-top: 12px; }
-    .card-actions-bottom { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--line-dark); }
+    /* fixed gap, not margin-top:auto: with cards now stretched (align-items:stretch
+       on .results-grid) the single margin-top:auto on the price wrapper is the only
+       flex spacer, so the whole pricing + actions block stays together at the card
+       bottom. A second auto margin here would split the free space and float the
+       price box into the middle. */
+    .card-actions-bottom { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line-dark); }
     .status-select {
       flex: 1; padding: 8px 10px; font-size: 12px; font-weight: 600; border-radius: var(--radius-sm);
       background: rgba(6,19,33,0.55); color: var(--text-light); border: 1px solid var(--line-dark);
