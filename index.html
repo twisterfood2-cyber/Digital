@@ -596,13 +596,22 @@
     #compareGoBtn:disabled { background: rgba(255,255,255,0.12); color: rgba(234,240,246,0.5); cursor: not-allowed; }
     .compare-bar .clear-link { background: transparent; color: var(--text-muted); text-decoration: underline; }
 
-    /* جدول المقارنة */
+    /* جدول المقارنة — dark navy surface, explicit light text so data stays readable */
     .compare-table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
     .compare-table th, .compare-table td {
-      padding: 11px 12px; text-align: center; border: 1px solid var(--border); white-space: normal; word-break: break-word; overflow-wrap: break-word;
+      padding: 11px 12px; text-align: center; border: 1px solid var(--line-dark);
+      white-space: normal; word-break: break-word; overflow-wrap: break-word;
     }
-    .compare-table th { background: var(--navy); color: var(--gold-soft); font-weight: 700; letter-spacing: 0.2px; }
-    .compare-table td.row-label { background: var(--bg); color: var(--muted); font-weight: 700; text-align: right; white-space: normal; word-break: break-word; }
+    .compare-table td { color: var(--text-light); background: rgba(255,255,255,0.02); }
+    .compare-table th {
+      background: var(--navy); color: var(--gold-soft); font-weight: 700; letter-spacing: 0.2px;
+      border-color: var(--border-gold);
+    }
+    .compare-table td.row-label {
+      background: rgba(255,255,255,0.05); color: var(--gold-soft);
+      font-weight: 700; text-align: right; white-space: normal; word-break: break-word;
+    }
+    .compare-table img { border: 1px solid var(--line-dark); }
 
     /* حاسبة السعر والتقسيط */
     .calc-results {
@@ -797,7 +806,7 @@
     }
     .modal-overlay.open { display: flex; }
     .modal-box {
-      background: var(--off-white); border-radius: var(--radius-lg); width: 100%; max-width: 900px;
+      background: var(--off-white); color: var(--text); border-radius: var(--radius-lg); width: 100%; max-width: 900px;
       border: 1px solid var(--border-gold); border-top: 2px solid var(--gold);
       padding: 20px; box-shadow: var(--shadow-soft);
     }
@@ -928,6 +937,78 @@
     .modal-box .images-preview + .section-title,
     .modal-box .calc-results + .section-title { margin-top: 22px; }
     .modal-box .grid { row-gap: 14px; }
+
+    /* ===== Add-Unit / Edit modal + Comparison modal — dark navy glass, same system as the search screen ===== */
+    #editModal .modal-box,
+    #compareModal .modal-box {
+      background: var(--glass-panel);
+      color: var(--text-light);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-card);
+    }
+    #editModal .modal-header,
+    #compareModal .modal-header { border-bottom-color: var(--line-dark); }
+    #editModal .modal-title,
+    #compareModal .modal-title { color: var(--text-light); }
+    #editModal .modal-close,
+    #compareModal .modal-close {
+      background: rgba(255,255,255,0.06); color: var(--text-light);
+      border-color: rgba(255,255,255,0.14);
+    }
+    #editModal .modal-close:hover,
+    #compareModal .modal-close:hover { background: rgba(255,255,255,0.12); }
+    #editModal .section-title { color: var(--gold-soft); }
+    #editModal label { color: var(--text-muted); }
+    #editModal .images-zone {
+      background: rgba(255,255,255,0.04); border-color: var(--border-gold);
+    }
+    #editModal .images-zone p { color: var(--text-muted); }
+    #editModal .image-link-row button {
+      background: rgba(255,255,255,0.06); color: var(--text-light); border-color: rgba(255,255,255,0.14);
+    }
+    #editModal .image-thumb { border-color: var(--line-dark); }
+    #editModal .image-thumb .uploading-overlay { background: rgba(6,19,33,0.72); color: var(--text-light); }
+    #editModal .installment-preview { color: var(--gold-soft); }
+    #editModal .installment-preview b { color: var(--text-light); }
+    #editModal #editDeleteBtn { color: #E9908A; border-color: rgba(176,39,31,0.6); }
+    #editModal #editDeleteBtn:hover { background: rgba(176,39,31,0.14); }
+
+    /* AI auto-fill panel inside the Add-Unit modal — deep glass like the main AI search console */
+    #editModal #unitAddAiSection.ai-fill-panel {
+      background: var(--glass-strong);
+      border-color: var(--border-gold);
+    }
+    #editModal #unitAddAiSection .section-title { color: var(--gold-soft); }
+    #editModal #unitAddAiSection p { color: var(--text-muted); }
+    #editModal #unitAddAiSection textarea {
+      background: rgba(255,255,255,0.05); color: var(--text-light);
+      border: 1px solid rgba(201,154,46,0.22);
+    }
+    #editModal #unitAddAiSection textarea::placeholder { color: var(--text-muted); }
+    #editModal #unitAddAiSection textarea:focus {
+      border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,154,46,0.16);
+      background: rgba(255,255,255,0.07);
+    }
+    #editModal #unitAddAiSection .ai-paste-zone {
+      background: rgba(255,255,255,0.04); color: var(--gold-soft);
+    }
+    #editModal #unitAddAiSection input[type="file"] {
+      color-scheme: dark; color: var(--text-light); font-size: 12px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(201,154,46,0.22);
+      border-radius: var(--radius-sm); padding: 8px 10px;
+    }
+
+    /* Comparison export button */
+    #compareModal #compareExportPdfBtn {
+      border: 1px solid var(--border-gold); border-radius: var(--radius-sm);
+      transition: background-color var(--ease), border-color var(--ease);
+    }
+    #compareModal #compareExportPdfBtn:hover { background: var(--navy-deep); border-color: rgba(201,154,46,0.5); }
+    #compareModal .compare-empty {
+      text-align: center; padding: 30px 16px;
+      color: var(--text-muted); font-size: 13px; line-height: 1.9;
+    }
 
     /* ===== responsive breakpoints ===== */
     @media (max-width: 640px) {
@@ -1569,7 +1650,7 @@
     </div>
     <div id="unitAddAiSection" class="ai-fill-panel" style="display:none; padding:10px;">
       <div class="section-title" style="margin-bottom:4px; margin-top:0;"><svg class="ico" viewBox="0 0 24 24"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"/><path d="m18.5 14 .8 2.4 2.4.8-2.4.8-.8 2.4-.8-2.4-2.4-.8 2.4-.8Z"/></svg>تعبئة تلقائية بالذكاء الاصطناعي</div>
-      <p style="font-size:11px; color:var(--muted); margin:0 0 6px; line-height:1.5;">
+      <p style="font-size:11px; color:var(--text-muted); margin:0 0 6px; line-height:1.5;">
         الصق رسالة المطور، أو ارفع صورة/PDF، والذكاء الاصطناعي هيملى الفورم تلقائيًا تحت.
       </p>
       <textarea id="unitAddAiPasteText" placeholder="الصق نص الرسالة هنا (اختياري)..." style="min-height:50px; width:100%; padding:7px 10px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:13px;"></textarea>
@@ -1735,7 +1816,7 @@
         <div>
           <label>المقدم (نسبة %)</label>
           <input type="number" name="downPayment" min="0" max="100" step="any">
-          <div id="editDownPaymentValueHint" style="font-size:12px; color:var(--muted); margin-top:5px; display:none;"></div>
+          <div id="editDownPaymentValueHint" style="font-size:12px; color:var(--text-muted); margin-top:5px; display:none;"></div>
         </div>
         <div>
           <label>المقدم محسوب على</label>
@@ -1747,7 +1828,7 @@
         <div>
           <label>قيمة الدفعة (نسبة % أو قيمة)</label>
           <input type="text" name="paymentAmount">
-          <div id="editPaymentAmountValueHint" style="font-size:12px; color:var(--muted); margin-top:5px; display:none;"></div>
+          <div id="editPaymentAmountValueHint" style="font-size:12px; color:var(--text-muted); margin-top:5px; display:none;"></div>
         </div>
         <div>
           <label>عدد الدفعات</label>
@@ -4101,12 +4182,16 @@
 
   /* ---------- نظام مقارنة الوحدات ---------- */
   let compareList = [];
+  // نحفظ نسخة من كائن الوحدة وقت اختيارها للمقارنة، عشان المقارنة تفضل شغالة
+  // حتى لو المستخدم عمل بحث جديد واتغيّرت lastResults (ده كان بيسبب "مفيش تفاصيل مقارنة")
+  const compareUnitsById = {};
   const MAX_COMPARE = 4;
 
   function toggleCompare(unitId, checkboxEl) {
     const idx = compareList.indexOf(unitId);
     if (idx !== -1) {
       compareList.splice(idx, 1);
+      delete compareUnitsById[unitId];
     } else {
       if (compareList.length >= MAX_COMPARE) {
         showToast('أقصى عدد وحدات للمقارنة ' + MAX_COMPARE + '، شيل وحدة الأول', 'error');
@@ -4114,10 +4199,19 @@
         return;
       }
       compareList.push(unitId);
+      const snap = lastResults.find(u => u['Unit ID'] === unitId);
+      if (snap) compareUnitsById[unitId] = snap;
     }
     updateCompareBar();
   }
   window.toggleCompare = toggleCompare;
+
+  // الوحدات المختارة للمقارنة بالبيانات الحقيقية: من النسخة المحفوظة، وإلا من النتائج الحالية
+  function getCompareUnits() {
+    return compareList
+      .map(id => compareUnitsById[id] || lastResults.find(u => u['Unit ID'] === id))
+      .filter(Boolean);
+  }
 
   function updateCompareBar() {
     const bar = document.getElementById('compareBar');
@@ -4132,6 +4226,7 @@
 
   document.getElementById('compareClearBtn').addEventListener('click', function() {
     compareList = [];
+    Object.keys(compareUnitsById).forEach(k => delete compareUnitsById[k]);
     updateCompareBar();
     renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
   });
@@ -4196,9 +4291,15 @@
   }
 
   function openCompareModal() {
-    const units = lastResults.filter(u => compareList.indexOf(u['Unit ID']) !== -1);
+    const units = getCompareUnits();
+    const content = document.getElementById('compareModalContent');
+    if (units.length < 2) {
+      content.innerHTML = '<div class="compare-empty">اختر وحدتين على الأقل من نتائج البحث لعرض المقارنة</div>';
+      document.getElementById('compareModal').classList.add('open');
+      return;
+    }
     const visibleRows = buildCompareRows(units);
-    document.getElementById('compareModalContent').innerHTML = buildCompareTableHtml(units, visibleRows);
+    content.innerHTML = buildCompareTableHtml(units, visibleRows);
     document.getElementById('compareModal').classList.add('open');
   }
 
@@ -4212,7 +4313,7 @@
   /* ---------- تصدير PDF مقارنة لأكتر من وحدة ---------- */
   async function downloadComparePDF() {
     const btn = document.getElementById('compareExportPdfBtn');
-    const units = lastResults.filter(u => compareList.indexOf(u['Unit ID']) !== -1);
+    const units = getCompareUnits();
     if (units.length < 2) { showToast('محتاج وحدتين على الأقل للمقارنة', 'error'); return; }
 
     btn.disabled = true;
