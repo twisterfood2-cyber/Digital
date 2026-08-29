@@ -57,6 +57,10 @@
       --shadow-soft: 0 10px 30px rgba(0,0,0,0.18);
       --shadow-card: 0 6px 20px rgba(4,12,22,0.26);
       --ease: 180ms ease;
+      /* عرض حاوية التطبيق الموحّد — كل الأقسام الرئيسية (الغلاف / التنقّل / البحث /
+         النتائج / الإحصائيات / لوحة التحكم) بتتحاذى عليه. سقف معقول لتجنّب أسطر نص
+         طويلة على الشاشات فائقة العرض، وبيصغّر تلقائيًا مع المنافذ الأضيق. */
+      --app-max: 1720px;
     }
     * { box-sizing: border-box; }
     button, input, select, textarea, optgroup, option {
@@ -95,7 +99,7 @@
       -webkit-backdrop-filter: blur(4px);
       backdrop-filter: blur(4px);
     }
-    .container { max-width: 1240px; margin: 0 auto; }
+    .container { max-width: var(--app-max); margin: 0 auto; }
     h1 { font-size: 20px; color: var(--text-light); font-weight: 700; margin: 6px 0 20px; }
 
     /* ===== page heading block ===== */
@@ -265,7 +269,9 @@
     #resultsCount { font-size: 12px; color: rgba(234,240,246,0.72); margin: 10px 2px; font-weight: 600; letter-spacing: 0.3px; }
     .results-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      /* auto-fill + minmax: عدد الكروت في الصف بيزيد تلقائيًا مع عرض الحاوية.
+         الحد الأدنى 300px (تخفيف بسيط من 320 عشان تظهر ~5 كروت من ≥1600px). */
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 18px;
       direction: rtl;
       /* stretch = each card fills its own grid row's track height, so cards that
@@ -673,7 +679,7 @@
     .cover-wrap {
       position: relative;
       width: 100%;
-      max-width: 1240px;
+      max-width: var(--app-max);
       margin: 0 auto 18px;
       border-radius: var(--radius-lg);
       border: 1px solid var(--border-gold);
@@ -756,7 +762,7 @@
     #appNav .app-nav-btn svg { width: 15px; height: 15px; }
 
     /* ===== "الإحصائيات والمخزون" — inline in-document view (NOT an iframe) ===== */
-    #statsView { display: none; max-width: 1120px; margin: 0 auto; }
+    #statsView { display: none; max-width: var(--app-max); margin: 0 auto; }
     /* view switch: hide search-only chrome, keep #appNav + #statsView */
     /* The full shared site header stays visible on the Statistics view — the premium
        cover banner (.cover-wrap), the site title/tagline (.site-header) AND the 7-button
@@ -798,7 +804,7 @@
       padding: 0;
       overflow: visible;
       z-index: auto;
-      max-width: 1120px;
+      max-width: var(--app-max);
       margin: 0 auto;
       pointer-events: none;              /* clicks on the empty edges do nothing (no accidental close) */
     }
@@ -913,7 +919,7 @@
        عرض مدمج داخل نفس المستند (مش iframe / مش نافذة منفصلة). التفويض بيمرّ بنفس
        آلية لوحة الإدارة الحالية (verifyAdminPin) أو دور فيه VIEW_STATISTICS. كل الوحدات
        بتوصل للدوال الخلفية الموجودة زي ما هي — مافيش نظام صلاحيات جديد ولا باك-إند جديد. */
-    #dashboardView { display: none; max-width: 1180px; margin: 0 auto; }
+    #dashboardView { display: none; max-width: var(--app-max); margin: 0 auto; }
     body.app-view-dashboard .ai-search-panel,
     body.app-view-dashboard .filters-card,
     body.app-view-dashboard #resultsCount,
