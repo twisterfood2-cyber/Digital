@@ -4161,6 +4161,10 @@
       status: 'نشط' // الدخول نجح ⇒ الحساب نشط (السيرفر بيرفض غير النشط)
     };
     applyRoleUiVisibility();
+    // المرحلة 3.6: الجلسة اتستعادت (هوية + دور + صلاحيات) — خلّصنا الاستعادة، ونعيد تقييم
+    // المسار الحالي بالصلاحيات دلوقتي (من غير أي بوابة كلمة سر ثانوية قديمة).
+    window.__aqarAuthRestoring = false;
+    if (typeof window.__aqarReroute === 'function') { try { window.__aqarReroute(); } catch (e) {} }
   }
   function applyRoleUiVisibility() {
     // زر "إدخال وحدة" في التنقّل: يختفي فقط لدور مؤكَّد بلا ADD_UNIT (SALES/MANAGER)
@@ -6300,12 +6304,14 @@
           setCurrentUserFromLogin(res, email); // المرحلة 1: نبني طبقة "المستخدم الحالي" من ردّ السيرفر
           showApp();
         } else {
+          window.__aqarAuthRestoring = false; // فشل الدخول التلقائي — نوقف حالة "الاستعادة جارية"
           statusEl.className = 'access-gate-status error';
           statusEl.textContent = res.message;
         }
       })
       .withFailureHandler(function(err) {
         btn.disabled = false; btn.textContent = 'دخول';
+        window.__aqarAuthRestoring = false;
         statusEl.className = 'access-gate-status error';
         statusEl.textContent = 'حدث خطأ: ' + err.message;
       })
@@ -6341,6 +6347,9 @@
       document.getElementById('loginEmail').value = savedEmail;
     }
     if (savedEmail && savedPassword) {
+      // المرحلة 3.6: علامة إن استعادة الجلسة شغّالة دلوقتي — البوابات تأجّل قرارها لحد ما
+      // نعرف هوية المستخدم ودوره، بدل ما تطلب كلمة سر ثانوية قديمة بعد إعادة تحميل الصفحة.
+      window.__aqarAuthRestoring = true;
       attemptLogin(savedEmail, savedPassword);
     } else if (savedEmail) {
       document.getElementById('loginPassword').focus();
@@ -7204,55 +7213,63 @@
       window.scrollTo(0, 0);
     }
 
-    // بوابة كلمة سر لوحة التحكم (نفس آلية لوحة التحكم الموجودة)
+    /* ============================================================
+     * المرحلة 3.6 — إزالة بوابات كلمة السر الثانوية القديمة (PIN) عند إعادة تحميل الصفحة.
+     * ------------------------------------------------------------
+     * المستخدم بعد تسجيل الدخول عنده هوية + دور + صلاحيات. البوابات دي بقت تعتمد على
+     * الدور فقط (المصدر: verifyUserAccess → window.__currentUser)، والتحقق النهائي
+     * لأي عملية حساسة لسه في السيرفر (authorizeAdminView_ / authorizeUnitOp_ / ...).
+     *   • عنده الصلاحية        → افتح القسم مباشرة (بلا أي prompt).
+     *   • الجلسة لسه بتُستعاد   → أجّل القرار؛ __aqarReroute بيعيد التقييم بعد الاستعادة.
+     *   • داخل وما عندوش صلاحية → رفض واضح (toast) + تنضيف الـ hash.
+     * مافيش verifyAdminPin / verifyDataEntryPin / askForPin هنا خالص.
+     * ============================================================ */
+    function hasSavedLogin_() {
+      try { return !!(localStorage.getItem('loginEmail') && localStorage.getItem('loginPassword')); }
+      catch (e) { return false; }
+    }
+    function sessionRestorePending_() {
+      // استعادة جلسة جارية بعد reload، أو بيانات دخول محفوظة لكن __currentUser لسه ماتبنتش
+      return !!window.__aqarAuthRestoring || (!window.__currentUser && hasSavedLogin_());
+    }
+    function gateHasPerm_(perm) {
+      return typeof roleActive === 'function' && roleActive()
+          && typeof hasPermission === 'function' && hasPermission(perm);
+    }
+    function denyGatedSection_(hashName, msg) {
+      // مستخدم داخل بجدّ لكن ناقص الصلاحية → رفض واضح + شيل الـ hash عشان reload مايفضلش عالق.
+      if (window.__currentUser) {
+        if (msg) showToast(msg, 'error');
+        if (location.hash === '#' + hashName) {
+          history.replaceState('', document.title, location.pathname + location.search);
+        }
+      }
+      // مش داخل لسه (بوابة الدخول ظاهرة): سيب الـ hash زيّ ما هو — بعد الدخول __aqarReroute هيفتحه.
+    }
+
     function unlockStatsThen(onOk) {
       if (statsUnlocked()) { onOk(); return; }
-      // المرحلة 2: دور فيه VIEW_STATISTICS (OWNER / MANAGER) → دخول مباشر بلا بوابة كلمة سر.
-      // نمرّر بيانات الدخول بدل الـ PIN؛ السيرفر بيتحقق من الدور (authorizeAdminView_).
-      if (typeof roleActive === 'function' && roleActive()
-          && typeof hasPermission === 'function' && hasPermission('VIEW_STATISTICS')) {
+      // دور فيه VIEW_STATISTICS (OWNER / MANAGER) → دخول مباشر. نمرّر بيانات الدخول؛ السيرفر يتحقق (authorizeAdminView_).
+      if (gateHasPerm_('VIEW_STATISTICS')) {
         window.__aqarStatsUnlock(Object.assign({ pin: '' }, getAuthCreds()));
         onOk(); return;
       }
-      if (typeof isAdminUnlocked !== 'undefined' && isAdminUnlocked && adminPin) {
+      if (typeof isAdminUnlocked !== 'undefined' && isAdminUnlocked && adminPin) { // جلسة أدمن مفتوحة داخل نفس الجلسة (مش reload)
         window.__aqarStatsUnlock(adminPin); onOk(); return;
       }
-      askForPin('كلمة سر لوحة التحكم:', function (pin) {
-        if (pin === null) return;
-        if (!pin.trim()) { showToast('لازم تدخل كلمة السر', 'error'); return; }
-        google.script.run.withSuccessHandler(function (isValid) {
-          if (!isValid) { showToast('كلمة السر غير صحيحة', 'error'); return; }
-          window.__aqarStatsUnlock(pin);
-          onOk();
-        }).verifyAdminPin(pin);
-      });
+      if (sessionRestorePending_()) return;
+      denyGatedSection_('stats', 'صلاحيتك الحالية لا تسمح بعرض الإحصائيات والمخزون');
     }
 
-    // بوابة كلمة سر إدخال الوحدة (نفس آلية الزر القديم #addUnitFabBtn — verifyDataEntryPin)
     function unlockAddThen(onOk) {
       if (addUnlocked()) { onOk(); return; }
-      // المرحلة 1: دور مؤكَّد فيه ADD_UNIT (OWNER/DATA_ENTRY) → يفتح مباشرة بلا بوابة كلمة سر
-      if (typeof roleActive === 'function' && roleActive() && typeof hasPermission === 'function' && hasPermission('ADD_UNIT')) {
-        addUnlockedFlag = true; onOk(); return;
-      }
-      // دور مؤكَّد وناقص ADD_UNIT (SALES/MANAGER) → رفض واضح، من غير بوابة كلمة سر
-      if (typeof roleActive === 'function' && roleActive() && typeof hasPermission === 'function' && !hasPermission('ADD_UNIT')
-          && !(typeof isAdminUnlocked !== 'undefined' && isAdminUnlocked && adminPin)) {
-        showToast('صلاحيتك الحالية لا تسمح بإضافة وحدات', 'error');
-        return;
-      }
+      // دور مؤكَّد فيه ADD_UNIT (OWNER / DATA_ENTRY) → يفتح مباشرة
+      if (gateHasPerm_('ADD_UNIT')) { addUnlockedFlag = true; onOk(); return; }
       if (typeof isAdminUnlocked !== 'undefined' && isAdminUnlocked && adminPin) {
         addVerifiedPin = adminPin; addUnlockedFlag = true; onOk(); return;
       }
-      askForPin('كلمة سر فتح شاشة إضافة وحدة جديدة:', function (pin) {
-        if (pin === null) return;
-        if (!pin.trim()) { showToast('لازم تدخل كلمة السر', 'error'); return; }
-        google.script.run.withSuccessHandler(function (isValid) {
-          if (!isValid) { showToast('كلمة السر غير صحيحة', 'error'); return; }
-          addVerifiedPin = pin; addUnlockedFlag = true;
-          onOk();
-        }).verifyDataEntryPin(pin);
-      });
+      if (sessionRestorePending_()) return;
+      denyGatedSection_('add', 'صلاحيتك الحالية لا تسمح بإضافة وحدات');
     }
 
     /* ============================================================
@@ -7303,29 +7320,14 @@
 
     function unlockDashboardThen(onOk) {
       if (dashUnlocked()) { onOk(); return; }
-      // دور مؤكَّد فيه VIEW_STATISTICS (OWNER/MANAGER) → دخول مباشر، السيرفر بيتحقق بالدور.
-      if (typeof roleActive === 'function' && roleActive()
-          && typeof hasPermission === 'function' && hasPermission('VIEW_STATISTICS')) {
-        dashUnlockedFlag = true; onOk(); return;
-      }
-      // جلسة أدمن مفتوحة بالفعل
+      // دور مؤكَّد فيه VIEW_STATISTICS (OWNER / MANAGER) → دخول مباشر، السيرفر بيتحقق بالدور.
+      if (gateHasPerm_('VIEW_STATISTICS')) { dashUnlockedFlag = true; onOk(); return; }
+      // جلسة أدمن مفتوحة داخل نفس الجلسة (مش reload)
       if (typeof isAdminUnlocked !== 'undefined' && isAdminUnlocked && typeof adminPin !== 'undefined' && adminPin) {
         dashUnlockedFlag = true; onOk(); return;
       }
-      // غير كده: بوابة كلمة سر لوحة التحكم (نفس #stats بالظبط)
-      askForPin('كلمة سر لوحة التحكم:', function (pin) {
-        if (pin === null) return;
-        if (!pin.trim()) { showToast('لازم تدخل كلمة السر', 'error'); return; }
-        google.script.run.withSuccessHandler(function (isValid) {
-          if (!isValid) { showToast('كلمة السر غير صحيحة', 'error'); return; }
-          try {
-            adminPin = pin;
-            if (typeof isAdminUnlocked !== 'undefined') isAdminUnlocked = true;
-          } catch (e) {}
-          dashUnlockedFlag = true;
-          onOk();
-        }).verifyAdminPin(pin);
-      });
+      if (sessionRestorePending_()) return;   // المرحلة 3.6: استنى استعادة الجلسة — بلا بوابة كلمة سر ثانوية
+      denyGatedSection_('dashboard', 'صلاحيتك الحالية لا تسمح بفتح لوحة التحكم');
     }
 
     function dashApplyRoleVisibility() {
@@ -7563,6 +7565,9 @@
 
     window.addEventListener('hashchange', route);
     window.addEventListener('popstate', route);
+    // المرحلة 3.6: بعد استعادة الجلسة عقب إعادة تحميل الصفحة، نعيد تقييم المسار الحالي
+    // بالصلاحيات اللي عرفناها دلوقتي (يفتح #dashboard / #add / #stats بلا أي كلمة سر ثانوية).
+    window.__aqarReroute = route;
 
     // حالة الزر النشِط: "إدخال وحدة" وأنت في عرض الإضافة أو مودال الإضافة/الاستنساخ مفتوح
     if (editModalEl && 'MutationObserver' in window) {
