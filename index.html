@@ -1225,14 +1225,30 @@
     .small-btn .ico { width: 14px; height: 14px; margin-left: 6px; vertical-align: -0.16em; }
     .compare-bar .ico { width: 15px; height: 15px; margin-left: 6px; vertical-align: -0.18em; }
 
-    /* ===== card provenance row (moved off inline styles) ===== */
+    /* ===== card provenance row (moved off inline styles) =====
+       صف واحد بثلاث خانات: أضافها (يسار بصري) | عدد المشاهدات (وسط) | المطور (يمين بصري).
+       ترتيب الـ DOM: [المطور، المشاهدات، أضافها] — في RTL أول عنصر flex يروح لليمين،
+       وآخر عنصر لليسار، فيتحقق التوزيع المطلوب. text-align فيزيائي (left/right) مش
+       منطقي عشان يفضل ثابت مهما كان اتجاه الصفحة. */
     .card-provenance {
       margin-top: 8px; padding-top: 8px;
       border-top: 1px dashed var(--line-dark);
       font-size: 11px; color: var(--text-muted);
-      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px;
+      display: flex; align-items: center; gap: 8px; flex-wrap: nowrap;
+    }
+    .card-provenance .prov-dev,
+    .card-provenance .prov-added {
+      flex: 1 1 0; min-width: 0;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .card-provenance .prov-dev { text-align: right; }
+    .card-provenance .prov-added { text-align: left; }
+    .card-provenance .prov-views {
+      flex: 0 0 auto; text-align: center; white-space: nowrap;
+      display: inline-flex; align-items: center; gap: 3px;
     }
     .card-provenance a { color: var(--gold-soft); font-weight: 700; text-decoration: underline; cursor: pointer; }
+    @media (max-width: 380px) { .card-provenance { font-size: 10px; gap: 5px; } }
 
     /* ===== conditional card header padding: only reserve gutter when there is no cover image ===== */
     .unit-card:has(.unit-cover) .unit-top { padding: 2px 0 0; }
@@ -1381,8 +1397,7 @@
     .fav-btn .ico { width: 15px; height: 15px; }
     .unit-loc .ico, .unit-added .ico { vertical-align: -0.18em; }
     .resale-box-title { display: flex; align-items: center; }
-    .card-provenance { justify-content: flex-start; gap: 6px 18px; }
-    .card-provenance span { display: inline-flex; align-items: center; }
+    .card-provenance .prov-views .ico { margin-left: 0; }
     .images-choose-btn .ico { width: 13px; height: 13px; margin-left: 5px; vertical-align: -0.1em; }
     .ai-extract-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
@@ -2363,6 +2378,7 @@
     trendUp:  '<svg class="ico" viewBox="0 0 24 24"><path d="M22 7 13.5 15.5l-5-5L2 17"/><path d="M16 7h6v6"/></svg>',
     building: '<svg class="ico" viewBox="0 0 24 24"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></svg>',
     user:     '<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>',
+    eye:      '<svg class="ico" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>',
     users:    '<svg class="ico" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 5.2a3.5 3.5 0 0 1 0 6.8M18 20a6.5 6.5 0 0 0-3.2-5.6"/></svg>',
     check:    '<svg class="ico" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>',
     camera:   '<svg class="ico" viewBox="0 0 24 24"><path d="M3 8a2 2 0 0 1 2-2h2l1.5-2h7L15 6h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><circle cx="12" cy="12.5" r="3.5"/></svg>',
@@ -3689,7 +3705,7 @@
         </div>
         `}
         </div>
-        <button type="button" class="toggle-details-btn" onclick="toggleUnitDetails(this)">
+        <button type="button" class="toggle-details-btn" onclick="toggleUnitDetails(this, '${u['Unit ID']}')">
           <span class="label">عرض التفاصيل الكاملة</span><span class="chevron">▾</span>
         </button>
         <div class="unit-extra">
@@ -3720,23 +3736,64 @@
             <button type="button" class="icon-action-btn" onclick='showSimilarUnits(${JSON.stringify(u)})' title="وحدات مشابهة">مشابهة</button>
             ${isAdminUnlocked ? `<button type="button" class="icon-action-btn" onclick="cloneUnit('${u['Unit ID']}')" title="استنساخ الوحدة (أدمن)">نسخ</button>` : ''}
           </div>
-          ${(u['Developer Name'] || u['Entered By']) ? `
           <div class="card-provenance">
-            ${u['Developer Name'] ? `<span>${ICON.building} المطور: <a href="javascript:void(0)" onclick='showDeveloperProfile(${JSON.stringify(u['Developer Name'])})'>${u['Developer Name']}</a></span>` : '<span></span>'}
-            ${u['Entered By'] ? `<span>${ICON.user} أضافها: ${u['Entered By']}</span>` : ''}
-          </div>` : ''}
+            <span class="prov-dev">${u['Developer Name'] ? `${ICON.building} المطور: <a href="javascript:void(0)" onclick='showDeveloperProfile(${JSON.stringify(u['Developer Name'])})'>${u['Developer Name']}</a>` : ''}</span>
+            <span class="prov-views" title="عدد مرات مشاهدة تفاصيل الوحدة">${ICON.eye} <span class="views-num">${Number(u['Details View Count']) || 0}</span></span>
+            <span class="prov-added">${u['Entered By'] ? `${ICON.user} أضافها: ${u['Entered By']}` : ''}</span>
+          </div>
         </div>
       </div>`;
     }).join('');
   }
 
-  function toggleUnitDetails(btnEl) {
+  function toggleUnitDetails(btnEl, unitId) {
     const extra = btnEl.nextElementSibling;
     const isOpen = extra.classList.toggle('open');
     btnEl.classList.toggle('open', isOpen);
     btnEl.querySelector('.label').textContent = isOpen ? 'إخفاء التفاصيل' : 'عرض التفاصيل الكاملة';
+
+    // تسجيل مشاهدة تفاصيل الوحدة: عند الفتح فقط (مش عند الإخفاء)، ومرة واحدة لكل
+    // ضغطة فتح. ده الـ handler الوحيد للزر (onclick سطري، مفيش listeners مكررة ولا
+    // bubbling)، والـ toggle نفسه بيمنع العد المزدوج: فتح→إغلاق→فتح = مشاهدتين صح.
+    // تسجيل العداد وظيفة *إضافية* - فتح التفاصيل فوق حصل بالفعل ومش متوقف عليها.
+    if (isOpen && unitId) logUnitDetailsView(unitId, btnEl);
   }
   window.toggleUnitDetails = toggleUnitDetails;
+
+  /* ---------- تسجيل مشاهدة تفاصيل وحدة (Persistent في شيت Units عبر Apps Script) ---------- */
+  function logUnitDetailsView(unitId, btnEl) {
+    try {
+      const card = (btnEl && btnEl.closest) ? btnEl.closest('.unit-card') : null;
+      const numEl = card ? card.querySelector('.prov-views .views-num') : null;
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (!res || res.success !== true || typeof res.newCount !== 'number') {
+            console.error('AqarDigital: تسجيل مشاهدة الوحدة ' + unitId + ' لم ينجح:', res && res.message);
+            return; // مانعرضش رقم على إنه اتحفظ وهو ماتحفظش
+          }
+          // نعرض القيمة المعتمدة من السيرفر فقط لو أكبر من المعروض (نتفادى رد متأخّر يرجّع الرقم لتحت)
+          if (numEl) {
+            const shown = Number(numEl.textContent) || 0;
+            if (res.newCount > shown) numEl.textContent = String(res.newCount);
+          }
+          // نحدّث النسخة في الذاكرة عشان إعادة الرسم (تغيير ترتيب/فلتر) متضيّعش العدّ الجديد
+          const rec = (typeof lastResults !== 'undefined' && lastResults.find)
+            ? lastResults.find(function(x) { return x['Unit ID'] === unitId; }) : null;
+          if (rec) {
+            const cur = Number(rec['Details View Count']) || 0;
+            if (res.newCount > cur) rec['Details View Count'] = res.newCount;
+          }
+        })
+        .withFailureHandler(function(err) {
+          console.error('AqarDigital: تسجيل مشاهدة الوحدة ' + unitId + ' فشل (شبكة/سيرفر):',
+            (err && err.message) ? err.message : err);
+        })
+        .incrementUnitDetailsView(unitId);
+    } catch (e) {
+      console.error('AqarDigital: استثناء غير متوقع أثناء تسجيل مشاهدة الوحدة:', e);
+    }
+  }
 
   function changeStatus(unitId, newStatus) {
     google.script.run.updateUnitStatus(unitId, newStatus);
