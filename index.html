@@ -5266,6 +5266,18 @@
     unitWritePin = null;
   }
 
+  // بعد نجاح حفظ وحدة جديدة من نموذج "إدخال وحدة" المفتوح داخل صفحة البحث:
+  // نفرّغ النموذج بالكامل ونرجّعه لحالته الابتدائية بإعادة استخدام نفس دالة
+  // تجهيز النموذج (openAddUnitModal) - نفس ما تفعله صفحة الإدخال الرئيسية
+  // add.html بعد الحفظ. من غير قفل النموذج، ولا تنقّل، ولا تغيير URL، ولا
+  // إعادة تحميل. رسالة النجاح تفضل ظاهرة. لا يُستدعى إلا عند نجاح الحفظ.
+  function resetAddUnitFormAfterSuccess(successMessage) {
+    openAddUnitModal(); // reset كامل: كل الحقول النصية/الأرقام/القوائم + الموقع + السعر + الخصم + التقسيط + المالك + الحالة + الصور + خانة الذكاء الاصطناعي وكل state المرتبط بيها
+    editMsg.className = 'success';
+    editMsg.textContent = successMessage;
+    editMsg.style.display = 'block';
+  }
+
   document.getElementById('editCloseBtn').addEventListener('click', closeEditModal);
   editModal.addEventListener('click', function(e) {
     if (e.target === editModal) closeEditModal();
@@ -5308,7 +5320,7 @@
                 editMsg.innerHTML = '';
                 editMsg.className = res2.success ? 'success' : 'error';
                 editMsg.textContent = res2.message;
-                if (res2.success) { clearClientSearchCache(); runSearch(); setTimeout(closeEditModal, 1200); }
+                if (res2.success) { clearClientSearchCache(); runSearch(); resetAddUnitFormAfterSuccess(res2.message); }
               }).confirmAddAsSameUnit(data, res.matchUnitId);
             });
             document.getElementById('editDifferentUnitBtn').addEventListener('click', function() {
@@ -5318,7 +5330,7 @@
                 editMsg.innerHTML = '';
                 editMsg.className = res2.success ? 'success' : 'error';
                 editMsg.textContent = res2.message;
-                if (res2.success) { clearClientSearchCache(); runSearch(); setTimeout(closeEditModal, 1200); }
+                if (res2.success) { clearClientSearchCache(); runSearch(); resetAddUnitFormAfterSuccess(res2.message); }
               }).confirmAddAsNewUnit(data);
             });
             return;
@@ -5330,7 +5342,9 @@
           if (res.success) {
             clearClientSearchCache();
             runSearch();
-            setTimeout(closeEditModal, 1200);
+            // نجح الحفظ: نفرّغ النموذج بالكامل ونرجّعه لحالته الابتدائية (النموذج
+            // يفضل مفتوح وجاهز لوحدة جديدة) - بدل ما نقفله زي ما كان بيحصل
+            resetAddUnitFormAfterSuccess(res.message);
           }
         })
         .withFailureHandler(function(err) {
