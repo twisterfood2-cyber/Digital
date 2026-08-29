@@ -596,6 +596,7 @@
     .toast.show { opacity: 1; transform: translateY(0); }
     .toast-success { background: rgba(30,110,69,0.95); border-color: rgba(30,110,69,0.6); }
     .toast-error { background: rgba(176,39,31,0.95); border-color: rgba(176,39,31,0.6); }
+    .toast-warn { background: rgba(122,86,0,0.95); border-color: rgba(122,86,0,0.6); }
     .toast-info { background: var(--glass-strong); }
 
     /* شريط المقارنة العائم */
@@ -952,6 +953,132 @@
     .access-req-item .status-tag.Approved { background: var(--success-bg); color: var(--success-fg); }
     .access-req-item .status-tag.Pending { background: var(--warn-bg); color: var(--warn-fg); }
     .access-req-item .status-tag.Rejected { background: var(--error-bg); color: var(--error-fg); }
+
+    /* ============================================================
+     * المرحلة 2.3 — إدارة المستخدمين 2.0 (إضافة بحتة، بهوية أقار الرقمية)
+     * ============================================================ */
+    #usersModal .modal-box.um-box { max-width: 640px; }
+    #umUserModal .modal-box.um-user-box { max-width: 460px; }
+    .um-toolbar {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      margin: 4px 0 12px; flex-wrap: wrap;
+    }
+    .um-count { font-size: 13px; color: var(--muted); font-weight: 600; }
+    .um-count b { color: var(--navy); font-size: 15px; }
+    .um-add-toggle {
+      border: 1px solid var(--border-gold); background: var(--navy); color: var(--gold-soft);
+      font-weight: 700; font-size: 12px; padding: 8px 14px; border-radius: var(--radius-sm); cursor: pointer;
+    }
+    .um-add-toggle:hover { background: var(--navy-deep); }
+    .um-addform {
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      padding: 14px; margin-bottom: 14px; background: var(--off-white);
+    }
+    .um-addform .section-title { margin-top: 0; }
+    .um-hint {
+      font-size: 11px; color: var(--muted); background: var(--warn-bg); color: var(--warn-fg);
+      border-radius: 6px; padding: 6px 9px; margin: 8px 0 0; line-height: 1.7;
+    }
+    .um-primary {
+      width: 100%; margin-top: 12px; padding: 11px; border: none; border-radius: 9px;
+      background: var(--navy); color: var(--gold-soft); font-weight: 700; font-size: 14px; cursor: pointer;
+    }
+    .um-primary:disabled { opacity: .6; cursor: default; }
+    .um-msg { font-size: 12px; margin-top: 8px; min-height: 14px; }
+    .um-msg.ok { color: var(--success-fg); }
+    .um-msg.err { color: var(--error-fg); }
+
+    .um-filters { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+    #umSearch {
+      width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-family: inherit; font-size: 13px; background: var(--white);
+    }
+    .um-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .um-chips button {
+      border: 1px solid var(--border); background: var(--white); color: var(--muted);
+      font-size: 11px; font-weight: 700; padding: 5px 11px; border-radius: 999px; cursor: pointer;
+      transition: var(--ease);
+    }
+    .um-chips button.active { background: var(--navy); color: var(--gold-soft); border-color: var(--navy); }
+
+    .um-list { max-height: 46vh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 2px; }
+    .um-empty { text-align: center; color: var(--muted); padding: 18px; font-size: 12px; }
+    .um-card {
+      display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+      border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--white);
+      cursor: pointer; transition: var(--ease);
+    }
+    .um-card:hover { border-color: var(--border-gold); box-shadow: var(--shadow-card); }
+    .um-card.is-owner { border-color: var(--gold); background: linear-gradient(180deg, #fffdf6, var(--white)); }
+    .um-avatar {
+      width: 42px; height: 42px; border-radius: 50%; object-fit: cover; flex-shrink: 0;
+      background: var(--navy); color: var(--gold-soft); display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 15px; border: 1px solid var(--border);
+    }
+    .um-card.is-owner .um-avatar { border: 2px solid var(--gold); }
+    .um-main { flex: 1; min-width: 0; }
+    .um-name { font-weight: 800; color: var(--navy); font-size: 13px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .um-sub { font-size: 11px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .um-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+    .um-badge {
+      font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 999px; letter-spacing: .3px;
+      border: 1px solid transparent;
+    }
+    .um-badge.role-OWNER { background: var(--gold); color: #3a2a05; }
+    .um-badge.role-MANAGER { background: #dbe7f3; color: #1c4a75; }
+    .um-badge.role-SALES { background: #e6efe9; color: #1e6e45; }
+    .um-badge.role-DATA_ENTRY { background: #efe7f5; color: #5a3a86; }
+    .um-status { font-size: 10px; font-weight: 800; padding: 2px 9px; border-radius: 999px; }
+    .um-status.active { background: var(--success-bg); color: var(--success-fg); }
+    .um-status.inactive { background: var(--error-bg); color: var(--error-fg); }
+
+    #umUserBody .um-uhead { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    #umUserBody .um-avatar { width: 60px; height: 60px; font-size: 20px; }
+    #umUserBody .um-field { margin-bottom: 10px; }
+    #umUserBody .um-field label { font-size: 11px; font-weight: 700; color: var(--muted); display: block; margin-bottom: 4px; }
+    #umUserBody .um-field input, #umUserBody .um-field select {
+      width: 100%; padding: 9px 11px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-family: inherit; font-size: 13px; background: var(--white);
+    }
+    #umUserBody .um-field input:disabled { background: var(--bg); color: var(--muted); }
+    #umUserBody .um-readonly { font-size: 13px; color: var(--navy); font-weight: 600; }
+    #umUserBody .um-uid { font-size: 10px; color: var(--muted); word-break: break-all; margin-top: 2px; }
+    #umUserBody .um-note { font-size: 10px; color: var(--muted); margin-top: 3px; }
+    #umUserBody .um-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+    #umUserBody .um-actions button {
+      padding: 9px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-size: 12px; font-weight: 700; cursor: pointer; background: var(--white); color: var(--navy);
+    }
+    #umUserBody .um-actions button.primary { background: var(--navy); color: var(--gold-soft); border-color: var(--navy); }
+    #umUserBody .um-actions button.danger { background: var(--error-bg); color: var(--error-fg); border-color: transparent; }
+    #umUserBody .um-actions button:disabled { opacity: .45; cursor: not-allowed; }
+    #umUserBody .um-inline { display: flex; gap: 6px; margin-top: 6px; }
+    #umUserBody .um-inline input { flex: 1; }
+    #umUserBody .um-inline button { padding: 8px 12px; border: none; border-radius: var(--radius-sm); background: var(--navy); color: var(--gold-soft); font-weight: 700; font-size: 12px; cursor: pointer; }
+    @media (max-width: 560px) {
+      #usersModal .modal-box.um-box { max-width: 100%; }
+      .um-sub { white-space: normal; }
+      #umUserBody .um-actions { grid-template-columns: 1fr; }
+      #umAuditModal .modal-box.um-box { max-width: 100%; }
+    }
+
+    /* المرحلة 2.4 — سجل النشاط (للقراءة فقط) */
+    .umlog-list { max-height: 52vh; }
+    .umlog-row {
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 9px 11px; background: var(--white); font-size: 12px;
+    }
+    .umlog-row.denied { border-color: rgba(176,39,31,0.35); background: #fff8f7; }
+    .umlog-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .umlog-action { font-weight: 800; color: var(--navy); letter-spacing: .3px; }
+    .umlog-res { font-size: 10px; font-weight: 800; padding: 1px 8px; border-radius: 999px; }
+    .umlog-res.SUCCESS { background: var(--success-bg); color: var(--success-fg); }
+    .umlog-res.DENIED { background: var(--error-bg); color: var(--error-fg); }
+    .umlog-time { margin-inline-start: auto; color: var(--muted); font-size: 11px; }
+    .umlog-meta { color: var(--muted); margin-top: 3px; line-height: 1.7; }
+    .umlog-meta b { color: var(--navy); font-weight: 700; }
+    .umlog-details { color: var(--text); margin-top: 2px; word-break: break-word; }
+
     .admin-panel h3 { font-size: 14px; color: var(--navy); margin: 0 0 12px; }
     .live-count {
       display: flex; align-items: center; gap: 8px;
@@ -1997,34 +2124,103 @@
   <button type="button" id="adminLogoutBtn" class="small-btn" style="display:block; width:100%; text-align:center; margin-top:8px; background:rgba(233,144,138,0.10); color:#E9908A; border-color:rgba(233,144,138,0.4);"><svg class="ico" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg> تسجيل خروج الإدارة</button>
 </div>
 
-<!-- مودال إدارة المستخدمين -->
+<!-- مودال إدارة المستخدمين 2.0 (المرحلة 2.3) -->
 <div class="modal-overlay" id="usersModal">
-  <div class="modal-box" style="max-width:480px;">
+  <div class="modal-box um-box">
     <div class="modal-header">
       <div class="modal-title"><svg class="ico" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 5.2a3.5 3.5 0 0 1 0 6.8M18 20a6.5 6.5 0 0 0-3.2-5.6"/></svg>إدارة المستخدمين</div>
       <button class="modal-close" id="usersModalCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
 
-    <div class="section-title">إضافة مستخدم جديد</div>
-    <div class="grid">
-      <div>
-        <label>الاسم</label>
-        <input type="text" id="newUserName" placeholder="مثال: أحمد محمد">
-      </div>
-      <div>
-        <label>الإيميل</label>
-        <input type="email" id="newUserEmail" placeholder="example@gmail.com">
-      </div>
-      <div>
-        <label>كلمة السر</label>
-        <input type="text" id="newUserPassword" placeholder="كلمة سر خاصة بيه">
+    <div class="um-toolbar">
+      <div class="um-count">عدد المستخدمين: <b id="umCount">-</b></div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button type="button" class="um-add-toggle" id="umAuditToggle" hidden style="background:var(--white); color:var(--navy);">سجل العمليات</button>
+        <button type="button" class="um-add-toggle" id="umAddToggle">+ إضافة مستخدم</button>
       </div>
     </div>
-    <button type="button" id="addUserBtn" style="width:100%; margin-top:12px; padding:11px; border:none; border-radius:9px; background:var(--navy); color:var(--gold-soft); font-weight:700; font-size:14px; cursor:pointer;">إضافة المستخدم</button>
-    <div id="addUserMsg" style="font-size:12px; margin-top:8px;"></div>
 
-    <div class="section-title">المستخدمون الحاليون</div>
-    <div id="usersListContent" style="max-height:40vh; overflow-y:auto;"></div>
+    <div class="um-addform" id="umAddForm" hidden>
+      <div class="section-title">إضافة مستخدم جديد</div>
+      <div class="grid">
+        <div>
+          <label>الاسم</label>
+          <input type="text" id="newUserName" placeholder="مثال: أحمد محمد">
+        </div>
+        <div>
+          <label>الإيميل</label>
+          <input type="email" id="newUserEmail" placeholder="example@gmail.com">
+        </div>
+        <div>
+          <label>كلمة السر</label>
+          <input type="text" id="newUserPassword" placeholder="كلمة سر خاصة بيه">
+        </div>
+        <div>
+          <label>الصلاحية</label>
+          <select id="newUserRole">
+            <option value="SALES">مبيعات — SALES</option>
+            <option value="DATA_ENTRY">إدخال بيانات — DATA_ENTRY</option>
+            <option value="MANAGER">مدير — MANAGER</option>
+            <option value="OWNER">مالك — OWNER</option>
+          </select>
+        </div>
+        <div>
+          <label>رقم الهاتف (اختياري)</label>
+          <input type="text" id="newUserPhone" placeholder="01000000000">
+        </div>
+        <div>
+          <label>صورة المستخدم (اختياري)</label>
+          <input type="file" id="newUserPhoto" accept="image/*">
+        </div>
+      </div>
+      <div class="um-hint" id="umOwnerHint" hidden>إنشاء حساب "مالك" يتطلب تسجيل دخولك أنت بحساب مالك (لا يكفي كلمة سر لوحة التحكم).</div>
+      <button type="button" id="addUserBtn" class="um-primary">إضافة المستخدم</button>
+      <div id="addUserMsg" class="um-msg"></div>
+    </div>
+
+    <div class="um-filters">
+      <input type="search" id="umSearch" placeholder="بحث بالاسم أو الإيميل أو الهاتف أو معرّف المستخدم">
+      <div class="um-chips" id="umRoleChips">
+        <button type="button" data-role="ALL" class="active">الكل</button>
+        <button type="button" data-role="OWNER">OWNER</button>
+        <button type="button" data-role="MANAGER">MANAGER</button>
+        <button type="button" data-role="SALES">SALES</button>
+        <button type="button" data-role="DATA_ENTRY">DATA_ENTRY</button>
+      </div>
+      <div class="um-chips" id="umStatusChips">
+        <button type="button" data-st="ALL" class="active">كل الحالات</button>
+        <button type="button" data-st="ACTIVE">نشط</button>
+        <button type="button" data-st="INACTIVE">موقوف</button>
+      </div>
+    </div>
+
+    <div id="usersListContent" class="um-list"></div>
+  </div>
+</div>
+
+<!-- مودال تفاصيل/تعديل مستخدم (المرحلة 2.3) -->
+<div class="modal-overlay" id="umUserModal">
+  <div class="modal-box um-user-box">
+    <div class="modal-header">
+      <div class="modal-title">تفاصيل المستخدم</div>
+      <button class="modal-close" id="umUserCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div id="umUserBody"></div>
+  </div>
+</div>
+
+<!-- مودال سجل نشاط إدارة المستخدمين (المرحلة 2.4) — OWNER فقط، للقراءة فقط -->
+<div class="modal-overlay" id="umAuditModal">
+  <div class="modal-box um-box">
+    <div class="modal-header">
+      <div class="modal-title"><svg class="ico" viewBox="0 0 24 24"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>سجل عمليات إدارة المستخدمين</div>
+      <button class="modal-close" id="umAuditCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="um-filters">
+      <input type="search" id="umAuditSearch" placeholder="بحث بالمُنفِّذ أو المستهدف أو الإجراء">
+    </div>
+    <div id="umAuditList" class="um-list umlog-list"></div>
+    <button type="button" id="umAuditMore" class="um-primary" hidden style="background:var(--white); color:var(--navy); border:1px solid var(--border);">عرض المزيد</button>
   </div>
 </div>
 
@@ -5979,97 +6175,380 @@
     reader.readAsDataURL(file);
   });
 
-  /* ---------- إدارة المستخدمين ---------- */
+  /* ============================================================
+   * إدارة المستخدمين 2.0 — المرحلة 2.3
+   * - إضافة بحتة فوق نظام 2.2. لا مساس بـ RBAC / المصادقة / تسجيل الدخول.
+   * - الأمان في الباك-إند: كل نداء يمرّ بـ authorizeOwnerAdmin_ + checkOwnerProtection_.
+   *   إخفاء/تعطيل الأزرار هنا **راحة فقط** ولا يُعتمد عليه.
+   * - auth المُرسل = { pin: adminPin, authEmail, authPassword } → السيرفر يقبل أي مسار.
+   * ============================================================ */
   const usersModal = document.getElementById('usersModal');
+  const umUserModal = document.getElementById('umUserModal');
+  const ROLE_LABELS = { OWNER: 'مالك', MANAGER: 'مدير', SALES: 'مبيعات', DATA_ENTRY: 'إدخال بيانات' };
+  let umAllUsers = [];
+  let umRoleFilter = 'ALL';
+  let umStatusFilter = 'ALL';
 
-  document.getElementById('openUsersModalBtn').addEventListener('click', function() {
+  function umAuth() { return Object.assign({ pin: adminPin || '' }, getAuthCreds()); }
+  function umEsc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function umCallerIsOwner() {
+    return !!(window.__currentUser && window.__currentUser.roleConfirmed && window.__currentUser.role === 'OWNER');
+  }
+  function umInitials(name, email) {
+    const s = String(name || email || '؟').trim();
+    return s ? s.charAt(0).toUpperCase() : '؟';
+  }
+  function umAvatarHtml(u, cls) {
+    if (u.photo) return `<img class="um-avatar ${cls || ''}" src="${umEsc(u.photo)}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'um-avatar ${cls || ''}',textContent:'${umInitials(u.name, u.email)}'}))">`;
+    return `<div class="um-avatar ${cls || ''}">${umEsc(umInitials(u.name, u.email))}</div>`;
+  }
+
+  document.getElementById('openUsersModalBtn').addEventListener('click', function () {
     if (!adminPin) return;
     usersModal.classList.add('open');
+    document.getElementById('umOwnerHint').hidden = umCallerIsOwner();
+    // زر سجل النشاط — للمالك فقط (الباك-إند بيفرض OWNER بغض النظر عن ده).
+    document.getElementById('umAuditToggle').hidden = !umCallerIsOwner();
     loadUsersList();
   });
   document.getElementById('usersModalCloseBtn').addEventListener('click', () => usersModal.classList.remove('open'));
-  usersModal.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
+  usersModal.addEventListener('click', function (e) { if (e.target === this) this.classList.remove('open'); });
+  document.getElementById('umUserCloseBtn').addEventListener('click', () => umUserModal.classList.remove('open'));
+  umUserModal.addEventListener('click', function (e) { if (e.target === this) this.classList.remove('open'); });
+
+  document.getElementById('umAddToggle').addEventListener('click', function () {
+    const f = document.getElementById('umAddForm');
+    f.hidden = !f.hidden;
+  });
+
+  /* ---------------- سجل النشاط (المرحلة 2.4) — OWNER فقط، للقراءة فقط ---------------- */
+  const umAuditModal = document.getElementById('umAuditModal');
+  let umAuditOffset = 0;
+  const UM_AUDIT_PAGE = 100;
+
+  function umSurfaceAuditWarning(res) {
+    if (res && res.auditWarning) showToast(res.auditWarning, 'warn');
+  }
+
+  document.getElementById('umAuditToggle').addEventListener('click', function () {
+    umAuditModal.classList.add('open');
+    umAuditOffset = 0;
+    document.getElementById('umAuditSearch').value = '';
+    loadAuditLog(false);
+  });
+  document.getElementById('umAuditCloseBtn').addEventListener('click', () => umAuditModal.classList.remove('open'));
+  umAuditModal.addEventListener('click', function (e) { if (e.target === this) this.classList.remove('open'); });
+  document.getElementById('umAuditMore').addEventListener('click', function () { umAuditOffset += UM_AUDIT_PAGE; loadAuditLog(true); });
+  let umAuditSearchTimer = null;
+  document.getElementById('umAuditSearch').addEventListener('input', function () {
+    clearTimeout(umAuditSearchTimer);
+    umAuditSearchTimer = setTimeout(function () { umAuditOffset = 0; loadAuditLog(false); }, 250);
+  });
+
+  function loadAuditLog(append) {
+    const list = document.getElementById('umAuditList');
+    if (!append) list.innerHTML = '<div class="um-empty">جاري التحميل...</div>';
+    const q = document.getElementById('umAuditSearch').value.trim();
+    google.script.run
+      .withSuccessHandler(function (res) {
+        if (!res || !res.success) { list.innerHTML = '<div class="um-empty">' + umEsc((res && res.message) || 'تعذّر تحميل السجل') + '</div>'; return; }
+        renderAuditLog(res.entries || [], append, res.hasMore, res.total);
+      })
+      .withFailureHandler(function (err) { list.innerHTML = '<div class="um-empty">حدث خطأ: ' + umEsc(err && err.message) + '</div>'; })
+      .getUserAuditLog(umAuth(), { limit: UM_AUDIT_PAGE, offset: umAuditOffset, q: q });
+  }
+
+  function renderAuditLog(entries, append, hasMore, total) {
+    const list = document.getElementById('umAuditList');
+    const rowsHtml = entries.map(function (e) {
+      const denied = e.result === 'DENIED';
+      return `
+      <div class="umlog-row ${denied ? 'denied' : ''}">
+        <div class="umlog-top">
+          <span class="umlog-action">${umEsc(e.action)}</span>
+          <span class="umlog-res ${denied ? 'DENIED' : 'SUCCESS'}">${denied ? 'مرفوض' : 'تم'}</span>
+          <span class="umlog-time">${umEsc(e.timestamp)}</span>
+        </div>
+        <div class="umlog-meta"><b>المُنفِّذ:</b> ${umEsc(e.actorEmail || '(غير معروف)')}${e.actorRole ? ' · ' + umEsc(e.actorRole) : ''}${e.targetEmail ? ' &nbsp;<b>المستهدف:</b> ' + umEsc(e.targetEmail) : ''}</div>
+        ${e.details ? `<div class="umlog-details">${umEsc(e.details)}</div>` : ''}
+      </div>`;
+    }).join('');
+    if (append) list.insertAdjacentHTML('beforeend', rowsHtml);
+    else list.innerHTML = rowsHtml || '<div class="um-empty">لا توجد عمليات مسجّلة مطابقة</div>';
+    const more = document.getElementById('umAuditMore');
+    more.hidden = !hasMore;
+    more.textContent = 'عرض المزيد (' + (total || 0) + ' إجمالًا)';
+  }
+
+  /* ---- search + filters (client-side only; backend still authorizes every op) ---- */
+  document.getElementById('umSearch').addEventListener('input', applyUmFilters);
+  document.getElementById('umRoleChips').addEventListener('click', function (e) {
+    const b = e.target.closest('button'); if (!b) return;
+    this.querySelectorAll('button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active'); umRoleFilter = b.dataset.role; applyUmFilters();
+  });
+  document.getElementById('umStatusChips').addEventListener('click', function (e) {
+    const b = e.target.closest('button'); if (!b) return;
+    this.querySelectorAll('button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active'); umStatusFilter = b.dataset.st; applyUmFilters();
+  });
 
   function loadUsersList() {
     const content = document.getElementById('usersListContent');
-    content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:14px; font-size:12px;">جاري التحميل...</div>';
-    google.script.run.withSuccessHandler(function(res) {
-      if (!res.success) { content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:14px; font-size:12px;">' + res.message + '</div>'; return; }
-      renderUsersList(res.users);
-    }).getUsersList(adminPin);
+    content.innerHTML = '<div class="um-empty">جاري التحميل...</div>';
+    google.script.run
+      .withSuccessHandler(function (res) {
+        if (!res || !res.success) { content.innerHTML = '<div class="um-empty">' + umEsc((res && res.message) || 'تعذّر تحميل المستخدمين') + '</div>'; return; }
+        umAllUsers = res.users || [];
+        applyUmFilters();
+      })
+      .withFailureHandler(function (err) { content.innerHTML = '<div class="um-empty">حدث خطأ: ' + umEsc(err && err.message) + '</div>'; })
+      .getUsersList(umAuth());
+  }
+
+  function applyUmFilters() {
+    const q = (document.getElementById('umSearch').value || '').trim().toLowerCase();
+    const filtered = umAllUsers.filter(function (u) {
+      if (umRoleFilter !== 'ALL' && u.role !== umRoleFilter) return false;
+      const active = u.status === 'نشط';
+      if (umStatusFilter === 'ACTIVE' && !active) return false;
+      if (umStatusFilter === 'INACTIVE' && active) return false;
+      if (!q) return true;
+      return [u.name, u.email, u.phone, u.userId].some(v => String(v || '').toLowerCase().indexOf(q) !== -1);
+    });
+    document.getElementById('umCount').textContent =
+      filtered.length === umAllUsers.length ? String(umAllUsers.length) : (filtered.length + ' / ' + umAllUsers.length);
+    renderUsersList(filtered);
   }
 
   function renderUsersList(users) {
     const content = document.getElementById('usersListContent');
-    if (!users.length) {
-      content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:14px; font-size:12px;">مفيش مستخدمين مسجلين لسه</div>';
-      return;
-    }
-    content.innerHTML = users.map(u => `
-      <div class="access-req-item">
-        <div class="name">${u.name || '(بدون اسم)'}</div>
-        <div class="meta">${u.email} - أُضيف في ${u.addedDate}</div>
-        <div class="actions">
-          <button type="button" class="${u.status === 'نشط' ? 'reject-btn' : 'approve-btn'}" onclick="toggleUserStatus('${u.email}', '${u.status === 'نشط' ? 'معطل' : 'نشط'}')">${u.status === 'نشط' ? ICON.ban + ' إيقاف' : ICON.check + ' تفعيل'}</button>
-          <button type="button" class="reject-btn" onclick="removeUserAccount('${u.email}')">${ICON.trash} حذف</button>
+    if (!users.length) { content.innerHTML = '<div class="um-empty">مفيش مستخدمين مطابقين</div>'; return; }
+    content.innerHTML = users.map(function (u) {
+      const isOwner = u.role === 'OWNER';
+      const active = u.status === 'نشط';
+      return `
+      <div class="um-card ${isOwner ? 'is-owner' : ''}" data-email="${umEsc(u.email)}">
+        ${umAvatarHtml(u)}
+        <div class="um-main">
+          <div class="um-name">${umEsc(u.name || '(بدون اسم)')}
+            <span class="um-badge role-${u.role}">${umEsc(ROLE_LABELS[u.role] || u.role)}</span>
+            ${isOwner ? '<span title="حساب المالك — محمي">★</span>' : ''}
+          </div>
+          <div class="um-sub">${umEsc(u.email)}</div>
+          <div class="um-sub">${u.phone ? umEsc(u.phone) + ' · ' : ''}أُضيف ${umEsc(u.addedDate || '-')}</div>
+        </div>
+        <div class="um-right">
+          <span class="um-status ${active ? 'active' : 'inactive'}">${active ? 'نشط' : 'موقوف'}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  document.getElementById('usersListContent').addEventListener('click', function (e) {
+    const card = e.target.closest('.um-card'); if (!card) return;
+    const u = umAllUsers.find(x => x.email === card.dataset.email);
+    if (u) openUmUser(u);
+  });
+
+  /* ---------------- user details / edit / actions ---------------- */
+  function openUmUser(u) {
+    const isOwner = u.role === 'OWNER';
+    const active = u.status === 'نشط';
+    const canGrantOwner = umCallerIsOwner();
+    const body = document.getElementById('umUserBody');
+    const roleOpts = ['SALES', 'DATA_ENTRY', 'MANAGER', 'OWNER'].map(function (r) {
+      const dis = (r === 'OWNER' && !canGrantOwner) ? ' disabled' : '';
+      return `<option value="${r}"${r === u.role ? ' selected' : ''}${dis}>${ROLE_LABELS[r]} — ${r}</option>`;
+    }).join('');
+
+    body.innerHTML = `
+      <div class="um-uhead">
+        ${umAvatarHtml(u)}
+        <div>
+          <div style="font-weight:800;color:var(--navy);">${umEsc(u.name || '(بدون اسم)')}
+            <span class="um-badge role-${u.role}">${umEsc(ROLE_LABELS[u.role] || u.role)}</span></div>
+          <div class="um-uid">معرّف المستخدم: ${umEsc(u.userId || '-')}</div>
         </div>
       </div>
-    `).join('');
-  }
 
-  function toggleUserStatus(email, newStatus) {
-    if (!adminPin) return;
-    google.script.run.withSuccessHandler(function(res) {
-      if (!res.success) { showToast(res.message, 'error'); return; }
-      showToast(newStatus === 'نشط' ? 'تم تفعيل المستخدم' : 'تم إيقاف صلاحية المستخدم', 'success');
+      <div class="um-field"><label>الاسم</label>
+        <input type="text" id="umfName" value="${umEsc(u.name || '')}"></div>
+
+      <div class="um-field"><label>الإيميل</label>
+        <div class="um-readonly">${umEsc(u.email)}</div>
+        <div class="um-note">الإيميل مُعرِّف الدخول ولا يمكن تغييره من هنا.</div></div>
+
+      <div class="um-field"><label>رقم الهاتف</label>
+        <input type="text" id="umfPhone" value="${umEsc(u.phone || '')}" placeholder="اختياري"></div>
+
+      <div class="um-field"><label>الصلاحية</label>
+        <select id="umfRole">${roleOpts}</select>
+        ${isOwner ? '<div class="um-note">حساب المالك محمي: لا يمكن تنزيل رتبته أو ترك النظام بلا مالك نشط.</div>'
+                  : (canGrantOwner ? '' : '<div class="um-note">ترقية مستخدم إلى "مالك" تتطلب تسجيل دخولك أنت بحساب مالك.</div>')}</div>
+
+      <div class="um-field"><label>الحالة</label>
+        <span class="um-status ${active ? 'active' : 'inactive'}">${active ? 'نشط' : 'موقوف'}</span>
+        <span class="um-note"> · أُضيف في ${umEsc(u.addedDate || '-')}</span></div>
+
+      <div class="um-field"><label>تغيير صورة المستخدم</label>
+        <input type="file" id="umfPhoto" accept="image/*"></div>
+
+      <div class="um-field"><label>إعادة تعيين كلمة السر</label>
+        <div class="um-inline">
+          <input type="text" id="umfNewPw" placeholder="كلمة سر جديدة">
+          <button type="button" id="umBtnResetPw">إعادة تعيين</button>
+        </div></div>
+
+      <div class="um-actions">
+        <button type="button" class="primary" id="umBtnSaveProfile">حفظ البيانات</button>
+        <button type="button" id="umBtnSaveRole">تغيير الصلاحية</button>
+        <button type="button" id="umBtnToggleStatus"${isOwner ? ' disabled title="لا يمكن تعطيل حساب المالك"' : ''}>${active ? 'إيقاف الحساب' : 'تفعيل الحساب'}</button>
+        <button type="button" class="danger" id="umBtnDelete"${isOwner ? ' disabled title="لا يمكن حذف حساب المالك"' : ''}>حذف المستخدم</button>
+      </div>
+      <div id="umUserMsg" class="um-msg"></div>
+    `;
+
+    const msg = document.getElementById('umUserMsg');
+    const setMsg = (t, ok) => { msg.textContent = t; msg.className = 'um-msg ' + (ok ? 'ok' : 'err'); };
+    const run = (label, fn) => {
+      setMsg('جاري ' + label + '...', true); msg.className = 'um-msg';
+      return fn;
+    };
+    const onDone = (res, okText) => {
+      if (!res || !res.success) { setMsg((res && res.message) || 'فشل الإجراء', false); return false; }
+      setMsg(okText || res.message, true);
+      showToast(okText || res.message, 'success');
+      umSurfaceAuditWarning(res);
       loadUsersList();
-    }).setUserStatus(email, newStatus, adminPin);
-  }
-  window.toggleUserStatus = toggleUserStatus;
+      return true;
+    };
 
-  function removeUserAccount(email) {
-    if (!adminPin) return;
-    const confirmed = confirm('متأكد إنك عايز تمسح المستخدم ده نهائيًا؟');
-    if (!confirmed) return;
-    google.script.run.withSuccessHandler(function(res) {
-      if (!res.success) { showToast(res.message, 'error'); return; }
-      showToast('تم حذف المستخدم', 'success');
-      loadUsersList();
-    }).deleteUserAccount(email, adminPin);
-  }
-  window.removeUserAccount = removeUserAccount;
+    document.getElementById('umBtnSaveProfile').addEventListener('click', function () {
+      const patch = { name: document.getElementById('umfName').value.trim(), phone: document.getElementById('umfPhone').value.trim() };
+      if (!patch.name) { setMsg('الاسم مطلوب', false); return; }
+      run('الحفظ');
+      google.script.run
+        .withSuccessHandler(r => onDone(r, 'تم تحديث بيانات المستخدم بنجاح'))
+        .withFailureHandler(e => setMsg('حدث خطأ: ' + (e && e.message), false))
+        .updateUserProfile(umAuth(), u.email, patch);
+    });
 
-  document.getElementById('addUserBtn').addEventListener('click', function() {
+    document.getElementById('umBtnSaveRole').addEventListener('click', function () {
+      const newRole = document.getElementById('umfRole').value;
+      if (newRole === u.role) { setMsg('لا يوجد تغيير في الصلاحية', false); return; }
+      if (!confirm('تغيير صلاحية "' + (u.name || u.email) + '" إلى ' + (ROLE_LABELS[newRole] || newRole) + '؟')) return;
+      run('تغيير الصلاحية');
+      google.script.run
+        .withSuccessHandler(r => { if (onDone(r, 'تم تغيير الصلاحية بنجاح')) umUserModal.classList.remove('open'); })
+        .withFailureHandler(e => setMsg('حدث خطأ: ' + (e && e.message), false))
+        .setUserRole(umAuth(), u.email, newRole);
+    });
+
+    document.getElementById('umBtnToggleStatus').addEventListener('click', function () {
+      const newStatus = active ? 'معطل' : 'نشط';
+      if (!confirm((active ? 'إيقاف' : 'تفعيل') + ' حساب "' + (u.name || u.email) + '"؟')) return;
+      run('تحديث الحالة');
+      google.script.run
+        .withSuccessHandler(r => { if (onDone(r, active ? 'تم إيقاف المستخدم' : 'تم تفعيل المستخدم')) umUserModal.classList.remove('open'); })
+        .withFailureHandler(e => setMsg('حدث خطأ: ' + (e && e.message), false))
+        .setUserStatus(u.email, newStatus, umAuth());
+    });
+
+    document.getElementById('umBtnResetPw').addEventListener('click', function () {
+      const pw = document.getElementById('umfNewPw').value;
+      if (!pw || pw.length < 4) { setMsg('كلمة السر الجديدة قصيرة جدًا', false); return; }
+      if (!confirm('إعادة تعيين كلمة سر "' + (u.name || u.email) + '"؟')) return;
+      run('إعادة التعيين');
+      google.script.run
+        .withSuccessHandler(r => { onDone(r, 'تم إعادة تعيين كلمة السر بنجاح'); document.getElementById('umfNewPw').value = ''; })
+        .withFailureHandler(e => setMsg('حدث خطأ: ' + (e && e.message), false))
+        .resetUserPassword(umAuth(), u.email, pw);
+    });
+
+    document.getElementById('umfPhoto').addEventListener('change', function () {
+      const file = this.files && this.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) { setMsg('الصورة كبيرة جدًا (الحد 5 ميجابايت)', false); return; }
+      run('رفع الصورة');
+      const reader = new FileReader();
+      reader.onload = function () {
+        const b64 = String(reader.result).split(',')[1];
+        google.script.run
+          .withSuccessHandler(r => onDone(r, 'تم تحديث صورة المستخدم بنجاح'))
+          .withFailureHandler(e => setMsg('حدث خطأ: ' + (e && e.message), false))
+          .uploadUserPhoto(umAuth(), u.email, b64, file.type);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('umBtnDelete').addEventListener('click', function () {
+      if (!confirm('هل أنت متأكد من حذف هذا المستخدم؟ لا يمكن التراجع.')) return;
+      run('الحذف');
+      google.script.run
+        .withSuccessHandler(r => { if (onDone(r, 'تم حذف المستخدم')) umUserModal.classList.remove('open'); })
+        .withFailureHandler(e => setMsg('حدث خطأ: ' + (e && e.message), false))
+        .deleteUserAccount(u.email, umAuth());
+    });
+
+    umUserModal.classList.add('open');
+  }
+
+  /* ---------------- add user ---------------- */
+  (function () {
+    const roleSel = document.getElementById('newUserRole');
+    roleSel.addEventListener('change', function () {
+      document.getElementById('umOwnerHint').hidden = !(this.value === 'OWNER' && !umCallerIsOwner());
+    });
+  })();
+
+  document.getElementById('addUserBtn').addEventListener('click', function () {
     if (!adminPin) return;
     const name = document.getElementById('newUserName').value.trim();
     const email = document.getElementById('newUserEmail').value.trim();
     const password = document.getElementById('newUserPassword').value;
+    const role = document.getElementById('newUserRole').value;
+    const phone = document.getElementById('newUserPhone').value.trim();
+    const photoFile = document.getElementById('newUserPhoto').files[0] || null;
     const msg = document.getElementById('addUserMsg');
-    if (!email || !password) {
-      msg.style.color = 'var(--error-fg)';
-      msg.textContent = 'لازم تدخل إيميل وكلمة سر على الأقل';
-      return;
-    }
+    const setMsg = (t, ok) => { msg.textContent = t; msg.className = 'um-msg ' + (ok ? 'ok' : 'err'); };
+
+    if (!name) { setMsg('الاسم مطلوب', false); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setMsg('الإيميل غير صحيح', false); return; }
+    if (!password || password.length < 4) { setMsg('كلمة السر قصيرة جدًا', false); return; }
+
     const btn = this;
     btn.disabled = true; btn.textContent = 'جاري الإضافة...';
+    const finish = () => { btn.disabled = false; btn.textContent = 'إضافة المستخدم'; };
+
     google.script.run
-      .withSuccessHandler(function(res) {
-        btn.disabled = false; btn.textContent = 'إضافة المستخدم';
-        msg.style.color = res.success ? 'var(--success-fg)' : 'var(--error-fg)';
-        msg.textContent = res.message;
-        if (res.success) {
-          document.getElementById('newUserName').value = '';
-          document.getElementById('newUserEmail').value = '';
-          document.getElementById('newUserPassword').value = '';
+      .withSuccessHandler(function (res) {
+        if (!res || !res.success) { finish(); setMsg((res && res.message) || 'فشل إضافة المستخدم', false); return; }
+        umSurfaceAuditWarning(res);
+        const created = () => {
+          finish();
+          setMsg('تمت إضافة المستخدم' + (res.role && res.role !== role ? ' — تم ضبط الصلاحية على ' + res.role + ' (صلاحيتك لا تسمح بمنح OWNER)' : ''), true);
+          ['newUserName', 'newUserEmail', 'newUserPassword', 'newUserPhone', 'newUserPhoto'].forEach(id => { document.getElementById(id).value = ''; });
           loadUsersList();
-        }
+        };
+        if (photoFile) {
+          const reader = new FileReader();
+          reader.onload = function () {
+            const b64 = String(reader.result).split(',')[1];
+            google.script.run
+              .withSuccessHandler(created)
+              .withFailureHandler(created)
+              .uploadUserPhoto(umAuth(), email, b64, photoFile.type);
+          };
+          reader.readAsDataURL(photoFile);
+        } else { created(); }
       })
-      .withFailureHandler(function(err) {
-        btn.disabled = false; btn.textContent = 'إضافة المستخدم';
-        msg.style.color = 'var(--error-fg)';
-        msg.textContent = 'حدث خطأ: ' + err.message;
-      })
-      .addUserAccount(name, email, password, adminPin);
+      .withFailureHandler(function (err) { finish(); setMsg('حدث خطأ: ' + (err && err.message), false); })
+      .addUserAccount(name, email, password, umAuth(), role, phone);
   });
 
   /* ---------- إدارة بيانات المطورين ---------- */
