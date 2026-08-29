@@ -717,7 +717,10 @@
 <div id="sameUnitModal" style="display:none; position:fixed; inset:0; background:rgba(4,12,22,0.66); -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px); z-index:2500; align-items:center; justify-content:center; padding:20px;">
   <div style="background:var(--off-white); border-radius:var(--radius-lg); max-width:420px; width:100%; padding:26px; text-align:center; box-shadow:var(--shadow-soft); border:1px solid var(--border-gold); border-top:2px solid var(--gold);">
     <h2 style="font-size:16px; color:var(--navy); margin:0 0 12px; font-weight:700; letter-spacing:0.2px;">دي نفس الوحدة ولا وحدة مختلفة؟</h2>
-    <p id="sameUnitModalText" style="font-size:13px; color:var(--muted); line-height:1.8; margin-bottom:20px;"></p>
+    <p id="sameUnitModalText" style="font-size:13px; color:var(--muted); line-height:1.8; margin-bottom:12px;"></p>
+    <p id="sameUnitRoleNote" style="display:none; font-size:12px; color:var(--navy); background:var(--warn-bg, #f7eee0); border:1px solid var(--border-gold); border-radius:var(--radius-sm); padding:9px 11px; line-height:1.8; margin-bottom:16px;">
+      تحديث سعر أو بيانات وحدة موجودة يتطلب صلاحية مدير أو مالك. تقدر تسجّلها كـ"وحدة مختلفة"، أو كلّم المسؤول لتحديث الوحدة الحالية.
+    </p>
     <button type="button" id="sameUnitConfirmBtn" style="width:100%; padding:12px; border:1px solid var(--border-gold); border-radius:var(--radius-sm); background:var(--navy); color:var(--gold-soft); font-weight:700; font-size:14px; cursor:pointer; margin-bottom:10px;">
       نفس الوحدة - حدّث السعر والبيانات
     </button>
@@ -1364,6 +1367,24 @@
     const modal = document.getElementById('sameUnitModal');
     document.getElementById('sameUnitModalText').textContent = res.message;
     modal.dataset.matchUnitId = res.matchUnitId;
+
+    // زر "نفس الوحدة - حدّث" = تعديل سجل موجود → يحتاج EDIT_UNIT (OWNER/MANAGER).
+    // للواجهة فقط: لو دور المستخدم واضح إنه ما يملكش EDIT_UNIT نعطّل الزر ونعرض رسالة.
+    // الباك-إند بيرفض العملية بنفسه في كل الأحوال (authorizeUnitOp_ + EDIT_UNIT).
+    const confirmBtn = document.getElementById('sameUnitConfirmBtn');
+    const roleNote = document.getElementById('sameUnitRoleNote');
+    if (canEditExistingUnit()) {
+      confirmBtn.disabled = false;
+      confirmBtn.style.opacity = '';
+      confirmBtn.style.cursor = 'pointer';
+      roleNote.style.display = 'none';
+    } else {
+      confirmBtn.disabled = true;
+      confirmBtn.style.opacity = '0.45';
+      confirmBtn.style.cursor = 'not-allowed';
+      roleNote.style.display = 'block';
+    }
+
     modal.style.display = 'flex';
   }
 
@@ -1374,7 +1395,10 @@
 
   document.getElementById('sameUnitConfirmBtn').addEventListener('click', function() {
     if (!pendingUnitData) return;
-    const dataToSend = pendingUnitData;
+    // نبني نسخة بالبيانات + بيانات دخول المستخدم (authEmail/authPassword) — نفس نمط index.html.
+    // الباك-إند بيعيد التحقق منها (resolveUserForAuth_ + EDIT_UNIT) ويرفض غير المصرّح لهم.
+    // ما بنمسّش pendingUnitData الأصلي.
+    const dataToSend = Object.assign({}, pendingUnitData, getAuthCreds());
     const matchUnitId = document.getElementById('sameUnitModal').dataset.matchUnitId;
     closeSameUnitModal();
 
@@ -1386,7 +1410,13 @@
         submitBtn.disabled = false;
         submitBtn.textContent = "حفظ الوحدة";
         msg.className = res.success ? 'success' : 'error';
-        msg.textContent = res.message;
+        // رسالة أوضح لو الباك-إند رفض العملية لأسباب صلاحية (مثلاً دور تغيّر بعد الدخول).
+        if (!res.success && res.message && res.message.indexOf('مصرّح') !== -1) {
+          msg.textContent = "تحديث سعر أو بيانات وحدة موجودة يتطلب صلاحية مدير أو مالك"
+            + (matchUnitId ? " — الوحدة رقم " + matchUnitId : "") + ".";
+        } else {
+          msg.textContent = res.message;
+        }
         msg.style.display = 'block';
         if (res.success) {
           form.reset();
@@ -1470,6 +1500,24 @@
   // مش بتتخزن في localStorage/sessionStorage ولا بتظهر في الـ URL.
   let dataEntryPin = null;
 
+  // دور المستخدم الحالي (من ردّ verifyUserAccess). للواجهة فقط — الباك-إند هو الحَكَم
+  // النهائي ويعيد التحقق من الدور والصلاحية (EDIT_UNIT) في كل عملية عبر resolveUserForAuth_.
+  let currentUserRole = '';
+  // مرآة عميل فقط لِمن يملك EDIT_UNIT (مطابِقة لـ PERMISSIONS_BY_ROLE_ في Code.gs — OWNER/MANAGER).
+  const ROLES_WITH_EDIT_UNIT = ['OWNER', 'MANAGER'];
+  function canEditExistingUnit() {
+    // لو السيرفر ما رجّعش دور (نسخة قديمة) → ما نقيّدش الواجهة؛ الباك-إند هيرفض لو مش مصرّح.
+    return !currentUserRole || ROLES_WITH_EDIT_UNIT.indexOf(currentUserRole) !== -1;
+  }
+
+  // نفس نمط index.html: بيانات دخول المستخدم من localStorage (اتخزنت وقت verifyUserAccess).
+  // بتُرسل مع عملية "تحديث وحدة موجودة" عشان الباك-إند يتحقّق من الدور/الصلاحية.
+  function getAuthCreds() {
+    var e = '', p = '';
+    try { e = localStorage.getItem('loginEmail') || ''; p = localStorage.getItem('loginPassword') || ''; } catch (x) {}
+    return { authEmail: e, authPassword: p };
+  }
+
   function showApp() {
     document.getElementById('loginGate').style.display = 'none';
     document.getElementById('mainContainer').style.display = 'block';
@@ -1541,6 +1589,8 @@
             localStorage.setItem('loginEmail', email);
             localStorage.setItem('loginPassword', password);
           } catch (e) {}
+          // نحتفظ بالدور من ردّ السيرفر — للواجهة فقط (إظهار/إخفاء زر تحديث وحدة موجودة).
+          currentUserRole = (res && res.role) ? String(res.role).toUpperCase() : '';
           // حساب المستخدم صحيح — لكن الوصول لإدخال الوحدات لسه محتاج كلمة سر الإدخال
           showDataEntryPinStep();
         } else {
