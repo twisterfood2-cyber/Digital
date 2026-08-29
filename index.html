@@ -32,7 +32,7 @@
       --bg: #F1EFE8;               /* light working-surface base */
       --text: #10253A;            /* dark text on light surfaces */
       --text-light: #EAF0F6;      /* light text on dark surfaces */
-      --text-muted: #9CA9B7;      /* muted light text on dark surfaces */
+      --text-muted: #AEB9C6;      /* muted light text on dark surfaces — رُفع تباينه قليلًا للقراءة */
       --muted: #5E6B7A;           /* muted text on light surfaces */
       /* lines & borders */
       --border: rgba(16,37,58,0.14);        /* hairline on light */
@@ -84,7 +84,12 @@
       margin: 0;
       padding: 28px 24px 44px;
       color: var(--text-light);
+      /* قراءة عربية أفضل بخط Cairo: ارتفاع سطر مريح + إيقاف التباعد الحرفي الموجب
+         (يكسر وصل الحروف العربية بصريًا). المكوّنات ذات القياسات الثابتة بتتجاوزه. */
+      line-height: 1.6;
+      letter-spacing: 0;
       -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       text-rendering: optimizeLegibility;
     }
     /* premium glass depth: softens ONLY the city background behind the UI.
@@ -394,17 +399,17 @@
     .lightbox-prev { right: 20px; }
     .lightbox-next { left: 20px; }
 
-    .unit-id { font-size: 12px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px; }
+    .unit-id { font-size: 12px; color: var(--text-muted); font-weight: 700; letter-spacing: 0.4px; }
     .unit-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 2px 0 12px; padding: 2px 38px 0 44px; }
     .status-badge {
-      font-size: 11px; padding: 3px 9px; border-radius: 6px; font-weight: 700; letter-spacing: 0.3px;
+      font-size: 11px; padding: 3px 9px; border-radius: 6px; font-weight: 800; letter-spacing: 0; line-height: 1.35;
       background: rgba(30,110,69,0.16); color: #7FD3A3; border: 1px solid rgba(30,110,69,0.32);
     }
     .status-badge.محجوز { background: rgba(201,154,46,0.16); color: var(--gold-soft); border-color: rgba(201,154,46,0.35); }
     .status-badge.مباع { background: rgba(176,39,31,0.16); color: #E9908A; border-color: rgba(176,39,31,0.35); }
-    .unit-title { font-size: 15px; font-weight: 700; letter-spacing: 0.2px; margin-bottom: 5px; color: var(--text-light); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .unit-loc { font-size: 12px; color: rgba(234,240,246,0.82); font-weight: 600; margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .unit-added { font-size: 11px; color: var(--text-muted); margin-bottom: 12px; }
+    .unit-title { font-size: 15.5px; font-weight: 700; letter-spacing: 0; line-height: 1.4; margin-bottom: 5px; color: var(--text-light); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .unit-loc { font-size: 12px; color: rgba(234,240,246,0.9); font-weight: 600; line-height: 1.5; margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .unit-added { font-size: 11px; color: rgba(234,240,246,0.78); letter-spacing: 0; line-height: 1.5; margin-bottom: 12px; }
     .unit-info-block { min-height: 132px; }
     .unit-specs { display: flex; flex-wrap: wrap; gap: 7px; font-size: 12px; margin-bottom: 12px; min-height: 58px; align-content: flex-start; }
     .spec-chip {
@@ -421,13 +426,13 @@
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       text-align: center; overflow: hidden;
     }
-    .unit-price-box .old-price { text-decoration: line-through; color: rgba(234,240,246,0.5); font-size: 12px; font-weight: 600; line-height: 1.4; }
+    .unit-price-box .old-price { text-decoration: line-through; color: rgba(234,240,246,0.58); font-size: 12px; font-weight: 600; line-height: 1.4; }
     .unit-price-box .discount-tag {
       background: var(--gold); color: var(--navy-deep); font-size: 11px; font-weight: 800;
       padding: 2px 10px; border-radius: 999px; margin-right: 8px; line-height: 1.6;
     }
-    .unit-price-box .final-price { font-size: 21px; font-weight: 800; color: var(--gold-soft); letter-spacing: 0.3px; margin-top: 2px; line-height: 1.3; }
-    .unit-price-box .per-meter { font-size: 12px; font-weight: 600; color: rgba(234,240,246,0.72); margin-top: 3px; line-height: 1.4; }
+    .unit-price-box .final-price { font-size: 21px; font-weight: 800; color: var(--gold-soft); letter-spacing: 0.2px; margin-top: 2px; line-height: 1.3; }
+    .unit-price-box .per-meter { font-size: 12px; font-weight: 600; color: rgba(234,240,246,0.82); margin-top: 3px; line-height: 1.4; }
 
     /* كارت الوضع المالي الحالي لوحدات الريسيل */
     .resale-current-box {
@@ -438,7 +443,7 @@
     .resale-box-title { font-size: 12px; font-weight: 800; letter-spacing: 0.3px; color: var(--text-light); margin-bottom: 8px; }
     .resale-row-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; }
     .resale-item { display: flex; flex-direction: column; gap: 1px; }
-    .resale-current-box .resale-label { font-size: 10px; color: rgba(234,240,246,0.72); }
+    .resale-current-box .resale-label { font-size: 10.5px; color: rgba(234,240,246,0.82); }
     .resale-current-box .resale-value { font-size: 13px; font-weight: 800; color: var(--text-light); }
     .resale-current-box .resale-item.highlight .resale-value { color: var(--gold-soft); }
     .toggle-details-btn {
@@ -452,7 +457,7 @@
     .toggle-details-btn .chevron { transition: transform .2s; font-size: 10px; }
     .toggle-details-btn.open .chevron { transform: rotate(180deg); }
     .unit-extra {
-      font-size: 12px; color: rgba(234,240,246,0.72); line-height: 1.85;
+      font-size: 12px; color: rgba(234,240,246,0.82); line-height: 1.8;
       margin-top: 9px;
       padding: 11px 13px; border-radius: var(--radius-sm);
       background: rgba(6,19,33,0.45);
@@ -1144,6 +1149,8 @@
     #dashPanel-users .um-card:hover { border-color: var(--border-gold); }
     #dashPanel-users .um-card.is-owner { background: rgba(201,154,46,0.10); border-color: var(--gold); }
     #dashPanel-users .um-name { color: var(--text-light); }
+    /* تصحيح تباين: .um-sub كان بلون رمادي للأسطح الفاتحة (--muted) فوق لوح داكن → غير مقروء */
+    #dashPanel-users .um-sub { color: rgba(234,240,246,0.72); }
     #dashPanel-users .um-empty { color: var(--text-muted); }
 
     /* ===== المرحلة 3.6+ — الحضور (متصل الآن / آخر ظهور) + ملخّص المتصلين ===== */
@@ -1309,8 +1316,8 @@
     }
     .um-card.is-owner .um-avatar { border: 2px solid var(--gold); }
     .um-main { flex: 1; min-width: 0; }
-    .um-name { font-weight: 800; color: var(--navy); font-size: 13px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-    .um-sub { font-size: 11px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .um-name { font-weight: 800; color: var(--navy); font-size: 14px; letter-spacing: 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .um-sub { font-size: 11.5px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .um-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
     .um-badge {
       font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 999px; letter-spacing: .3px;
@@ -1650,7 +1657,7 @@
     .card-provenance {
       margin-top: 8px; padding-top: 8px;
       border-top: 1px dashed var(--line-dark);
-      font-size: 11px; color: var(--text-muted);
+      font-size: 11.5px; font-weight: 500; color: rgba(234,240,246,0.78);
       display: flex; align-items: center; gap: 8px; flex-wrap: nowrap;
     }
     .card-provenance .prov-dev,
@@ -4378,7 +4385,7 @@
           <div class="card-provenance">
             <span class="prov-dev">${u['Developer Name'] ? `${ICON.building} المطور: <a href="javascript:void(0)" onclick='showDeveloperProfile(${JSON.stringify(u['Developer Name'])})'>${u['Developer Name']}</a>` : ''}</span>
             ${isAdminUnlocked ? `<span class="prov-views" title="عدد مرات مشاهدة تفاصيل الوحدة (إداري)">${ICON.eye} <span class="views-num">${Number(u['Details View Count']) || 0}</span></span>` : ''}
-            <span class="prov-added">${u['Entered By'] ? `${ICON.user} أضافها: ${u['Entered By']}` : ''}</span>
+            <span class="prov-added" title="مُدخِل الوحدة">${u['Entered By'] ? `${ICON.user} ${u['Entered By']}` : ''}</span>
           </div>
         </div>
       </div>`;
