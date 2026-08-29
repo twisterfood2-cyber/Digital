@@ -2087,14 +2087,7 @@
   <!-- ===== عرض "الإحصائيات والمخزون" — مدمج داخل نفس الصفحة (مش iframe) ===== -->
   <section id="statsView" aria-label="لوحة الإحصائيات والمخزون">
     <h1>لوحة إحصائيات المخزون</h1>
-
-    <div class="lock-screen" id="lockScreen">
-      <div class="icon">🔒</div>
-      <h2>الصفحة دي محمية بكلمة سر لوحة التحكم</h2>
-      <input type="password" id="pinInput" placeholder="كلمة السر">
-      <button id="unlockBtn">دخول</button>
-      <div class="error-msg" id="lockError">كلمة السر غير صحيحة</div>
-    </div>
+    <!-- (أُزيلت شاشة قفل كلمة السر القديمة — الوصول مبنيّ على صلاحية VIEW_STATISTICS) -->
 
     <div id="dashboardContent">
       <button class="refresh-btn" id="refreshBtn">🔄 تحديث الإحصائيات</button>
@@ -2548,14 +2541,7 @@
   </div>
 </div>
 
-<!-- نافذة إدخال كلمة سر متمركزة (بديل عن prompt الافتراضي) -->
-<div class="admin-panel-overlay" id="pinPromptOverlay"></div>
-<div class="admin-panel" id="pinPromptModal" style="max-width:340px; text-align:center;">
-  <button class="close-panel" id="pinPromptCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-  <h3 id="pinPromptTitle" style="margin-bottom:14px;">كلمة السر</h3>
-  <input type="password" id="pinPromptInput" placeholder="اكتب كلمة السر..." style="width:100%; padding:12px 14px; border:1px solid var(--border); border-radius:8px; font-size:15px; text-align:center;">
-  <button type="button" id="pinPromptConfirmBtn" style="width:100%; margin-top:12px; padding:11px; border:none; border-radius:9px; background:var(--navy); color:var(--gold-soft); font-weight:700; font-size:14px; cursor:pointer;">تأكيد</button>
-</div>
+<!-- (أُزيلت نافذة كلمة سر الأقسام القديمة — التفويض بقى مبنيًّا على جلسة الدخول والدور فقط) -->
 
 <!-- مودال بروفايل المطور -->
 <div class="modal-overlay" id="developerProfileModal">
@@ -3270,28 +3256,10 @@
     }).getDistrictPriceStats();
   });
 
+  // زر قديم مخفي (استُبدل بـ navAddUnitBtn → #add). أي نقرة عليه تمرّ على نفس
+  // البوابة المبنيّة على الصلاحيات (unlockAddThen) عبر مسار الـ SPA — مافيش كلمة سر ثانوية.
   document.getElementById('addUnitFabBtn').addEventListener('click', function() {
-    // لو الأدمن متحقق منه بالفعل (داخل بكلمة سر لوحة التحكم)، نفتح الفورم على طول
-    // من غير ما نطلب كلمة سر منفصلة تانية - أدمن يبقى أدمن، مش محتاج تأكيد إضافي
-    if (isAdminUnlocked) {
-      unitWritePin = adminPin; // كلمة السر اللي هتتبعت للسيرفر مع عملية الحفظ (تحقّق سيرفر-سايد)
-      openAddUnitModal();
-      return;
-    }
-
-    askForPin('كلمة سر فتح شاشة إضافة وحدة جديدة:', function(pin) {
-      if (pin === null) return;
-      if (!pin.trim()) { showToast('لازم تدخل كلمة السر', 'error'); return; }
-
-      google.script.run.withSuccessHandler(function(isValid) {
-        if (!isValid) {
-          showToast('كلمة السر غير صحيحة', 'error');
-          return;
-        }
-        unitWritePin = pin; // كلمة السر اللي هتتبعت للسيرفر مع عملية الحفظ (تحقّق سيرفر-سايد)
-        openAddUnitModal();
-      }).verifyDataEntryPin(pin);
-    });
+    if (location.hash !== '#add') location.hash = 'add'; else if (typeof window.__aqarReroute === 'function') window.__aqarReroute();
   });
 
   function openAddUnitModal() {
@@ -3459,7 +3427,7 @@
 
   function cloneUnit(unitId) {
     editModalMode = 'clone';
-    unitWritePin = adminPin; // الاستنساخ متاح للأدمن فقط - نبعت كلمة سره للتحقق سيرفر-سايد
+    unitWritePin = ''; // التفويض عبر بيانات الدخول (getAuthCreds) والدور — السيرفر بيتحقق من CLONE_UNIT
     currentEditUnitId = null; // مفيش وحدة بنعدّل عليها، إحنا بنعمل وحدة جديدة
     document.getElementById('editUnitIdLabel').textContent = '(استنساخ من ' + unitId + ')';
     document.querySelector('#editModal .modal-title').firstChild.textContent = 'إضافة وحدة جديدة (استنساخ) ';
@@ -4380,11 +4348,11 @@
             <button type="button" class="icon-action-btn" onclick='shareOnWhatsApp(${JSON.stringify(u)})' title="مشاركة على واتساب">واتساب</button>
             <button type="button" class="icon-action-btn" onclick='downloadUnitPDF(${JSON.stringify(u)}, this)' title="تصدير PDF">PDF</button>
             <button type="button" class="icon-action-btn" onclick='showSimilarUnits(${JSON.stringify(u)})' title="وحدات مشابهة">مشابهة</button>
-            ${(isAdminUnlocked || (roleActive() && hasPermission('CLONE_UNIT'))) ? `<button type="button" class="icon-action-btn" onclick="cloneUnit('${u['Unit ID']}')" title="استنساخ الوحدة">نسخ</button>` : ''}
+            ${(roleActive() && hasPermission('CLONE_UNIT')) ? `<button type="button" class="icon-action-btn" onclick="cloneUnit('${u['Unit ID']}')" title="استنساخ الوحدة">نسخ</button>` : ''}
           </div>
           <div class="card-provenance">
             <span class="prov-dev">${u['Developer Name'] ? `${ICON.building} المطور: <a href="javascript:void(0)" onclick='showDeveloperProfile(${JSON.stringify(u['Developer Name'])})'>${u['Developer Name']}</a>` : ''}</span>
-            ${isAdminUnlocked ? `<span class="prov-views" title="عدد مرات مشاهدة تفاصيل الوحدة (إداري)">${ICON.eye} <span class="views-num">${Number(u['Details View Count']) || 0}</span></span>` : ''}
+            ${(roleActive() && hasPermission('VIEW_STATISTICS') && u['Details View Count'] !== undefined) ? `<span class="prov-views" title="عدد مرات مشاهدة تفاصيل الوحدة (إداري)">${ICON.eye} <span class="views-num">${Number(u['Details View Count']) || 0}</span></span>` : ''}
             <span class="prov-added" title="مُدخِل الوحدة">${u['Entered By'] ? `${ICON.user} ${u['Entered By']}` : ''}</span>
           </div>
         </div>
@@ -5202,12 +5170,12 @@
     Object.keys(clientSearchCache).forEach(k => delete clientSearchCache[k]);
   }
 
-  // كلمة سر لوحة التحكم اللي هنبعتها مع طلبات البحث - عشان السيرفر يرجّع الحقول
-  // الإدارية (عدّاد المشاهدة) للأدمن بس. السيرفر هو اللي بيتحقق منها؛ لو مش
-  // صحيحة أو فاضية بيتعامل مع المستخدم كسيلز ومابيرجعش العدّاد أصلاً.
+  // التفويض للحقول الإدارية في نتائج البحث (عدّاد المشاهدة) بقى مبنيًّا على جلسة
+  // الدخول والدور فقط — بنبعت بيانات دخول المستخدم الحالي، والسيرفر
+  // (stripAdminOnlyFields_ → authorizeAdminView_) بيقرّر: OWNER/MANAGER يشوفوا
+  // الحقل، غيرهم لأ. مافيش كلمة سر قسم ولا مفتاح مخزَّن في المتصفح.
   function getViewerAdminPin() {
-    if (typeof adminPin === 'string' && adminPin) return adminPin;
-    try { return localStorage.getItem('adminPin') || ''; } catch (e) { return ''; }
+    return (typeof getAuthCreds === 'function') ? getAuthCreds() : { authEmail: '', authPassword: '' };
   }
 
   function runSearch() {
@@ -5777,47 +5745,15 @@
   document.getElementById('editFetchLastSimilarBtn').addEventListener('click', editFetchLastSimilarUnitData);
 
   function openEditModal(unitId) {
-    // المرحلة 1: لو دور المستخدم مؤكَّد وفيه EDIT_UNIT (OWNER) → نفتح التعديل مباشرة
-    // من غير بوابة كلمة سر. الحفظ بيبعت بيانات الدخول والسيرفر بيتحقق من الدور.
+    // تفويض مبنيّ على الصلاحيات فقط: من دوره فيه EDIT_UNIT (OWNER/MANAGER) يفتح التعديل
+    // مباشرة؛ غير كده رفض واضح — مافيش بوابة كلمة سر ثانوية ولا مفتاح مخزَّن.
+    // التحقّق النهائي في السيرفر (authorizeUnitOp_ عند الحفظ).
     if (roleActive() && hasPermission('EDIT_UNIT')) {
       verifiedPin = '';
       loadUnitIntoEditForm(unitId);
       return;
     }
-    // لو كلمة السر متحفوظة من قبل في الجهاز، نستخدمها مباشرة من غير ما نطلبها تاني
-    let savedPin = '';
-    try { savedPin = localStorage.getItem('adminPin') || ''; } catch (e) {}
-
-    if (savedPin) {
-      google.script.run.withSuccessHandler(function(isValid) {
-        if (isValid) {
-          verifiedPin = savedPin;
-          loadUnitIntoEditForm(unitId);
-        } else {
-          try { localStorage.removeItem('adminPin'); } catch (e) {}
-          askForEditPin(unitId);
-        }
-      }).verifyAdminPin(savedPin);
-      return;
-    }
-    askForEditPin(unitId);
-  }
-
-  function askForEditPin(unitId) {
-    askForPin('أدخل كلمة سر التعديل:', function(pin) {
-      if (pin === null) return; // المستخدم دوس إلغاء
-      if (pin.trim() === '') { showToast('لازم تدخل كلمة السر', 'error'); return; }
-
-      google.script.run.withSuccessHandler(function(isValid) {
-        if (!isValid) {
-          showToast('كلمة السر غير صحيحة - غير مصرح لك بالتعديل', 'error');
-          return;
-        }
-        try { localStorage.setItem('adminPin', pin); } catch (e) {}
-        verifiedPin = pin;
-        loadUnitIntoEditForm(unitId);
-      }).verifyAdminPin(pin);
-    });
+    showToast('صلاحيتك الحالية لا تسمح بتعديل بيانات الوحدات', 'error');
   }
 
   function loadUnitIntoEditForm(unitId) {
@@ -6319,34 +6255,14 @@
     setTimeout(function() {
       visitorName = getVisitorName();
       loadCoverImage();
-      silentlyCheckAdminStatus();
+      // نظّف أي مفتاح كلمة سر قسم قديم متبقّي في المتصفح (لم يعد يُستخدم كتفويض إطلاقًا).
+      try { localStorage.removeItem('adminPin'); } catch (e) {}
     }, 1000);
 
     setTimeout(function() {
       sendHeartbeat();
       setInterval(sendHeartbeat, 45000);
     }, 1500);
-  }
-
-  // فحص صامت في الخلفية: لو كلمة سر الأدمن متحفوظة من قبل في الجهاز،
-  // نتأكد منها من غير ما نفتح لوحة التحكم، عشان زرار الاستنساخ يظهر تلقائيًا
-  function silentlyCheckAdminStatus() {
-    let savedPin = '';
-    try { savedPin = localStorage.getItem('adminPin') || ''; } catch (e) {}
-    if (!savedPin) return;
-    google.script.run.withSuccessHandler(function(isValid) {
-      if (isValid) {
-        adminPin = savedPin;
-        isAdminUnlocked = true;
-        // لو نتيجة التحميل الأول لسه ما وصلتش، متعملش إعادة رسم دلوقتي -
-        // ده بيمنع ظهور رسالة "مفيش نتائج" غلط لما lastResults لسه []
-        // الافتراضية. الرسم الحقيقي اللي هيجي من getInitialSearchData()
-        // هيعكس isAdminUnlocked صح من غير ما نحتاج نرسم هنا خالص
-        if (initialResultsReady) {
-          renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
-        }
-      }
-    }).verifyAdminPin(savedPin);
   }
 
   /* ---------- بوابة دخول المستخدمين ---------- */
@@ -6485,88 +6401,19 @@
   const adminFab = document.getElementById('adminFab');
   const adminPanel = document.getElementById('adminPanel');
   const liveCountValue = document.getElementById('liveCountValue');
-  let adminPin = null;
 
-  /* ---------- نافذة كلمة سر متمركزة (بديل prompt) ---------- */
-  const pinPromptOverlay = document.getElementById('pinPromptOverlay');
-  const pinPromptModal = document.getElementById('pinPromptModal');
-  const pinPromptInput = document.getElementById('pinPromptInput');
-  let pinPromptCallback = null;
-
-  function askForPin(title, callback) {
-    document.getElementById('pinPromptTitle').textContent = title;
-    pinPromptInput.value = '';
-    pinPromptCallback = callback;
-    pinPromptOverlay.classList.add('open');
-    pinPromptModal.classList.add('open');
-    setTimeout(() => pinPromptInput.focus(), 100);
-  }
-
-  function closePinPrompt(resultValue) {
-    pinPromptOverlay.classList.remove('open');
-    pinPromptModal.classList.remove('open');
-    const cb = pinPromptCallback;
-    pinPromptCallback = null;
-    if (cb) cb(resultValue);
-  }
-
-  document.getElementById('pinPromptCloseBtn').addEventListener('click', () => closePinPrompt(null));
-  pinPromptOverlay.addEventListener('click', () => closePinPrompt(null));
-  document.getElementById('pinPromptConfirmBtn').addEventListener('click', function() {
-    closePinPrompt(pinPromptInput.value);
-  });
-  pinPromptInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') closePinPrompt(pinPromptInput.value);
-  });
-
-
-  let isAdminUnlocked = false;
+  // بقايا نظام كلمات سر الأقسام القديم — لم تعد تُكتب ولا تُستخدم كتفويض.
+  // كل الوصول للأقسام المحمية مبنيّ على جلسة الدخول والدور (hasPermission).
+  // نُبقيها معرّفة فقط لتفادي مراجع قديمة متبقّية؛ قيمتها ثابتة.
+  const adminPin = null;
+  const isAdminUnlocked = false;
   let liveCountTimer = null;
 
   adminFab.addEventListener('click', function() {
-    // المرحلة 3.4: زر "لوحة الإدارة" بقى يفتح لوحة التحكم كعرض صفحة كامل (#dashboard)
-    // بدل المودال المنزلق. نفس بوابة التفويض بالظبط (verifyAdminPin أو دور فيه
-    // VIEW_STATISTICS) — الفرق في العرض فقط. لو الجسر مش جاهز لأي سبب، نرجع للسلوك القديم.
-    if (typeof window.__aqarOpenDashboard === 'function') { window.__aqarOpenDashboard(); return; }
-    if (adminPanel.classList.contains('open')) { closeAdminPanel(); return; }
-    let savedPin = '';
-    try { savedPin = localStorage.getItem('adminPin') || ''; } catch (e) {}
-    if (savedPin) {
-      google.script.run.withSuccessHandler(function(isValid) {
-        if (isValid) { openAdminPanelWithPin(savedPin); }
-        else { try { localStorage.removeItem('adminPin'); } catch (e) {} askForAdminPin(); }
-      }).verifyAdminPin(savedPin);
-      return;
-    }
-    askForAdminPin();
+    // زر "لوحة الإدارة" → لوحة التحكم كعرض صفحة كامل (#dashboard). التفويض مبنيّ على
+    // جلسة الدخول والدور فقط (unlockDashboardThen → VIEW_STATISTICS). مافيش كلمة سر قسم.
+    if (typeof window.__aqarOpenDashboard === 'function') window.__aqarOpenDashboard();
   });
-
-  function askForAdminPin() {
-    askForPin('كلمة سر لوحة التحكم:', function(pin) {
-      if (pin === null) return;
-      if (!pin.trim()) { showToast('لازم تدخل كلمة السر', 'error'); return; }
-      google.script.run.withSuccessHandler(function(isValid) {
-        if (!isValid) { showToast('كلمة السر غير صحيحة', 'error'); return; }
-        try { localStorage.setItem('adminPin', pin); } catch (e) {}
-        openAdminPanelWithPin(pin);
-      }).verifyAdminPin(pin);
-    });
-  }
-
-  function openAdminPanelWithPin(pin) {
-    adminPin = pin;
-    if (!isAdminUnlocked) {
-      isAdminUnlocked = true;
-      renderResults(sortUnits(lastResults, document.getElementById('f_sort').value)); // عشان زرار الاستنساخ يظهر فورًا
-      // إعادة جلب نتائج البحث بكلمة سر الأدمن عشان عدّاد المشاهدة (حقل إداري) يوصل من السيرفر
-      clearClientSearchCache();
-      runSearch();
-    }
-    adminPanel.classList.add('open');
-    document.getElementById('adminPanelOverlay').classList.add('open');
-    refreshLiveCount();
-    liveCountTimer = setInterval(refreshLiveCount, 10000);
-  }
 
   function closeAdminPanel() {
     adminPanel.classList.remove('open');
@@ -6576,23 +6423,19 @@
   document.getElementById('adminPanelClose').addEventListener('click', closeAdminPanel);
   document.getElementById('adminPanelOverlay').addEventListener('click', closeAdminPanel);
 
-  // تسجيل خروج الإدارة: إنهاء صلاحية الأدمن الحالية (نفس متغيّرات الحالة الموجودة،
-  // مش نظام login جديد). بعده: عدّاد المشاهدة يختفي من الكروت (لا في الواجهة ولا
-  // في بيانات الـ response لأن البحث بيتعاد من غير كلمة سر)، ولوحة الإحصائيات تترجع
-  // مقفولة. مابيمسّش جلسة "إدخال وحدة" (كلمة سر مختلفة).
+  // "تسجيل خروج الإدارة" (يُستدعى من زر خروج لوحة التحكم): يقفل عرض الإحصائيات،
+  // يغلق أي لوحة قديمة، وينظّف أي مفتاح كلمة سر متبقٍّ، ثم يعيد جلب النتائج بدون
+  // امتيازات إدارية. لا يمسّ جلسة تسجيل الدخول للمستخدم.
   document.getElementById('adminLogoutBtn').addEventListener('click', function() {
-    adminPin = null;
-    isAdminUnlocked = false;
     try { localStorage.removeItem('adminPin'); } catch (e) {}
     if (typeof window.__aqarStatsLock === 'function') window.__aqarStatsLock();
     closeAdminPanel();
     clearClientSearchCache();
-    runSearch(); // إعادة جلب النتائج من غير كلمة سر → السيرفر مايرجعش العدّاد + إعادة رسم من غير الخانة
+    runSearch();
     showToast('تم تسجيل خروج الإدارة', 'success');
   });
 
   function refreshLiveCount() {
-    if (!adminPin) return;
     google.script.run.withSuccessHandler(function(res) {
       if (res.success) {
         liveCountValue.textContent = res.count;
@@ -6606,11 +6449,10 @@
           listDiv.innerHTML = '';
         }
       }
-    }).getActiveUsersCount(adminPin);
+    }).getActiveUsersCount(getAuthCreds());
   }
 
   document.getElementById('coverUploadBtn').addEventListener('click', function() {
-    if (!adminPin) return;
     const fileInput = document.getElementById('coverFileInput');
     const file = fileInput.files[0];
     const msg = document.getElementById('coverMsg');
@@ -6637,7 +6479,7 @@
           msg.className = 'error';
           msg.textContent = 'حدث خطأ: ' + err.message;
         })
-        .uploadCoverImage(base64Data, file.type, adminPin);
+        .uploadCoverImage(base64Data, file.type, getAuthCreds());
     };
     reader.readAsDataURL(file);
   });
@@ -7437,9 +7279,6 @@
         window.__aqarStatsUnlock(Object.assign({ pin: '' }, getAuthCreds()));
         onOk(); return;
       }
-      if (typeof isAdminUnlocked !== 'undefined' && isAdminUnlocked && adminPin) { // جلسة أدمن مفتوحة داخل نفس الجلسة (مش reload)
-        window.__aqarStatsUnlock(adminPin); onOk(); return;
-      }
       if (sessionRestorePending_()) return;
       denyGatedSection_('stats', 'صلاحيتك الحالية لا تسمح بعرض الإحصائيات والمخزون');
     }
@@ -7448,9 +7287,6 @@
       if (addUnlocked()) { onOk(); return; }
       // دور مؤكَّد فيه ADD_UNIT (OWNER / DATA_ENTRY) → يفتح مباشرة
       if (gateHasPerm_('ADD_UNIT')) { addUnlockedFlag = true; onOk(); return; }
-      if (typeof isAdminUnlocked !== 'undefined' && isAdminUnlocked && adminPin) {
-        addVerifiedPin = adminPin; addUnlockedFlag = true; onOk(); return;
-      }
       if (sessionRestorePending_()) return;
       denyGatedSection_('add', 'صلاحيتك الحالية لا تسمح بإضافة وحدات');
     }
@@ -7505,11 +7341,7 @@
       if (dashUnlocked()) { onOk(); return; }
       // دور مؤكَّد فيه VIEW_STATISTICS (OWNER / MANAGER) → دخول مباشر، السيرفر بيتحقق بالدور.
       if (gateHasPerm_('VIEW_STATISTICS')) { dashUnlockedFlag = true; onOk(); return; }
-      // جلسة أدمن مفتوحة داخل نفس الجلسة (مش reload)
-      if (typeof isAdminUnlocked !== 'undefined' && isAdminUnlocked && typeof adminPin !== 'undefined' && adminPin) {
-        dashUnlockedFlag = true; onOk(); return;
-      }
-      if (sessionRestorePending_()) return;   // المرحلة 3.6: استنى استعادة الجلسة — بلا بوابة كلمة سر ثانوية
+      if (sessionRestorePending_()) return;   // استنى استعادة الجلسة بعد إعادة التحميل — بلا أي بوابة كلمة سر
       denyGatedSection_('dashboard', 'صلاحيتك الحالية لا تسمح بفتح لوحة التحكم');
     }
 
@@ -7793,28 +7625,14 @@
       return Number(n).toLocaleString('en-US');
     }
 
-    document.getElementById('unlockBtn').addEventListener('click', tryUnlock);
-    document.getElementById('pinInput').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') tryUnlock();
-    });
-
     function unlockDashboard(pin) {
+      // pin هنا = كائن بيانات الدخول القادم من الـ shell (unlockStatsThen) بعد
+      // التحقق من صلاحية VIEW_STATISTICS. يُحفظ مؤقتًا في الذاكرة فقط.
       currentPin = pin;
-      document.getElementById('lockScreen').style.display = 'none';
+      var lock = document.getElementById('lockScreen');
+      if (lock) lock.style.display = 'none';
       document.getElementById('dashboardContent').style.display = 'block';
       loadStats();
-    }
-
-    function tryUnlock() {
-      const pin = document.getElementById('pinInput').value;
-      if (!pin) return;
-      google.script.run.withSuccessHandler(function(isValid) {
-        if (!isValid) {
-          document.getElementById('lockError').style.display = 'block';
-          return;
-        }
-        unlockDashboard(pin);
-      }).verifyAdminPin(pin);
     }
 
     // جسر مع الـ shell: الـ shell بيتحقق من كلمة السر ثم بيمرّرها هنا (مؤقتًا في الذاكرة فقط)
