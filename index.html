@@ -275,8 +275,9 @@
     .results-grid {
       display: grid;
       /* auto-fill + minmax: عدد الكروت في الصف بيزيد تلقائيًا مع عرض الحاوية.
-         الحد الأدنى 300px (تخفيف بسيط من 320 عشان تظهر ~5 كروت من ≥1600px). */
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+         min(100%, 300px): الحد الأدنى للمسار لا يتعدّى عرض الحاوية أبدًا → المسار
+         (والكارت) مايفيضش أفقيًا عن #mainContainer مهما ضاقت النافذة. */
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
       gap: 18px;
       direction: rtl;
       /* stretch = each card fills its own grid row's track height, so cards that
@@ -295,6 +296,10 @@
       border-right: 2px solid rgba(201,154,46,0.5);
       border-radius: var(--radius-md);
       padding: 18px;
+      /* السبب الجذري لطفح الموبايل: عنصر الشبكة افتراضيًا min-width:auto، فالعناوين
+         بـ white-space:nowrap كانت توسّع مسار 1fr خارج حدود الحاوية. الصفر يسمح
+         للكارت بالانكماش لعرض مساره، ويشتغل الـ ellipsis على .unit-title/.unit-loc. */
+      min-width: 0;
       box-shadow: var(--shadow-card);
       transition: transform var(--ease), border-color var(--ease), background-color var(--ease);
       position: relative;
@@ -1791,8 +1796,9 @@
       .top-action-btn { min-width: calc(50% - 4px); max-width: none; font-size: 12px; padding: 10px 12px; }
       /* #appNav stays ONE row on mobile too — it scrolls horizontally (see base rule) */
       #appNav .app-nav-btn { font-size: 12px; padding: 8px 10px; min-width: max-content; }
-      .grid { grid-template-columns: 1fr 1fr; gap: 10px 12px; }
-      .results-grid { grid-template-columns: 1fr; gap: 14px; }
+      .grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px 12px; }
+      /* minmax(0,1fr) مش 1fr: عمود واحد لا يتوسّع بمحتوى غير قابل للّف (nowrap) خارج الحاوية */
+      .results-grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
       /* single column: cards no longer share a row, so drop the reserved footer
          height to avoid empty space under cards without a developer/owner row */
       .card-actions-bottom { min-height: 0; }
@@ -1811,7 +1817,7 @@
     @media (max-width: 420px) {
       .top-action-btn { min-width: calc(50% - 4px); font-size: 11px; padding: 10px 8px; gap: 6px; }
       .top-action-btn svg { width: 15px; height: 15px; }
-      .grid { grid-template-columns: 1fr; }
+      .grid { grid-template-columns: minmax(0, 1fr); }
     }
 
     /* ===== icon fine-tuning ===== */
@@ -2140,7 +2146,12 @@
       </div>
 
       <div class="section">
-        <h3>الأكتر طلبًا (تصدير PDF ومشاركة واتساب)</h3>
+        <h3>التفاعل مع الوحدات (تصدير PDF ومشاركة واتساب)</h3>
+        <div class="kpi-grid" style="margin-bottom:14px;">
+          <div class="kpi-card"><div class="kpi-value" id="statTotalPdf">-</div><div class="kpi-label">إجمالي تصدير PDF (كل الموقع)</div></div>
+          <div class="kpi-card"><div class="kpi-value" id="statTotalWhatsApp">-</div><div class="kpi-label">إجمالي مشاركة واتساب (كل الموقع)</div></div>
+        </div>
+        <h3 style="font-size:12px;">أعلى 10 وحدات تفاعلًا</h3>
         <table id="mostRequestedTable">
           <thead>
             <tr><th>رقم الوحدة</th><th>المشروع</th><th>PDF</th><th>واتساب</th><th>الإجمالي</th></tr>
@@ -7160,17 +7171,13 @@
   });
 
   /* ============================================================
-   * التنقّل الموحّد داخل نفس النافذة (SPA): البحث / إدخال وحدة / الإحصائيات والمخزون
-   * - كل الأقسام تعرض داخل نفس المستند — مفيش iframe.
-   * - "إدخال وحدة" يمرّ بنفس بوابة كلمة السر والمودال الحاليين (#addUnitFabBtn).
-   * - "الإحصائيات والمخزون" عرض مدمج (#statsView) في نفس الصفحة. التفويض:
-   *     · الـ shell يطلب كلمة سر لوحة التحكم مرّة واحدة (askForPin + verifyAdminPin)
-   *       أو يستخدم جلسة الأدمن المفتوحة بالفعل.
-   *     · بعد التحقق: window.__aqarStatsUnlock(pin) بيحط الـ pin في متغيّر مؤقت
-   *       جوّه الـ IIFE بتاع اللوحة (مش localStorage / مش URL / مش HTML ظاهر)،
-   *       وكل نداء بيانات للوحة بيبعت الـ pin، والسيرفر بيتحقق منه في كل مرة
-   *       (getDashboardStats / getMostRequestedUnits / ... كلها بتفحص ADMIN_PIN).
-   * - التنقّل عبر hash (#stats) — client-side بحت، مش بيلمس راوتنج Apps Script (?page=...).
+   * التنقّل الموحّد داخل نفس النافذة (SPA): البحث / إدخال وحدة / الإحصائيات والمخزون / لوحة التحكم
+   * - كل الأقسام تُعرض داخل نفس المستند — مفيش iframe ولا صفحة منفصلة.
+   * - التفويض لكل قسم مبنيّ على جلسة الدخول والدور فقط (gateHasPerm_ / hasPermission):
+   *     له الصلاحية → يفتح مباشرة؛ الجلسة تُستعاد → يؤجَّل ثم __aqarReroute؛ داخل بلا صلاحية → رفض.
+   *   مافيش أي كلمة سر قسم / prompt / verifyAdminPin / verifyDataEntryPin.
+   * - بعد التحقق: window.__aqarStatsUnlock(auth) بيمرّر كائن بيانات الدخول للموديول (بالذاكرة فقط).
+   * - التنقّل عبر hash (#stats / #add / #dashboard) — client-side بحت، مش بيلمس راوتنج Apps Script.
    * ============================================================ */
   (function initUnifiedNav() {
     var navSearchBtn  = document.getElementById('navSearchBtn');
@@ -7629,25 +7636,20 @@
       // pin هنا = كائن بيانات الدخول القادم من الـ shell (unlockStatsThen) بعد
       // التحقق من صلاحية VIEW_STATISTICS. يُحفظ مؤقتًا في الذاكرة فقط.
       currentPin = pin;
-      var lock = document.getElementById('lockScreen');
-      if (lock) lock.style.display = 'none';
       document.getElementById('dashboardContent').style.display = 'block';
       loadStats();
     }
 
-    // جسر مع الـ shell: الـ shell بيتحقق من كلمة السر ثم بيمرّرها هنا (مؤقتًا في الذاكرة فقط)
+    // جسر مع الـ shell: بعد تحقق الصلاحية (VIEW_STATISTICS) بيمرّر كائن بيانات الدخول هنا (بالذاكرة فقط)
     window.__aqarStatsUnlock = function(pin) {
       if (currentPin) { return; }        // اتفتحت قبل كده
       unlockDashboard(pin);
     };
     window.__aqarStatsUnlocked = function() { return !!currentPin; };
-    // قفل لوحة الإحصائيات عند تسجيل خروج الإدارة - بتُمسح كلمة السر من الذاكرة
-    // وترجع شاشة القفل، فأي فتح تاني بيطلب الكلمة من جديد
+    // قفل عرض الإحصائيات (عند "تسجيل خروج الإدارة"): يمسح التفويض من الذاكرة ويخفي المحتوى.
     window.__aqarStatsLock = function() {
       currentPin = null;
-      var lock = document.getElementById('lockScreen');
       var content = document.getElementById('dashboardContent');
-      if (lock) lock.style.display = '';
       if (content) content.style.display = 'none';
     };
 
@@ -7694,8 +7696,12 @@
       tbody.innerHTML = '<tr><td colspan="5" class="empty-note">جاري التحميل...</td></tr>';
       google.script.run.withSuccessHandler(function(res) {
         if (!res.success) { tbody.innerHTML = '<tr><td colspan="5" class="empty-note">' + res.message + '</td></tr>'; return; }
+        var pdfEl = document.getElementById('statTotalPdf');
+        var waEl = document.getElementById('statTotalWhatsApp');
+        if (pdfEl) pdfEl.textContent = fmtNum(res.totalPdf != null ? res.totalPdf : (res.units || []).reduce(function(s,u){return s+(u.pdfCount||0);},0));
+        if (waEl) waEl.textContent = fmtNum(res.totalWhatsApp != null ? res.totalWhatsApp : (res.units || []).reduce(function(s,u){return s+(u.whatsappCount||0);},0));
         if (!res.units.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-note">لا توجد بيانات بعد</td></tr>'; return; }
-        tbody.innerHTML = res.units.map(u => `
+        tbody.innerHTML = res.units.slice(0, 10).map(u => `
           <tr>
             <td>${u.unitId}</td>
             <td>${u.projectName || '-'}</td>
