@@ -2379,6 +2379,11 @@
           <label>اسم المشروع</label>
           <input type="text" name="projectName" list="editProjectDatalist" autocomplete="off">
           <datalist id="editProjectDatalist"></datalist>
+          <!-- المرحلة 3.2: زر يدوي فقط — نفس سلوك add.html. تغيير اسم المشروع **لا** يجيب بيانات آخر وحدة تلقائيًا
+               (عشان متتعارضش مع بيانات الذكاء الاصطناعي). التعبئة من آخر وحدة تحصل فقط عند الضغط على الزر ده. -->
+          <button type="button" id="editFetchLastSimilarBtn" style="margin-top:6px; width:100%; padding:9px; border:1px solid rgba(255,255,255,0.14); border-radius:var(--radius-sm); background:rgba(255,255,255,0.06); color:var(--text-light); font-weight:700; font-size:12px; cursor:pointer;">
+            🔄 جيب بيانات آخر وحدة مشابهة
+          </button>
         </div>
       </div>
 
@@ -2923,6 +2928,7 @@
     editSaveBtn.textContent = 'حفظ الوحدة الجديدة';
     editDeleteBtn.style.display = 'none';
     editResetBtn.style.display = ''; // زر "تفريغ النموذج" يظهر في وضع إضافة وحدة فقط (زي add.html)
+    document.getElementById('editFetchLastSimilarBtn').style.display = ''; // زر "جيب آخر وحدة مشابهة" — وضع الإضافة فقط (زي add.html)
     editMsg.style.display = 'none';
     editMsg.className = '';
 
@@ -3085,6 +3091,7 @@
     editSaveBtn.textContent = 'إضافة كوحدة جديدة';
     editDeleteBtn.style.display = 'none';
     editResetBtn.style.display = 'none'; // "تفريغ النموذج" لوضع الإضافة العادية فقط (مش الاستنساخ)
+    document.getElementById('editFetchLastSimilarBtn').style.display = 'none'; // "جيب آخر وحدة مشابهة" — إضافة عادية فقط
     editMsg.style.display = 'none';
     document.getElementById('unitAddAiSection').style.display = 'none';
     editModal.classList.add('open');
@@ -3812,8 +3819,8 @@
   var CLIENT_BASE_PERMS = ['VIEW_UNITS','SEARCH_UNITS','FILTER_UNITS','VIEW_UNIT_DETAILS','SHARE_UNIT','EXPORT_UNIT','EXPORT_COMPARISON','CREATE_OFFER'];
   var CLIENT_PERMS = {
     OWNER:      ['*'],
-    MANAGER:    CLIENT_BASE_PERMS.concat(['ADD_UNIT','EDIT_UNIT','DELETE_UNIT','CLONE_UNIT','CHANGE_UNIT_STATUS','VIEW_STATISTICS']),
-    DATA_ENTRY: CLIENT_BASE_PERMS.concat(['ADD_UNIT']),
+    MANAGER:    CLIENT_BASE_PERMS.concat(['ADD_UNIT','EDIT_UNIT','DELETE_UNIT','CLONE_UNIT','CHANGE_UNIT_STATUS','VIEW_STATISTICS','UPDATE_UNIT_TERMS']),
+    DATA_ENTRY: CLIENT_BASE_PERMS.concat(['ADD_UNIT','UPDATE_UNIT_TERMS']),
     SALES:      CLIENT_BASE_PERMS.slice()
   };
   function currentUserRole() {
@@ -5342,33 +5349,46 @@
   }
   editDeveloperInput.addEventListener('input', refreshEditProjectSuggestions);
 
-  editProjectNameInput.addEventListener('input', function() {
+  // المرحلة 3.2: تغيير اسم المشروع **لا** يجيب بيانات آخر وحدة تلقائيًا — نفس سلوك add.html
+  // بالظبط (اتشال الربط التلقائي عشان متعارضش مع تعبئة الذكاء الاصطناعي على نفس الخانات).
+  // التعبئة من آخر وحدة تحصل فقط عند الضغط اليدوي على زر #editFetchLastSimilarBtn.
+  // 1:1 مع add.html: fetchLastSimilarUnitData().
+  function editFetchLastSimilarUnitData() {
     const dev = editDeveloperInput.value.trim();
     const proj = editProjectNameInput.value.trim();
+    if (!dev || !proj) {
+      showToast('لازم تكتب اسم المطور واسم المشروع الأول', 'error');
+      return;
+    }
     const info = editDevProjectMap.map[dev] && editDevProjectMap.map[dev][proj];
-    if (info && info.city) {
+    if (!info) {
+      showToast('مفيش وحدة سابقة مسجلة بنفس المطور والمشروع دول', 'error');
+      return;
+    }
+    if (info.city) {
       editCitySelect.value = info.city;
       populateDistrictSelect(editDistrictSelect, info.city, false, info.district);
     }
-    if (info) {
-      const currentType = editForm.elements['propertyType'].value;
-      if (currentType) {
-        google.script.run.withSuccessHandler(function(typeDefaults) {
-          if (!typeDefaults) return;
-          if (typeDefaults.finishing) editForm.elements['finishing'].value = typeDefaults.finishing;
-          if (typeDefaults.view) editForm.elements['view'].value = typeDefaults.view;
-          if (typeDefaults.paymentMethod) editForm.elements['paymentMethod'].value = typeDefaults.paymentMethod;
-          if (typeDefaults.downPayment) editForm.elements['downPayment'].value = typeDefaults.downPayment;
-          if (typeDefaults.downPaymentBase) editForm.elements['downPaymentBase'].value = typeDefaults.downPaymentBase;
-          if (typeDefaults.installmentYears) editForm.elements['installmentYears'].value = typeDefaults.installmentYears;
-          if (typeDefaults.deliveryDate) editForm.elements['deliveryDate'].value = typeDefaults.deliveryDate;
-          if (typeDefaults.otherPaymentPlans) editForm.elements['otherPaymentPlans'].value = typeDefaults.otherPaymentPlans;
-          calcEditMonthlyInstallment();
-          showToast('اتملت بيانات الدفع والتشطيب تلقائيًا من آخر وحدة بنفس المشروع والنوع', 'info');
-        }).getProjectTypeDefaults(dev, proj, currentType);
-      }
+    const currentType = editForm.elements['propertyType'].value;
+    if (!currentType) {
+      showToast('اختار نوع العقار الأول عشان نجيب بيانات مطابقة', 'error');
+      return;
     }
-  });
+    google.script.run.withSuccessHandler(function(typeDefaults) {
+      if (!typeDefaults) { showToast('مفيش بيانات كفاية لنفس نوع العقار ده في المشروع', 'error'); return; }
+      if (typeDefaults.finishing) editForm.elements['finishing'].value = typeDefaults.finishing;
+      if (typeDefaults.view) editForm.elements['view'].value = typeDefaults.view;
+      if (typeDefaults.paymentMethod) editForm.elements['paymentMethod'].value = typeDefaults.paymentMethod;
+      if (typeDefaults.downPayment) editForm.elements['downPayment'].value = typeDefaults.downPayment;
+      if (typeDefaults.downPaymentBase) editForm.elements['downPaymentBase'].value = typeDefaults.downPaymentBase;
+      if (typeDefaults.installmentYears) editForm.elements['installmentYears'].value = typeDefaults.installmentYears;
+      if (typeDefaults.deliveryDate) editForm.elements['deliveryDate'].value = typeDefaults.deliveryDate;
+      if (typeDefaults.otherPaymentPlans) editForm.elements['otherPaymentPlans'].value = typeDefaults.otherPaymentPlans;
+      calcEditMonthlyInstallment();
+      showToast('اتملت بيانات الدفع والتشطيب تلقائيًا من آخر وحدة بنفس المشروع والنوع - راجعها وعدّل اللي محتاج تغيير', 'info');
+    }).getProjectTypeDefaults(dev, proj, currentType);
+  }
+  document.getElementById('editFetchLastSimilarBtn').addEventListener('click', editFetchLastSimilarUnitData);
 
   function openEditModal(unitId) {
     // المرحلة 1: لو دور المستخدم مؤكَّد وفيه EDIT_UNIT (OWNER) → نفتح التعديل مباشرة
@@ -5422,6 +5442,7 @@
     editSaveBtn.textContent = 'حفظ التعديلات';
     editDeleteBtn.style.display = uiAllows('DELETE_UNIT') ? '' : 'none'; // المرحلة 1: الحذف لـ OWNER (أو ADMIN_PIN) فقط
     editResetBtn.style.display = 'none'; // "تفريغ النموذج" لوضع الإضافة فقط
+    document.getElementById('editFetchLastSimilarBtn').style.display = 'none'; // "جيب آخر وحدة مشابهة" — وضع الإضافة فقط
     editMsg.style.display = 'none';
     document.getElementById('unitAddAiSection').style.display = 'block';
     document.getElementById('unitAddAiPasteText').value = '';
@@ -5663,17 +5684,30 @@
           if (res.possibleMatch) {
             editMsg.className = '';
             editMsg.style.display = 'block';
-            // "نفس الوحدة - حدّث" = تعديل سجل موجود → لأصحاب EDIT_UNIT فقط (المدير/المالك).
-            // موظف الإدخال يشوف "وحدة مختلفة" فقط. السيرفر يرفض confirmAddAsSameUnit من غير EDIT_UNIT.
-            var _canUpdateExisting = uiAllows('EDIT_UNIT');
+            // المرحلة 3.1:
+            //  - EDIT_UNIT (OWNER/MANAGER): "نفس الوحدة - حدّث" = تعديل كامل عبر confirmAddAsSameUnit — سلوك قائم بدون تغيير.
+            //  - UPDATE_UNIT_TERMS بدون EDIT_UNIT (DATA_ENTRY): "نفس الوحدة — تحديث السعر ونظام السداد" =
+            //    updateUnitCommercialTerms (السعر + الخصم + المقدم + التقسيط + الدفعات + جدول/طريقة السداد فقط؛
+            //    بيانات الوحدة/الهوية لا تتغيّر). نرسل مجموعة مفاتيح تجارية محدّدة فقط — لا الهوية.
+            //  السيرفر هو الحَكَم: confirmAddAsSameUnit يطلب EDIT_UNIT، updateUnitCommercialTerms يطلب UPDATE_UNIT_TERMS
+            //  ولا يقرأ/يكتب أي حقل هوية إطلاقًا.
+            var _canFullUpdate = uiAllows('EDIT_UNIT');
+            var _canTermsUpdate = !_canFullUpdate && uiAllows('UPDATE_UNIT_TERMS');
+            var _sameBtnHtml = '';
+            if (_canFullUpdate) {
+              _sameBtnHtml = `<button type="button" id="editSameUnitBtn" style="flex:1; padding:9px; border:none; border-radius:8px; background:var(--navy); color:var(--gold-soft); font-weight:700; font-size:12px; cursor:pointer;">نفس الوحدة - حدّث</button>`;
+            } else if (_canTermsUpdate) {
+              _sameBtnHtml = `<button type="button" id="editSameTermsBtn" style="flex:1; padding:9px; border:none; border-radius:8px; background:var(--navy); color:var(--gold-soft); font-weight:700; font-size:12px; cursor:pointer;">نفس الوحدة — تحديث السعر ونظام السداد</button>`;
+            }
             editMsg.innerHTML = `
               <div style="margin-bottom:8px;">${res.message}</div>
+              ${_canTermsUpdate ? `<div style="margin-bottom:8px; font-size:11px; color:var(--muted);">سيتم تحديث السعر ونظام السداد فقط (الخصم/المقدم/التقسيط/الدفعات/الجدول). بيانات الوحدة (المطور/المشروع/المساحة/الدور/التشطيب/الفيو...) تبقى كما هي.</div>` : ''}
               <div style="display:flex; gap:8px;">
-                ${_canUpdateExisting ? `<button type="button" id="editSameUnitBtn" style="flex:1; padding:9px; border:none; border-radius:8px; background:var(--navy); color:var(--gold-soft); font-weight:700; font-size:12px; cursor:pointer;">نفس الوحدة - حدّث</button>` : ''}
+                ${_sameBtnHtml}
                 <button type="button" id="editDifferentUnitBtn" style="flex:1; padding:9px; border:none; border-radius:8px; background:var(--gold); color:var(--navy-deep); font-weight:700; font-size:12px; cursor:pointer;">وحدة مختلفة</button>
               </div>
             `;
-            if (_canUpdateExisting) document.getElementById('editSameUnitBtn').addEventListener('click', function() {
+            if (_canFullUpdate) document.getElementById('editSameUnitBtn').addEventListener('click', function() {
               editSaveBtn.disabled = true; editSaveBtn.textContent = 'جاري التحديث...';
               google.script.run.withSuccessHandler(function(res2) {
                 editSaveBtn.disabled = false; editSaveBtn.textContent = 'حفظ الوحدة الجديدة';
@@ -5682,6 +5716,29 @@
                 editMsg.textContent = res2.message;
                 if (res2.success) { clearClientSearchCache(); runSearch(); resetAddUnitFormAfterSuccess(res2.message); }
               }).confirmAddAsSameUnit(data, res.matchUnitId);
+            });
+            if (_canTermsUpdate) document.getElementById('editSameTermsBtn').addEventListener('click', function() {
+              editSaveBtn.disabled = true; editSaveBtn.textContent = 'جاري تحديث السعر ونظام السداد...';
+              // نرسل مجموعة مفاتيح تجارية/سداد محدّدة فقط — بدون أي حقل هوية. الباك-إند يتجاهل أي مفتاح آخر.
+              var _terms = {
+                price: (data && data.price) || '',
+                discountPercent: (data && data.discountPercent) || '',
+                downPayment: (data && data.downPayment) || '',
+                downPaymentBase: (data && data.downPaymentBase) || '',
+                paymentAmount: (data && data.paymentAmount) || '',
+                paymentCount: (data && data.paymentCount) || '',
+                installmentYears: (data && data.installmentYears) || '',
+                paymentSchedule: (data && data.paymentSchedule) || '',
+                paymentMethod: (data && data.paymentMethod) || '',
+                otherPaymentPlans: (data && data.otherPaymentPlans) || ''
+              };
+              google.script.run.withSuccessHandler(function(res2) {
+                editSaveBtn.disabled = false; editSaveBtn.textContent = 'حفظ الوحدة الجديدة';
+                editMsg.innerHTML = '';
+                editMsg.className = res2.success ? 'success' : 'error';
+                editMsg.textContent = res2.message;
+                if (res2.success) { clearClientSearchCache(); runSearch(); resetAddUnitFormAfterSuccess(res2.message); }
+              }).updateUnitCommercialTerms(res.matchUnitId, _terms, getAuthCreds());
             });
             document.getElementById('editDifferentUnitBtn').addEventListener('click', function() {
               editSaveBtn.disabled = true; editSaveBtn.textContent = 'جاري الحفظ...';
