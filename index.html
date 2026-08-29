@@ -901,7 +901,7 @@
       #statsView .section { padding: 14px; }
       #statsView .kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
       #statsView .kpi-value { font-size: 23px; }
-      #statsView #districtTable, #statsView #mostRequestedTable { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      #statsView #mostViewedTable, #statsView #mostRequestedTable { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
       #statsView .chart-summary .stat { min-width: 100%; }
     }
     @media (max-width: 380px) {
@@ -1698,12 +1698,12 @@
       </div>
 
       <div class="section">
-        <h3>متوسط سعر المتر لكل منطقة (حسب نوع العقار)</h3>
-        <table id="districtTable">
+        <h3>أكثر 10 وحدات مشاهدة لتفاصيلها</h3>
+        <table id="mostViewedTable">
           <thead>
-            <tr><th>المنطقة</th><th>نوع العقار</th><th>عدد الوحدات</th><th>متوسط السعر</th></tr>
+            <tr><th style="width:38px;">#</th><th>رقم الوحدة</th><th>الوحدة</th><th>المشاهدات</th></tr>
           </thead>
-          <tbody id="districtTableBody"></tbody>
+          <tbody id="mostViewedTableBody"></tbody>
         </table>
       </div>
 
@@ -1994,6 +1994,7 @@
   <button type="button" class="small-btn" id="openUsersModalBtn" style="margin-top:12px;"><svg class="ico" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 5.2a3.5 3.5 0 0 1 0 6.8M18 20a6.5 6.5 0 0 0-3.2-5.6"/></svg> إدارة المستخدمين</button>
   <button type="button" class="small-btn" id="openDevProfilesModalBtn" style="margin-top:8px;"><svg class="ico" viewBox="0 0 24 24"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></svg> إدارة بيانات المطورين</button>
   <button type="button" id="adminPanelStatsBtn" class="small-btn" style="display:block; width:100%; text-align:center; margin-top:8px;"><svg class="ico" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg> لوحة الإحصائيات</button>
+  <button type="button" id="adminLogoutBtn" class="small-btn" style="display:block; width:100%; text-align:center; margin-top:8px; background:rgba(233,144,138,0.10); color:#E9908A; border-color:rgba(233,144,138,0.4);"><svg class="ico" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg> تسجيل خروج الإدارة</button>
 </div>
 
 <!-- مودال إدارة المستخدمين -->
@@ -3738,7 +3739,7 @@
           </div>
           <div class="card-provenance">
             <span class="prov-dev">${u['Developer Name'] ? `${ICON.building} المطور: <a href="javascript:void(0)" onclick='showDeveloperProfile(${JSON.stringify(u['Developer Name'])})'>${u['Developer Name']}</a>` : ''}</span>
-            <span class="prov-views" title="عدد مرات مشاهدة تفاصيل الوحدة">${ICON.eye} <span class="views-num">${Number(u['Details View Count']) || 0}</span></span>
+            ${isAdminUnlocked ? `<span class="prov-views" title="عدد مرات مشاهدة تفاصيل الوحدة (إداري)">${ICON.eye} <span class="views-num">${Number(u['Details View Count']) || 0}</span></span>` : ''}
             <span class="prov-added">${u['Entered By'] ? `${ICON.user} أضافها: ${u['Entered By']}` : ''}</span>
           </div>
         </div>
@@ -4541,6 +4542,14 @@
     Object.keys(clientSearchCache).forEach(k => delete clientSearchCache[k]);
   }
 
+  // كلمة سر لوحة التحكم اللي هنبعتها مع طلبات البحث - عشان السيرفر يرجّع الحقول
+  // الإدارية (عدّاد المشاهدة) للأدمن بس. السيرفر هو اللي بيتحقق منها؛ لو مش
+  // صحيحة أو فاضية بيتعامل مع المستخدم كسيلز ومابيرجعش العدّاد أصلاً.
+  function getViewerAdminPin() {
+    if (typeof adminPin === 'string' && adminPin) return adminPin;
+    try { return localStorage.getItem('adminPin') || ''; } catch (e) { return ''; }
+  }
+
   function runSearch() {
     const filters = collectFilters();
     const cacheKey = JSON.stringify(filters);
@@ -4573,7 +4582,7 @@
           document.getElementById('resultsCount').textContent = '';
           resolve();
         })
-        .searchUnits(filters);
+        .searchUnits(filters, getViewerAdminPin());
     });
   }
   window.runSearch = runSearch;
@@ -5578,7 +5587,7 @@
         document.getElementById('resultsCount').textContent = '';
         loadFilterOptions(); // شبكة أمان - لو الطلب المجمّع فشل، قوائم الفلاتر تتحمل لوحدها على الأقل
       })
-      .getInitialSearchData();
+      .getInitialSearchData(getViewerAdminPin()); // السيرفر بيتحقق من الكلمة؛ العدّاد بيرجع للأدمن بس
 
     setTimeout(function() {
       visitorName = getVisitorName();
@@ -5797,6 +5806,9 @@
     if (!isAdminUnlocked) {
       isAdminUnlocked = true;
       renderResults(sortUnits(lastResults, document.getElementById('f_sort').value)); // عشان زرار الاستنساخ يظهر فورًا
+      // إعادة جلب نتائج البحث بكلمة سر الأدمن عشان عدّاد المشاهدة (حقل إداري) يوصل من السيرفر
+      clearClientSearchCache();
+      runSearch();
     }
     adminPanel.classList.add('open');
     document.getElementById('adminPanelOverlay').classList.add('open');
@@ -5811,6 +5823,21 @@
   }
   document.getElementById('adminPanelClose').addEventListener('click', closeAdminPanel);
   document.getElementById('adminPanelOverlay').addEventListener('click', closeAdminPanel);
+
+  // تسجيل خروج الإدارة: إنهاء صلاحية الأدمن الحالية (نفس متغيّرات الحالة الموجودة،
+  // مش نظام login جديد). بعده: عدّاد المشاهدة يختفي من الكروت (لا في الواجهة ولا
+  // في بيانات الـ response لأن البحث بيتعاد من غير كلمة سر)، ولوحة الإحصائيات تترجع
+  // مقفولة. مابيمسّش جلسة "إدخال وحدة" (كلمة سر مختلفة).
+  document.getElementById('adminLogoutBtn').addEventListener('click', function() {
+    adminPin = null;
+    isAdminUnlocked = false;
+    try { localStorage.removeItem('adminPin'); } catch (e) {}
+    if (typeof window.__aqarStatsLock === 'function') window.__aqarStatsLock();
+    closeAdminPanel();
+    clearClientSearchCache();
+    runSearch(); // إعادة جلب النتائج من غير كلمة سر → السيرفر مايرجعش العدّاد + إعادة رسم من غير الخانة
+    showToast('تم تسجيل خروج الإدارة', 'success');
+  });
 
   function refreshLiveCount() {
     if (!adminPin) return;
@@ -6349,6 +6376,15 @@
       unlockDashboard(pin);
     };
     window.__aqarStatsUnlocked = function() { return !!currentPin; };
+    // قفل لوحة الإحصائيات عند تسجيل خروج الإدارة - بتُمسح كلمة السر من الذاكرة
+    // وترجع شاشة القفل، فأي فتح تاني بيطلب الكلمة من جديد
+    window.__aqarStatsLock = function() {
+      currentPin = null;
+      var lock = document.getElementById('lockScreen');
+      var content = document.getElementById('dashboardContent');
+      if (lock) lock.style.display = '';
+      if (content) content.style.display = 'none';
+    };
 
     document.getElementById('refreshBtn').addEventListener('click', loadStats);
 
@@ -6357,6 +6393,34 @@
       loadPriceHistoryProjects();
       loadEntryActivityLog();
       loadMostRequested();
+      loadMostViewed();
+    }
+
+    /* ---------- أكثر 10 وحدات مشاهدة لتفاصيلها (Admin-only، معتمدة على عدّاد Details View Count) ---------- */
+    function loadMostViewed() {
+      const tbody = document.getElementById('mostViewedTableBody');
+      tbody.innerHTML = '<tr><td colspan="4" class="empty-note">جاري التحميل...</td></tr>';
+      google.script.run.withSuccessHandler(function(res) {
+        if (!res || !res.success) {
+          tbody.innerHTML = '<tr><td colspan="4" class="empty-note">' + ((res && res.message) || 'تعذّر التحميل') + '</td></tr>';
+          return;
+        }
+        if (!res.units.length) {
+          tbody.innerHTML = '<tr><td colspan="4" class="empty-note">لا توجد مشاهدات مسجّلة بعد</td></tr>';
+          return;
+        }
+        tbody.innerHTML = res.units.map((u, i) => {
+          const desc = [u.propertyType, u.projectName, (u.city && u.district) ? (u.city + ' - ' + u.district) : (u.city || u.district), u.developer]
+            .filter(Boolean).join(' · ');
+          return `
+            <tr>
+              <td class="num">${i + 1}</td>
+              <td>${u.unitId || '-'}</td>
+              <td>${desc || '-'}</td>
+              <td class="num">${fmtNum(u.count)}</td>
+            </tr>`;
+        }).join('');
+      }).getMostViewedUnits(currentPin);
     }
 
     /* ---------- الأكتر طلبًا ---------- */
@@ -6506,15 +6570,9 @@
         </div>
       `).join('') : '<div class="empty-note">لا توجد بيانات بعد</div>';
 
-      // District table
-      document.getElementById('districtTableBody').innerHTML = res.districtStats.length ? res.districtStats.map(d => `
-        <tr>
-          <td>${d.name}</td>
-          <td>${d.propertyType}</td>
-          <td>${d.count}</td>
-          <td class="num">${d.avgPricePerMeter !== null ? fmtNum(d.avgPricePerMeter) + ' ج/م²' : (d.avgPrice !== null ? fmtNum(d.avgPrice) + ' جنيه (سعر إجمالي)' : '-')}</td>
-        </tr>
-      `).join('') : '<tr><td colspan="4" class="empty-note">لا توجد بيانات بعد</td></tr>';
+      // "متوسط سعر المتر لكل منطقة" اتشال من هنا (موجود بالفعل في مودال "متوسط سعر المتر"
+      // المتاح للكل). res.districtStats لسه بيرجع من getDashboardStats من غير تغيير -
+      // بس مش بيتعرض في اللوحة. أي حساب لسعر المتر في باقي الموقع شغّال زي ما هو.
     }
 
     /* ---------- سجل نشاط إدخال الوحدات لكل موظف ---------- */
