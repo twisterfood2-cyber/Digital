@@ -1104,6 +1104,42 @@
     #dashPanel-developers .dev-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
     #dashPanel-developers .dev-actions button { flex: 1 1 160px; }
 
+    /* ===== المرحلة 3.6 — "إدارة المستخدمين" كقسم كامل داخل لوحة التحكم (#dashPanel-users) =====
+       نفس الماركب/الـ IDs/المنطق، اتنقل من مودال #usersModal لقسم لوحة التحكم.
+       طبقة بصرية فقط: نلبس كلاسّات .um-* (المصممة أصلاً للمودال الفاتح) ألوان لوحة التحكم
+       الداكنة — بنفس أسلوب #dashPanel-developers. مودالا "تفاصيل المستخدم" و"سجل العمليات"
+       يفضلوا مودالات (نوافذ فرعية مركّزة) وستايلهم ما اتغيّرش. */
+    #dashPanel-users .section-title { color: var(--gold-soft); border-bottom-color: var(--border-gold); }
+    #dashPanel-users label { color: var(--text-light); }
+    #dashPanel-users .um-count { color: var(--text-muted); }
+    #dashPanel-users .um-count b { color: var(--gold-soft); }
+    #dashPanel-users .um-addform { background: rgba(255,255,255,0.04); border-color: var(--border-gold); }
+    #dashPanel-users #umSearch,
+    #dashPanel-users .um-addform input,
+    #dashPanel-users .um-addform select {
+      background: var(--input-dark); color: var(--text-light); border: 1px solid rgba(255,255,255,0.14);
+    }
+    #dashPanel-users #umSearch::placeholder,
+    #dashPanel-users .um-addform input::placeholder { color: var(--text-muted); }
+    #dashPanel-users #umSearch:focus,
+    #dashPanel-users .um-addform input:focus,
+    #dashPanel-users .um-addform select:focus {
+      outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,154,46,0.16);
+      background: rgba(27,52,74,0.78);
+    }
+    #dashPanel-users .um-chips button {
+      background: rgba(255,255,255,0.05); color: var(--text-muted); border-color: rgba(255,255,255,0.14);
+    }
+    #dashPanel-users .um-chips button.active { background: var(--navy); color: var(--gold-soft); border-color: var(--gold); }
+    #dashPanel-users .um-list { max-height: none; }
+    #dashPanel-users .um-card {
+      background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.12);
+    }
+    #dashPanel-users .um-card:hover { border-color: var(--border-gold); }
+    #dashPanel-users .um-card.is-owner { background: rgba(201,154,46,0.10); border-color: var(--gold); }
+    #dashPanel-users .um-name { color: var(--text-light); }
+    #dashPanel-users .um-empty { color: var(--text-muted); }
+
     .price-stats-search {
       width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);
       font-size: 14px; margin-bottom: 14px;
@@ -1152,7 +1188,7 @@
     /* ============================================================
      * المرحلة 2.3 — إدارة المستخدمين 2.0 (إضافة بحتة، بهوية أقار الرقمية)
      * ============================================================ */
-    #usersModal .modal-box.um-box { max-width: 640px; }
+    /* المرحلة 3.6: #usersModal اتشال — الواجهة الرئيسية بقت #dashPanel-users. */
     #umUserModal .modal-box.um-user-box { max-width: 460px; }
     .um-toolbar {
       display: flex; align-items: center; justify-content: space-between; gap: 10px;
@@ -1251,7 +1287,6 @@
     #umUserBody .um-inline input { flex: 1; }
     #umUserBody .um-inline button { padding: 8px 12px; border: none; border-radius: var(--radius-sm); background: var(--navy); color: var(--gold-soft); font-weight: 700; font-size: 12px; cursor: pointer; }
     @media (max-width: 560px) {
-      #usersModal .modal-box.um-box { max-width: 100%; }
       .um-sub { white-space: normal; }
       #umUserBody .um-actions { grid-template-columns: 1fr; }
       #umAuditModal .modal-box.um-box { max-width: 100%; }
@@ -2159,13 +2194,71 @@
         </div>
 
         <div class="dash-panel" id="dashPanel-users" hidden>
-          <div class="dash-page-title">المستخدمون</div>
+          <div class="dash-page-title">إدارة المستخدمين</div>
           <div class="section">
-            <p class="dash-note" style="margin-top:0;">إدارة حسابات المستخدمين والأدوار والحالات وإعادة تعيين كلمات السر وسجل العمليات — بيفتح نفس أداة "إدارة المستخدمين 2.0" الموجودة (متاحة لمالك النظام فقط، والتحقق النهائي في السيرفر).</p>
-            <div style="margin-top:12px;">
-              <button type="button" class="dash-cta" id="dashOpenUsersBtn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 5.2a3.5 3.5 0 0 1 0 6.8"/></svg>فتح إدارة المستخدمين</button>
+            <div class="um-toolbar">
+              <div class="um-count">عدد المستخدمين: <b id="umCount">-</b></div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button type="button" class="um-add-toggle" id="umAuditToggle" hidden>سجل العمليات</button>
+                <button type="button" class="um-add-toggle" id="umAddToggle">+ إضافة مستخدم</button>
+              </div>
             </div>
-            <p class="dash-note" id="dashUsersCount"></p>
+
+            <div class="um-addform" id="umAddForm" hidden>
+              <div class="section-title">إضافة مستخدم جديد</div>
+              <div class="grid">
+                <div>
+                  <label>الاسم</label>
+                  <input type="text" id="newUserName" placeholder="مثال: أحمد محمد">
+                </div>
+                <div>
+                  <label>الإيميل</label>
+                  <input type="email" id="newUserEmail" placeholder="example@gmail.com">
+                </div>
+                <div>
+                  <label>كلمة السر</label>
+                  <input type="text" id="newUserPassword" placeholder="كلمة سر خاصة بيه">
+                </div>
+                <div>
+                  <label>الصلاحية</label>
+                  <select id="newUserRole">
+                    <option value="SALES">مبيعات — SALES</option>
+                    <option value="DATA_ENTRY">إدخال بيانات — DATA_ENTRY</option>
+                    <option value="MANAGER">مدير — MANAGER</option>
+                    <option value="OWNER">مالك — OWNER</option>
+                  </select>
+                </div>
+                <div>
+                  <label>رقم الهاتف (اختياري)</label>
+                  <input type="text" id="newUserPhone" placeholder="01000000000">
+                </div>
+                <div>
+                  <label>صورة المستخدم (اختياري)</label>
+                  <input type="file" id="newUserPhoto" accept="image/*">
+                </div>
+              </div>
+              <div class="um-hint" id="umOwnerHint" hidden>إنشاء حساب "مالك" يتطلب تسجيل دخولك أنت بحساب مالك (لا يكفي كلمة سر لوحة التحكم).</div>
+              <button type="button" id="addUserBtn" class="um-primary">إضافة المستخدم</button>
+              <div id="addUserMsg" class="um-msg"></div>
+            </div>
+
+            <div class="um-filters">
+              <input type="search" id="umSearch" placeholder="بحث بالاسم أو الإيميل أو الهاتف أو معرّف المستخدم">
+              <div class="um-chips" id="umRoleChips">
+                <button type="button" data-role="ALL" class="active">الكل</button>
+                <button type="button" data-role="OWNER">OWNER</button>
+                <button type="button" data-role="MANAGER">MANAGER</button>
+                <button type="button" data-role="SALES">SALES</button>
+                <button type="button" data-role="DATA_ENTRY">DATA_ENTRY</button>
+              </div>
+              <div class="um-chips" id="umStatusChips">
+                <button type="button" data-st="ALL" class="active">كل الحالات</button>
+                <button type="button" data-st="ACTIVE">نشط</button>
+                <button type="button" data-st="INACTIVE">موقوف</button>
+              </div>
+            </div>
+
+            <div id="usersListContent" class="um-list"></div>
           </div>
         </div>
 
@@ -2461,80 +2554,9 @@
   <button type="button" id="adminLogoutBtn" class="small-btn" style="display:block; width:100%; text-align:center; margin-top:8px; background:rgba(233,144,138,0.10); color:#E9908A; border-color:rgba(233,144,138,0.4);"><svg class="ico" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg> تسجيل خروج الإدارة</button>
 </div>
 
-<!-- مودال إدارة المستخدمين 2.0 (المرحلة 2.3) -->
-<div class="modal-overlay" id="usersModal">
-  <div class="modal-box um-box">
-    <div class="modal-header">
-      <div class="modal-title"><svg class="ico" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 5.2a3.5 3.5 0 0 1 0 6.8M18 20a6.5 6.5 0 0 0-3.2-5.6"/></svg>إدارة المستخدمين</div>
-      <button class="modal-close" id="usersModalCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-    </div>
-
-    <div class="um-toolbar">
-      <div class="um-count">عدد المستخدمين: <b id="umCount">-</b></div>
-      <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <button type="button" class="um-add-toggle" id="umAuditToggle" hidden style="background:var(--white); color:var(--navy);">سجل العمليات</button>
-        <button type="button" class="um-add-toggle" id="umAddToggle">+ إضافة مستخدم</button>
-      </div>
-    </div>
-
-    <div class="um-addform" id="umAddForm" hidden>
-      <div class="section-title">إضافة مستخدم جديد</div>
-      <div class="grid">
-        <div>
-          <label>الاسم</label>
-          <input type="text" id="newUserName" placeholder="مثال: أحمد محمد">
-        </div>
-        <div>
-          <label>الإيميل</label>
-          <input type="email" id="newUserEmail" placeholder="example@gmail.com">
-        </div>
-        <div>
-          <label>كلمة السر</label>
-          <input type="text" id="newUserPassword" placeholder="كلمة سر خاصة بيه">
-        </div>
-        <div>
-          <label>الصلاحية</label>
-          <select id="newUserRole">
-            <option value="SALES">مبيعات — SALES</option>
-            <option value="DATA_ENTRY">إدخال بيانات — DATA_ENTRY</option>
-            <option value="MANAGER">مدير — MANAGER</option>
-            <option value="OWNER">مالك — OWNER</option>
-          </select>
-        </div>
-        <div>
-          <label>رقم الهاتف (اختياري)</label>
-          <input type="text" id="newUserPhone" placeholder="01000000000">
-        </div>
-        <div>
-          <label>صورة المستخدم (اختياري)</label>
-          <input type="file" id="newUserPhoto" accept="image/*">
-        </div>
-      </div>
-      <div class="um-hint" id="umOwnerHint" hidden>إنشاء حساب "مالك" يتطلب تسجيل دخولك أنت بحساب مالك (لا يكفي كلمة سر لوحة التحكم).</div>
-      <button type="button" id="addUserBtn" class="um-primary">إضافة المستخدم</button>
-      <div id="addUserMsg" class="um-msg"></div>
-    </div>
-
-    <div class="um-filters">
-      <input type="search" id="umSearch" placeholder="بحث بالاسم أو الإيميل أو الهاتف أو معرّف المستخدم">
-      <div class="um-chips" id="umRoleChips">
-        <button type="button" data-role="ALL" class="active">الكل</button>
-        <button type="button" data-role="OWNER">OWNER</button>
-        <button type="button" data-role="MANAGER">MANAGER</button>
-        <button type="button" data-role="SALES">SALES</button>
-        <button type="button" data-role="DATA_ENTRY">DATA_ENTRY</button>
-      </div>
-      <div class="um-chips" id="umStatusChips">
-        <button type="button" data-st="ALL" class="active">كل الحالات</button>
-        <button type="button" data-st="ACTIVE">نشط</button>
-        <button type="button" data-st="INACTIVE">موقوف</button>
-      </div>
-    </div>
-
-    <div id="usersListContent" class="um-list"></div>
-  </div>
-</div>
-
+<!-- المرحلة 3.6: "إدارة المستخدمين" اتحوّلت من مودال #usersModal لقسم كامل داخل لوحة التحكم
+     (#dashPanel-users). نفس الماركب/الـ IDs/المنطق — اتشال الغلاف المودالي فقط. مودالا "تفاصيل
+     المستخدم" (#umUserModal) و"سجل العمليات" (#umAuditModal) يفضلوا مودالات (نوافذ فرعية مركّزة). -->
 <!-- مودال تفاصيل/تعديل مستخدم (المرحلة 2.3) -->
 <div class="modal-overlay" id="umUserModal">
   <div class="modal-box um-user-box">
@@ -6524,7 +6546,8 @@
    *   إخفاء/تعطيل الأزرار هنا **راحة فقط** ولا يُعتمد عليه.
    * - auth المُرسل = { pin: adminPin, authEmail, authPassword } → السيرفر يقبل أي مسار.
    * ============================================================ */
-  const usersModal = document.getElementById('usersModal');
+  // المرحلة 3.6: "إدارة المستخدمين" الرئيسية بقت قسم كامل داخل لوحة التحكم (#dashPanel-users)،
+  // مش مودال. مودال "تفاصيل المستخدم" (#umUserModal) لسه مودال — نافذة فرعية مركّزة للتعديل.
   const umUserModal = document.getElementById('umUserModal');
   const ROLE_LABELS = { OWNER: 'مالك', MANAGER: 'مدير', SALES: 'مبيعات', DATA_ENTRY: 'إدخال بيانات' };
   let umAllUsers = [];
@@ -6549,16 +6572,24 @@
     return `<div class="um-avatar ${cls || ''}">${umEsc(umInitials(u.name, u.email))}</div>`;
   }
 
-  document.getElementById('openUsersModalBtn').addEventListener('click', function () {
-    if (!adminPin) return;
-    usersModal.classList.add('open');
-    document.getElementById('umOwnerHint').hidden = umCallerIsOwner();
-    // زر سجل النشاط — للمالك فقط (الباك-إند بيفرض OWNER بغض النظر عن ده).
-    document.getElementById('umAuditToggle').hidden = !umCallerIsOwner();
+  // تحميل محتوى قسم "إدارة المستخدمين" داخل لوحة التحكم — بينده من dashSelect('users').
+  // نفس منطق فتح المودال القديم بالظبط (تلميحة المالك + زر سجل النشاط + تحميل القائمة).
+  function loadUserManagementSection() {
+    var hint = document.getElementById('umOwnerHint');
+    if (hint) hint.hidden = umCallerIsOwner();
+    var auditBtn = document.getElementById('umAuditToggle');
+    if (auditBtn) auditBtn.hidden = !umCallerIsOwner(); // الباك-إند بيفرض OWNER بغض النظر عن ده
     loadUsersList();
-  });
-  document.getElementById('usersModalCloseBtn').addEventListener('click', () => usersModal.classList.remove('open'));
-  usersModal.addEventListener('click', function (e) { if (e.target === this) this.classList.remove('open'); });
+  }
+  window.__aqarLoadUsers = loadUserManagementSection;
+
+  // الزر القديم في اللوحة المنزلقة القديمة (لسه موجود كـ fallback) — يوجّه لقسم المستخدمين في لوحة التحكم.
+  var _openUsersBtn = document.getElementById('openUsersModalBtn');
+  if (_openUsersBtn) {
+    _openUsersBtn.addEventListener('click', function () {
+      if (typeof window.__aqarOpenDashboard === 'function') window.__aqarOpenDashboard('users');
+    });
+  }
   document.getElementById('umUserCloseBtn').addEventListener('click', () => umUserModal.classList.remove('open'));
   umUserModal.addEventListener('click', function (e) { if (e.target === this) this.classList.remove('open'); });
 
@@ -6849,7 +6880,8 @@
   })();
 
   document.getElementById('addUserBtn').addEventListener('click', function () {
-    if (!adminPin) return;
+    // المرحلة 3.6: شِلنا حارس adminPin — المالك الداخل بدوره لازم يقدر يضيف مستخدم.
+    // التفويض النهائي في السيرفر (addUserAccount → authorizeOwnerAdmin_) بيبقى صاحب القرار.
     const name = document.getElementById('newUserName').value.trim();
     const email = document.getElementById('newUserEmail').value.trim();
     const password = document.getElementById('newUserPassword').value;
@@ -7326,7 +7358,7 @@
       window.scrollTo(0, 0);
       if (key === 'home') dashLoadHome();
       else if (key === 'profile') dashRenderProfile();
-      else if (key === 'users') dashLoadUsersCount();
+      else if (key === 'users' && typeof window.__aqarLoadUsers === 'function') window.__aqarLoadUsers();
       else if (key === 'settings') dashReparentSettingsOnce();
       else if (key === 'developers' && typeof window.__aqarLoadDevelopers === 'function') window.__aqarLoadDevelopers();
     }
@@ -7418,14 +7450,8 @@
         '<p class="dash-note">الإيميل هو اسم الدخول ولا يمكن تغييره. لتعديل الاسم أو الهاتف أو الصورة أو الصلاحية، تواصل مع مالك النظام عبر "إدارة المستخدمين".</p>';
     }
 
-    function dashLoadUsersCount() {
-      var el = document.getElementById('dashUsersCount');
-      if (!el) return;
-      google.script.run.withSuccessHandler(function (res) {
-        if (res && res.success && res.users) el.textContent = 'عدد المستخدمين المسجّلين: ' + res.users.length;
-        else el.textContent = '';
-      }).getUsersList(dashState());
-    }
+    // المرحلة 3.6: قسم "المستخدمون" بقى واجهة الإدارة الكاملة نفسها (بعدّاد umCount الخاص بيها)
+    // والتحميل من dashSelect('users') → window.__aqarLoadUsers. dashLoadUsersCount اتشالت.
 
     function dashReparentSettingsOnce() {
       if (dashReparented) return;
@@ -7455,11 +7481,8 @@
       if (goSearch) goSearch.addEventListener('click', goToSearchHash);
       var addU = document.getElementById('dashAddUnitBtn');
       if (addU) addU.addEventListener('click', function () { openAdd(); });
-      // المرحلة 3.5: قسم "المطوّرون" بقى نموذج الإدارة نفسه (مش زر يفتح مودال) — التحميل من dashSelect('developers').
-      var usrB = document.getElementById('dashOpenUsersBtn');
-      if (usrB) usrB.addEventListener('click', function () {
-        var t = document.getElementById('openUsersModalBtn'); if (t) t.click();
-      });
+      // المرحلة 3.5/3.6: قسما "المطوّرون" و"المستخدمون" بقوا واجهة الإدارة نفسها داخل القسم
+      // (مش زر يفتح مودال) — التحميل من dashSelect('developers') / dashSelect('users').
       var stB = document.getElementById('dashOpenStatsBtn');
       if (stB) stB.addEventListener('click', function () { openStats(); });
 
