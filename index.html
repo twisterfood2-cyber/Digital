@@ -1190,6 +1190,14 @@
     }
     #editDeleteBtn:hover { background: var(--error-bg); }
     #editDeleteBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+    /* زر "تفريغ النموذج" - نفس نمط زر تفريغ الفورم الثانوي في add.html (#resetBtn) */
+    #editResetBtn {
+      background: rgba(255,255,255,0.06); color: var(--text-light); border: 1px solid rgba(255,255,255,0.14);
+      border-radius: var(--radius-sm);
+      width: 100%; margin-top: 10px; padding: 11px; font-weight: 700;
+    }
+    #editResetBtn:hover { background: rgba(255,255,255,0.1); }
+    #editResetBtn:disabled { opacity: 0.6; cursor: not-allowed; }
 
     /* ===== inline SVG UI icon system (replaces emoji glyphs) ===== */
     .ico {
@@ -2094,6 +2102,7 @@
         <div>
           <label>تصنيف الوحدة</label>
           <select name="category" required>
+            <option value="">اختر</option>
             <option value="سكني">سكني</option>
             <option value="تجاري">تجاري</option>
             <option value="إداري">إداري</option>
@@ -2103,6 +2112,7 @@
         <div>
           <label>نوع العقار</label>
           <select name="propertyType" required>
+            <option value="">اختر</option>
             <optgroup label="Residential">
               <option value="Apartment">Apartment</option>
               <option value="Duplex">Duplex</option>
@@ -2147,7 +2157,7 @@
       <div class="grid">
         <div>
           <label>المدينة</label>
-          <select name="city" id="editCitySelect" required></select>
+          <select name="city" id="editCitySelect" required><option value="">اختر المدينة</option></select>
         </div>
         <div>
           <label>المنطقة</label>
@@ -2241,7 +2251,7 @@
         <div>
           <label>المقدم محسوب على</label>
           <select name="downPaymentBase">
-            <option value="بعد الخصم">السعر بعد الخصم</option>
+            <option value="بعد الخصم" selected>السعر بعد الخصم</option>
             <option value="قبل الخصم">السعر قبل الخصم</option>
           </select>
         </div>
@@ -2269,14 +2279,14 @@
         <div>
           <label>أنظمة سداد أخرى</label>
           <select name="otherPaymentPlans">
-            <option value="لا">لا</option>
+            <option value="لا" selected>لا</option>
             <option value="نعم">نعم</option>
           </select>
         </div>
         <div>
           <label>حالة الوحدة</label>
           <select name="status">
-            <option value="متاح">متاح</option>
+            <option value="متاح" selected>متاح</option>
             <option value="محجوز">محجوز</option>
             <option value="مباع">مباع</option>
           </select>
@@ -2323,6 +2333,7 @@
 
       <div id="editMsg"></div>
       <button type="submit" id="editSaveBtn">حفظ التعديلات</button>
+      <button type="button" id="editResetBtn" style="display:none;">تفريغ النموذج</button>
       <button type="button" id="editDeleteBtn">مسح الوحدة نهائيًا</button>
     </form>
   </div>
@@ -2698,6 +2709,7 @@
     document.querySelector('#editModal .modal-title').firstChild.textContent = 'إضافة وحدة جديدة ';
     editSaveBtn.textContent = 'حفظ الوحدة الجديدة';
     editDeleteBtn.style.display = 'none';
+    editResetBtn.style.display = ''; // زر "تفريغ النموذج" يظهر في وضع إضافة وحدة فقط (زي add.html)
     editMsg.style.display = 'none';
     editMsg.className = '';
 
@@ -2859,6 +2871,7 @@
     document.querySelector('#editModal .modal-title').firstChild.textContent = 'إضافة وحدة جديدة (استنساخ) ';
     editSaveBtn.textContent = 'إضافة كوحدة جديدة';
     editDeleteBtn.style.display = 'none';
+    editResetBtn.style.display = 'none'; // "تفريغ النموذج" لوضع الإضافة العادية فقط (مش الاستنساخ)
     editMsg.style.display = 'none';
     document.getElementById('unitAddAiSection').style.display = 'none';
     editModal.classList.add('open');
@@ -5068,6 +5081,7 @@
     document.querySelector('#editModal .modal-title').firstChild.textContent = 'تعديل بيانات الوحدة ';
     editSaveBtn.textContent = 'حفظ التعديلات';
     editDeleteBtn.style.display = '';
+    editResetBtn.style.display = 'none'; // "تفريغ النموذج" لوضع الإضافة فقط
     editMsg.style.display = 'none';
     document.getElementById('unitAddAiSection').style.display = 'block';
     document.getElementById('unitAddAiPasteText').value = '';
@@ -5407,6 +5421,17 @@
         editMsg.style.display = 'block';
       })
       .updateUnit(currentEditUnitId, data);
+  });
+
+  // زر "تفريغ النموذج" (وضع إضافة وحدة فقط) - يعيد الفورم لحالته الابتدائية بإعادة
+  // استخدام openAddUnitModal() - نفس منطق التفريغ المستخدم عند فتح الإضافة وبعد
+  // نجاح الحفظ، مطابق لسلوك زر "تفريغ الفورم" في add.html (يمسح الحقول + القوائم
+  // + المدينة/المنطقة + الصور + خانة الذكاء الاصطناعي وكل state بتاعها). لا يمسّ
+  // كلمة سر الإدخال / جلسة الصلاحيات (زي add.html بالظبط).
+  const editResetBtn = document.getElementById('editResetBtn');
+  editResetBtn.addEventListener('click', function() {
+    if (editModalMode !== 'add') return; // الزر ظاهر في وضع الإضافة فقط أصلًا - حماية إضافية
+    openAddUnitModal();
   });
 
   const editDeleteBtn = document.getElementById('editDeleteBtn');
