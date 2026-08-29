@@ -1140,6 +1140,61 @@
     #dashPanel-users .um-name { color: var(--text-light); }
     #dashPanel-users .um-empty { color: var(--text-muted); }
 
+    /* ===== المرحلة 3.6+ — الحضور (متصل الآن / آخر ظهور) + ملخّص المتصلين ===== */
+    .um-online-sum { font-size: 13px; color: var(--text-muted); font-weight: 600; margin-inline-start: 12px; }
+    .um-online-sum b { color: var(--ok); font-size: 15px; }
+    .um-presence {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 700; margin-top: 4px; white-space: nowrap;
+    }
+    .um-presence .um-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: var(--text-muted); }
+    .um-presence.is-online { color: var(--ok); }
+    .um-presence.is-online .um-dot { background: var(--ok); box-shadow: 0 0 0 3px rgba(127,211,163,0.18); }
+    .um-presence.is-offline { color: var(--text-muted); }
+    #umUserBody .um-presence { margin-top: 0; }
+    #umUserBody .um-presence.is-offline { color: var(--muted); }
+    #umUserBody .um-presence.is-online { color: var(--success-fg); }
+
+    /* ===== المرحلة 3.6+ — "سجل عمليات إدارة المستخدمين" كقسم كامل داخل لوحة التحكم (#dashPanel-audit) ===== */
+    #dashPanel-audit .um-filters { margin-bottom: 12px; }
+    #dashPanel-audit #umAuditSearch {
+      width: 100%; padding: 10px 12px; border-radius: var(--radius-sm); font-family: inherit; font-size: 13px;
+      background: var(--input-dark); color: var(--text-light); border: 1px solid rgba(255,255,255,0.14);
+    }
+    #dashPanel-audit #umAuditSearch::placeholder { color: var(--text-muted); }
+    #dashPanel-audit #umAuditSearch:focus {
+      outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,154,46,0.16); background: rgba(27,52,74,0.78);
+    }
+    #dashPanel-audit .umlog-list { max-height: none; display: flex; flex-direction: column; gap: 8px; }
+    #dashPanel-audit .umlog-row {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12);
+      border-radius: var(--radius-md); padding: 11px 13px; font-size: 12px;
+    }
+    #dashPanel-audit .umlog-row.denied { border-color: rgba(233,144,138,0.4); background: rgba(233,144,138,0.07); }
+    #dashPanel-audit .umlog-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    #dashPanel-audit .umlog-action {
+      font-weight: 800; letter-spacing: .3px; color: var(--gold-soft);
+      background: rgba(201,154,46,0.14); border: 1px solid var(--border-gold);
+      border-radius: 999px; padding: 2px 9px; font-size: 11px;
+    }
+    #dashPanel-audit .umlog-res { font-size: 10px; font-weight: 800; padding: 2px 9px; border-radius: 999px; }
+    #dashPanel-audit .umlog-res.SUCCESS { background: rgba(127,211,163,0.16); color: var(--ok); }
+    #dashPanel-audit .umlog-res.DENIED { background: rgba(233,144,138,0.16); color: var(--danger); }
+    #dashPanel-audit .umlog-time { margin-inline-start: auto; color: var(--text-muted); font-size: 11px; }
+    #dashPanel-audit .umlog-meta { color: var(--text-muted); margin-top: 5px; line-height: 1.7; }
+    #dashPanel-audit .umlog-meta b { color: var(--text-light); font-weight: 700; }
+    #dashPanel-audit .umlog-details {
+      color: var(--text-light); margin-top: 4px; word-break: break-word;
+      background: rgba(255,255,255,0.03); border-radius: var(--radius-sm); padding: 6px 9px;
+    }
+    #dashPanel-audit .um-empty { color: var(--text-muted); text-align: center; padding: 18px; font-size: 12px; }
+    .dash-back-link {
+      display: inline-flex; align-items: center; gap: 6px; margin-bottom: 12px;
+      background: none; border: none; color: var(--gold-soft); font-family: inherit;
+      font-size: 13px; font-weight: 700; cursor: pointer; padding: 4px 0;
+    }
+    .dash-back-link:hover { text-decoration: underline; }
+
     .price-stats-search {
       width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);
       font-size: 14px; margin-bottom: 14px;
@@ -1289,7 +1344,6 @@
     @media (max-width: 560px) {
       .um-sub { white-space: normal; }
       #umUserBody .um-actions { grid-template-columns: 1fr; }
-      #umAuditModal .modal-box.um-box { max-width: 100%; }
     }
 
     /* المرحلة 2.4 — سجل النشاط (للقراءة فقط) */
@@ -2197,7 +2251,7 @@
           <div class="dash-page-title">إدارة المستخدمين</div>
           <div class="section">
             <div class="um-toolbar">
-              <div class="um-count">عدد المستخدمين: <b id="umCount">-</b></div>
+              <div class="um-count">عدد المستخدمين: <b id="umCount">-</b><span class="um-online-sum">🟢 متصل الآن: <b id="umOnlineCount">-</b></span></div>
               <div style="display:flex; gap:8px; flex-wrap:wrap;">
                 <button type="button" class="um-add-toggle" id="umAuditToggle" hidden>سجل العمليات</button>
                 <button type="button" class="um-add-toggle" id="umAddToggle">+ إضافة مستخدم</button>
@@ -2285,6 +2339,21 @@
             <h3>صورة غلاف الصفحة</h3>
             <div id="dashSettingsCoverSlot"></div>
             <p class="dash-note">رفع صورة الغلاف عملية إدارية محمية بكلمة سر لوحة التحكم (زيّ ما هي حاليًا). لو دخلت لوحة التحكم بدورك كمالك من غير كلمة السر، هتحتاج تدخلها عشان تغيّر الصورة.</p>
+          </div>
+        </div>
+
+        <!-- المرحلة 3.6+: "سجل عمليات إدارة المستخدمين" — قسم كامل داخل لوحة التحكم (مش مودال).
+             قسم فرعي من "المستخدمون"؛ نفس الـ IDs والمنطق، ماركب/تصميم متوافق مع باقي اللوحة. -->
+        <div class="dash-panel" id="dashPanel-audit" hidden>
+          <button type="button" class="dash-back-link" id="umAuditBackBtn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>رجوع لإدارة المستخدمين</button>
+          <div class="dash-page-title">سجل عمليات إدارة المستخدمين</div>
+          <div class="section">
+            <p class="dash-note" style="margin-top:0;">سجل للقراءة فقط لكل عمليات إدارة المستخدمين (إضافة / تعديل / تغيير صلاحية / إيقاف / حذف / إعادة تعيين كلمة سر) — الأحدث أولًا. متاح لمالك النظام فقط، والتحقق النهائي في السيرفر.</p>
+            <div class="um-filters">
+              <input type="search" id="umAuditSearch" placeholder="بحث بالمُنفِّذ أو المستهدف أو الإجراء">
+            </div>
+            <div id="umAuditList" class="um-list umlog-list"></div>
+            <button type="button" id="umAuditMore" class="um-primary" hidden style="margin-top:10px;">عرض المزيد</button>
           </div>
         </div>
       </div>
@@ -2554,9 +2623,9 @@
   <button type="button" id="adminLogoutBtn" class="small-btn" style="display:block; width:100%; text-align:center; margin-top:8px; background:rgba(233,144,138,0.10); color:#E9908A; border-color:rgba(233,144,138,0.4);"><svg class="ico" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg> تسجيل خروج الإدارة</button>
 </div>
 
-<!-- المرحلة 3.6: "إدارة المستخدمين" اتحوّلت من مودال #usersModal لقسم كامل داخل لوحة التحكم
-     (#dashPanel-users). نفس الماركب/الـ IDs/المنطق — اتشال الغلاف المودالي فقط. مودالا "تفاصيل
-     المستخدم" (#umUserModal) و"سجل العمليات" (#umAuditModal) يفضلوا مودالات (نوافذ فرعية مركّزة). -->
+<!-- المرحلة 3.6: "إدارة المستخدمين" → قسم كامل (#dashPanel-users). المرحلة 3.6+: "سجل العمليات"
+     → قسم كامل (#dashPanel-audit). الباقي كمودال فرعي مركّز واحد فقط: "تفاصيل/تعديل مستخدم"
+     (#umUserModal) — نافذة تعديل لكل مستخدم، مناسبة كمودال. -->
 <!-- مودال تفاصيل/تعديل مستخدم (المرحلة 2.3) -->
 <div class="modal-overlay" id="umUserModal">
   <div class="modal-box um-user-box">
@@ -2568,20 +2637,8 @@
   </div>
 </div>
 
-<!-- مودال سجل نشاط إدارة المستخدمين (المرحلة 2.4) — OWNER فقط، للقراءة فقط -->
-<div class="modal-overlay" id="umAuditModal">
-  <div class="modal-box um-box">
-    <div class="modal-header">
-      <div class="modal-title"><svg class="ico" viewBox="0 0 24 24"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>سجل عمليات إدارة المستخدمين</div>
-      <button class="modal-close" id="umAuditCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-    </div>
-    <div class="um-filters">
-      <input type="search" id="umAuditSearch" placeholder="بحث بالمُنفِّذ أو المستهدف أو الإجراء">
-    </div>
-    <div id="umAuditList" class="um-list umlog-list"></div>
-    <button type="button" id="umAuditMore" class="um-primary" hidden style="background:var(--white); color:var(--navy); border:1px solid var(--border);">عرض المزيد</button>
-  </div>
-</div>
+<!-- المرحلة 3.6+: سجل النشاط اتحوّل من مودال #umAuditModal لقسم كامل داخل لوحة التحكم (#dashPanel-audit). -->
+
 
 <!-- المرحلة 3.5: "إدارة بيانات المطورين" اتحوّلت من مودال لقسم كامل داخل لوحة التحكم
      (#dashPanel-developers). نفس الماركب/الـ IDs/المنطق — اتشال الغلاف المودالي فقط. -->
@@ -4165,6 +4222,8 @@
     // المسار الحالي بالصلاحيات دلوقتي (من غير أي بوابة كلمة سر ثانوية قديمة).
     window.__aqarAuthRestoring = false;
     if (typeof window.__aqarReroute === 'function') { try { window.__aqarReroute(); } catch (e) {} }
+    // المرحلة 3.6+ — نبدأ نبضة الحضور (مؤقّت واحد فقط؛ الدالة نفسها بتمنع التكرار).
+    if (typeof startPresenceHeartbeat === 'function') { try { startPresenceHeartbeat(); } catch (e) {} }
   }
   function applyRoleUiVisibility() {
     // زر "إدخال وحدة" في التنقّل: يختفي فقط لدور مؤكَّد بلا ADD_UNIT (SALES/MANAGER)
@@ -6377,6 +6436,28 @@
     google.script.run.heartbeat(sessionId, visitorName);
   }
 
+  /* ---------- المرحلة 3.6+ — نبضة حضور المستخدم المُسجَّل دخول (Presence) ----------
+     مؤقّت واحد فقط لكل جلسة متصفح. الهوية تُشتقّ في السيرفر من بيانات الدخول
+     (heartbeatPresence(getAuthCreds())) — الفرونت ما بيبعتش إيميل/معرّف. لا تُسجَّل في سجل النشاط. */
+  var __presenceHbTimer = null;
+  function sendPresenceHeartbeat() {
+    if (!window.__currentUser) return;
+    try { google.script.run.heartbeatPresence(getAuthCreds()); } catch (e) {}
+  }
+  function startPresenceHeartbeat() {
+    if (__presenceHbTimer) return;           // نبضة واحدة فقط — التنقّل بين الأقسام ما يبدأش حلقات جديدة
+    sendPresenceHeartbeat();
+    __presenceHbTimer = setInterval(sendPresenceHeartbeat, 45000);
+  }
+  function stopPresenceHeartbeat() {
+    if (__presenceHbTimer) { clearInterval(__presenceHbTimer); __presenceHbTimer = null; }
+  }
+  window.__aqarStopPresenceHeartbeat = stopPresenceHeartbeat;
+  // محاولة أخيرة أفضل-جهد عند إغلاق الصفحة (مش المصدر الأساسي — المهلة في السيرفر هي الحكم).
+  window.addEventListener('beforeunload', function () {
+    if (window.__currentUser) { try { google.script.run.heartbeatPresence(getAuthCreds()); } catch (e) {} }
+  });
+
   /* ---------- صورة الغلاف ---------- */
   function loadCoverImage() {
     google.script.run.withSuccessHandler(function(url) {
@@ -6562,8 +6643,40 @@
   let umAllUsers = [];
   let umRoleFilter = 'ALL';
   let umStatusFilter = 'ALL';
+  let umServerNow = 0;                 // وقت السيرفر من آخر ردّ (لحساب "آخر ظهور" باتساق)
+  let umPresenceTimer = null;          // مؤقّت واحد فقط لتحديث الحضور أثناء عرض قسم المستخدمين
 
   function umAuth() { return Object.assign({ pin: adminPin || '' }, getAuthCreds()); }
+
+  /* المرحلة 3.6+ — صياغة "آخر ظهور" (توقيت مصر — نفس اصطلاح التطبيق: dd/MM/yyyy + 12h ص/م). */
+  function umFormatLastSeen(lastSeen, serverNow, online) {
+    if (online) return 'متصل الآن';
+    var ls = Number(lastSeen) || 0;
+    if (!ls) return 'لم يسجل ظهور سابق';
+    var now = Number(serverNow) || Date.now();
+    var diff = Math.max(0, now - ls);
+    if (diff < 60 * 1000) return 'آخر ظهور منذ لحظات';
+    if (diff < 60 * 60 * 1000) return 'آخر ظهور منذ ' + Math.floor(diff / 60000) + ' دقيقة';
+    var d = new Date(ls);
+    var hh = d.getHours(); var mm = d.getMinutes();
+    var ap = hh < 12 ? 'ص' : 'م';
+    var h12 = hh % 12; if (h12 === 0) h12 = 12;
+    var t = h12 + ':' + (mm < 10 ? '0' + mm : mm) + ' ' + ap;
+    var today = new Date(now);
+    var sameDay = d.getFullYear() === today.getFullYear() && d.getMonth() === today.getMonth() && d.getDate() === today.getDate();
+    var y = new Date(now - 86400000);
+    var isYest = d.getFullYear() === y.getFullYear() && d.getMonth() === y.getMonth() && d.getDate() === y.getDate();
+    if (sameDay) return 'آخر ظهور اليوم ' + t;
+    if (isYest) return 'آخر ظهور أمس ' + t;
+    var dd = d.getDate(); var mo = d.getMonth() + 1;
+    return (dd < 10 ? '0' + dd : dd) + '/' + (mo < 10 ? '0' + mo : mo) + '/' + d.getFullYear() + ' ' + t;
+  }
+  function umPresenceHtml(u) {
+    var online = !!u.online;
+    var cls = online ? 'is-online' : 'is-offline';
+    return '<span class="um-presence ' + cls + '"><span class="um-dot"></span>' +
+           umEsc(umFormatLastSeen(u.lastSeen, umServerNow, online)) + '</span>';
+  }
   function umEsc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -6607,8 +6720,9 @@
     f.hidden = !f.hidden;
   });
 
-  /* ---------------- سجل النشاط (المرحلة 2.4) — OWNER فقط، للقراءة فقط ---------------- */
-  const umAuditModal = document.getElementById('umAuditModal');
+  /* ---------------- سجل النشاط (المرحلة 2.4) — OWNER فقط، للقراءة فقط ----------------
+     المرحلة 3.6+: بقى قسم كامل داخل لوحة التحكم (#dashPanel-audit) — مش مودال. نفس الـ IDs
+     (umAuditSearch / umAuditList / umAuditMore) ونفس المنطق (loadAuditLog / getUserAuditLog). */
   let umAuditOffset = 0;
   const UM_AUDIT_PAGE = 100;
 
@@ -6616,14 +6730,23 @@
     if (res && res.auditWarning) showToast(res.auditWarning, 'warn');
   }
 
-  document.getElementById('umAuditToggle').addEventListener('click', function () {
-    umAuditModal.classList.add('open');
+  // بينده من dashSelect('audit') — بعد التنقّل لقسم السجل داخل نفس شِل لوحة التحكم.
+  function loadUserAuditSection() {
     umAuditOffset = 0;
-    document.getElementById('umAuditSearch').value = '';
+    var s = document.getElementById('umAuditSearch');
+    if (s) s.value = '';
     loadAuditLog(false);
+  }
+  window.__aqarLoadAudit = loadUserAuditSection;
+
+  // زر "سجل العمليات" داخل قسم المستخدمين → تنقّل SPA لقسم السجل (مش فتح مودال).
+  document.getElementById('umAuditToggle').addEventListener('click', function () {
+    if (typeof window.__aqarOpenDashboard === 'function') window.__aqarOpenDashboard('audit');
   });
-  document.getElementById('umAuditCloseBtn').addEventListener('click', () => umAuditModal.classList.remove('open'));
-  umAuditModal.addEventListener('click', function (e) { if (e.target === this) this.classList.remove('open'); });
+  var _umAuditBack = document.getElementById('umAuditBackBtn');
+  if (_umAuditBack) _umAuditBack.addEventListener('click', function () {
+    if (typeof window.__aqarOpenDashboard === 'function') window.__aqarOpenDashboard('users');
+  });
   document.getElementById('umAuditMore').addEventListener('click', function () { umAuditOffset += UM_AUDIT_PAGE; loadAuditLog(true); });
   let umAuditSearchTimer = null;
   document.getElementById('umAuditSearch').addEventListener('input', function () {
@@ -6686,10 +6809,17 @@
       .withSuccessHandler(function (res) {
         if (!res || !res.success) { content.innerHTML = '<div class="um-empty">' + umEsc((res && res.message) || 'تعذّر تحميل المستخدمين') + '</div>'; return; }
         umAllUsers = res.users || [];
+        umServerNow = Number(res.serverNow) || Date.now();
         applyUmFilters();
+        umStartPresencePoll();  // مؤقّت واحد لتحديث الحضور أثناء عرض القسم
       })
       .withFailureHandler(function (err) { content.innerHTML = '<div class="um-empty">حدث خطأ: ' + umEsc(err && err.message) + '</div>'; })
       .getUsersList(umAuth());
+  }
+
+  function umUpdateOnlineCount() {
+    var el = document.getElementById('umOnlineCount');
+    if (el) el.textContent = String(umAllUsers.filter(function (u) { return !!u.online; }).length);
   }
 
   function applyUmFilters() {
@@ -6704,6 +6834,7 @@
     });
     document.getElementById('umCount').textContent =
       filtered.length === umAllUsers.length ? String(umAllUsers.length) : (filtered.length + ' / ' + umAllUsers.length);
+    umUpdateOnlineCount();
     renderUsersList(filtered);
   }
 
@@ -6725,11 +6856,49 @@
           <div class="um-sub">${u.phone ? umEsc(u.phone) + ' · ' : ''}أُضيف ${umEsc(u.addedDate || '-')}</div>
         </div>
         <div class="um-right">
+          ${umPresenceHtml(u)}
           <span class="um-status ${active ? 'active' : 'inactive'}">${active ? 'نشط' : 'موقوف'}</span>
         </div>
       </div>`;
     }).join('');
   }
+
+  /* المرحلة 3.6+ — تحديث حالة الحضور في المكان (بلا إعادة رسم القائمة → السكرول والفلاتر ما تتأثرش). */
+  function umApplyPresenceInPlace() {
+    document.querySelectorAll('#usersListContent .um-card').forEach(function (card) {
+      var u = umAllUsers.find(function (x) { return x.email === card.dataset.email; });
+      if (!u) return;
+      var right = card.querySelector('.um-right');
+      var old = right && right.querySelector('.um-presence');
+      if (!right) return;
+      var tmp = document.createElement('div'); tmp.innerHTML = umPresenceHtml(u);
+      var fresh = tmp.firstChild;
+      if (old) right.replaceChild(fresh, old); else right.insertBefore(fresh, right.firstChild);
+    });
+    umUpdateOnlineCount();
+  }
+
+  function umRefreshPresence() {
+    google.script.run.withSuccessHandler(function (res) {
+      if (!res || !res.success || !res.presence) return;
+      umServerNow = Number(res.serverNow) || Date.now();
+      umAllUsers.forEach(function (u) {
+        var p = res.presence[String(u.email || '').trim().toLowerCase()];
+        u.online = !!(p && p.online);
+        u.lastSeen = (p && p.lastSeen) ? p.lastSeen : (u.lastSeen || '');
+      });
+      umApplyPresenceInPlace();
+    }).getUsersPresence(umAuth());
+  }
+
+  function umStartPresencePoll() {
+    if (umPresenceTimer) return;                 // مؤقّت واحد فقط
+    umPresenceTimer = setInterval(umRefreshPresence, 45000);
+  }
+  function umStopPresencePoll() {
+    if (umPresenceTimer) { clearInterval(umPresenceTimer); umPresenceTimer = null; }
+  }
+  window.__aqarStopUsersPresencePoll = umStopPresencePoll;
 
   document.getElementById('usersListContent').addEventListener('click', function (e) {
     const card = e.target.closest('.um-card'); if (!card) return;
@@ -6755,6 +6924,7 @@
           <div style="font-weight:800;color:var(--navy);">${umEsc(u.name || '(بدون اسم)')}
             <span class="um-badge role-${u.role}">${umEsc(ROLE_LABELS[u.role] || u.role)}</span></div>
           <div class="um-uid">معرّف المستخدم: ${umEsc(u.userId || '-')}</div>
+          <div style="margin-top:4px;">${umPresenceHtml(u)}</div>
         </div>
       </div>
 
@@ -7342,20 +7512,31 @@
       // زر "إدخال وحدة جديدة" داخل قسم الوحدات — يظهر فقط لمن يملك ADD_UNIT فعليًا
       var addBtn = document.getElementById('dashAddUnitBtn');
       if (addBtn) addBtn.hidden = !(typeof uiAllows === 'function' ? uiAllows('ADD_UNIT') : true) || !(role === 'OWNER' || role === 'DATA_ENTRY');
-      // لو القسم الحالي مش متاح للدور ده → ارجع لأول قسم متاح
-      var curBtn = document.querySelector('#dashNav .dash-nav-item[data-dash="' + dashCurrent + '"]');
-      if (!curBtn || curBtn.hidden) dashCurrent = firstVisible || 'home';
+      // لو القسم الحالي مش متاح للدور ده → ارجع لأول قسم متاح.
+      // ('audit' قسم فرعي من "المستخدمون" — بلا عنصر شريط جانبي؛ متاح لمن يرى "المستخدمون".)
+      if (dashCurrent === 'audit') {
+        var usersItem = document.querySelector('#dashNav .dash-nav-item[data-dash="users"]');
+        if (!usersItem || usersItem.hidden) dashCurrent = firstVisible || 'home';
+      } else {
+        var curBtn = document.querySelector('#dashNav .dash-nav-item[data-dash="' + dashCurrent + '"]');
+        if (!curBtn || curBtn.hidden) dashCurrent = firstVisible || 'home';
+      }
     }
 
+    var DASH_PANEL_KEYS = ['home', 'units', 'developers', 'users', 'stats', 'profile', 'settings', 'audit'];
     function dashSelect(key) {
       dashCurrent = key;
+      // "سجل العمليات" (audit) قسم فرعي من "المستخدمون" → نبقّي "المستخدمون" مُفعَّلًا في الشريط الجانبي.
+      var navKey = (key === 'audit') ? 'users' : key;
       document.querySelectorAll('#dashNav .dash-nav-item[data-dash]').forEach(function (b) {
-        b.classList.toggle('is-active', b.getAttribute('data-dash') === key);
+        b.classList.toggle('is-active', b.getAttribute('data-dash') === navKey);
       });
-      ['home', 'units', 'developers', 'users', 'stats', 'profile', 'settings'].forEach(function (k) {
+      DASH_PANEL_KEYS.forEach(function (k) {
         var p = document.getElementById('dashPanel-' + k);
         if (p) p.hidden = (k !== key);
       });
+      // إيقاف مؤقّت حضور المستخدمين عند مغادرة قسمي "المستخدمون"/"سجل العمليات"
+      if (key !== 'users' && typeof window.__aqarStopUsersPresencePoll === 'function') window.__aqarStopUsersPresencePoll();
       dashCloseDrawer();
       window.scrollTo(0, 0);
       if (key === 'home') dashLoadHome();
@@ -7363,6 +7544,7 @@
       else if (key === 'users' && typeof window.__aqarLoadUsers === 'function') window.__aqarLoadUsers();
       else if (key === 'settings') dashReparentSettingsOnce();
       else if (key === 'developers' && typeof window.__aqarLoadDevelopers === 'function') window.__aqarLoadDevelopers();
+      else if (key === 'audit' && typeof window.__aqarLoadAudit === 'function') window.__aqarLoadAudit();
     }
 
     function dashBars(containerId, rows, unitWord) {
