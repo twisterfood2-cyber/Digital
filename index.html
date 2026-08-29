@@ -3604,6 +3604,62 @@
     return Number(n).toLocaleString('en-US');
   }
 
+  /* ============================================================
+   * نظام الأدوار/الصلاحيات — المرحلة 1 (طبقة العميل)
+   * ------------------------------------------------------------
+   * - window.__currentUser بيتظبط بعد نجاح verifyUserAccess (من ردّ السيرفر).
+   * - roleConfirmed = هل السيرفر رجّع Role صريح؟ لو لأ (سيرفر قديم/قبل الترقية)،
+   *   الواجهة **متغيّرش أي حاجة** وتفضل شغّالة زي دلوقتي بالظبط (بوابات كلمة السر).
+   * - hasPermission() هنا **للواجهة فقط** (إخفاء أزرار). الحماية الحقيقية في الباك-إند.
+   * ============================================================ */
+  // مرآة للـ PERMISSIONS_BY_ROLE_ في Code.gs — للواجهة فقط. أي تغيير هنا لازم يتطابق مع السيرفر.
+  var CLIENT_BASE_PERMS = ['VIEW_UNITS','SEARCH_UNITS','FILTER_UNITS','VIEW_UNIT_DETAILS','SHARE_UNIT','EXPORT_UNIT','EXPORT_COMPARISON','CREATE_OFFER'];
+  var CLIENT_PERMS = {
+    OWNER:      ['*'],
+    MANAGER:    CLIENT_BASE_PERMS.concat(['ADD_UNIT','EDIT_UNIT','DELETE_UNIT','CLONE_UNIT','CHANGE_UNIT_STATUS','VIEW_STATISTICS']),
+    DATA_ENTRY: CLIENT_BASE_PERMS.concat(['ADD_UNIT']),
+    SALES:      CLIENT_BASE_PERMS.slice()
+  };
+  function currentUserRole() {
+    return (window.__currentUser && window.__currentUser.role) || 'SALES';
+  }
+  function roleActive() {
+    return !!(window.__currentUser && window.__currentUser.roleConfirmed);
+  }
+  function hasPermission(perm) {
+    var list = CLIENT_PERMS[currentUserRole()] || CLIENT_PERMS.SALES;
+    return list.indexOf('*') !== -1 || list.indexOf(perm) !== -1;
+  }
+  // نُظهر/نُقيّد عنصر واجهة فقط لو عندنا دور مؤكَّد وناقص الصلاحية. غير كده نسيبه زي ما هو.
+  function uiAllows(perm) {
+    return !roleActive() || hasPermission(perm);
+  }
+  function getAuthCreds() {
+    var e = '', p = '';
+    try { e = localStorage.getItem('loginEmail') || ''; p = localStorage.getItem('loginPassword') || ''; } catch (x) {}
+    return { authEmail: e, authPassword: p };
+  }
+  function setCurrentUserFromLogin(res, fallbackEmail) {
+    window.__currentUser = {
+      email: (res && res.email) || fallbackEmail || '',
+      name: (res && res.name) || '',
+      userId: (res && res.userId) || '',
+      role: (res && res.role) ? String(res.role).toUpperCase() : 'SALES',
+      roleConfirmed: !!(res && res.role)   // السيرفر رجّع دور صريح
+    };
+    applyRoleUiVisibility();
+  }
+  function applyRoleUiVisibility() {
+    // زر "إدخال وحدة" في التنقّل: يختفي فقط لدور مؤكَّد بلا ADD_UNIT (SALES/MANAGER)
+    var addBtn = document.getElementById('navAddUnitBtn');
+    if (addBtn) addBtn.style.display = uiAllows('ADD_UNIT') ? '' : 'none';
+    // لو النتائج اترسمت قبل ما نعرف الدور، نعيد رسمها بالصلاحيات الصحيحة
+    if (roleActive() && typeof lastResults !== 'undefined' && lastResults && lastResults.length) {
+      try { renderResults(sortUnits(lastResults, document.getElementById('f_sort').value)); } catch (e) {}
+    }
+  }
+  window.hasPermission = hasPermission; // مفيدة للتشخيص فقط
+
   function renderResults(units) {
     if (showFavoritesOnly) {
       const favIds = getFavoriteIds();
@@ -3724,18 +3780,18 @@
         </div>
         <div class="card-actions-bottom">
           <div class="card-actions">
-            <select class="status-select" onchange="changeStatus('${u['Unit ID']}', this.value)">
+            ${uiAllows('CHANGE_UNIT_STATUS') ? `<select class="status-select" onchange="changeStatus('${u['Unit ID']}', this.value)">
               <option value="متاح" ${u['Status']==='متاح'?'selected':''}>متاح</option>
               <option value="محجوز" ${u['Status']==='محجوز'?'selected':''}>محجوز</option>
               <option value="مباع" ${u['Status']==='مباع'?'selected':''}>مباع</option>
-            </select>
+            </select>` : ''}
           </div>
           <div class="card-icon-row">
-            <button type="button" class="icon-action-btn" onclick="openEditModal('${u['Unit ID']}')" title="تعديل الوحدة">تعديل</button>
+            ${uiAllows('EDIT_UNIT') ? `<button type="button" class="icon-action-btn" onclick="openEditModal('${u['Unit ID']}')" title="تعديل الوحدة">تعديل</button>` : ''}
             <button type="button" class="icon-action-btn" onclick='shareOnWhatsApp(${JSON.stringify(u)})' title="مشاركة على واتساب">واتساب</button>
             <button type="button" class="icon-action-btn" onclick='downloadUnitPDF(${JSON.stringify(u)}, this)' title="تصدير PDF">PDF</button>
             <button type="button" class="icon-action-btn" onclick='showSimilarUnits(${JSON.stringify(u)})' title="وحدات مشابهة">مشابهة</button>
-            ${isAdminUnlocked ? `<button type="button" class="icon-action-btn" onclick="cloneUnit('${u['Unit ID']}')" title="استنساخ الوحدة (أدمن)">نسخ</button>` : ''}
+            ${(isAdminUnlocked || (roleActive() && hasPermission('CLONE_UNIT'))) ? `<button type="button" class="icon-action-btn" onclick="cloneUnit('${u['Unit ID']}')" title="استنساخ الوحدة">نسخ</button>` : ''}
           </div>
           <div class="card-provenance">
             <span class="prov-dev">${u['Developer Name'] ? `${ICON.building} المطور: <a href="javascript:void(0)" onclick='showDeveloperProfile(${JSON.stringify(u['Developer Name'])})'>${u['Developer Name']}</a>` : ''}</span>
@@ -3797,7 +3853,22 @@
   }
 
   function changeStatus(unitId, newStatus) {
-    google.script.run.updateUnitStatus(unitId, newStatus);
+    // المرحلة 1: نرفق التفويض (بيانات الدخول + كلمة سر الأدمن لو موجودة).
+    // CHANGE_UNIT_STATUS = OWNER فقط (أو ADMIN_PIN) — السيرفر بيرفض غير كده.
+    var auth = Object.assign(
+      { pin: (typeof adminPin !== 'undefined' && adminPin) ? adminPin : '' },
+      getAuthCreds()
+    );
+    google.script.run
+      .withSuccessHandler(function (res) {
+        if (res && res.success === false) {
+          showToast(res.message || 'غير مصرّح لك بتغيير حالة الوحدة', 'error');
+          clearClientSearchCache();
+          runSearch(); // نرجّع العرض للحالة الحقيقية من السيرفر
+        }
+      })
+      .withFailureHandler(function () { /* صامت - تغيير الحالة وظيفة ثانوية */ })
+      .updateUnitStatus(unitId, newStatus, auth);
   }
 
   /* ---------- صندوق عرض الصور المكبر ---------- */
@@ -5104,6 +5175,13 @@
   });
 
   function openEditModal(unitId) {
+    // المرحلة 1: لو دور المستخدم مؤكَّد وفيه EDIT_UNIT (OWNER) → نفتح التعديل مباشرة
+    // من غير بوابة كلمة سر. الحفظ بيبعت بيانات الدخول والسيرفر بيتحقق من الدور.
+    if (roleActive() && hasPermission('EDIT_UNIT')) {
+      verifiedPin = '';
+      loadUnitIntoEditForm(unitId);
+      return;
+    }
     // لو كلمة السر متحفوظة من قبل في الجهاز، نستخدمها مباشرة من غير ما نطلبها تاني
     let savedPin = '';
     try { savedPin = localStorage.getItem('adminPin') || ''; } catch (e) {}
@@ -5146,7 +5224,7 @@
     document.getElementById('editUnitIdLabel').textContent = '(' + unitId + ')';
     document.querySelector('#editModal .modal-title').firstChild.textContent = 'تعديل بيانات الوحدة ';
     editSaveBtn.textContent = 'حفظ التعديلات';
-    editDeleteBtn.style.display = '';
+    editDeleteBtn.style.display = uiAllows('DELETE_UNIT') ? '' : 'none'; // المرحلة 1: الحذف لـ OWNER (أو ADMIN_PIN) فقط
     editResetBtn.style.display = 'none'; // "تفريغ النموذج" لوضع الإضافة فقط
     editMsg.style.display = 'none';
     document.getElementById('unitAddAiSection').style.display = 'block';
@@ -5373,6 +5451,9 @@
     const data = {};
     new FormData(editForm).forEach((v, k) => data[k] = v);
     data.images = editUnitImages.join(',');
+    // المرحلة 1: نرفق بيانات دخول المستخدم عشان السيرفر يتحقق من دوره (ADD/EDIT_UNIT).
+    // data.pin (كلمة السر المشتركة) بيتبعت كمان كطريق احتياطي — السيرفر يقبل أي منهم.
+    Object.assign(data, getAuthCreds());
     // إضافة/استنساخ وحدة: نرفق كلمة السر اللي اتحققنا منها عشان السيرفر يتأكد من التفويض قبل أي كتابة
     if (editModalMode === 'add' || editModalMode === 'clone') data.pin = unitWritePin;
 
@@ -5386,14 +5467,17 @@
           if (res.possibleMatch) {
             editMsg.className = '';
             editMsg.style.display = 'block';
+            // "نفس الوحدة - حدّث" = تعديل سجل موجود → لأصحاب EDIT_UNIT فقط (المدير/المالك).
+            // موظف الإدخال يشوف "وحدة مختلفة" فقط. السيرفر يرفض confirmAddAsSameUnit من غير EDIT_UNIT.
+            var _canUpdateExisting = uiAllows('EDIT_UNIT');
             editMsg.innerHTML = `
               <div style="margin-bottom:8px;">${res.message}</div>
               <div style="display:flex; gap:8px;">
-                <button type="button" id="editSameUnitBtn" style="flex:1; padding:9px; border:none; border-radius:8px; background:var(--navy); color:var(--gold-soft); font-weight:700; font-size:12px; cursor:pointer;">نفس الوحدة - حدّث</button>
+                ${_canUpdateExisting ? `<button type="button" id="editSameUnitBtn" style="flex:1; padding:9px; border:none; border-radius:8px; background:var(--navy); color:var(--gold-soft); font-weight:700; font-size:12px; cursor:pointer;">نفس الوحدة - حدّث</button>` : ''}
                 <button type="button" id="editDifferentUnitBtn" style="flex:1; padding:9px; border:none; border-radius:8px; background:var(--gold); color:var(--navy-deep); font-weight:700; font-size:12px; cursor:pointer;">وحدة مختلفة</button>
               </div>
             `;
-            document.getElementById('editSameUnitBtn').addEventListener('click', function() {
+            if (_canUpdateExisting) document.getElementById('editSameUnitBtn').addEventListener('click', function() {
               editSaveBtn.disabled = true; editSaveBtn.textContent = 'جاري التحديث...';
               google.script.run.withSuccessHandler(function(res2) {
                 editSaveBtn.disabled = false; editSaveBtn.textContent = 'حفظ الوحدة الجديدة';
@@ -5440,6 +5524,7 @@
 
     if (editModalMode === 'clone') {
       data.enteredBy = visitorName || '';
+      data.isClone = true; // المرحلة 2: السيرفر يطلب صلاحية CLONE_UNIT (المدير/المالك فقط) لمسار الاستنساخ
       google.script.run
         .withSuccessHandler(function(res) {
           editSaveBtn.disabled = false;
@@ -5502,7 +5587,10 @@
 
   const editDeleteBtn = document.getElementById('editDeleteBtn');
   editDeleteBtn.addEventListener('click', function() {
-    if (!currentEditUnitId || !verifiedPin) return;
+    // المرحلة 1: نسمح بالحذف لو عندنا verifiedPin (مسار قديم) أو دور فيه DELETE_UNIT.
+    // السيرفر هو اللي بيرفض فعليًا لو مفيش تفويض.
+    if (!currentEditUnitId) return;
+    if (!verifiedPin && !(roleActive() && hasPermission('DELETE_UNIT'))) return;
     const confirmed = confirm('متأكد إنك عايز تمسح الوحدة ' + currentEditUnitId + ' نهائيًا؟ الإجراء ده مينفعش يترجع فيه.');
     if (!confirmed) return;
 
@@ -5530,7 +5618,7 @@
         editMsg.textContent = 'حدث خطأ: ' + err.message;
         editMsg.style.display = 'block';
       })
-      .deleteUnit(currentEditUnitId, verifiedPin);
+      .deleteUnit(currentEditUnitId, Object.assign({ pin: verifiedPin || '' }, getAuthCreds()));
   });
 
   const INITIAL_UNIT_ID = new URLSearchParams(window.location.search).get('unit') || "";
@@ -5646,6 +5734,7 @@
             localStorage.setItem('loginEmail', email);
             localStorage.setItem('loginPassword', password);
           } catch (e) {}
+          setCurrentUserFromLogin(res, email); // المرحلة 1: نبني طبقة "المستخدم الحالي" من ردّ السيرفر
           showApp();
         } else {
           statusEl.className = 'access-gate-status error';
@@ -6246,6 +6335,13 @@
     // بوابة كلمة سر لوحة التحكم (نفس آلية لوحة التحكم الموجودة)
     function unlockStatsThen(onOk) {
       if (statsUnlocked()) { onOk(); return; }
+      // المرحلة 2: دور فيه VIEW_STATISTICS (OWNER / MANAGER) → دخول مباشر بلا بوابة كلمة سر.
+      // نمرّر بيانات الدخول بدل الـ PIN؛ السيرفر بيتحقق من الدور (authorizeAdminView_).
+      if (typeof roleActive === 'function' && roleActive()
+          && typeof hasPermission === 'function' && hasPermission('VIEW_STATISTICS')) {
+        window.__aqarStatsUnlock(Object.assign({ pin: '' }, getAuthCreds()));
+        onOk(); return;
+      }
       if (typeof isAdminUnlocked !== 'undefined' && isAdminUnlocked && adminPin) {
         window.__aqarStatsUnlock(adminPin); onOk(); return;
       }
@@ -6263,6 +6359,16 @@
     // بوابة كلمة سر إدخال الوحدة (نفس آلية الزر القديم #addUnitFabBtn — verifyDataEntryPin)
     function unlockAddThen(onOk) {
       if (addUnlocked()) { onOk(); return; }
+      // المرحلة 1: دور مؤكَّد فيه ADD_UNIT (OWNER/DATA_ENTRY) → يفتح مباشرة بلا بوابة كلمة سر
+      if (typeof roleActive === 'function' && roleActive() && typeof hasPermission === 'function' && hasPermission('ADD_UNIT')) {
+        addUnlockedFlag = true; onOk(); return;
+      }
+      // دور مؤكَّد وناقص ADD_UNIT (SALES/MANAGER) → رفض واضح، من غير بوابة كلمة سر
+      if (typeof roleActive === 'function' && roleActive() && typeof hasPermission === 'function' && !hasPermission('ADD_UNIT')
+          && !(typeof isAdminUnlocked !== 'undefined' && isAdminUnlocked && adminPin)) {
+        showToast('صلاحيتك الحالية لا تسمح بإضافة وحدات', 'error');
+        return;
+      }
       if (typeof isAdminUnlocked !== 'undefined' && isAdminUnlocked && adminPin) {
         addVerifiedPin = adminPin; addUnlockedFlag = true; onOk(); return;
       }
