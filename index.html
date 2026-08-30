@@ -827,10 +827,9 @@
     /* it's a page now, not a dialog — the × close control is not shown here (use the nav) */
     body.app-view-add #editModal .modal-close { display: none; }
 
-    /* ===== "عرض السعر" (#calcModal) و "سعر المتر" (#priceStatsModal) كعرض صفحة داخل
-       مساحة المحتوى الرئيسية — نفس نمط "إدخال وحدة" بالظبط. الهيدر + الغلاف + شريط
-       الأزرار (#appNav) يفضلوا ظاهرين؛ المودال يتحوّل لقسم in-flow بدل نافذة عائمة.
-       منطق الحساب / نداءات الباك-إند / الـ IDs لم تتغيّر — تغيير عرض وتنقّل فقط. ===== */
+    /* ===== "عرض السعر" (#quote) = نفس نموذج "إدخال وحدة" (#editModal) بالضبط، معروضًا
+       كصفحة داخل مساحة المحتوى (البند 1). "سعر المتر" (#meter) = #priceStatsModal كصفحة.
+       الهيدر + الغلاف + شريط #appNav يفضلوا ظاهرين؛ المودال يتحوّل لقسم in-flow. ===== */
     body.app-view-quote .ai-search-panel,
     body.app-view-quote .filters-card,
     body.app-view-quote #resultsCount,
@@ -839,7 +838,6 @@
     body.app-view-quote #scrollTopBtn,
     body.app-view-quote #statsView,
     body.app-view-quote #dashboardView,
-    body.app-view-quote #editModal,
     body.app-view-quote #priceStatsModal,
     body.app-view-meter .ai-search-panel,
     body.app-view-meter .filters-card,
@@ -849,11 +847,35 @@
     body.app-view-meter #scrollTopBtn,
     body.app-view-meter #statsView,
     body.app-view-meter #dashboardView,
-    body.app-view-meter #editModal,
-    body.app-view-meter #calcModal { display: none !important; }
+    body.app-view-meter #editModal { display: none !important; }
 
-    /* present the two as full-width in-flow sections under the header/nav (not a modal) */
-    body.app-view-quote #calcModal,
+    /* #editModal in-flow — يخدم عرضَي "إدخال وحدة" و"عرض السعر" بنفس التنسيق */
+    body.app-view-quote #editModal {
+      position: static;
+      display: block;
+      inset: auto;
+      background: none;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      padding: 0;
+      overflow: visible;
+      z-index: auto;
+      max-width: var(--app-max);
+      margin: 0 auto;
+      pointer-events: none;
+    }
+    body.app-view-quote #editModal .modal-box {
+      max-width: none;
+      width: 100%;
+      margin: 0;
+      pointer-events: auto;
+    }
+    /* في "عرض السعر" الـ × يبقى ظاهرًا كطريق رجوع واضح لشاشة البحث */
+    body.app-view-quote #editModal .modal-close {
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+
+    /* #priceStatsModal in-flow — عرض "سعر المتر" */
     body.app-view-meter #priceStatsModal {
       position: static;
       display: block;
@@ -866,18 +888,17 @@
       z-index: auto;
       max-width: var(--app-max);
       margin: 0 auto;
-      pointer-events: none;              /* clicks on the empty edges do nothing (no accidental close) */
+      pointer-events: none;
     }
-    body.app-view-quote #calcModal .modal-box,
     body.app-view-meter #priceStatsModal .modal-box {
-      max-width: none;   /* صفحة كاملة العرض داخل مساحة المحتوى (يتفوّق على 520/640px بالـ specificity) */
+      max-width: none;
       width: 100%;
       margin: 0;
       pointer-events: auto;
     }
-    /* the × in the card header stays — it's the clear "back to search" control for this page */
-    body.app-view-quote #calcModal .modal-close,
-    body.app-view-meter #priceStatsModal .modal-close { display: inline-flex; align-items: center; justify-content: center; }
+    body.app-view-meter #priceStatsModal .modal-close {
+      display: inline-flex; align-items: center; justify-content: center;
+    }
 
     /* ---- dashboard styles, all scoped under #statsView so nothing leaks into Search ---- */
     #statsView h1 {
@@ -1750,6 +1771,20 @@
     }
     #editResetBtn:hover { background: rgba(255,255,255,0.1); }
     #editResetBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+    /* البند 1+2: صف أزرار "عرض السعر" (تصدير + واتساب) — نفس لغة أزرار النظام */
+    #quoteActionRow { display: none; gap: 10px; margin-top: 12px; }
+    #quoteActionRow.show { display: flex; flex-wrap: wrap; }
+    #quoteActionRow button {
+      flex: 1 1 200px; padding: 12px; border-radius: 9px;
+      font-family: inherit; font-weight: 700; font-size: 14px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    #quoteExportBtn { background: var(--navy); color: var(--gold-soft); border: 1px solid var(--border-gold); }
+    #quoteExportBtn:hover { background: var(--navy-deep); }
+    #quoteWhatsAppBtn { background: #4FA579; color: #fff; border: 1px solid #4FA579; }
+    #quoteWhatsAppBtn:hover { background: #46946c; }
+    #quoteActionRow button:disabled { opacity: 0.6; cursor: not-allowed; }
+    #quoteActionRow button svg { width: 16px; height: 16px; flex-shrink: 0; }
 
     /* ===== inline SVG UI icon system (replaces emoji glyphs) ===== */
     .ico {
@@ -1777,30 +1812,37 @@
     .small-btn .ico { width: 14px; height: 14px; margin-left: 6px; vertical-align: -0.16em; }
     .compare-bar .ico { width: 15px; height: 15px; margin-left: 6px; vertical-align: -0.18em; }
 
-    /* ===== card provenance row (moved off inline styles) =====
-       صف واحد بثلاث خانات: أضافها (يسار بصري) | عدد المشاهدات (وسط) | المطور (يمين بصري).
-       ترتيب الـ DOM: [المطور، المشاهدات، أضافها] — في RTL أول عنصر flex يروح لليمين،
-       وآخر عنصر لليسار، فيتحقق التوزيع المطلوب. text-align فيزيائي (left/right) مش
-       منطقي عشان يفضل ثابت مهما كان اتجاه الصفحة. */
+    /* ===== card provenance row =====
+       المطلوب (البند 8): "مُدخِل الوحدة" و"عدد مشاهدات التفاصيل" على نفس السطر ومتجاورين،
+       وعدّاد المشاهدات محاذى لليسار بجوار منطقة "أضافها" (اتجاه RTL). المطوّر يبقى على يمين السطر.
+       DOM: [prov-dev] [prov-meta:( prov-added, prov-views )] — RTL: المطوّر يمينًا، والمجموعة يسارًا.
+       text-align فيزيائي (left/right) عشان يفضل ثابت. responsive: يلتفّ لأسفل لو المطوّر طويل. */
     .card-provenance {
       margin-top: 8px; padding-top: 8px;
       border-top: 1px dashed var(--line-dark);
       font-size: 11.5px; font-weight: 500; color: rgba(234,240,246,0.78);
-      display: flex; align-items: center; gap: 8px; flex-wrap: nowrap;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; flex-wrap: wrap;
     }
-    .card-provenance .prov-dev,
-    .card-provenance .prov-added {
-      flex: 1 1 0; min-width: 0;
+    .card-provenance .prov-dev {
+      flex: 1 1 auto; min-width: 0; text-align: right;
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
-    .card-provenance .prov-dev { text-align: right; }
-    .card-provenance .prov-added { text-align: left; }
+    .card-provenance .prov-meta {
+      flex: 0 1 auto; min-width: 0;
+      display: inline-flex; align-items: center; gap: 10px;
+    }
+    .card-provenance .prov-added {
+      min-width: 0; text-align: left;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
     .card-provenance .prov-views {
-      flex: 0 0 auto; text-align: center; white-space: nowrap;
+      flex: 0 0 auto; white-space: nowrap;
       display: inline-flex; align-items: center; gap: 3px;
+      color: var(--gold-soft); font-weight: 700;
     }
     .card-provenance a { color: var(--gold-soft); font-weight: 700; text-decoration: underline; cursor: pointer; }
-    @media (max-width: 380px) { .card-provenance { font-size: 10px; gap: 5px; } }
+    @media (max-width: 380px) { .card-provenance { font-size: 10px; gap: 5px 8px; } }
 
     /* ===== conditional card header padding: only reserve gutter when there is no cover image ===== */
     .unit-card:has(.unit-cover) .unit-top { padding: 2px 0 0; }
@@ -2110,7 +2152,7 @@
     <button type="button" class="top-action-btn app-nav-btn top-action-price" id="priceInfoFabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>سعر المتر</span></button>
     <button type="button" class="top-action-btn app-nav-btn" id="navAddUnitBtn" data-app-view="add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>إدخال وحدة</span></button>
     <a href="https://resale-units.vercel.app/" target="_blank" rel="noopener" class="top-action-btn app-nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg><span>وحدات إعادة البيع</span></a>
-    <button type="button" class="top-action-btn app-nav-btn" id="navStatsBtn" data-app-view="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span>الإحصائيات والمخزون</span></button>
+    <!-- "الإحصائيات والمخزون" أُزيل من الشريط الرئيسي — الوصول إليه من لوحة التحكم / الشريط الجانبي فقط، وحسب صلاحية VIEW_STATISTICS. -->
     <button type="button" class="top-action-btn app-nav-btn top-action-admin" id="adminFab" data-app-view="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>لوحة الإدارة</span></button>
   </nav>
   <!-- زر بوابة كلمة سر إدخال الوحدة — مخفي، بيتفعّل من زر "إدخال وحدة" في الشريط أعلاه -->
@@ -2545,140 +2587,7 @@
   </div>
 </div>
 
-<!-- مودال حاسبة السعر والتقسيط -->
-<div class="modal-overlay" id="calcModal">
-  <div class="modal-box">
-    <div class="modal-header">
-      <div class="modal-title"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg>حاسبة السعر والتقسيط</div>
-      <button class="modal-close" id="calcModalCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-    </div>
-
-    <div class="ai-fill-panel">
-      <div class="section-title" style="margin-bottom:6px;"><svg class="ico" viewBox="0 0 24 24"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"/><path d="m18.5 14 .8 2.4 2.4.8-2.4.8-.8 2.4-.8-2.4-2.4-.8 2.4-.8Z"/></svg>تعبئة تلقائية بالذكاء الاصطناعي</div>
-      <p style="font-size:12px; color:var(--muted); margin:0 0 10px; line-height:1.7;">
-        الصق رسالة المطور، أو ارفع صورة/PDF، والذكاء الاصطناعي هيملى الحاسبة تلقائيًا. راجع البيانات كويس قبل ما تصدّر.
-      </p>
-      <textarea id="calcAiPasteText" placeholder="الصق نص الرسالة هنا (اختياري)..." style="min-height:80px; width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:13px;"></textarea>
-      <div id="calcAiImagePasteZone" class="ai-paste-zone" tabindex="0">
-        دوس هنا وبعدين الصق صورة (Ctrl+V)
-      </div>
-      <div id="calcAiPastedImagePreview" style="display:none; margin-top:8px; position:relative; max-width:180px;">
-        <img id="calcAiPastedImageTag" style="width:100%; border-radius:8px; border:1px solid var(--border);">
-        <button type="button" id="calcAiPastedImageRemove" style="position:absolute; top:-8px; left:-8px; width:22px; height:22px; border-radius:50%; background:var(--error-fg); color:#fff; border:none; cursor:pointer; font-size:12px;"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-      </div>
-      <input type="file" id="calcAiFileInput" accept="image/*,application/pdf" style="margin-top:8px; width:100%; font-size:12px;">
-      <button type="button" id="calcAiExtractBtn" class="ai-extract-btn">
-        استخرج البيانات وابدأ التعبئة
-      </button>
-      <div id="calcAiExtractMsg" style="font-size:12px; margin-top:8px; display:none;"></div>
-    </div>
-
-    <div class="section-title">بيانات الوحدة</div>
-    <div class="grid">
-      <div>
-        <label>المدينة</label>
-        <select id="calcCitySelect"></select>
-      </div>
-      <div>
-        <label>المنطقة</label>
-        <select id="calcDistrictSelect" disabled></select>
-      </div>
-      <div>
-        <label>المطور العقاري</label>
-        <input type="text" id="calcDeveloper" list="calcDeveloperDatalist" placeholder="مثال: طلعت مصطفى" autocomplete="off">
-        <datalist id="calcDeveloperDatalist"></datalist>
-      </div>
-      <div>
-        <label>اسم المشروع</label>
-        <input type="text" id="calcProjectName" list="calcProjectDatalist" placeholder="مثال: هايد بارك" autocomplete="off">
-        <datalist id="calcProjectDatalist"></datalist>
-      </div>
-      <div>
-        <label>المساحة (م²)</label>
-        <input type="number" id="calcUnitArea" min="0" step="any">
-      </div>
-      <div>
-        <label>الدور</label>
-        <input type="text" id="calcFloor" placeholder="مثال: الثالث">
-      </div>
-      <div>
-        <label>مساحة الحديقة (م²)</label>
-        <input type="number" id="calcGardenArea" min="0" step="any">
-      </div>
-      <div>
-        <label>مساحة التراس (م²)</label>
-        <input type="number" id="calcTerraceArea" min="0" step="any">
-      </div>
-      <div>
-        <label>مساحة السطح (م²)</label>
-        <input type="number" id="calcRoofArea" min="0" step="any">
-      </div>
-      <div>
-        <label>السعر الأصلي (قبل الخصم)</label>
-        <input type="number" id="calcPrice" min="0">
-      </div>
-      <div>
-        <label>نسبة الخصم %</label>
-        <input type="number" id="calcDiscount" min="0" max="100" step="any">
-      </div>
-    </div>
-
-    <div class="section-title">صور الوحدة (اختياري)</div>
-    <div class="images-zone" id="calcImagesZone" tabindex="0">
-      <p>الصق صورة (Ctrl+V) هنا، أو اسحب صورة، أو اختار من جهازك</p>
-      <input type="file" id="calcImagesFileInput" accept="image/*" multiple style="display:none;">
-      <button type="button" class="images-choose-btn" id="calcImagesChooseBtn"><svg class="ico" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg> اختيار صور من الجهاز</button>
-    </div>
-    <div id="calcImagesPreview" class="images-preview"></div>
-    <div id="calcImagesUploadMsg" style="font-size:12px; margin-top:6px;"></div>
-
-    <div class="section-title">المقدم والدفعات</div>
-    <div class="grid">
-      <div>
-        <label>المقدم (نسبة %)</label>
-        <input type="number" id="calcDownPayment" min="0" max="100" step="any">
-      </div>
-      <div>
-        <label>المقدم محسوب على</label>
-        <select id="calcDownPaymentBase">
-          <option value="بعد الخصم">السعر بعد الخصم</option>
-          <option value="قبل الخصم">السعر قبل الخصم</option>
-        </select>
-      </div>
-      <div>
-        <label>قيمة الدفعة (نسبة % أو قيمة)</label>
-        <input type="text" id="calcPaymentAmount" placeholder="مثال: 5% أو 50000">
-      </div>
-      <div>
-        <label>عدد الدفعات</label>
-        <input type="number" id="calcPaymentCount" min="0">
-      </div>
-      <div>
-        <label>موعد الدفعات</label>
-        <input type="text" id="calcPaymentSchedule" placeholder="مثال: كل 6 شهور">
-      </div>
-      <div>
-        <label>عدد سنوات التقسيط</label>
-        <input type="number" id="calcInstallmentYears" min="0" step="any">
-      </div>
-    </div>
-
-    <div class="section-title">ملاحظات</div>
-    <textarea id="calcNotes" placeholder="أي تفاصيل إضافية عن العرض..." style="width:100%; min-height:60px; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:14px;"></textarea>
-
-    <div class="calc-results" id="calcResults">
-      <div class="calc-result-row"><span>السعر بعد الخصم</span><b id="calcResPriceAfterDiscount">-</b></div>
-      <div class="calc-result-row"><span>سعر المتر</span><b id="calcResPricePerMeter">-</b></div>
-      <div class="calc-result-row"><span>قيمة المقدم</span><b id="calcResDownPaymentValue">-</b></div>
-      <div class="calc-result-row"><span>إجمالي الدفعات</span><b id="calcResTotalPayments">-</b></div>
-      <div class="calc-result-row"><span>المتبقي على الأقساط</span><b id="calcResRemaining">-</b></div>
-      <div class="calc-result-row highlight"><span>القسط الشهري التقريبي</span><b id="calcResMonthly">-</b></div>
-      <div class="calc-result-row highlight"><span>القسط الربع سنوي التقريبي</span><b id="calcResQuarterly">-</b></div>
-    </div>
-
-    <button type="button" id="calcExportBtn" style="width:100%; margin-top:16px; padding:13px; border:none; border-radius:9px; background:var(--navy); color:var(--gold-soft); font-weight:700; font-size:14px; cursor:pointer;">تصدير النتيجة PDF</button>
-  </div>
-</div>
+<!-- (أُزيل مودال "حاسبة السعر والتقسيط" #calcModal — البند 1: "عرض السعر" بقى يستخدم نفس نموذج "إدخال وحدة" (#editModal) في وضع quote. لا نموذجين.) -->
 
 <!-- مودال اختيار الصور للمشاركة -->
 <div class="modal-overlay" id="shareImagesModal">
@@ -3066,6 +2975,11 @@
       <button type="submit" id="editSaveBtn">حفظ التعديلات</button>
       <button type="button" id="editResetBtn" style="display:none;">تفريغ النموذج</button>
       <button type="button" id="editDeleteBtn">مسح الوحدة نهائيًا</button>
+      <!-- البند 1+2: أزرار "عرض السعر" — نفس النموذج، تظهر فقط في وضع quote (يضبطها openQuoteMode) -->
+      <div id="quoteActionRow">
+        <button type="button" id="quoteExportBtn"><svg class="ico" viewBox="0 0 24 24"><path d="M14 3v5h5"/><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M9 13h6M9 17h6"/></svg><span class="qlbl">تصدير عرض السعر (PDF)</span></button>
+        <button type="button" id="quoteWhatsAppBtn"><svg class="ico" viewBox="0 0 24 24"><path d="M3 21l1.9-5.6A9 9 0 1 1 12 21a9 9 0 0 1-4.6-1.2L3 21Z"/><path d="M9 10c0 3 2 5 5 5"/></svg><span class="qlbl">مشاركة عبر WhatsApp</span></button>
+      </div>
     </form>
   </div>
 </div>
@@ -3309,22 +3223,13 @@
   }
   window.showToast = showToast;
 
-  /* ---------- حاسبة السعر والتقسيط ---------- */
-  const calcModal = document.getElementById('calcModal');
+  /* ---------- "عرض السعر" (البند 1) ----------
+   * لم يعد له نموذج/حاسبة منفصلة. "عرض السعر" يفتح نفس نموذج "إدخال وحدة" (#editModal)
+   * في وضع editModalMode='quote' — نفس الحقول/الترتيب/القوائم/الحسابات بالضبط.
+   * الزر ينقل فقط إلى #quote، وroute() → showQuoteView() → openQuoteMode().
+   */
   const calcFabBtn = document.getElementById('calcFabBtn');
-  const calcModalCloseBtn = document.getElementById('calcModalCloseBtn');
-
-  // تعبئة قائمة المطوّرين في الحاسبة — نفس المنطق القديم، متاح كجسر للـ SPA view.
-  window.__aqarPopulateCalcDevs = function() {
-    var dl = document.getElementById('calcDeveloperDatalist');
-    if (dl && editDevProjectMap && Array.isArray(editDevProjectMap.developers)) {
-      dl.innerHTML = editDevProjectMap.developers.map(d => `<option value="${d}">`).join('');
-    }
-  };
-  // "عرض السعر" — يفتح كصفحة داخل مساحة المحتوى الرئيسية (مش Modal). التنقّل عبر الـ hash،
-  // وroute() → showQuoteView() (اللي بينده __aqarPopulateCalcDevs). منطق الحساب لم يتغيّر.
   calcFabBtn.addEventListener('click', function() {
-    window.__aqarPopulateCalcDevs();
     if (location.hash !== '#quote') location.hash = 'quote';
     else if (typeof window.__aqarReroute === 'function') window.__aqarReroute();
   });
@@ -3439,9 +3344,11 @@
     document.getElementById('editUnitIdLabel').textContent = '';
     document.querySelector('#editModal .modal-title').firstChild.textContent = 'إضافة وحدة جديدة ';
     editSaveBtn.textContent = 'حفظ الوحدة الجديدة';
+    editSaveBtn.style.display = '';   // (يُخفى في وضع "عرض السعر" — نعيده هنا)
     editDeleteBtn.style.display = 'none';
     editResetBtn.style.display = ''; // زر "تفريغ النموذج" يظهر في وضع إضافة وحدة فقط (زي add.html)
     document.getElementById('editFetchLastSimilarBtn').style.display = ''; // زر "جيب آخر وحدة مشابهة" — وضع الإضافة فقط (زي add.html)
+    var _qr = document.getElementById('quoteActionRow'); if (_qr) _qr.classList.remove('show');
     editMsg.style.display = 'none';
     editMsg.className = '';
 
@@ -3462,6 +3369,126 @@
     calcEditMonthlyInstallment();
     editModal.classList.add('open');
   }
+
+  /* ============================================================
+   * البند 1 — "عرض السعر" = نفس نموذج "إدخال وحدة" (#editForm) في وضع quote.
+   * نفس الحقول/الترتيب/القوائم/الحسابات (calcEditMonthlyInstallment) وتعبئة الـ AI.
+   * الفرق: لا حفظ في الباك-إند — الهدف توليد/مشاركة عرض السعر (PDF + WhatsApp)
+   * من نفس بيانات الوحدة المُدخَلة، بإعادة استخدام downloadUnitPDF / shareOnWhatsApp.
+   * ============================================================ */
+  function openQuoteMode() {
+    // ابدأ من reset كامل زي وضع الإضافة (نفس القوائم/الحقول/تعبئة AI/الصور)
+    openAddUnitModal();
+    editModalMode = 'quote';
+    document.querySelector('#editModal .modal-title').firstChild.textContent = 'عرض السعر ';
+    // في وضع "عرض السعر": لا "حفظ"، لا "مسح"، لا "جيب آخر وحدة" — بدلها صفّ (تصدير + واتساب)
+    editSaveBtn.style.display = 'none';
+    editDeleteBtn.style.display = 'none';
+    editResetBtn.style.display = '';
+    document.getElementById('editFetchLastSimilarBtn').style.display = '';
+    var qr = document.getElementById('quoteActionRow'); if (qr) qr.classList.add('show');
+    editMsg.style.display = 'none';
+    editMsg.className = '';
+  }
+  window.__aqarOpenQuoteMode = openQuoteMode;
+
+  /* بناء كائن وحدة (بمفاتيح أعمدة الشيت) من نموذج #editForm — لإعادة استخدام
+   * downloadUnitPDF / shareOnWhatsApp / buildUnitShareText كما هي. الحسابات نفس
+   * منطق calcEditMonthlyInstallment (خصم/مقدم/قسط) + سعر المتر = بعد الخصم ÷ المساحة. */
+  function buildQuoteUnitObject() {
+    var g = function (name) { var el = editForm.elements[name]; return el ? String(el.value || '').trim() : ''; };
+    var num = function (v) { var n = parseFloat(String(v).replace(/,/g, '')); return isNaN(n) ? 0 : n; };
+
+    var price = num(g('price'));
+    var discountPercent = num(g('discountPercent'));
+    var priceAfterDiscount = discountPercent > 0 ? Math.round(price - (price * discountPercent / 100)) : price;
+    var unitArea = num(g('unitArea'));
+    var pricePerMeter = unitArea > 0 ? Math.round(priceAfterDiscount / unitArea) : '';
+
+    var downPaymentPercent = num(g('downPayment'));
+    var downPaymentBase = g('downPaymentBase') === 'قبل الخصم' ? price : priceAfterDiscount;
+    var downPaymentValue = Math.round(downPaymentBase * (downPaymentPercent / 100));
+
+    var payRaw = (g('paymentAmount') || '').replace(/٪/g, '%');
+    var paymentAmountValue = payRaw.indexOf('%') !== -1
+      ? Math.round(priceAfterDiscount * ((parseFloat(payRaw) || 0) / 100))
+      : num(payRaw);
+    var paymentCount = num(g('paymentCount'));
+    var years = num(g('installmentYears'));
+    var months = years * 12;
+    var monthly = '';
+    if (priceAfterDiscount > 0 && months > 0) {
+      var remaining = priceAfterDiscount - downPaymentValue - (paymentAmountValue * paymentCount);
+      monthly = Math.round(remaining / months);
+    }
+
+    return {
+      'Unit ID': '',                               // عرض سعر تقديري — بلا رقم وحدة حقيقي
+      'Status': g('status') || 'متاح',
+      'Property Type': g('propertyType') || 'وحدة',
+      'Category': g('category'),
+      'Project Name': g('projectName'),
+      'Developer Name': g('developer'),
+      'City': g('city'),
+      'Area/District': g('district'),
+      'Unit Area (sqm)': g('unitArea'),
+      'Garden Area (sqm)': g('gardenArea'),
+      'Terrace Area (sqm)': g('terraceArea'),
+      'Roof Area (sqm)': g('roofArea'),
+      'Rooms': g('rooms'),
+      'Bathrooms': g('bathrooms'),
+      'Floor': g('floor'),
+      'Finishing': g('finishing'),
+      'View': g('view'),
+      'Price': price || '',
+      'Discount Percentage': discountPercent || '',
+      'Price After Discount': priceAfterDiscount || '',
+      'Price per Meter': pricePerMeter,
+      'Payment Method': g('paymentMethod'),
+      'Down Payment': downPaymentPercent || '',
+      'Down Payment Value': downPaymentValue || '',
+      'Payment Count': paymentCount || '',
+      'Payment Amount Value': paymentAmountValue || '',
+      'Payment Schedule': g('paymentSchedule'),
+      'Installment Years': g('installmentYears'),
+      'Monthly Installment': monthly,
+      'Other Payment Plans': g('otherPaymentPlans'),
+      'Delivery Date': g('deliveryDate'),
+      'Owner Phone': '',
+      'Sales/Agent': g('agent'),
+      'Notes': g('notes'),
+      'Images': (typeof editUnitImages !== 'undefined' ? editUnitImages : []).join(','),
+      'Entered By': (window.__currentUser && window.__currentUser.name) || '',
+      'Date Added': '', 'Last Updated': ''
+    };
+  }
+
+  function quoteValidateMinimum() {
+    var price = parseFloat(String((editForm.elements['price'] || {}).value || '').replace(/,/g, '')) || 0;
+    if (price <= 0) { showToast('اكتب السعر الأصلي الأول', 'error'); return false; }
+    return true;
+  }
+
+  // shim: generateUnitPDF يعدّل btnEl.textContent/disabled — نوجّهه على span النص فقط
+  // كي لا تُمسح الأيقونة، ونحافظ على شكل الزر كما هو.
+  function quoteBtnShim(realBtn) {
+    var lbl = realBtn.querySelector('.qlbl');
+    return {
+      get textContent() { return lbl ? lbl.textContent : realBtn.textContent; },
+      set textContent(v) { if (lbl) lbl.textContent = v; else realBtn.textContent = v; },
+      get disabled() { return realBtn.disabled; },
+      set disabled(v) { realBtn.disabled = v; }
+    };
+  }
+  document.getElementById('quoteExportBtn').addEventListener('click', function () {
+    if (!quoteValidateMinimum()) return;
+    // إعادة استخدام مسار تصدير الوحدة نفسه بالكامل (نافذة بيانات المسؤول + generateUnitPDF)
+    downloadUnitPDF(buildQuoteUnitObject(), quoteBtnShim(this));
+  });
+  document.getElementById('quoteWhatsAppBtn').addEventListener('click', function () {
+    if (!quoteValidateMinimum()) return;
+    shareOnWhatsApp(buildQuoteUnitObject());   // نفس buildUnitShareText — لا بيانات ناقصة
+  });
 
   /* ---------- استخراج بيانات الوحدة بالذكاء الاصطناعي داخل نافذة الإضافة ---------- */
   let unitAddAiPastedImageBase64 = null;
@@ -3662,554 +3689,13 @@
     renderPriceStatsTable(lastPriceStats.filter(d => d.name.toLowerCase().includes(kw) || d.propertyType.toLowerCase().includes(kw)));
   });
 
-  /* ---------- قوائم المدينة/المنطقة/المطور/المشروع في الحاسبة ---------- */
-  const calcCitySelect = document.getElementById('calcCitySelect');
-  const calcDistrictSelect = document.getElementById('calcDistrictSelect');
-  const calcDeveloperInput = document.getElementById('calcDeveloper');
-  const calcProjectNameInput = document.getElementById('calcProjectName');
-  const calcDeveloperDatalist = document.getElementById('calcDeveloperDatalist');
-  const calcProjectDatalist = document.getElementById('calcProjectDatalist');
+  /* ---------- (أُزيلت وحدة "حاسبة السعر" بالكامل — البند 1) ----------
+   * كانت: قوائم المدينة/المنطقة/المطور + تعبئة AI + runCalculator + رفع صور +
+   * calcExportBtn. كلها مكرّرة من نموذج "إدخال وحدة" (#editModal): نفس القوائم
+   * (populateCitySelect/populateDistrictSelect)، نفس حساب القسط (calcEditMonthlyInstallment)،
+   * نفس رفع الصور (uploadEditImageFile)، ونفس تعبئة AI (unitAddAiSection).
+   * "عرض السعر" الآن = openQuoteMode() على نفس #editForm. لا كود حاسبة منفصل. */
 
-  populateCitySelect(calcCitySelect, false);
-  calcCitySelect.addEventListener('change', function() {
-    populateDistrictSelect(calcDistrictSelect, calcCitySelect.value, false);
-  });
-
-  calcDeveloperInput.addEventListener('input', function() {
-    const dev = calcDeveloperInput.value.trim();
-    const projects = (editDevProjectMap.map[dev]) ? Object.keys(editDevProjectMap.map[dev]) : [];
-    calcProjectDatalist.innerHTML = projects.map(p => `<option value="${p}">`).join('');
-  });
-  calcProjectNameInput.addEventListener('input', function() {
-    const dev = calcDeveloperInput.value.trim();
-    const proj = calcProjectNameInput.value.trim();
-    const info = editDevProjectMap.map[dev] && editDevProjectMap.map[dev][proj];
-    if (info && info.city) {
-      calcCitySelect.value = info.city;
-      populateDistrictSelect(calcDistrictSelect, info.city, false, info.district);
-    }
-  });
-
-  // × في رأس الصفحة = الرجوع الواضح لشاشة البحث (الصفحة السابقة). مش بيغيّر منطق الحاسبة.
-  function __leaveQuotePage() {
-    if (typeof window.__aqarGoSearch === 'function') window.__aqarGoSearch();
-    else { location.hash = ''; }
-  }
-  calcModalCloseBtn.addEventListener('click', __leaveQuotePage);
-  calcModal.addEventListener('click', function(e) { if (e.target === this) __leaveQuotePage(); });
-
-  /* ---------- تعبئة تلقائية بالذكاء الاصطناعي في الحاسبة ---------- */
-  let calcAiPastedImageBase64 = null;
-  let calcAiPastedImageMime = null;
-
-  document.getElementById('calcAiImagePasteZone').addEventListener('focus', function() {
-    this.classList.add('is-armed');
-    this.textContent = 'جاهز - الصق الصورة دلوقتي (Ctrl+V)';
-  });
-  document.getElementById('calcAiImagePasteZone').addEventListener('blur', function() {
-    this.classList.remove('is-armed');
-    this.textContent = 'دوس هنا وبعدين الصق صورة (Ctrl+V)';
-  });
-  document.getElementById('calcAiImagePasteZone').addEventListener('paste', function(e) {
-    const items = (e.clipboardData || window.clipboardData).items;
-    for (const item of items) {
-      if (item.type.indexOf('image') === 0) {
-        e.preventDefault();
-        const file = item.getAsFile();
-        const reader = new FileReader();
-        reader.onload = function() {
-          calcAiPastedImageBase64 = reader.result.split(',')[1];
-          calcAiPastedImageMime = file.type;
-          document.getElementById('calcAiPastedImageTag').src = reader.result;
-          document.getElementById('calcAiPastedImagePreview').style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-        return;
-      }
-    }
-  });
-  document.getElementById('calcAiPastedImageRemove').addEventListener('click', function() {
-    calcAiPastedImageBase64 = null;
-    calcAiPastedImageMime = null;
-    document.getElementById('calcAiPastedImagePreview').style.display = 'none';
-  });
-
-  document.getElementById('calcAiExtractBtn').addEventListener('click', function() {
-    const btn = this;
-    const msg = document.getElementById('calcAiExtractMsg');
-    const text = document.getElementById('calcAiPasteText').value.trim();
-    const fileInput = document.getElementById('calcAiFileInput');
-    const file = fileInput.files[0];
-
-    if (!text && !file && !calcAiPastedImageBase64) {
-      msg.style.display = 'block';
-      msg.style.color = 'var(--error-fg)';
-      msg.textContent = 'الصق نص أو صورة، أو ارفع صورة/PDF الأول';
-      return;
-    }
-
-    btn.disabled = true;
-    btn.textContent = 'جاري القراءة والاستخراج...';
-    msg.style.display = 'none';
-
-    function callExtract(fileBase64, mimeType) {
-      google.script.run
-        .withSuccessHandler(function(res) {
-          btn.disabled = false;
-          btn.textContent = 'استخرج البيانات وابدأ التعبئة';
-          if (!res.success) {
-            msg.style.display = 'block';
-            msg.style.color = 'var(--error-fg)';
-            msg.textContent = res.message;
-            return;
-          }
-          fillCalcFormFromAI(res.data);
-          msg.style.display = 'block';
-          msg.style.color = 'var(--success-fg)';
-          msg.textContent = 'تم استخراج البيانات - راجعها كويس قبل التصدير';
-        })
-        .withFailureHandler(function(err) {
-          btn.disabled = false;
-          btn.textContent = 'استخرج البيانات وابدأ التعبئة';
-          msg.style.display = 'block';
-          msg.style.color = 'var(--error-fg)';
-          msg.textContent = 'حدث خطأ: ' + err.message;
-        })
-        .extractUnitDataWithAI(text, fileBase64, mimeType);
-    }
-
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function() {
-        const base64Data = reader.result.split(',')[1];
-        callExtract(base64Data, file.type);
-      };
-      reader.readAsDataURL(file);
-    } else if (calcAiPastedImageBase64) {
-      callExtract(calcAiPastedImageBase64, calcAiPastedImageMime);
-    } else {
-      callExtract(null, null);
-    }
-  });
-
-  function fillCalcFormFromAI(data) {
-    const directMap = {
-      developer: 'calcDeveloper', projectName: 'calcProjectName', unitArea: 'calcUnitArea',
-      floor: 'calcFloor', gardenArea: 'calcGardenArea', terraceArea: 'calcTerraceArea',
-      roofArea: 'calcRoofArea', price: 'calcPrice', discountPercent: 'calcDiscount',
-      downPayment: 'calcDownPayment', downPaymentBase: 'calcDownPaymentBase',
-      paymentAmount: 'calcPaymentAmount', paymentCount: 'calcPaymentCount',
-      paymentSchedule: 'calcPaymentSchedule', installmentYears: 'calcInstallmentYears',
-      notes: 'calcNotes'
-    };
-
-    Object.keys(directMap).forEach(key => {
-      const value = data[key];
-      if (!value) return;
-      const el = document.getElementById(directMap[key]);
-      if (!el) return;
-      el.value = value;
-      el.dispatchEvent(new Event('input', { bubbles: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true }));
-    });
-
-    // المدينة والمنطقة
-    if (data.city) {
-      const cityMatch = Object.keys(CITY_DISTRICTS).find(c => c === data.city || c.includes(data.city) || data.city.includes(c));
-      if (cityMatch) {
-        calcCitySelect.value = cityMatch;
-        let districtMatch = '';
-        if (data.district) {
-          districtMatch = CITY_DISTRICTS[cityMatch].find(d =>
-            d === data.district || d.includes(data.district) || data.district.includes(d)) || '';
-        }
-        populateDistrictSelect(calcDistrictSelect, cityMatch, false, districtMatch);
-      }
-    }
-
-    if (typeof runCalculator === 'function') runCalculator();
-  }
-
-  const calcFieldIds = ['calcPrice', 'calcDiscount', 'calcDownPayment', 'calcDownPaymentBase', 'calcPaymentAmount', 'calcPaymentCount', 'calcInstallmentYears'];
-  let lastCalcResult = null;
-
-  function runCalculator() {
-    const price = parseFloat(document.getElementById('calcPrice').value) || 0;
-    const discountPercent = parseFloat(document.getElementById('calcDiscount').value) || 0;
-    const priceAfterDiscount = discountPercent > 0 ? Math.round(price - (price * discountPercent / 100)) : price;
-
-    const unitArea = parseFloat(document.getElementById('calcUnitArea').value) || 0;
-    const floor = document.getElementById('calcFloor').value.trim();
-    const gardenArea = parseFloat(document.getElementById('calcGardenArea').value) || 0;
-    const terraceArea = parseFloat(document.getElementById('calcTerraceArea').value) || 0;
-    const roofArea = parseFloat(document.getElementById('calcRoofArea').value) || 0;
-    const weightedArea = unitArea + (gardenArea / 3) + (terraceArea / 3) + (roofArea / 3);
-    const pricePerMeter = weightedArea > 0 ? Math.round(price / weightedArea) : 0;
-
-    const downPaymentPercent = parseFloat(document.getElementById('calcDownPayment').value) || 0;
-    const downPaymentBase = document.getElementById('calcDownPaymentBase').value === 'قبل الخصم' ? price : priceAfterDiscount;
-    const downPaymentValue = Math.round(downPaymentBase * (downPaymentPercent / 100));
-
-    const paymentAmountRaw = (document.getElementById('calcPaymentAmount').value || '').trim();
-    let paymentAmountValue = 0;
-    if (paymentAmountRaw.indexOf('%') !== -1) {
-      paymentAmountValue = Math.round(priceAfterDiscount * ((parseFloat(paymentAmountRaw) || 0) / 100));
-    } else {
-      paymentAmountValue = parseFloat(paymentAmountRaw) || 0;
-    }
-    const paymentCount = parseFloat(document.getElementById('calcPaymentCount').value) || 0;
-    const totalPayments = paymentAmountValue * paymentCount;
-
-    const years = parseFloat(document.getElementById('calcInstallmentYears').value) || 0;
-    const months = years * 12;
-    const remaining = priceAfterDiscount - downPaymentValue - totalPayments;
-    const monthly = months > 0 ? Math.round(remaining / months) : 0;
-
-    document.getElementById('calcResPriceAfterDiscount').textContent = price > 0 ? fmtNum(priceAfterDiscount) + ' جنيه' : '-';
-    document.getElementById('calcResPricePerMeter').textContent = pricePerMeter > 0 ? fmtNum(pricePerMeter) + ' ج/م²' : '-';
-    document.getElementById('calcResDownPaymentValue').textContent = downPaymentPercent > 0 ? fmtNum(downPaymentValue) + ' جنيه' : '-';
-    document.getElementById('calcResTotalPayments').textContent = totalPayments > 0 ? fmtNum(totalPayments) + ' جنيه' : '-';
-    document.getElementById('calcResRemaining').textContent = price > 0 ? fmtNum(remaining) + ' جنيه' : '-';
-    document.getElementById('calcResMonthly').textContent = months > 0 ? fmtNum(monthly) + ' جنيه/شهريًا' : '-';
-    document.getElementById('calcResQuarterly').textContent = months > 0 ? fmtNum(monthly * 3) + ' جنيه/كل 3 شهور' : '-';
-
-    lastCalcResult = {
-      city: calcCitySelect.value, district: calcDistrictSelect.value,
-      developer: calcDeveloperInput.value.trim(), projectName: calcProjectNameInput.value.trim(),
-      unitArea, floor, gardenArea, terraceArea, roofArea, pricePerMeter,
-      price, discountPercent, priceAfterDiscount, downPaymentPercent, downPaymentValue,
-      downPaymentBaseLabel: document.getElementById('calcDownPaymentBase').value,
-      paymentAmountRaw, paymentAmountValue, paymentCount, totalPayments,
-      paymentSchedule: document.getElementById('calcPaymentSchedule').value.trim(),
-      notes: document.getElementById('calcNotes').value.trim(),
-      years, monthly, remaining
-    };
-  }
-  calcFieldIds.concat(['calcPaymentSchedule', 'calcNotes', 'calcCitySelect', 'calcDistrictSelect', 'calcDeveloper', 'calcProjectName', 'calcUnitArea', 'calcFloor', 'calcGardenArea', 'calcTerraceArea', 'calcRoofArea']).forEach(id => {
-    const el = document.getElementById(id);
-    el.addEventListener('input', runCalculator);
-    el.addEventListener('change', runCalculator);
-  });
-
-  /* ---------- إدارة صور الوحدة في الحاسبة ---------- */
-  let calcImages = [];
-  let calcUploadingCount = 0;
-  const calcImagesZone = document.getElementById('calcImagesZone');
-  const calcImagesFileInput = document.getElementById('calcImagesFileInput');
-  const calcImagesChooseBtn = document.getElementById('calcImagesChooseBtn');
-  const calcImagesPreview = document.getElementById('calcImagesPreview');
-  const calcImagesUploadMsg = document.getElementById('calcImagesUploadMsg');
-
-  function renderCalcImagesPreview() {
-    calcImagesPreview.innerHTML = calcImages.map((url, idx) => `
-      <div class="image-thumb">
-        <img src="${url}" alt="صورة الوحدة">
-        <button type="button" class="remove-img" onclick="removeCalcImage(${idx})">${ICON.x}</button>
-      </div>
-    `).join('');
-  }
-  function removeCalcImage(idx) {
-    calcImages.splice(idx, 1);
-    renderCalcImagesPreview();
-  }
-  window.removeCalcImage = removeCalcImage;
-
-  function addCalcPlaceholderThumb() {
-    const div = document.createElement('div');
-    div.className = 'image-thumb';
-    div.innerHTML = '<div class="uploading-overlay">جاري الرفع...</div>';
-    calcImagesPreview.appendChild(div);
-    return div;
-  }
-
-  function uploadCalcImageFile(file) {
-    if (!file.type.startsWith('image/')) return;
-    calcUploadingCount++;
-    const placeholder = addCalcPlaceholderThumb();
-    calcImagesUploadMsg.textContent = '';
-
-    const reader = new FileReader();
-    reader.onload = function() {
-      const base64Data = reader.result.split(',')[1];
-      google.script.run
-        .withSuccessHandler(function(res) {
-          calcUploadingCount--;
-          placeholder.remove();
-          if (res.success) {
-            calcImages.push(res.url);
-            renderCalcImagesPreview();
-          } else {
-            calcImagesUploadMsg.style.color = 'var(--gold)';
-            calcImagesUploadMsg.textContent = 'فشل رفع إحدى الصور: ' + res.message;
-          }
-        })
-        .withFailureHandler(function(err) {
-          calcUploadingCount--;
-          placeholder.remove();
-          calcImagesUploadMsg.style.color = 'var(--gold)';
-          calcImagesUploadMsg.textContent = 'حدث خطأ أثناء رفع الصورة: ' + err.message;
-        })
-        .uploadUnitImage(base64Data, file.type);
-    };
-    reader.readAsDataURL(file);
-  }
-
-  calcImagesChooseBtn.addEventListener('click', () => calcImagesFileInput.click());
-  calcImagesFileInput.addEventListener('change', function() {
-    Array.from(calcImagesFileInput.files).forEach(uploadCalcImageFile);
-    calcImagesFileInput.value = '';
-  });
-  calcImagesZone.addEventListener('dragover', function(e) { e.preventDefault(); calcImagesZone.classList.add('drag-over'); });
-  calcImagesZone.addEventListener('dragleave', function() { calcImagesZone.classList.remove('drag-over'); });
-  calcImagesZone.addEventListener('drop', function(e) {
-    e.preventDefault();
-    calcImagesZone.classList.remove('drag-over');
-    Array.from(e.dataTransfer.files).forEach(uploadCalcImageFile);
-  });
-  calcImagesZone.addEventListener('paste', function(e) {
-    const items = (e.clipboardData || window.clipboardData).items;
-    for (const item of items) {
-      if (item.type.indexOf('image') === 0) uploadCalcImageFile(item.getAsFile());
-    }
-  });
-
-  document.getElementById('calcExportBtn').addEventListener('click', async function() {
-    runCalculator();
-    if (!lastCalcResult || !lastCalcResult.price) {
-      showToast('اكتب السعر الأصلي الأول', 'error');
-      return;
-    }
-    const btn = this;
-    const originalLabel = btn.textContent;
-    btn.disabled = true; btn.textContent = 'جاري التجهيز...';
-
-    let agentName = '';
-    let agentPhone = '';
-    try {
-      agentName = localStorage.getItem('pdfAgentName') || '';
-      agentPhone = localStorage.getItem('pdfAgentPhone') || '';
-    } catch (e) {}
-
-    const r = lastCalcResult;
-    const detailRow = (label, value) => value ? `
-      <div style="padding:8px 0; border-bottom:1px solid #eef0f2; display:flex; justify-content:space-between; font-size:12px;">
-        <span style="color:#6b7684;">${label}</span>
-        <span style="color:#1c2530; font-weight:600;">${value}</span>
-      </div>` : '';
-
-    try {
-      const resolvedCalcImages = calcImages.length > 0
-        ? (await Promise.all(calcImages.slice(0, 9).map(fetchImageAsDataUrl))).filter(Boolean)
-        : [];
-
-      const title = (r.projectName || r.developer || 'حساب تقريبي') + (r.developer && r.projectName ? ' - ' + r.developer : '');
-
-      /* ---------- الصفحة الأولى: الغلاف والمواصفات والسعر ---------- */
-      const page1 = document.createElement('div');
-      page1.style.position = 'fixed';
-      page1.style.left = '-9999px';
-      page1.style.top = '0';
-      page1.style.width = '480px';
-      page1.style.fontFamily = "'Segoe UI', Tahoma, Arial, sans-serif";
-      page1.style.direction = 'rtl';
-      page1.style.background = '#ffffff';
-
-      page1.innerHTML = `
-        <div style="background:#0f2942;padding:16px 20px;">
-          <div style="color:#ecd08c;font-size:15px;font-weight:700;">Digital Real Estate</div>
-          <div style="color:#9fb0c2;font-size:11px;margin-top:2px;">بوابتك الآمنة إلى عالم الاستثمار العقاري</div>
-        </div>
-
-        ${resolvedCalcImages[0] ? `<div style="height:220px;background:#e2e5ea;"><img src="${resolvedCalcImages[0]}" style="width:100%;height:100%;object-fit:cover;display:block;"></div>` : ''}
-
-        <div style="padding:18px 20px 4px;">
-          <div style="font-size:18px;font-weight:700;color:#0f2942;">${title}</div>
-          ${r.city ? `<div style="font-size:12px;color:#0f2942;font-weight:700;margin-top:4px;">${r.city}${r.district ? ' - ' + r.district : ''}</div>` : ''}
-        </div>
-
-        <div style="display:flex;flex-wrap:wrap;gap:6px;padding:12px 20px;">
-          ${r.unitArea ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">${fmtNum(r.unitArea)} م²</span>` : ''}
-          ${r.floor ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">دور ${r.floor}</span>` : ''}
-          ${r.gardenArea ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">حديقة ${fmtNum(r.gardenArea)} م²</span>` : ''}
-          ${r.terraceArea ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">تراس ${fmtNum(r.terraceArea)} م²</span>` : ''}
-          ${r.roofArea ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">روف ${fmtNum(r.roofArea)} م²</span>` : ''}
-        </div>
-
-        <div style="margin:6px 20px 0;padding:14px 16px;background:#faf6ec;border-radius:10px;">
-          ${r.discountPercent > 0 ? `
-            <div style="display:flex;align-items:baseline;gap:8px;">
-              <span style="font-size:12px;color:#6b7684;text-decoration:line-through;">${fmtNum(r.price)} جنيه</span>
-              <span style="background:#e24b4a;color:#fff;font-size:10px;padding:2px 8px;border-radius:5px;">خصم ${r.discountPercent}%</span>
-            </div>
-            <div style="font-size:22px;font-weight:700;color:#0f2942;margin-top:4px;">${fmtNum(r.priceAfterDiscount)} جنيه</div>
-          ` : `
-            <div style="font-size:22px;font-weight:700;color:#0f2942;">${fmtNum(r.price)} جنيه</div>
-          `}
-          ${r.pricePerMeter ? `<div style="font-size:11px;color:#6b7684;">${fmtNum(r.pricePerMeter)} جنيه/م²</div>` : ''}
-        </div>
-
-        <div style="margin:10px 20px 0;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-          ${r.downPaymentPercent ? `
-          <div style="background:#f3f4f7;border-radius:8px;padding:10px 12px;">
-            <div style="font-size:10px;color:#6b7684;">المقدم</div>
-            <div style="font-size:13px;font-weight:700;color:#0f2942;">${r.downPaymentPercent}% = ${fmtNum(r.downPaymentValue)} جنيه</div>
-          </div>` : '<div></div>'}
-          ${r.monthly ? `
-          <div style="background:#f3f4f7;border-radius:8px;padding:10px 12px;">
-            <div style="font-size:10px;color:#6b7684;">القسط الشهري</div>
-            <div style="font-size:13px;font-weight:700;color:#0f2942;">${fmtNum(r.monthly)} جنيه</div>
-          </div>` : '<div></div>'}
-          ${r.paymentCount ? `
-          <div style="background:#f3f4f7;border-radius:8px;padding:10px 12px;">
-            <div style="font-size:10px;color:#6b7684;">الدفعات</div>
-            <div style="font-size:13px;font-weight:700;color:#0f2942;">${r.paymentCount} × ${fmtNum(r.paymentAmountValue)} جنيه</div>
-          </div>` : '<div></div>'}
-          ${r.monthly ? `
-          <div style="background:#f3f4f7;border-radius:8px;padding:10px 12px;">
-            <div style="font-size:10px;color:#6b7684;">القسط الربع سنوي</div>
-            <div style="font-size:13px;font-weight:700;color:#0f2942;">${fmtNum(r.monthly * 3)} جنيه</div>
-          </div>` : '<div></div>'}
-        </div>
-        <div style="padding-bottom:20px;"></div>
-      `;
-      document.body.appendChild(page1);
-
-      /* ---------- الصفحة الثانية: كل تفاصيل الحساب وبيانات التواصل ---------- */
-      const page2 = document.createElement('div');
-      page2.style.position = 'fixed';
-      page2.style.left = '-9999px';
-      page2.style.top = '0';
-      page2.style.width = '480px';
-      page2.style.height = '700px';
-      page2.style.fontFamily = "'Segoe UI', Tahoma, Arial, sans-serif";
-      page2.style.direction = 'rtl';
-      page2.style.background = '#ffffff';
-      page2.style.display = 'flex';
-      page2.style.flexDirection = 'column';
-
-      page2.innerHTML = `
-        <div style="background:#0f2942;padding:14px 20px;">
-          <div style="color:#ecd08c;font-size:14px;font-weight:700;">تفاصيل العرض</div>
-        </div>
-        <div style="padding:16px 20px 0;">
-          ${detailRow('المشروع', r.projectName)}
-          ${detailRow('المطور', r.developer)}
-          ${detailRow('المدينة', r.city)}
-          ${detailRow('المنطقة', r.district)}
-          ${detailRow('المساحة', r.unitArea ? fmtNum(r.unitArea) + ' م²' : '')}
-          ${detailRow('الدور', r.floor)}
-          ${detailRow('مساحة الحديقة', r.gardenArea ? fmtNum(r.gardenArea) + ' م²' : '')}
-          ${detailRow('مساحة التراس', r.terraceArea ? fmtNum(r.terraceArea) + ' م²' : '')}
-          ${detailRow('مساحة الروف', r.roofArea ? fmtNum(r.roofArea) + ' م²' : '')}
-          ${detailRow('سعر المتر', r.pricePerMeter ? fmtNum(r.pricePerMeter) + ' ج/م²' : '')}
-          ${detailRow('المقدم', r.downPaymentPercent ? r.downPaymentPercent + '% (' + r.downPaymentBaseLabel + ') = ' + fmtNum(r.downPaymentValue) + ' جنيه' : '')}
-          ${detailRow('الدفعات', r.paymentCount ? r.paymentCount + ' × ' + fmtNum(r.paymentAmountValue) + ' جنيه = ' + fmtNum(r.totalPayments) + ' جنيه' : '')}
-          ${detailRow('موعد الدفعات', r.paymentSchedule)}
-          ${detailRow('فترة السداد', r.years ? r.years + ' سنة' : '')}
-          ${detailRow('المتبقي على الأقساط', fmtNum(r.remaining) + ' جنيه')}
-          ${detailRow('ملاحظات', r.notes)}
-        </div>
-
-        <div style="margin-top:auto;background:#0f2942;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
-          <span style="font-size:12px;color:#fff;font-weight:700;">${agentName || 'Digital Real Estate Team'}${agentPhone ? ' — ' : ''}<span style="color:#ecd08c;">${agentPhone || ''}</span></span>
-          <span style="font-size:9px;color:#9fb0c2;white-space:nowrap;">Contact Info</span>
-        </div>
-        <div style="padding:10px 20px;text-align:center;font-size:10px;color:#9aa4ae;">
-          حساب تقريبي غير ملزم - تم إصداره بتاريخ ${new Date().toLocaleDateString('ar-EG')}
-        </div>
-      `;
-      document.body.appendChild(page2);
-
-      /* ---------- صفحات الصور: صفحة منفصلة لكل صورة (بما فيها صورة الغلاف) بحجمها الطبيعي بالكامل ---------- */
-      const photoPages = [];
-      resolvedCalcImages.forEach((img, idx) => {
-        const pageDiv = document.createElement('div');
-        pageDiv.style.position = 'fixed';
-        pageDiv.style.left = '-9999px';
-        pageDiv.style.top = '0';
-        pageDiv.style.width = '480px';
-        pageDiv.style.height = '700px';
-        pageDiv.style.fontFamily = "'Segoe UI', Tahoma, Arial, sans-serif";
-        pageDiv.style.direction = 'rtl';
-        pageDiv.style.background = '#ffffff';
-        pageDiv.style.display = 'flex';
-        pageDiv.style.flexDirection = 'column';
-
-        pageDiv.innerHTML = `
-          <div style="background:#0f2942;padding:14px 20px;flex-shrink:0;">
-            <div style="color:#ecd08c;font-size:14px;font-weight:700;">صورة ${idx + 1} من ${resolvedCalcImages.length}</div>
-          </div>
-          <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:16px 20px;overflow:hidden;">
-            <img src="${img}" style="max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;display:block;border-radius:8px;">
-          </div>
-          <div style="background:#0f2942;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0;">
-            <span style="font-size:12px;color:#fff;font-weight:700;">${agentName || 'Digital Real Estate Team'}${agentPhone ? ' — ' : ''}<span style="color:#ecd08c;">${agentPhone || ''}</span></span>
-            <span style="font-size:9px;color:#9fb0c2;white-space:nowrap;">Contact Info</span>
-          </div>
-        `;
-        document.body.appendChild(pageDiv);
-        photoPages.push(pageDiv);
-      });
-
-      // مهلة بسيطة لتحميل الصور قبل التصوير
-      await new Promise(resolve => setTimeout(resolve, 400));
-
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 10;
-      const imgWidth = pageWidth - margin * 2;
-      const usableHeight = pageHeight - margin * 2;
-
-      // دالة تضيف عنصر DOM كصفحة/صفحات PDF، وبتقص بذكاء لو المحتوى أطول من صفحة واحدة
-      async function addElementAsPages(el, isFirstPageOverall) {
-        const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-        document.body.removeChild(el);
-
-        const pageHeightPx = Math.floor((usableHeight * canvas.width) / imgWidth);
-        let renderedPx = 0;
-        let first = true;
-        while (renderedPx < canvas.height) {
-          let sliceHeightPx = Math.min(pageHeightPx, canvas.height - renderedPx);
-          // لو الباقي بعد الشريحة دي صغير جدًا (تقريب بسيط)، نضمّه لنفس الشريحة عشان نتفادى صفحة شبه فاضية
-          const remainderAfter = canvas.height - (renderedPx + sliceHeightPx);
-          if (remainderAfter > 0 && remainderAfter < 20) sliceHeightPx += remainderAfter;
-
-          const pageCanvas = document.createElement('canvas');
-          pageCanvas.width = canvas.width;
-          pageCanvas.height = sliceHeightPx;
-          const ctx = pageCanvas.getContext('2d');
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
-          ctx.drawImage(canvas, 0, renderedPx, canvas.width, sliceHeightPx, 0, 0, canvas.width, sliceHeightPx);
-
-          const sliceImgData = pageCanvas.toDataURL('image/jpeg', 0.92);
-          const sliceHeightMM = (sliceHeightPx * imgWidth) / canvas.width;
-
-          if (!(isFirstPageOverall && first)) pdf.addPage();
-          pdf.addImage(sliceImgData, 'JPEG', margin, margin, imgWidth, sliceHeightMM);
-
-          renderedPx += sliceHeightPx;
-          first = false;
-        }
-      }
-
-      await addElementAsPages(page1, true);
-      await addElementAsPages(page2, false);
-      for (const pageDiv of photoPages) {
-        await addElementAsPages(pageDiv, false);
-      }
-
-      const fileLabel = (r.projectName || r.developer || 'عرض-سعر').replace(/[^a-zA-Z0-9أ-ي\- ]/g, '').trim() || 'عرض-سعر';
-      pdf.save('Digital Real Estate - ' + fileLabel + '.pdf');
-      showToast('تم تصدير الملف بنجاح', 'success');
-    } catch (err) {
-      showToast('حدث خطأ أثناء التصدير: ' + err.message, 'error');
-    } finally {
-      btn.disabled = false; btn.textContent = originalLabel;
-    }
-  });
 
 
   /* ---------- نظام المفضلة ---------- */
@@ -4392,9 +3878,15 @@
     if (typeof startPresenceHeartbeat === 'function') { try { startPresenceHeartbeat(); } catch (e) {} }
   }
   function applyRoleUiVisibility() {
-    // زر "إدخال وحدة" في التنقّل: يختفي فقط لدور مؤكَّد بلا ADD_UNIT (SALES/MANAGER)
+    // زر "إدخال وحدة" في التنقّل: لا يُعرَض أصلًا لدور مؤكَّد بلا ADD_UNIT (SALES/MANAGER).
+    // الحماية الحقيقية ليست الإخفاء: مسار #add محميّ بـ unlockAddThen (gateHasPerm_ ADD_UNIT)
+    // والسيرفر يتحقق (authorizeUnitOp_) — الإخفاء هنا فقط كي لا يظهر زر لوظيفة غير مسموحة.
     var addBtn = document.getElementById('navAddUnitBtn');
-    if (addBtn) addBtn.style.display = uiAllows('ADD_UNIT') ? '' : 'none';
+    if (addBtn) {
+      var canAdd = uiAllows('ADD_UNIT');
+      addBtn.hidden = !canAdd;
+      addBtn.style.display = canAdd ? '' : 'none';
+    }
     // لو النتائج اترسمت قبل ما نعرف الدور، نعيد رسمها بالصلاحيات الصحيحة
     if (roleActive() && typeof lastResults !== 'undefined' && lastResults && lastResults.length) {
       try { renderResults(sortUnits(lastResults, document.getElementById('f_sort').value)); } catch (e) {}
@@ -4537,8 +4029,10 @@
           </div>
           <div class="card-provenance">
             <span class="prov-dev">${u['Developer Name'] ? `${ICON.building} المطور: <a href="javascript:void(0)" onclick='showDeveloperProfile(${JSON.stringify(u['Developer Name'])})'>${u['Developer Name']}</a>` : ''}</span>
-            ${(roleActive() && hasPermission('VIEW_ADMIN_ANALYTICS') && u['Details View Count'] !== undefined) ? `<span class="prov-views" title="عدد مرات مشاهدة تفاصيل الوحدة (إداري)">${ICON.eye} <span class="views-num">${Number(u['Details View Count']) || 0}</span></span>` : ''}
-            <span class="prov-added" title="مُدخِل الوحدة">${u['Entered By'] ? `${ICON.user} ${u['Entered By']}` : ''}</span>
+            <span class="prov-meta">
+              <span class="prov-added" title="مُدخِل الوحدة">${u['Entered By'] ? `${ICON.user} ${u['Entered By']}` : ''}</span>
+              ${(roleActive() && hasPermission('VIEW_ADMIN_ANALYTICS') && u['Details View Count'] !== undefined) ? `<span class="prov-views" title="عدد مرات مشاهدة تفاصيل الوحدة (إداري)">${ICON.eye} <span class="views-num">${Number(u['Details View Count']) || 0}</span> مشاهدة</span>` : ''}
+            </span>
           </div>
         </div>
       </div>`;
@@ -4675,7 +4169,7 @@
       return;
     }
     // على اللابتوب/الكمبيوتر: نص بس مباشرة على واتساب (Web Share API بالصور مش مدعومة كويس هنا)
-    google.script.run.logUnitActivity(u['Unit ID'], u['Project Name'], 'WhatsApp');
+    if (u['Unit ID']) google.script.run.logUnitActivity(u['Unit ID'], u['Project Name'], 'WhatsApp'); // عرض السعر التقديري بلا رقم وحدة — لا نسجّل نشاطًا
     const lines = buildUnitShareText(u);
 
     const waDomain = ['h', 't', 't', 'p', 's', ':', '/', '/'].join('') + ['w', 'a', '.', 'm', 'e'].join('');
@@ -4811,7 +4305,7 @@
       pdfAgentPhoneInput.value = localStorage.getItem('pdfAgentPhone') || '';
     } catch (e) {}
     pdfContactModal.classList.add('open');
-    google.script.run.logUnitActivity(u['Unit ID'], u['Project Name'], 'PDF');
+    if (u['Unit ID']) google.script.run.logUnitActivity(u['Unit ID'], u['Project Name'], 'PDF'); // عرض سعر تقديري بلا رقم وحدة — لا نسجّل نشاطًا
   }
   window.downloadUnitPDF = downloadUnitPDF;
 
@@ -6160,13 +5654,25 @@
     editMsg.style.display = 'block';
   }
 
-  document.getElementById('editCloseBtn').addEventListener('click', closeEditModal);
+  // × النموذج: في وضع "عرض السعر" (صفحة داخل المحتوى) = رجوع واضح لشاشة البحث؛
+  // غير كده = إغلاق المودال العادي (تعديل/استنساخ).
+  function handleEditClose() {
+    if (editModalMode === 'quote') {
+      if (typeof window.__aqarGoSearch === 'function') { window.__aqarGoSearch(); return; }
+      location.hash = '';
+      return;
+    }
+    closeEditModal();
+  }
+  document.getElementById('editCloseBtn').addEventListener('click', handleEditClose);
   editModal.addEventListener('click', function(e) {
-    if (e.target === editModal) closeEditModal();
+    if (e.target === editModal) handleEditClose();
   });
 
   editForm.addEventListener('submit', function(e) {
     e.preventDefault();
+    // وضع "عرض السعر": النموذج للعرض/التصدير فقط — لا حفظ في الباك-إند.
+    if (editModalMode === 'quote') return;
     if (editModalMode === 'edit' && !currentEditUnitId) return;
     editSaveBtn.disabled = true;
     editSaveBtn.textContent = editModalMode === 'clone' ? 'جاري الإضافة...' : 'جاري الحفظ...';
@@ -7393,29 +6899,20 @@
   (function initUnifiedNav() {
     var navSearchBtn  = document.getElementById('navSearchBtn');
     var navAddUnitBtn = document.getElementById('navAddUnitBtn');
-    var navStatsBtn   = document.getElementById('navStatsBtn');
+    var navStatsBtn   = document.getElementById('navStatsBtn'); // أُزيل من #appNav — يبقى null، الوصول لـ #stats من الشريط الجانبي
     var editModalEl   = document.getElementById('editModal');
     var calcFabBtn    = document.getElementById('calcFabBtn');       // "عرض السعر"
     var priceInfoFabBtn = document.getElementById('priceInfoFabBtn'); // "سعر المتر"
-    var calcModalEl   = document.getElementById('calcModal');
     var priceStatsModalEl = document.getElementById('priceStatsModal');
     var mainContainerEl = document.getElementById('mainContainer');
-    if (!navSearchBtn || !navStatsBtn) return;
+    if (!navSearchBtn) return;
 
-    // "إدخال وحدة" view — SAME pattern as the Statistics view.
-    // Relocate the shared Add-Unit form (#editModal) into #mainContainer so it can render
-    // as an in-flow page section under the header/nav when app-view-add is active. As a
-    // fixed modal (edit/clone from a search card) it is viewport-positioned regardless of
-    // its DOM parent, so this move is safe and changes nothing about that use.
+    // "إدخال وحدة" + "عرض السعر" — كلاهما يعرض نفس #editModal كقسم in-flow داخل #mainContainer.
+    // كنافذة عائمة (تعديل/استنساخ من كارت البحث) موقعه viewport بغضّ النظر عن الأب، فالنقل آمن.
     if (mainContainerEl && editModalEl && editModalEl.parentElement !== mainContainerEl) {
       mainContainerEl.appendChild(editModalEl);
     }
-    // "عرض السعر" (#calcModal) و "سعر المتر" (#priceStatsModal) — نفس النقل: من body لـ
-    // #mainContainer عشان يتعرضوا كصفحة داخل مساحة المحتوى (app-view-quote / app-view-meter).
-    // ليهم فاتح وحيد (زرّي #appNav) فمافيش استخدام كنافذة عائمة — النقل آمن تمامًا.
-    if (mainContainerEl && calcModalEl && calcModalEl.parentElement !== mainContainerEl) {
-      mainContainerEl.appendChild(calcModalEl);
-    }
+    // "سعر المتر" (#priceStatsModal) — نفس النقل: يُعرض كصفحة داخل مساحة المحتوى (app-view-meter).
     if (mainContainerEl && priceStatsModalEl && priceStatsModalEl.parentElement !== mainContainerEl) {
       mainContainerEl.appendChild(priceStatsModalEl);
     }
@@ -7446,11 +6943,15 @@
       if (typeof dashCloseDrawer === 'function') dashCloseDrawer();
       document.body.classList.remove('app-view-dashboard');
     }
-    // "عرض السعر" / "سعر المتر" كصفحات داخل مساحة المحتوى — مغادرة = إزالة كلاس body فقط.
-    // لا نلمس منطق الحاسبة/سعر المتر ولا بياناتهما (تبقى في الـ DOM كما هي للفتحة التالية).
+    // "عرض السعر" — يشارك #editModal مع "إدخال وحدة": عند المغادرة نغلق النموذج ونصفّر وضعه.
     function leaveQuoteView() {
+      if (!document.body.classList.contains('app-view-quote')) return;
+      if (editModalEl && editModalEl.classList.contains('open') && typeof closeEditModal === 'function') {
+        closeEditModal();
+      }
       document.body.classList.remove('app-view-quote');
     }
+    // "سعر المتر" — مغادرة = إزالة كلاس body فقط (البيانات تبقى في الـ DOM للفتحة التالية).
     function leaveMeterView() {
       document.body.classList.remove('app-view-meter');
     }
@@ -7484,16 +6985,17 @@
       setActiveNav('add');
       window.scrollTo(0, 0);
     }
-    // "عرض السعر" — صفحة داخل مساحة المحتوى الرئيسية (مش Modal / مش نافذة منفصلة).
-    // الغلاف/الهيدر/#appNav يفضلوا؛ منطق الحاسبة والـ IDs زي ما هي. الرجوع عبر × أو زر البحث.
+    // "عرض السعر" (البند 1) — صفحة داخل مساحة المحتوى الرئيسية، تعرض *نفس* نموذج
+    // "إدخال وحدة" (#editModal) في وضع editModalMode='quote'. نفس الحقول/الترتيب/القوائم/
+    // الحسابات. لا نموذج منفصل. الرجوع لشاشة البحث عبر زر × (editCloseBtn) — يتصرّف
+    // حسب الوضع (quote → رجوع للبحث).
     function showQuoteView() {
       document.body.classList.remove('app-view-stats');
       leaveDashboardView();
       leaveAddView();
       leaveMeterView();
       document.body.classList.add('app-view-quote');
-      // نفس تعبئة قائمة المطوّرين اللي كانت بتحصل وقت فتح المودال (بدون تغيير منطق).
-      if (typeof window.__aqarPopulateCalcDevs === 'function') window.__aqarPopulateCalcDevs();
+      if (typeof window.__aqarOpenQuoteMode === 'function') window.__aqarOpenQuoteMode();
       setActiveNav('quote');
       window.scrollTo(0, 0);
     }
@@ -8063,7 +7565,7 @@
     }
 
     navSearchBtn.addEventListener('click', goToSearchHash);
-    navStatsBtn.addEventListener('click', openStats);
+    if (navStatsBtn) navStatsBtn.addEventListener('click', openStats); // الزر أُزيل من #appNav؛ يبقى الحارس لو رجع مستقبلًا
     navAddUnitBtn.addEventListener('click', openAdd);
 
     var adminPanelStatsBtn = document.getElementById('adminPanelStatsBtn');
