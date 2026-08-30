@@ -1061,15 +1061,41 @@
       color: var(--gold-soft); font-size: 11px; font-weight: 800;
     }
     .dash-field-row {
-      display: flex; justify-content: space-between; gap: 14px;
+      display: flex; justify-content: space-between; align-items: center; gap: 14px;
       padding: 11px 2px; border-bottom: 1px solid var(--line-dark); font-size: 13px;
     }
     .dash-field-row:last-child { border-bottom: none; }
-    .dash-field-row .k { color: var(--text-muted); font-weight: 600; }
+    .dash-field-row .k { color: var(--text-muted); font-weight: 600; flex-shrink: 0; }
     .dash-field-row .v { color: var(--text-light); font-weight: 700; text-align: left; }
+    /* حقول قابلة للتعديل داخل الملف الشخصي — نفس مقاس/محاذاة صف العرض */
+    .dash-prof-input {
+      flex: 1; min-width: 0; text-align: left; direction: ltr;
+      background: var(--input-dark); border: 1px solid var(--line-dark);
+      border-radius: var(--radius-sm); color: var(--text-light);
+      font-family: inherit; font-size: 13px; font-weight: 700; padding: 8px 10px;
+    }
+    .dash-prof-input:focus { outline: none; border-color: var(--border-gold); background: rgba(27,52,74,0.85); }
+    .dash-prof-input::placeholder { color: var(--text-muted); font-weight: 500; }
+    .dash-prof-photo-actions { margin-inline-start: auto; }
+    .dash-prof-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+    .dash-prof-msg { font-size: 12px; font-weight: 700; }
+    .dash-prof-msg.ok { color: var(--ok); }
+    .dash-prof-msg.err { color: var(--danger); }
+    /* بطاقة "المستخدمون المتصلون الآن" — سطح زجاجي واضح فوق خلفية اللوحة المموّهة */
+    #dashboardView .dash-live-card {
+      background: var(--glass-strong);
+      -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+      border: 1px solid var(--border-gold); border-radius: var(--radius-md);
+      padding: 12px 16px; margin: 0 0 16px;
+    }
     #dashboardView .live-count {
       display: flex; align-items: center; gap: 8px;
-      font-size: 12px; color: var(--text-muted); margin: 0 0 8px;
+      font-size: 13.5px; font-weight: 700; color: var(--text-light); margin: 0;
+    }
+    #dashboardView .dash-live-card .live-count b { font-size: 18px; font-weight: 800; color: var(--gold-soft); }
+    #dashLiveEmailsList {
+      font-size: 12.5px; font-weight: 600; line-height: 1.95;
+      color: var(--text-light); opacity: 0.92; margin: 6px 0 0;
     }
 
     @media (max-width: 860px) {
@@ -2233,8 +2259,10 @@
 
         <div class="dash-panel" id="dashPanel-home">
           <div class="dash-page-title">نظرة عامة</div>
-          <div class="live-count" id="dashLiveCount"><span class="live-dot"></span>المستخدمون المتصلون الآن: <b id="dashLiveCountValue">-</b></div>
-          <div id="dashLiveEmailsList" style="font-size:11px; color:var(--text-muted); margin:-2px 0 12px; line-height:1.9;"></div>
+          <div class="dash-live-card">
+            <div class="live-count" id="dashLiveCount"><span class="live-dot"></span>المستخدمون المتصلون الآن: <b id="dashLiveCountValue">-</b></div>
+            <div id="dashLiveEmailsList"></div>
+          </div>
           <div class="kpi-grid" id="dashKpiGrid"><div class="empty-note">جاري تحميل الملخّص…</div></div>
           <div class="section">
             <h3>الوحدات حسب التصنيف</h3>
@@ -7525,6 +7553,37 @@
       }).getOnlineUsers(dashState());
     }
 
+    /* ============================================================
+     * الملف الشخصي (Self-service) — كل مستخدم يفتح ملفه هو.
+     * - الهوية من __currentUser (من جلسة الدخول) + بيانات طازجة من getMyProfile.
+     * - تعديل الاسم/الهاتف/الصورة فقط. الإيميل/الصلاحية/الحالة للعرض فقط.
+     * - التحقق النهائي في السيرفر: updateMyProfile/uploadMyPhoto يشتقّان الهوية
+     *   سيرفر-سايد فيستحيل تعديل مستخدم آخر أو تغيير صلاحية.
+     * ============================================================ */
+    function dashProfileEsc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+    function dashProfileFmtDate(s) {
+      if (!s) return 'غير مُسجَّل';
+      var d = new Date(s);
+      if (isNaN(d.getTime())) return String(s);
+      try {
+        return d.toLocaleString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+      } catch (e) { return d.toISOString().slice(0, 16).replace('T', ' '); }
+    }
+    function dashProfileAvatarSrc(photo) {
+      var p = String(photo || '').trim();
+      if (!p) return '';
+      if (/^https?:\/\//i.test(p)) return p;
+      return 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(p) + '&sz=w400';
+    }
+    function dashProfileAuth() {
+      return (typeof dashState === 'function') ? dashState()
+        : (typeof getAuthCreds === 'function' ? getAuthCreds() : { authEmail: '', authPassword: '' });
+    }
+
     function dashRenderProfile() {
       var host = document.getElementById('dashProfileCard');
       if (!host) return;
@@ -7533,26 +7592,167 @@
         host.innerHTML = '<div class="empty-note">لم يتم تحديد بيانات مستخدم لهذه الجلسة (تم الدخول بكلمة سر لوحة التحكم فقط).</div>';
         return;
       }
-      var name = u.name || '—';
-      var roleAr = DASH_ROLE_AR[u.role] || u.role || '—';
-      var photo = String(u.photo || '').trim();
-      var avatar;
-      if (/^https?:\/\//i.test(photo)) avatar = '<img src="' + photo + '" alt="" onerror="this.style.display=\'none\';this.parentNode.textContent=\'' + (name.charAt(0) || '؟') + '\';">';
-      else if (photo) avatar = '<img src="https://drive.google.com/thumbnail?id=' + encodeURIComponent(photo) + '" alt="" onerror="this.style.display=\'none\';this.parentNode.textContent=\'' + (name.charAt(0) || '؟') + '\';">';
-      else avatar = (name.charAt(0) || '؟');
+      host.innerHTML = '<div class="empty-note">جارٍ تحميل بياناتك…</div>';
+      // عرض احتياطي من بيانات الجلسة — يُستدعى مرة واحدة فقط (نجاح فاشل / خطأ / مهلة)
+      var settled = false;
+      var fallback = function (warn) {
+        if (settled) return; settled = true;
+        dashProfilePaint({
+          name: u.name || '', email: u.email || '', phone: u.phone || '', photo: u.photo || '',
+          role: u.role || '', status: u.status || 'نشط', addedDate: '', lastLogin: '',
+          warn: warn
+        });
+      };
+      // فشل آمن: لو السيرفر ما ردّش خلال 12 ثانية، اعرض البطاقة من بيانات الجلسة بدل التعليق على "جارٍ التحميل".
+      var guard = setTimeout(function () { fallback('تأخّر ردّ السيرفر — يظهر ما هو محفوظ في جلستك. أعد فتح الملف الشخصي للمحاولة من جديد.'); }, 12000);
+      google.script.run
+        .withSuccessHandler(function (res) {
+          clearTimeout(guard);
+          if (settled) return;
+          if (res && res.success) {
+            settled = true;
+            dashProfilePaint({
+              name: res.name || u.name || '', email: res.email || u.email || '',
+              phone: res.phone || '', photo: res.photo || u.photo || '',
+              role: res.role || u.role || '', status: res.status || u.status || 'نشط',
+              addedDate: res.addedDate || '', lastLogin: res.lastLogin || ''
+            });
+          } else {
+            // ردّ فشل (مثال: نشر Code.gs لسه ما اتمّش) → عرض قابل للتعديل من بيانات الجلسة
+            fallback((res && res.message) || 'تعذّر جلب أحدث بياناتك — يظهر ما هو محفوظ في جلستك.');
+          }
+        })
+        .withFailureHandler(function (err) {
+          clearTimeout(guard);
+          fallback('حدث خطأ في الاتصال — يظهر ما هو محفوظ في جلستك.');
+        })
+        .getMyProfile(dashProfileAuth());
+    }
+
+    function dashProfilePaint(p) {
+      var host = document.getElementById('dashProfileCard');
+      if (!host) return;
+      var name = p.name || '—';
+      var roleAr = DASH_ROLE_AR[p.role] || p.role || '—';
+      var initial = (name.charAt(0) || '؟');
+      var src = dashProfileAvatarSrc(p.photo);
+      var avatarInner = src
+        ? '<img id="dashProfImg" src="' + dashProfileEsc(src) + '" alt="" onerror="this.style.display=\'none\';this.parentNode.textContent=\'' + dashProfileEsc(initial) + '\';">'
+        : dashProfileEsc(initial);
+
       host.innerHTML =
+        (p.warn ? '<div class="um-msg err" style="margin-bottom:12px">' + dashProfileEsc(p.warn) + '</div>' : '') +
         '<div class="dash-profile-head">' +
-          '<div class="dash-avatar">' + avatar + '</div>' +
-          '<div class="who"><div class="nm">' + name + '</div>' +
-          '<div class="rl">' + (u.email || '') + '</div>' +
-          '<span class="dash-role-badge">' + roleAr + '</span></div>' +
+          '<div class="dash-avatar" id="dashProfAvatar">' + avatarInner + '</div>' +
+          '<div class="who">' +
+            '<div class="nm">' + dashProfileEsc(name) + '</div>' +
+            '<div class="rl">' + dashProfileEsc(p.email || '') + '</div>' +
+            '<span class="dash-role-badge">' + dashProfileEsc(roleAr) + '</span>' +
+          '</div>' +
+          '<div class="dash-prof-photo-actions">' +
+            '<button type="button" class="dash-cta secondary" id="dashProfPhotoBtn">تغيير الصورة</button>' +
+            '<input type="file" id="dashProfPhotoInput" accept="image/*" hidden>' +
+          '</div>' +
         '</div>' +
-        '<div class="dash-field-row"><span class="k">الاسم</span><span class="v">' + name + '</span></div>' +
-        '<div class="dash-field-row"><span class="k">الإيميل (اسم الدخول)</span><span class="v">' + (u.email || '—') + '</span></div>' +
-        '<div class="dash-field-row"><span class="k">رقم الهاتف</span><span class="v">' + (u.phone ? u.phone : 'غير مسجّل') + '</span></div>' +
-        '<div class="dash-field-row"><span class="k">الصلاحية</span><span class="v">' + roleAr + ' — ' + (u.role || '') + '</span></div>' +
-        '<div class="dash-field-row"><span class="k">حالة الحساب</span><span class="v">' + (u.status || 'نشط') + '</span></div>' +
-        '<p class="dash-note">الإيميل هو اسم الدخول ولا يمكن تغييره. لتعديل الاسم أو الهاتف أو الصورة أو الصلاحية، تواصل مع مالك النظام عبر "إدارة المستخدمين".</p>';
+        '<label class="dash-field-row"><span class="k">الاسم</span>' +
+          '<input class="dash-prof-input" id="dashProfName" type="text" maxlength="120" value="' + dashProfileEsc(name === '—' ? '' : name) + '"></label>' +
+        '<div class="dash-field-row"><span class="k">البريد الإلكتروني</span><span class="v">' + dashProfileEsc(p.email || '—') + '</span></div>' +
+        '<label class="dash-field-row"><span class="k">رقم الهاتف</span>' +
+          '<input class="dash-prof-input" id="dashProfPhone" type="tel" maxlength="40" placeholder="غير مسجّل" value="' + dashProfileEsc(p.phone || '') + '"></label>' +
+        '<div class="dash-field-row"><span class="k">الوظيفة / الصلاحية</span><span class="v">' + dashProfileEsc(roleAr + ' — ' + (p.role || '')) + '</span></div>' +
+        '<div class="dash-field-row"><span class="k">حالة الحساب</span><span class="v">' + dashProfileEsc(p.status || 'نشط') + '</span></div>' +
+        '<div class="dash-field-row"><span class="k">تاريخ إنشاء الحساب</span><span class="v">' + dashProfileEsc(dashProfileFmtDate(p.addedDate)) + '</span></div>' +
+        '<div class="dash-field-row"><span class="k">آخر دخول</span><span class="v">' + dashProfileEsc(dashProfileFmtDate(p.lastLogin)) + '</span></div>' +
+        '<div class="dash-prof-actions">' +
+          '<button type="button" class="dash-cta" id="dashProfSaveBtn">حفظ التعديلات</button>' +
+          '<span class="dash-prof-msg" id="dashProfMsg"></span>' +
+        '</div>' +
+        '<p class="dash-note">البريد الإلكتروني هو اسم الدخول ولا يمكن تغييره. الصلاحية والحالة يديرهما مالك النظام عبر "إدارة المستخدمين".</p>';
+
+      dashProfileWire();
+    }
+
+    function dashProfileWire() {
+      var msgEl = document.getElementById('dashProfMsg');
+      var setMsg = function (t, ok) {
+        if (!msgEl) return;
+        msgEl.textContent = t || '';
+        msgEl.className = 'dash-prof-msg' + (t ? (ok ? ' ok' : ' err') : '');
+      };
+
+      var saveBtn = document.getElementById('dashProfSaveBtn');
+      if (saveBtn) saveBtn.addEventListener('click', function () {
+        var name = (document.getElementById('dashProfName') || {}).value || '';
+        var phone = (document.getElementById('dashProfPhone') || {}).value || '';
+        name = name.trim();
+        if (!name) { setMsg('الاسم مطلوب', false); return; }
+        saveBtn.disabled = true; saveBtn.textContent = 'جاري الحفظ…'; setMsg('', true);
+        google.script.run
+          .withSuccessHandler(function (res) {
+            saveBtn.disabled = false; saveBtn.textContent = 'حفظ التعديلات';
+            if (!res || !res.success) { setMsg((res && res.message) || 'فشل الحفظ', false); return; }
+            if (window.__currentUser) { window.__currentUser.name = name; window.__currentUser.phone = phone.trim(); }
+            setMsg(res.message || 'تم الحفظ', true);
+            if (typeof showToast === 'function') showToast(res.message || 'تم حفظ بياناتك', 'success');
+            dashProfileSyncElsewhere();
+          })
+          .withFailureHandler(function (err) {
+            saveBtn.disabled = false; saveBtn.textContent = 'حفظ التعديلات';
+            setMsg('حدث خطأ: ' + (err && err.message ? err.message : 'تعذّر الحفظ'), false);
+          })
+          .updateMyProfile(dashProfileAuth(), { name: name, phone: phone.trim() });
+      });
+
+      var photoBtn = document.getElementById('dashProfPhotoBtn');
+      var photoInput = document.getElementById('dashProfPhotoInput');
+      if (photoBtn && photoInput) {
+        photoBtn.addEventListener('click', function () { photoInput.click(); });
+        photoInput.addEventListener('change', function () {
+          var file = this.files && this.files[0];
+          if (!file) return;
+          if (!/^image\//.test(file.type)) { setMsg('اختر ملف صورة صالحًا', false); return; }
+          if (file.size > 5 * 1024 * 1024) { setMsg('الصورة كبيرة جدًا (الحد 5 ميجابايت)', false); return; }
+          var reader = new FileReader();
+          reader.onload = function () {
+            var dataUrl = String(reader.result);
+            // معاينة فورية
+            var av = document.getElementById('dashProfAvatar');
+            if (av) av.innerHTML = '<img src="' + dataUrl + '" alt="">';
+            var b64 = dataUrl.split(',')[1];
+            if (photoBtn) { photoBtn.disabled = true; photoBtn.textContent = 'جاري الرفع…'; }
+            setMsg('جاري رفع الصورة…', true);
+            google.script.run
+              .withSuccessHandler(function (res) {
+                if (photoBtn) { photoBtn.disabled = false; photoBtn.textContent = 'تغيير الصورة'; }
+                if (!res || !res.success) { setMsg((res && res.message) || 'فشل رفع الصورة', false); return; }
+                if (window.__currentUser) window.__currentUser.photo = res.url || '';
+                var av2 = document.getElementById('dashProfAvatar');
+                if (av2 && res.url) av2.innerHTML = '<img id="dashProfImg" src="' + dashProfileEsc(res.url) + '" alt="">';
+                setMsg(res.message || 'تم تحديث الصورة', true);
+                if (typeof showToast === 'function') showToast(res.message || 'تم تحديث صورتك', 'success');
+                dashProfileSyncElsewhere();
+              })
+              .withFailureHandler(function (err) {
+                if (photoBtn) { photoBtn.disabled = false; photoBtn.textContent = 'تغيير الصورة'; }
+                setMsg('حدث خطأ: ' + (err && err.message ? err.message : 'تعذّر رفع الصورة'), false);
+              })
+              .uploadMyPhoto(dashProfileAuth(), b64, file.type);
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+    }
+
+    // بعد تعديل الاسم/الصورة: حدّث أي مكان آخر يعرض المستخدم الحالي دون إعادة تحميل الصفحة.
+    function dashProfileSyncElsewhere() {
+      try {
+        // قائمة المستخدمين (للمالك) لو كانت محمّلة — تُعاد قراءتها من الشيت فتُحدَّث الصورة/الاسم.
+        if (document.body.classList.contains('app-view-dashboard') &&
+            typeof window.__aqarLoadUsers === 'function' &&
+            !document.getElementById('dashPanel-users').hasAttribute('hidden')) {
+          window.__aqarLoadUsers();
+        }
+      } catch (e) {}
     }
 
     // المرحلة 3.6: قسم "المستخدمون" بقى واجهة الإدارة الكاملة نفسها (بعدّاد umCount الخاص بيها)
