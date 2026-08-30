@@ -2441,12 +2441,14 @@
       <aside class="dash-sidebar" id="dashSidebar">
         <div class="dash-brand">AqaR Digital<span>لوحة التحكم</span></div>
         <nav class="dash-nav" id="dashNav" aria-label="أقسام لوحة التحكم">
-          <!-- الشريط الجانبي مبنيّ على الصلاحيات: العنصر يظهر فقط لو hasPermission(data-perm) — بلا data-perm = متاح للجميع.
-               data-roles للتوثيق فقط؛ الإظهار/الإخفاء يقرّره DASH_NAV_PERMS + hasPermission() (المرآة الآمنة، الافتراضي SALES). -->
+          <!-- قاعدة القائمة (مصدر واحد، صريحة): OWNER → كل العناصر. أي مستخدم غير OWNER → فقط
+               home · stats · inventory · profile (+ "تسجيل الخروج" الثابت). يقرّرها dashNavAllowed_()
+               عبر dashIsOwner_() + DASH_NONOWNER_MENU. data-roles/data-perm للتوثيق فقط. -->
           <button type="button" class="dash-nav-item is-active" data-dash="home" data-roles="OWNER,MANAGER,DATA_ENTRY,SALES"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg><span>الرئيسية</span></button>
           <button type="button" class="dash-nav-item" data-dash="developers" data-roles="OWNER" data-perm="MANAGE_DEVELOPERS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18ZM10 6h4M10 10h4M10 14h4M10 18h4"/></svg><span>المطوّرون</span></button>
           <button type="button" class="dash-nav-item" data-dash="users" data-roles="OWNER" data-perm="MANAGE_USERS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 5.2a3.5 3.5 0 0 1 0 6.8M18 20a6.5 6.5 0 0 0-3.2-5.6"/></svg><span>المستخدمون</span></button>
-          <button type="button" class="dash-nav-item" data-dash="stats" data-roles="OWNER,MANAGER,DATA_ENTRY,SALES" data-perm="VIEW_STATISTICS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span>الإحصائيات والمخزون</span></button>
+          <button type="button" class="dash-nav-item" data-dash="stats" data-roles="OWNER,MANAGER,DATA_ENTRY,SALES" data-perm="VIEW_STATISTICS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span>الإحصاءات</span></button>
+          <button type="button" class="dash-nav-item" data-dash="inventory" data-roles="OWNER,MANAGER,DATA_ENTRY,SALES" data-perm="VIEW_STATISTICS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M3 12h18M3 17h18M8 3v18"/></svg><span>المخزون</span></button>
           <button type="button" class="dash-nav-item" data-dash="profile" data-roles="OWNER,MANAGER,DATA_ENTRY,SALES"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>الملف الشخصي</span></button>
           <button type="button" class="dash-nav-item" data-dash="settings" data-roles="OWNER" data-perm="MANAGE_SETTINGS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>الإعدادات</span></button>
           <button type="button" class="dash-nav-item dash-logout" id="dashLogoutBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg><span>تسجيل الخروج</span></button>
@@ -2623,11 +2625,12 @@
           </div>
         </div>
 
-        <!-- "الإحصائيات والمخزون" — يُعرَض داخل شِل لوحة التحكم (الشريط الجانبي يبقى ظاهرًا)، بلا
-             صفحة وسيطة وبلا زر "فتح لوحة الإحصائيات التفصيلية". العرض التفصيلي #statsView
-             يُعاد توطينه بالـ JS داخل #dashStatsMount عند فتح القسم. -->
+        <!-- "الإحصاءات" و"المخزون" — عنصرا قائمة منفصلان يفتحان نفس اللوحة داخل شِل لوحة التحكم
+             (الشريط الجانبي يبقى ظاهرًا)، بلا صفحة وسيطة وبلا زر "فتح لوحة الإحصائيات التفصيلية".
+             العنوان يتبدّل عبر #dashStatsPanelTitle. العرض التفصيلي #statsView يُعاد توطينه بالـ JS
+             داخل #dashStatsMount عند فتح القسم. -->
         <div class="dash-panel" id="dashPanel-stats" hidden>
-          <div class="dash-page-title">الإحصائيات والمخزون</div>
+          <div class="dash-page-title" id="dashStatsPanelTitle">الإحصاءات</div>
           <div id="dashStatsMount"></div>
         </div>
 
@@ -7219,22 +7222,20 @@
     }
     var DASH_ROLE_AR = { OWNER: 'مالك', MANAGER: 'مدير', DATA_ENTRY: 'إدخال بيانات', SALES: 'مبيعات' };
 
-    // ===== الشريط الجانبي مبنيّ على الصلاحيات (مصدر واحد) =====
-    // كل عنصر ↦ الصلاحية المطلوبة (null = متاح للجميع). hasPermission() هو المرآة الآمنة:
-    // currentUserRole() افتراضه 'SALES'، وMANAGE_* غير موجودة إلا لدور OWNER (عبر '*') — مطابق
-    // للباك-إند authorizeOwnerAdmin_ (OWNER فقط). "الوحدات" أُزيل (البند 3).
-    var DASH_NAV_PERMS = {
-      home:       null,
-      profile:    null,
-      stats:      'VIEW_STATISTICS',   // OWNER · MANAGER · DATA_ENTRY · SALES
-      developers: 'MANAGE_DEVELOPERS', // OWNER فقط
-      users:      'MANAGE_USERS',      // OWNER فقط
-      settings:   'MANAGE_SETTINGS'    // OWNER فقط
-    };
+    // ===== قاعدة قائمة لوحة التحكم — مصدر واحد للحقيقة (صريحة، بلا اجتهاد) =====
+    //   OWNER                → القائمة الإدارية الكاملة (كل عناصر #dashNav).
+    //   أي مستخدم غير OWNER  → فقط: الرئيسية · الإحصاءات · المخزون · الملف الشخصي
+    //                          (+ "تسجيل الخروج" ظاهر دائمًا لأنه بلا data-dash).
+    //   لا يرى نهائيًا: المطوّرون · المستخدمون · الإعدادات · الوحدات · سجل النشاط ·
+    //                  إدارة الأدوار · إدارة الصلاحيات · أي وظيفة إدارية أخرى.
+    // نفس هذا الشريط (#dashNav) يُستخدم على الديسكتوب وكـ drawer على الموبايل — قاعدة واحدة.
+    var DASH_NONOWNER_MENU = { home: 1, stats: 1, inventory: 1, profile: 1 };
+    function dashIsOwner_() {
+      return (typeof currentUserRole === 'function') && currentUserRole() === 'OWNER';
+    }
     function dashNavAllowed_(dd) {
-      var perm = DASH_NAV_PERMS[dd];
-      if (perm == null) return true;
-      return typeof hasPermission === 'function' && hasPermission(perm);
+      if (dashIsOwner_()) return true;            // OWNER → القائمة كاملة
+      return !!DASH_NONOWNER_MENU[dd];            // غير OWNER → القائمة المقيّدة فقط
     }
 
     function dashCloseDrawer() {
@@ -7291,9 +7292,12 @@
     }
 
     var DASH_PANEL_KEYS = ['home', 'developers', 'users', 'stats', 'profile', 'settings', 'audit'];
-    // نفس مصدر الصلاحيات: حارس يمنع فتح القسم حتى لو استُدعيت dashSelect برمجيًا/عبر hash.
-    // (audit = "سجل عمليات إدارة المستخدمين" = OWNER فقط، مرآة getUserAuditLog.)
-    var DASH_PANEL_PERMS = { users: 'MANAGE_USERS', developers: 'MANAGE_DEVELOPERS', settings: 'MANAGE_SETTINGS', audit: 'MANAGE_USERS', stats: 'VIEW_STATISTICS' };
+    // المستوى الثاني (تفويض، مش مجرد إخفاء زر): أقسام إدارية حصرية للمالك — أي مستخدم غير
+    // OWNER يُمنَع من فتحها حتى لو استُدعيت dashSelect برمجيًا / عبر hash / Console / API.
+    // مرآة للباك-إند authorizeOwnerAdmin_ (OWNER فقط) — والباك-إند يعيد التحقق دائمًا.
+    var DASH_PANEL_OWNER_ONLY = { developers: 1, users: 1, settings: 1, audit: 1 };
+    // حارس دفاعي إضافي بالصلاحية (stats/inventory = VIEW_STATISTICS، متاحة لكل الأدوار).
+    var DASH_PANEL_PERMS = { users: 'MANAGE_USERS', developers: 'MANAGE_DEVELOPERS', settings: 'MANAGE_SETTINGS', audit: 'MANAGE_USERS', stats: 'VIEW_STATISTICS', inventory: 'VIEW_STATISTICS' };
 
     // "الإحصائيات والمخزون" — يُعرَض داخل شِل لوحة التحكم: نُعيد توطين #statsView داخل
     // #dashStatsMount (مرة واحدة)، ثم نفتح موديول الإحصائيات ببيانات الدخول (VIEW_STATISTICS).
@@ -7313,10 +7317,16 @@
     function dashSelect(key) {
       // وضع "الملف الشخصي فقط": أي محاولة للانتقال لقسم آخر تُعاد إلى "الملف الشخصي".
       if (dashProfileOnly && key !== 'profile') key = 'profile';
-      // حارس دفاعي: أي قسم بلا صلاحيته → يُعاد إلى "الرئيسية" (القرار النهائي في السيرفر برضه).
+      // المستوى الثاني — تفويض صريح: قسم إداري حصري للمالك + المستخدم ليس OWNER → "الرئيسية".
+      // يمنع الوصول عبر dashSelect المباشر / hash / Console / أي نداء برمجي (مش مجرد إخفاء الزر).
+      if (DASH_PANEL_OWNER_ONLY[key] && !dashIsOwner_()) key = 'home';
+      // حارس دفاعي إضافي بالصلاحية → أي قسم بلا صلاحيته يُعاد إلى "الرئيسية" (القرار النهائي في السيرفر).
       var needPerm = DASH_PANEL_PERMS[key];
       if (needPerm && !(typeof hasPermission === 'function' && hasPermission(needPerm))) key = 'home';
       dashCurrent = key;
+      // "المخزون" لا لوحة مستقلة له — يُعرَض داخل نفس لوحة الإحصائيات (#dashPanel-stats)
+      // مع تمرير الشاشة إلى شبكة مؤشرات المخزون. "audit" جزء من "المستخدمون".
+      var panelKey = (key === 'inventory') ? 'stats' : key;
       // "سجل العمليات" (audit) قسم فرعي من "المستخدمون" → نبقّي "المستخدمون" مُفعَّلًا في الشريط الجانبي.
       var navKey = (key === 'audit') ? 'users' : key;
       document.querySelectorAll('#dashNav .dash-nav-item[data-dash]').forEach(function (b) {
@@ -7324,14 +7334,25 @@
       });
       DASH_PANEL_KEYS.forEach(function (k) {
         var p = document.getElementById('dashPanel-' + k);
-        if (p) p.hidden = (k !== key);
+        if (p) p.hidden = (k !== panelKey);
       });
+      // عنوان لوحة الإحصائيات/المخزون يتبدّل حسب العنصر المختار (نفس اللوحة، عنوانان).
+      var stTitle = document.getElementById('dashStatsPanelTitle');
+      if (stTitle && (key === 'stats' || key === 'inventory')) {
+        stTitle.textContent = (key === 'inventory') ? 'المخزون' : 'الإحصاءات';
+      }
       // إيقاف مؤقّت حضور المستخدمين عند مغادرة قسمي "المستخدمون"/"سجل العمليات"
       if (key !== 'users' && typeof window.__aqarStopUsersPresencePoll === 'function') window.__aqarStopUsersPresencePoll();
       dashCloseDrawer();
       window.scrollTo(0, 0);
       if (key === 'home') dashLoadHome();
-      else if (key === 'stats') dashMountStats();
+      else if (key === 'stats' || key === 'inventory') {
+        dashMountStats();
+        if (key === 'inventory') {
+          var kg = document.getElementById('kpiGrid');   // نفس لوحة الإحصائيات → تمرير مباشر لمؤشرات المخزون
+          if (kg && kg.scrollIntoView) { try { kg.scrollIntoView({ block: 'start' }); } catch (e) { kg.scrollIntoView(); } }
+        }
+      }
       else if (key === 'profile') dashRenderProfile();
       else if (key === 'users' && typeof window.__aqarLoadUsers === 'function') window.__aqarLoadUsers();
       else if (key === 'settings') dashReparentSettingsOnce();
@@ -7680,6 +7701,10 @@
       if (location.hash === '#stats') {
         if (dashUnlocked()) { dashCurrent = 'stats'; showDashboardView(); }
         else { showSearchView(); unlockDashboardThen(function () { dashCurrent = 'stats'; showDashboardView(); }); }
+      } else if (location.hash === '#inventory') {
+        // "المخزون" — قسم داخل لوحة التحكم (نفس لوحة الإحصائيات، الشريط الجانبي يبقى ظاهرًا).
+        if (dashUnlocked()) { dashCurrent = 'inventory'; showDashboardView(); }
+        else { showSearchView(); unlockDashboardThen(function () { dashCurrent = 'inventory'; showDashboardView(); }); }
       } else if (location.hash === '#add') {
         if (addUnlocked()) { showAddView(); }
         else { showSearchView(); unlockAddThen(showAddView); }
