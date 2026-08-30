@@ -1417,6 +1417,37 @@
       background-color: var(--page-bg);
       display: flex; align-items: center; justify-content: center; padding: 20px;
     }
+
+    /* ---- استعادة الجلسة بعد Reload: منع وميض شاشة الدخول لمستخدم لديه جلسة محفوظة ----
+       سكربت سطري في بداية <body> يضيف .session-restoring على <html> فورًا (متزامن، بلا شبكة)
+       لو وُجدت بيانات دخول محفوظة، فتُخفى بوابة الدخول ويظهر سبلاش محايد لحين ردّ
+       verifyUserAccess:  نجاح → showApp() يزيل الكلاس ويعرض التطبيق بلا وميض؛
+       فشل/خطأ/مهلة → نزيل الكلاس فتظهر بوابة الدخول برسالة الخطأ الصحيحة. */
+    html.session-restoring #loginGate { display: none; }
+    #sessionRestoreSplash { display: none; }
+    html.session-restoring #sessionRestoreSplash {
+      display: flex; position: fixed; inset: 0; z-index: 2001; overflow: hidden;
+      align-items: center; justify-content: center;
+      background-color: var(--page-bg);
+    }
+    #sessionRestoreSplash::before {
+      content: ""; position: absolute; inset: -24px; z-index: 0;
+      background:
+        linear-gradient(180deg, rgba(10,28,46,0.50) 0%, rgba(15,41,66,0.42) 55%, rgba(18,55,84,0.40) 100%),
+        url('city-bg.png') center / cover no-repeat;
+      filter: blur(4px); pointer-events: none;
+    }
+    #sessionRestoreSplash .srs-inner {
+      position: relative; z-index: 1; display: flex; flex-direction: column;
+      align-items: center; gap: 16px; color: var(--text-light);
+    }
+    #sessionRestoreSplash .srs-spinner {
+      width: 34px; height: 34px; border-radius: 50%;
+      border: 3px solid rgba(230,201,120,0.25); border-top-color: var(--gold-soft);
+      animation: srsSpin 0.9s linear infinite;
+    }
+    #sessionRestoreSplash .srs-text { font-size: 14px; font-weight: 600; letter-spacing: 0; }
+    @keyframes srsSpin { to { transform: rotate(360deg); } }
     /* خلفية المدينة أطلسية/ناعمة خلف اللوحة، بنفس أسلوب باقي الصفحات */
     .access-gate::before {
       content: ""; position: absolute; inset: -24px; z-index: 0;
@@ -1940,6 +1971,23 @@
     });
   }
 </script>
+
+<!-- استعادة الجلسة: علّم الحالة قبل رسم بوابة الدخول مباشرةً (متزامن، بلا شبكة) -->
+<script>
+  (function () {
+    try {
+      if (localStorage.getItem('loginEmail') && localStorage.getItem('loginPassword')) {
+        document.documentElement.classList.add('session-restoring');
+      }
+    } catch (e) {}
+  })();
+</script>
+<div id="sessionRestoreSplash" aria-hidden="true">
+  <div class="srs-inner">
+    <div class="srs-spinner"></div>
+    <div class="srs-text">جاري استعادة الجلسة…</div>
+  </div>
+</div>
 
 <!-- بوابة دخول المستخدمين - محدش يقدر يشوف أو يستخدم أي حاجة قبل ما يسجل دخول صحيح -->
 <div class="access-gate" id="loginGate">
@@ -6278,6 +6326,7 @@
 
   /* ---------- بوابة دخول المستخدمين ---------- */
   function showApp() {
+    document.documentElement.classList.remove('session-restoring'); // انتهت الاستعادة بنجاح — أزل السبلاش
     document.getElementById('loginGate').style.display = 'none';
     document.getElementById('mainContainer').style.display = 'block';
     unlockApp();
@@ -6304,6 +6353,7 @@
           showApp();
         } else {
           window.__aqarAuthRestoring = false; // فشل الدخول التلقائي — نوقف حالة "الاستعادة جارية"
+          document.documentElement.classList.remove('session-restoring'); // أظهر بوابة الدخول برسالة السيرفر
           statusEl.className = 'access-gate-status error';
           statusEl.textContent = res.message;
         }
@@ -6311,6 +6361,7 @@
       .withFailureHandler(function(err) {
         btn.disabled = false; btn.textContent = 'دخول';
         window.__aqarAuthRestoring = false;
+        document.documentElement.classList.remove('session-restoring'); // خطأ شبكة/سيرفر — أظهر بوابة الدخول
         statusEl.className = 'access-gate-status error';
         statusEl.textContent = 'حدث خطأ: ' + err.message;
       })
@@ -6350,6 +6401,17 @@
       // نعرف هوية المستخدم ودوره، بدل ما تطلب كلمة سر ثانوية قديمة بعد إعادة تحميل الصفحة.
       window.__aqarAuthRestoring = true;
       attemptLogin(savedEmail, savedPassword);
+      // السبلاش ظاهر بالفعل (الكلاس أُضيف في سكربت <body> السطري). فشل آمن: لو ما وصلش
+      // ردّ خلال 15 ثانية (تعليق فعلي — withFailureHandler بيغطّي أخطاء الشبكة الصريحة)،
+      // أزل السبلاش وأظهر بوابة الدخول بدل ما يعلق المستخدم عليه.
+      setTimeout(function () {
+        if (window.__aqarAuthRestoring) {
+          window.__aqarAuthRestoring = false;
+          document.documentElement.classList.remove('session-restoring');
+          var b = document.getElementById('loginBtn');
+          if (b) { b.disabled = false; b.textContent = 'دخول'; }
+        }
+      }, 15000);
     } else if (savedEmail) {
       document.getElementById('loginPassword').focus();
     }
