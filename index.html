@@ -771,8 +771,12 @@
     }
     #appNav .app-nav-btn svg { width: 15px; height: 15px; }
 
-    /* ===== "الإحصائيات والمخزون" — inline in-document view (NOT an iframe) ===== */
+    /* ===== "الإحصائيات والمخزون" — يُعرَض داخل شِل لوحة التحكم (الشريط الجانبي يظل ظاهرًا) =====
+       #statsView مُعاد توطينه بالـ JS داخل #dashPanel-stats > #dashStatsMount. يظهر فقط
+       عندما يكون قسم الإحصائيات نشطًا (لأن #dashPanel-stats يحمل [hidden] وقتها). */
     #statsView { display: none; max-width: var(--app-max); margin: 0 auto; }
+    #dashboardView #dashPanel-stats #statsView { display: block; max-width: none; margin: 0; }
+    #dashboardView #dashPanel-stats #statsView > h1 { display: none; } /* عنوان .dash-page-title يكفي */
     /* view switch: hide search-only chrome, keep #appNav + #statsView */
     /* The full shared site header stays visible on the Statistics view — the premium
        cover banner (.cover-wrap), the site title/tagline (.site-header) AND the 7-button
@@ -1011,8 +1015,9 @@
     body.app-view-dashboard #results,
     body.app-view-dashboard #compareBar,
     body.app-view-dashboard #scrollTopBtn,
-    body.app-view-dashboard #statsView,
     body.app-view-dashboard #editModal { display: none !important; }
+    /* #statsView لم يعد يُخفى هنا — صار طفلًا لـ #dashPanel-stats داخل #dashboardView،
+       ويظهر فقط عندما يكون قسم الإحصائيات نشطًا (باقي الأوقات #dashPanel-stats[hidden]). */
     body.app-view-dashboard #dashboardView { display: block; }
 
     .dash-shell {
@@ -2581,8 +2586,13 @@
           </div>
         </div>
 
-        <!-- (البندان 4/5: أُزيلت الصفحة الوسيطة + زر "فتح لوحة الإحصائيات التفصيلية".
-             زر "الإحصائيات والمخزون" في الشريط الجانبي يفتح العرض التفصيلي #statsView مباشرة عبر openStats().) -->
+        <!-- "الإحصائيات والمخزون" — يُعرَض داخل شِل لوحة التحكم (الشريط الجانبي يبقى ظاهرًا)، بلا
+             صفحة وسيطة وبلا زر "فتح لوحة الإحصائيات التفصيلية". العرض التفصيلي #statsView
+             يُعاد توطينه بالـ JS داخل #dashStatsMount عند فتح القسم. -->
+        <div class="dash-panel" id="dashPanel-stats" hidden>
+          <div class="dash-page-title">الإحصائيات والمخزون</div>
+          <div id="dashStatsMount"></div>
+        </div>
 
         <div class="dash-panel" id="dashPanel-profile" hidden>
           <div class="dash-page-title">الملف الشخصي</div>
@@ -6972,6 +6982,13 @@
     if (mainContainerEl && editModalEl && editModalEl.parentElement !== mainContainerEl) {
       mainContainerEl.appendChild(editModalEl);
     }
+    // "الإحصائيات والمخزون" — نُعيد توطين #statsView داخل لوحة التحكم (#dashStatsMount) بحيث
+    // يُعرَض بجوار الشريط الجانبي. كل عناصره تُخاطَب بالـ ID، فنقل الـ DOM لا يكسر مستمعاته/رسومه.
+    (function relocateStatsView() {
+      var mount = document.getElementById('dashStatsMount');
+      var sv = document.getElementById('statsView');
+      if (mount && sv && sv.parentElement !== mount) mount.appendChild(sv);
+    })();
     // "سعر المتر" (#priceStatsModal) — نفس النقل: يُعرض كصفحة داخل مساحة المحتوى (app-view-meter).
     if (mainContainerEl && priceStatsModalEl && priceStatsModalEl.parentElement !== mainContainerEl) {
       mainContainerEl.appendChild(priceStatsModalEl);
@@ -7230,26 +7247,35 @@
       if (dashCurrent === 'audit') {
         var usersItem = document.querySelector('#dashNav .dash-nav-item[data-dash="users"]');
         if (!usersItem || usersItem.hidden) dashCurrent = firstVisible || 'home';
-      } else if (dashCurrent !== 'stats') {   // 'stats' يُفتح كعرض مستقل، مش كـ panel
+      } else {
         var curBtn = document.querySelector('#dashNav .dash-nav-item[data-dash="' + dashCurrent + '"]');
         if (!curBtn || curBtn.hidden) dashCurrent = firstVisible || 'home';
       }
     }
 
-    var DASH_PANEL_KEYS = ['home', 'developers', 'users', 'profile', 'settings', 'audit'];
+    var DASH_PANEL_KEYS = ['home', 'developers', 'users', 'stats', 'profile', 'settings', 'audit'];
     // نفس مصدر الصلاحيات: حارس يمنع فتح القسم حتى لو استُدعيت dashSelect برمجيًا/عبر hash.
     // (audit = "سجل عمليات إدارة المستخدمين" = OWNER فقط، مرآة getUserAuditLog.)
-    var DASH_PANEL_PERMS = { users: 'MANAGE_USERS', developers: 'MANAGE_DEVELOPERS', settings: 'MANAGE_SETTINGS', audit: 'MANAGE_USERS' };
+    var DASH_PANEL_PERMS = { users: 'MANAGE_USERS', developers: 'MANAGE_DEVELOPERS', settings: 'MANAGE_SETTINGS', audit: 'MANAGE_USERS', stats: 'VIEW_STATISTICS' };
+
+    // "الإحصائيات والمخزون" — يُعرَض داخل شِل لوحة التحكم: نُعيد توطين #statsView داخل
+    // #dashStatsMount (مرة واحدة)، ثم نفتح موديول الإحصائيات ببيانات الدخول (VIEW_STATISTICS).
+    // بلا صفحة وسيطة، بلا زر إضافي، والشريط الجانبي يظل ظاهرًا.
+    function dashMountStats() {
+      var mount = document.getElementById('dashStatsMount');
+      var sv = document.getElementById('statsView');
+      if (mount && sv && sv.parentElement !== mount) mount.appendChild(sv);
+      var auth = Object.assign({ pin: '' }, (typeof getAuthCreds === 'function' ? getAuthCreds() : {}));
+      if (typeof window.__aqarStatsUnlocked === 'function' && window.__aqarStatsUnlocked()) {
+        if (typeof window.__aqarStatsReload === 'function') window.__aqarStatsReload();  // إعادة فتح → تحديث الأرقام
+      } else if (typeof window.__aqarStatsUnlock === 'function') {
+        window.__aqarStatsUnlock(auth);
+      }
+    }
+
     function dashSelect(key) {
       // وضع "الملف الشخصي فقط": أي محاولة للانتقال لقسم آخر تُعاد إلى "الملف الشخصي".
       if (dashProfileOnly && key !== 'profile') key = 'profile';
-      // البندان 4/5: "الإحصائيات والمخزون" تفتح العرض التفصيلي مباشرة — لا صفحة وسيطة، لا زر إضافي.
-      if (key === 'stats') {
-        dashCurrent = 'home';                 // العودة للوحة التحكم تهبط على "الرئيسية"
-        dashCloseDrawer();
-        if (typeof openStats === 'function') openStats();   // openStats يتحقق من VIEW_STATISTICS (front + back)
-        return;
-      }
       // حارس دفاعي: أي قسم بلا صلاحيته → يُعاد إلى "الرئيسية" (القرار النهائي في السيرفر برضه).
       var needPerm = DASH_PANEL_PERMS[key];
       if (needPerm && !(typeof hasPermission === 'function' && hasPermission(needPerm))) key = 'home';
@@ -7268,6 +7294,7 @@
       dashCloseDrawer();
       window.scrollTo(0, 0);
       if (key === 'home') dashLoadHome();
+      else if (key === 'stats') dashMountStats();
       else if (key === 'profile') dashRenderProfile();
       else if (key === 'users' && typeof window.__aqarLoadUsers === 'function') window.__aqarLoadUsers();
       else if (key === 'settings') dashReparentSettingsOnce();
@@ -7605,14 +7632,17 @@
     }
     // جسر للـ scope اللي فيه أزرار/مستمعات المودالين القديمة — للرجوع لشاشة البحث.
     window.__aqarGoSearch = goToSearchHash;
-    function openStats() { unlockStatsThen(goToStatsHash); }
+    // "الإحصائيات والمخزون" = قسم داخل لوحة التحكم (الشريط الجانبي يظل ظاهرًا). الـ hash #stats
+    // يفتح لوحة التحكم على قسم الإحصائيات مباشرة (لا صفحة وسيطة). التفويض عبر unlockDashboardThen
+    // (VIEW_STATISTICS) + حارس dashSelect، والباك-إند يعيد التحقق (authorizeAdminView_).
+    function openStats() { goToStatsHash(); }
     function openAdd()   { unlockAddThen(goToAddHash); }
 
     // مزامنة العرض مع الـ hash — رجوع/تقديم/تحديث والوصول المباشر لـ #stats أو #add.
     function route() {
       if (location.hash === '#stats') {
-        if (statsUnlocked()) { showStatsView(); }
-        else { showSearchView(); unlockStatsThen(showStatsView); }
+        if (dashUnlocked()) { dashCurrent = 'stats'; showDashboardView(); }
+        else { showSearchView(); unlockDashboardThen(function () { dashCurrent = 'stats'; showDashboardView(); }); }
       } else if (location.hash === '#add') {
         if (addUnlocked()) { showAddView(); }
         else { showSearchView(); unlockAddThen(showAddView); }
@@ -7698,6 +7728,8 @@
       unlockDashboard(pin);
     };
     window.__aqarStatsUnlocked = function() { return !!currentPin; };
+    // إعادة تحميل الأرقام عند إعادة فتح قسم "الإحصائيات والمخزون" داخل لوحة التحكم (بلا إعادة تفويض).
+    window.__aqarStatsReload = function() { if (currentPin) loadStats(); };
     // قفل عرض الإحصائيات (عند "تسجيل خروج الإدارة"): يمسح التفويض من الذاكرة ويخفي المحتوى.
     window.__aqarStatsLock = function() {
       currentPin = null;
