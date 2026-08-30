@@ -2247,7 +2247,7 @@
           <button type="button" class="dash-nav-item" data-dash="units" data-roles="OWNER,MANAGER,DATA_ENTRY,SALES"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M6 21V7l6-4 6 4v14M10 12h4M10 16h4"/></svg><span>الوحدات</span></button>
           <button type="button" class="dash-nav-item" data-dash="developers" data-roles="OWNER"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18ZM10 6h4M10 10h4M10 14h4M10 18h4"/></svg><span>المطوّرون</span></button>
           <button type="button" class="dash-nav-item" data-dash="users" data-roles="OWNER"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 5.2a3.5 3.5 0 0 1 0 6.8M18 20a6.5 6.5 0 0 0-3.2-5.6"/></svg><span>المستخدمون</span></button>
-          <button type="button" class="dash-nav-item" data-dash="stats" data-roles="OWNER,MANAGER"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span>الإحصائيات والمخزون</span></button>
+          <button type="button" class="dash-nav-item" data-dash="stats" data-roles="OWNER,MANAGER,DATA_ENTRY,SALES"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span>الإحصائيات والمخزون</span></button>
           <button type="button" class="dash-nav-item" data-dash="profile" data-roles="OWNER,MANAGER,DATA_ENTRY,SALES"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>الملف الشخصي</span></button>
           <button type="button" class="dash-nav-item" data-dash="settings" data-roles="OWNER"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>الإعدادات</span></button>
           <button type="button" class="dash-nav-item dash-logout" id="dashLogoutBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg><span>تسجيل الخروج</span></button>
@@ -4247,11 +4247,16 @@
    * ============================================================ */
   // مرآة للـ PERMISSIONS_BY_ROLE_ في Code.gs — للواجهة فقط. أي تغيير هنا لازم يتطابق مع السيرفر.
   var CLIENT_BASE_PERMS = ['VIEW_UNITS','SEARCH_UNITS','FILTER_UNITS','VIEW_UNIT_DETAILS','SHARE_UNIT','EXPORT_UNIT','EXPORT_COMPARISON','CREATE_OFFER'];
+  // مرآة PERMISSIONS_BY_ROLE_ في Code.gs — للواجهة فقط (الحماية الحقيقية في الباك-إند).
+  // عائلة "العرض": VIEW_STATISTICS = إحصاءات عامة + مخزون + دخول لوحة التحكم/الإحصائيات (للجميع)؛
+  // VIEW_ACTIVITY_LOG = سجل نشاط إدخال الوحدات (OWNER/MANAGER/DATA_ENTRY — لا SALES)؛
+  // VIEW_ADMIN_ANALYTICS = تحليلات إدارية دقيقة: Details View Count / الأكثر مشاهدة أو طلبًا /
+  // المتصلون الآن (OWNER/MANAGER فقط).
   var CLIENT_PERMS = {
     OWNER:      ['*'],
-    MANAGER:    CLIENT_BASE_PERMS.concat(['ADD_UNIT','EDIT_UNIT','DELETE_UNIT','CLONE_UNIT','CHANGE_UNIT_STATUS','VIEW_STATISTICS','UPDATE_UNIT_TERMS']),
-    DATA_ENTRY: CLIENT_BASE_PERMS.concat(['ADD_UNIT','UPDATE_UNIT_TERMS']),
-    SALES:      CLIENT_BASE_PERMS.slice()
+    MANAGER:    CLIENT_BASE_PERMS.concat(['ADD_UNIT','EDIT_UNIT','DELETE_UNIT','CLONE_UNIT','CHANGE_UNIT_STATUS','VIEW_STATISTICS','UPDATE_UNIT_TERMS','VIEW_ACTIVITY_LOG','VIEW_ADMIN_ANALYTICS']),
+    DATA_ENTRY: CLIENT_BASE_PERMS.concat(['ADD_UNIT','UPDATE_UNIT_TERMS','VIEW_STATISTICS','VIEW_ACTIVITY_LOG']),
+    SALES:      CLIENT_BASE_PERMS.concat(['VIEW_STATISTICS'])
   };
   function currentUserRole() {
     return (window.__currentUser && window.__currentUser.role) || 'SALES';
@@ -4439,7 +4444,7 @@
           </div>
           <div class="card-provenance">
             <span class="prov-dev">${u['Developer Name'] ? `${ICON.building} المطور: <a href="javascript:void(0)" onclick='showDeveloperProfile(${JSON.stringify(u['Developer Name'])})'>${u['Developer Name']}</a>` : ''}</span>
-            ${(roleActive() && hasPermission('VIEW_STATISTICS') && u['Details View Count'] !== undefined) ? `<span class="prov-views" title="عدد مرات مشاهدة تفاصيل الوحدة (إداري)">${ICON.eye} <span class="views-num">${Number(u['Details View Count']) || 0}</span></span>` : ''}
+            ${(roleActive() && hasPermission('VIEW_ADMIN_ANALYTICS') && u['Details View Count'] !== undefined) ? `<span class="prov-views" title="عدد مرات مشاهدة تفاصيل الوحدة (إداري)">${ICON.eye} <span class="views-num">${Number(u['Details View Count']) || 0}</span></span>` : ''}
             <span class="prov-added" title="مُدخِل الوحدة">${u['Entered By'] ? `${ICON.user} ${u['Entered By']}` : ''}</span>
           </div>
         </div>
@@ -7566,6 +7571,12 @@
     function dashRefreshLive() {
       var vEl = document.getElementById('dashLiveCountValue');
       var lEl = document.getElementById('dashLiveEmailsList');
+      // "المتصلون الآن" = تحليلات إدارية دقيقة (VIEW_ADMIN_ANALYTICS = OWNER/MANAGER).
+      // لمن لا يملكها (SALES / DATA_ENTRY) نُخفي البطاقة ولا نستدعي الباك-إند.
+      var _card = document.querySelector('.dash-live-card');
+      var _canLive = typeof window.hasPermission === 'function' && window.hasPermission('VIEW_ADMIN_ANALYTICS');
+      if (_card) _card.style.display = _canLive ? '' : 'none';
+      if (!_canLive) return;
       // المصدر الموحّد للحضور: نفس مخزن ونفس تعريف "متصل الآن" المستخدم في صفحة "المستخدمون"
       // (USER_PRESENCE_V1 عبر getOnlineUsers) — بدل ACTIVE_SESSIONS الذي كان يعدّ كل تبويب مفتوح
       // بالاسم فيتناقض الرقم مع صفحة المستخدمين.
@@ -7958,11 +7969,24 @@
     document.getElementById('refreshBtn').addEventListener('click', loadStats);
 
     function loadStats() {
+      // إحصاءات عامة + مخزون — متاحة لكل مستخدم مُسجَّل دخول (VIEW_STATISTICS)
       google.script.run.withSuccessHandler(renderStats).getDashboardStats(currentPin);
       loadPriceHistoryProjects();
-      loadEntryActivityLog();
-      loadMostRequested();
-      loadMostViewed();
+      // أقسام مقيّدة: نُظهرها/نُخفيها ونستدعي الباك-إند فقط لمن يملك الصلاحية.
+      // (الباك-إند يعيد التحقق لكل نداء بأي حال — هذا لمنع رسالة رفض بشعة للـ SALES.)
+      var _can = function (p) { return typeof window.hasPermission === 'function' && window.hasPermission(p); };
+      var _showSec = function (innerId, ok) {
+        var el = document.getElementById(innerId);
+        var sec = el && el.closest ? el.closest('.section') : null;
+        if (sec) sec.style.display = ok ? '' : 'none';
+      };
+      var canLog = _can('VIEW_ACTIVITY_LOG');
+      var canAnalytics = _can('VIEW_ADMIN_ANALYTICS');
+      _showSec('activityEmployeeSelect', canLog);
+      _showSec('mostViewedTable', canAnalytics);
+      _showSec('mostRequestedTable', canAnalytics);
+      if (canLog) loadEntryActivityLog();
+      if (canAnalytics) { loadMostRequested(); loadMostViewed(); }
     }
 
     /* ---------- أكثر 10 وحدات مشاهدة لتفاصيلها (Admin-only، معتمدة على عدّاد Details View Count) ---------- */
