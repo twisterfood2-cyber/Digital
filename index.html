@@ -6361,12 +6361,16 @@
   function getVisitorName() {
     let name = '';
     try { name = localStorage.getItem('visitorName') || ''; } catch (e) {}
-    if (!name) {
-      name = prompt('اكتب اسمك عشان يظهر في سجل المستخدمين المتصلين (مرة واحدة بس):') || '';
-      name = name.trim();
-      if (name) {
-        try { localStorage.setItem('visitorName', name); } catch (e) {}
-      }
+    // كان هنا نداء prompt() — نافذة حظر بتوقف الـ main thread بالكامل. بعد الدخول
+    // التلقائي (كل reload وفيه بيانات محفوظة) كانت بتتنفّذ بعد ثانية من unlockApp()
+    // فتُجمّد الصفحة على آخر لقطة مرسومة (شاشة الدخول أو التطبيق قبل ما يشتغل)،
+    // وطول ما المستخدم بيلغيها أو بيفعّل "امنع النوافذ الإضافية" مفيش اسم بيتخزّن
+    // فكل reload بيعيد التجميد. المستخدم الداخل اسمه معروف من جلسة الدخول، فنستخدمه
+    // مباشرة بدون أي نافذة. الزائر المجهول بيتبعت باسم فاضي والسيرفر بيعرضه
+    // "زائر بدون اسم" زيّ ما هو.
+    if (!name && window.__currentUser && window.__currentUser.name) {
+      name = String(window.__currentUser.name).trim();
+      if (name) { try { localStorage.setItem('visitorName', name); } catch (e) {} }
     }
     return name;
   }
