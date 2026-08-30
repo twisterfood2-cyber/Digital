@@ -6675,7 +6675,13 @@
     if (auditBtn) auditBtn.hidden = !umCallerIsOwner(); // الباك-إند بيفرض OWNER بغض النظر عن ده
     loadUsersList();
   }
-  window.__aqarLoadUsers = loadUserManagementSection;
+  // حارس واجهة (طبقة أولى) — إدارة المستخدمين لمالك النظام فقط. الحماية الحقيقية في السيرفر
+  // (كل نداء داخل loadUserManagementSection يمرّ على authorizeOwnerAdmin_). حتى لو استُدعيت
+  // window.__aqarLoadUsers() من الـ Console بواسطة SALES، لا تُحمَّل الشاشة ولا تصل بياناتها.
+  window.__aqarLoadUsers = function () {
+    if (typeof hasPermission === 'function' && !hasPermission('MANAGE_USERS')) return;
+    return loadUserManagementSection.apply(this, arguments);
+  };
 
   // الزر القديم في اللوحة المنزلقة القديمة (لسه موجود كـ fallback) — يوجّه لقسم المستخدمين في لوحة التحكم.
   var _openUsersBtn = document.getElementById('openUsersModalBtn');
@@ -6709,7 +6715,10 @@
     if (s) s.value = '';
     loadAuditLog(false);
   }
-  window.__aqarLoadAudit = loadUserAuditSection;
+  window.__aqarLoadAudit = function () {
+    if (typeof hasPermission === 'function' && !hasPermission('MANAGE_USERS')) return;   // سجل عمليات إدارة المستخدمين — مالك فقط
+    return loadUserAuditSection.apply(this, arguments);
+  };
 
   // زر "سجل العمليات" داخل قسم المستخدمين → تنقّل SPA لقسم السجل (مش فتح مودال).
   document.getElementById('umAuditToggle').addEventListener('click', function () {
@@ -7102,7 +7111,10 @@
       if (dl && res && res.developers) dl.innerHTML = res.developers.map(function (d) { return '<option value="' + d + '">'; }).join('');
     }).getDeveloperProjectMap();
   }
-  window.__aqarLoadDevelopers = loadDeveloperManagementSection;
+  window.__aqarLoadDevelopers = function () {
+    if (typeof hasPermission === 'function' && !hasPermission('MANAGE_USERS')) return;   // إدارة بيانات المطوّرين — مالك فقط (authorizeOwnerAdmin_)
+    return loadDeveloperManagementSection.apply(this, arguments);
+  };
 
   /* ---------- استخراج بيانات المطور بالذكاء الاصطناعي ---------- */
   document.getElementById('clearDevProfileFormBtn').addEventListener('click', function() {
@@ -7167,7 +7179,7 @@
           msg.style.color = 'var(--error-fg)';
           msg.textContent = 'حدث خطأ: ' + err.message;
         })
-        .extractDeveloperProfileWithAI(text, fileBase64, mimeType);
+        .extractDeveloperProfileWithAI(text, fileBase64, mimeType, devMgmtAuth());
     }
 
     if (file) {
@@ -7500,9 +7512,17 @@
     }
 
     var DASH_PANEL_KEYS = ['home', 'units', 'developers', 'users', 'stats', 'profile', 'settings', 'audit'];
+    // أقسام إدارية بحتة — تتطلب صلاحية المالك (MANAGE_USERS = OWNER فقط، مرآة authorizeOwnerAdmin_).
+    // إخفاء زر الشريط الجانبي ليس كافيًا: هذا يمنع فتح القسم حتى لو استُدعيت dashSelect برمجيًا.
+    var DASH_ADMIN_PANELS = { users: 1, developers: 1, settings: 1, audit: 1 };
+    function dashCanAdminPanel() {
+      return typeof hasPermission === 'function' && hasPermission('MANAGE_USERS');
+    }
     function dashSelect(key) {
       // وضع "الملف الشخصي فقط": أي محاولة للانتقال لقسم آخر تُعاد إلى "الملف الشخصي".
       if (dashProfileOnly && key !== 'profile') key = 'profile';
+      // حارس دفاعي: أي قسم إداري بلا صلاحية المالك → يُعاد إلى "الرئيسية" (القرار النهائي في السيرفر برضه).
+      if (DASH_ADMIN_PANELS[key] && !dashCanAdminPanel()) key = 'home';
       dashCurrent = key;
       // "سجل العمليات" (audit) قسم فرعي من "المستخدمون" → نبقّي "المستخدمون" مُفعَّلًا في الشريط الجانبي.
       var navKey = (key === 'audit') ? 'users' : key;
