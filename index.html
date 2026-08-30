@@ -827,6 +827,58 @@
     /* it's a page now, not a dialog — the × close control is not shown here (use the nav) */
     body.app-view-add #editModal .modal-close { display: none; }
 
+    /* ===== "عرض السعر" (#calcModal) و "سعر المتر" (#priceStatsModal) كعرض صفحة داخل
+       مساحة المحتوى الرئيسية — نفس نمط "إدخال وحدة" بالظبط. الهيدر + الغلاف + شريط
+       الأزرار (#appNav) يفضلوا ظاهرين؛ المودال يتحوّل لقسم in-flow بدل نافذة عائمة.
+       منطق الحساب / نداءات الباك-إند / الـ IDs لم تتغيّر — تغيير عرض وتنقّل فقط. ===== */
+    body.app-view-quote .ai-search-panel,
+    body.app-view-quote .filters-card,
+    body.app-view-quote #resultsCount,
+    body.app-view-quote #results,
+    body.app-view-quote #compareBar,
+    body.app-view-quote #scrollTopBtn,
+    body.app-view-quote #statsView,
+    body.app-view-quote #dashboardView,
+    body.app-view-quote #editModal,
+    body.app-view-quote #priceStatsModal,
+    body.app-view-meter .ai-search-panel,
+    body.app-view-meter .filters-card,
+    body.app-view-meter #resultsCount,
+    body.app-view-meter #results,
+    body.app-view-meter #compareBar,
+    body.app-view-meter #scrollTopBtn,
+    body.app-view-meter #statsView,
+    body.app-view-meter #dashboardView,
+    body.app-view-meter #editModal,
+    body.app-view-meter #calcModal { display: none !important; }
+
+    /* present the two as full-width in-flow sections under the header/nav (not a modal) */
+    body.app-view-quote #calcModal,
+    body.app-view-meter #priceStatsModal {
+      position: static;
+      display: block;
+      inset: auto;
+      background: none;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      padding: 0;
+      overflow: visible;
+      z-index: auto;
+      max-width: var(--app-max);
+      margin: 0 auto;
+      pointer-events: none;              /* clicks on the empty edges do nothing (no accidental close) */
+    }
+    body.app-view-quote #calcModal .modal-box,
+    body.app-view-meter #priceStatsModal .modal-box {
+      max-width: none;   /* صفحة كاملة العرض داخل مساحة المحتوى (يتفوّق على 520/640px بالـ specificity) */
+      width: 100%;
+      margin: 0;
+      pointer-events: auto;
+    }
+    /* the × in the card header stays — it's the clear "back to search" control for this page */
+    body.app-view-quote #calcModal .modal-close,
+    body.app-view-meter #priceStatsModal .modal-close { display: inline-flex; align-items: center; justify-content: center; }
+
     /* ---- dashboard styles, all scoped under #statsView so nothing leaks into Search ---- */
     #statsView h1 {
       font-size: 22px; font-weight: 700; color: var(--text-light);
@@ -858,9 +910,11 @@
     #statsView .kpi-card.available { border-color: rgba(127,211,163,0.32); }
     #statsView .kpi-card.reserved  { border-color: rgba(230,201,120,0.40); }
     #statsView .kpi-card.sold      { border-color: rgba(233,144,138,0.34); }
+    #statsView .kpi-card.archived  { border-color: rgba(174,185,198,0.30); }
     #statsView .kpi-value { font-size: 26px; font-weight: 800; color: var(--gold-soft); line-height: 1.15; letter-spacing: 0.3px; }
     #statsView .kpi-card.available .kpi-value { color: var(--ok); }
     #statsView .kpi-card.sold      .kpi-value { color: var(--danger); }
+    #statsView .kpi-card.archived  .kpi-value { color: var(--text-muted); }
     #statsView .kpi-label { font-size: 12px; color: var(--text-muted); margin-top: 3px; font-weight: 600; line-height: 1.4; }
     #statsView .section {
       background: var(--glass-panel);
@@ -1081,21 +1135,25 @@
     .dash-prof-msg { font-size: 12px; font-weight: 700; }
     .dash-prof-msg.ok { color: var(--ok); }
     .dash-prof-msg.err { color: var(--danger); }
-    /* بطاقة "المستخدمون المتصلون الآن" — سطح زجاجي واضح فوق خلفية اللوحة المموّهة */
+    /* بطاقة "المستخدمون المتصلون الآن" — سطح كحلي معتم (مش شفّاف) لضمان تباين قوي مريح
+       للرقم وأسماء المتصلين مهما كانت الخلفية خلفها. نفس الهوية: كحلي + خط ذهبي، نفس المقاسات. */
     #dashboardView .dash-live-card {
-      background: var(--glass-strong);
-      -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+      background: var(--navy-deep);
       border: 1px solid var(--border-gold); border-radius: var(--radius-md);
       padding: 12px 16px; margin: 0 0 16px;
     }
     #dashboardView .live-count {
       display: flex; align-items: center; gap: 8px;
       font-size: 13.5px; font-weight: 700; color: var(--text-light); margin: 0;
+      /* إلغاء تنسيق "الحبّة" الفاتح القادم من .live-count العام (صفحة البحث) — كان بيحط
+         خلفية كريمي فاتحة جوه البطاقة الكحلي فيبان الاسم/الرقم باهتين. */
+      background: transparent; border: 0; padding: 0; border-radius: 0;
     }
+    #dashboardView .dash-live-card .live-dot { flex-shrink: 0; }
     #dashboardView .dash-live-card .live-count b { font-size: 18px; font-weight: 800; color: var(--gold-soft); }
     #dashLiveEmailsList {
-      font-size: 12.5px; font-weight: 600; line-height: 1.95;
-      color: var(--text-light); opacity: 0.92; margin: 6px 0 0;
+      font-size: 12.5px; font-weight: 700; line-height: 1.95;
+      color: var(--text-light); opacity: 1; margin: 6px 0 0;
     }
 
     @media (max-width: 860px) {
@@ -1566,13 +1624,21 @@
      * بالظبط (نفس التوكنز) عشان يبانوا جزء أصلي من نفس الموقع. visual layer فقط،
      * scoped على المودالين دول — أي مودال تاني مش بيتأثر. المنطق/الحسابات/الـ IDs زي ما هي.
      * ============================================================ */
-    #calcModal .modal-box,
+    #calcModal .modal-box {
+      background: var(--glass-panel);
+      color: var(--text-light);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-card);
+      max-width: 520px;   /* كان style سطري — نُقل للـ CSS ليتفوّق عليه عرض الصفحة الكاملة */
+    }
     #priceStatsModal .modal-box {
       background: var(--glass-panel);
       color: var(--text-light);
       -webkit-backdrop-filter: blur(12px);
       backdrop-filter: blur(12px);
       box-shadow: var(--shadow-card);
+      max-width: 640px;   /* كان style سطري — نُقل للـ CSS */
     }
     #calcModal .modal-header,
     #priceStatsModal .modal-header { border-bottom-color: var(--line-dark); }
@@ -2263,14 +2329,14 @@
             <div class="live-count" id="dashLiveCount"><span class="live-dot"></span>المستخدمون المتصلون الآن: <b id="dashLiveCountValue">-</b></div>
             <div id="dashLiveEmailsList"></div>
           </div>
-          <div class="kpi-grid" id="dashKpiGrid"><div class="empty-note">جاري تحميل الملخّص…</div></div>
-          <div class="section">
-            <h3>الوحدات حسب التصنيف</h3>
-            <div id="dashCategoryBars"><div class="empty-note">—</div></div>
-          </div>
-          <div class="section">
-            <h3>أكتر المطورين تكرارًا</h3>
-            <div id="dashDeveloperBars"><div class="empty-note">—</div></div>
+          <!-- الصفحة الرئيسية مختصرة: الإحصاءات والمخزون والتصنيفات انتقلت إلى قسم مستقل
+               "الإحصائيات والمخزون" (نفس الصلاحية VIEW_STATISTICS). لا حذف لأي وظيفة. -->
+          <div class="section" id="dashHomeQuick">
+            <p class="dash-note" style="margin-top:0;">الملخّص التفصيلي (إجمالي الوحدات / المتاحة / المحجوزة / المباعة / <b>المؤرشفة</b> / قيمة المخزون / التصنيفات / المطوّرون) في قسم "الإحصائيات والمخزون".</p>
+            <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+              <button type="button" class="dash-cta" id="dashHomeStatsBtn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>فتح الإحصائيات والمخزون</button>
+              <button type="button" class="dash-cta secondary" id="dashHomeSearchBtn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>الذهاب إلى شاشة البحث</button>
+            </div>
           </div>
         </div>
 
@@ -2481,7 +2547,7 @@
 
 <!-- مودال حاسبة السعر والتقسيط -->
 <div class="modal-overlay" id="calcModal">
-  <div class="modal-box" style="max-width:520px;">
+  <div class="modal-box">
     <div class="modal-header">
       <div class="modal-title"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg>حاسبة السعر والتقسيط</div>
       <button class="modal-close" id="calcModalCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
@@ -2654,7 +2720,7 @@
 
 <!-- مودال متوسط سعر المتر لكل منطقة - متاح للكل من غير كلمة سر -->
 <div class="modal-overlay" id="priceStatsModal">
-  <div class="modal-box" style="max-width:640px;">
+  <div class="modal-box">
     <div class="modal-header">
       <div class="modal-title"><svg class="ico" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>متوسط سعر المتر لكل منطقة</div>
       <button class="modal-close" id="priceStatsCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
@@ -3248,9 +3314,19 @@
   const calcFabBtn = document.getElementById('calcFabBtn');
   const calcModalCloseBtn = document.getElementById('calcModalCloseBtn');
 
+  // تعبئة قائمة المطوّرين في الحاسبة — نفس المنطق القديم، متاح كجسر للـ SPA view.
+  window.__aqarPopulateCalcDevs = function() {
+    var dl = document.getElementById('calcDeveloperDatalist');
+    if (dl && editDevProjectMap && Array.isArray(editDevProjectMap.developers)) {
+      dl.innerHTML = editDevProjectMap.developers.map(d => `<option value="${d}">`).join('');
+    }
+  };
+  // "عرض السعر" — يفتح كصفحة داخل مساحة المحتوى الرئيسية (مش Modal). التنقّل عبر الـ hash،
+  // وroute() → showQuoteView() (اللي بينده __aqarPopulateCalcDevs). منطق الحساب لم يتغيّر.
   calcFabBtn.addEventListener('click', function() {
-    calcModal.classList.add('open');
-    calcDeveloperDatalist.innerHTML = editDevProjectMap.developers.map(d => `<option value="${d}">`).join('');
+    window.__aqarPopulateCalcDevs();
+    if (location.hash !== '#quote') location.hash = 'quote';
+    else if (typeof window.__aqarReroute === 'function') window.__aqarReroute();
   });
 
   /* ---------- متوسط سعر المتر لكل منطقة - متاح للكل من غير كلمة سر ---------- */
@@ -3333,14 +3409,21 @@
     content.appendChild(grid);
   }
 
-  document.getElementById('priceInfoFabBtn').addEventListener('click', function() {
-    priceStatsModal.classList.add('open');
-    document.getElementById('priceStatsContent').innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:24px;">جاري التحميل...</div>';
+  // تحميل متوسط سعر المتر — نفس نداء getDistrictPriceStats ونفس العرض بالظبط.
+  // منقول لدالة جسر عشان showMeterView (SPA view) يستدعيها عند الفتح المباشر بالـ hash.
+  window.__aqarLoadMeterStats = function() {
+    var c = document.getElementById('priceStatsContent');
+    if (c) c.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:24px;">جاري التحميل...</div>';
     google.script.run.withSuccessHandler(function(res) {
-      if (!res.success) { document.getElementById('priceStatsContent').innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:24px;">حصل خطأ في التحميل</div>'; return; }
+      if (!res || !res.success) { if (c) c.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:24px;">حصل خطأ في التحميل</div>'; return; }
       lastPriceStats = res.districtStats;
       renderPriceStatsTable(lastPriceStats);
     }).getDistrictPriceStats();
+  };
+  // "سعر المتر" — يفتح كصفحة داخل مساحة المحتوى الرئيسية (مش Modal). البيانات/المنطق كما هي.
+  document.getElementById('priceInfoFabBtn').addEventListener('click', function() {
+    if (location.hash !== '#meter') location.hash = 'meter';
+    else if (typeof window.__aqarReroute === 'function') window.__aqarReroute();
   });
 
   // زر قديم مخفي (استُبدل بـ navAddUnitBtn → #add). أي نقرة عليه تمرّ على نفس
@@ -3565,8 +3648,13 @@
   }
   window.cloneUnit = cloneUnit;
 
-  document.getElementById('priceStatsCloseBtn').addEventListener('click', () => priceStatsModal.classList.remove('open'));
-  priceStatsModal.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
+  // × في رأس الصفحة = الرجوع الواضح لشاشة البحث (الصفحة السابقة). مش بيغيّر بيانات سعر المتر.
+  function __leaveMeterPage() {
+    if (typeof window.__aqarGoSearch === 'function') window.__aqarGoSearch();
+    else { location.hash = ''; }
+  }
+  document.getElementById('priceStatsCloseBtn').addEventListener('click', __leaveMeterPage);
+  priceStatsModal.addEventListener('click', function(e) { if (e.target === this) __leaveMeterPage(); });
 
   priceStatsSearchInput.addEventListener('input', function() {
     const kw = this.value.trim().toLowerCase();
@@ -3602,8 +3690,13 @@
     }
   });
 
-  calcModalCloseBtn.addEventListener('click', () => calcModal.classList.remove('open'));
-  calcModal.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
+  // × في رأس الصفحة = الرجوع الواضح لشاشة البحث (الصفحة السابقة). مش بيغيّر منطق الحاسبة.
+  function __leaveQuotePage() {
+    if (typeof window.__aqarGoSearch === 'function') window.__aqarGoSearch();
+    else { location.hash = ''; }
+  }
+  calcModalCloseBtn.addEventListener('click', __leaveQuotePage);
+  calcModal.addEventListener('click', function(e) { if (e.target === this) __leaveQuotePage(); });
 
   /* ---------- تعبئة تلقائية بالذكاء الاصطناعي في الحاسبة ---------- */
   let calcAiPastedImageBase64 = null;
@@ -7302,6 +7395,10 @@
     var navAddUnitBtn = document.getElementById('navAddUnitBtn');
     var navStatsBtn   = document.getElementById('navStatsBtn');
     var editModalEl   = document.getElementById('editModal');
+    var calcFabBtn    = document.getElementById('calcFabBtn');       // "عرض السعر"
+    var priceInfoFabBtn = document.getElementById('priceInfoFabBtn'); // "سعر المتر"
+    var calcModalEl   = document.getElementById('calcModal');
+    var priceStatsModalEl = document.getElementById('priceStatsModal');
     var mainContainerEl = document.getElementById('mainContainer');
     if (!navSearchBtn || !navStatsBtn) return;
 
@@ -7313,12 +7410,23 @@
     if (mainContainerEl && editModalEl && editModalEl.parentElement !== mainContainerEl) {
       mainContainerEl.appendChild(editModalEl);
     }
+    // "عرض السعر" (#calcModal) و "سعر المتر" (#priceStatsModal) — نفس النقل: من body لـ
+    // #mainContainer عشان يتعرضوا كصفحة داخل مساحة المحتوى (app-view-quote / app-view-meter).
+    // ليهم فاتح وحيد (زرّي #appNav) فمافيش استخدام كنافذة عائمة — النقل آمن تمامًا.
+    if (mainContainerEl && calcModalEl && calcModalEl.parentElement !== mainContainerEl) {
+      mainContainerEl.appendChild(calcModalEl);
+    }
+    if (mainContainerEl && priceStatsModalEl && priceStatsModalEl.parentElement !== mainContainerEl) {
+      mainContainerEl.appendChild(priceStatsModalEl);
+    }
+    if (calcFabBtn) calcFabBtn.setAttribute('data-app-view', 'quote');
+    if (priceInfoFabBtn) priceInfoFabBtn.setAttribute('data-app-view', 'meter');
     var addVerifiedPin = null;   // data-entry PIN (or admin PIN) verified this session — kept in memory only
     var addUnlockedFlag = false;
     var navDashBtn = document.getElementById('adminFab'); // المرحلة 3.4: زر "لوحة الإدارة"
 
     function setActiveNav(view) {
-      [navSearchBtn, navAddUnitBtn, navStatsBtn, navDashBtn].forEach(function (b) {
+      [navSearchBtn, navAddUnitBtn, navStatsBtn, navDashBtn, calcFabBtn, priceInfoFabBtn].forEach(function (b) {
         if (b) b.classList.toggle('is-active', b.getAttribute('data-app-view') === view);
       });
     }
@@ -7338,16 +7446,28 @@
       if (typeof dashCloseDrawer === 'function') dashCloseDrawer();
       document.body.classList.remove('app-view-dashboard');
     }
+    // "عرض السعر" / "سعر المتر" كصفحات داخل مساحة المحتوى — مغادرة = إزالة كلاس body فقط.
+    // لا نلمس منطق الحاسبة/سعر المتر ولا بياناتهما (تبقى في الـ DOM كما هي للفتحة التالية).
+    function leaveQuoteView() {
+      document.body.classList.remove('app-view-quote');
+    }
+    function leaveMeterView() {
+      document.body.classList.remove('app-view-meter');
+    }
     function showSearchView() {
       document.body.classList.remove('app-view-stats');
       leaveDashboardView();
       leaveAddView();
+      leaveQuoteView();
+      leaveMeterView();
       setActiveNav('search');
       window.scrollTo(0, 0);
     }
     function showStatsView() {
       leaveAddView();
       leaveDashboardView();
+      leaveQuoteView();
+      leaveMeterView();
       document.body.classList.add('app-view-stats');
       setActiveNav('stats');
       window.scrollTo(0, 0);
@@ -7355,11 +7475,38 @@
     function showAddView() {
       document.body.classList.remove('app-view-stats');
       leaveDashboardView();
+      leaveQuoteView();
+      leaveMeterView();
       document.body.classList.add('app-view-add');
       // existing helper — puts #editModal into ADD mode: fresh form + visible AI section + .open
       if (typeof openAddUnitModal === 'function') openAddUnitModal();
       if (typeof unitWritePin !== 'undefined') unitWritePin = addVerifiedPin; // keep the save authorised server-side
       setActiveNav('add');
+      window.scrollTo(0, 0);
+    }
+    // "عرض السعر" — صفحة داخل مساحة المحتوى الرئيسية (مش Modal / مش نافذة منفصلة).
+    // الغلاف/الهيدر/#appNav يفضلوا؛ منطق الحاسبة والـ IDs زي ما هي. الرجوع عبر × أو زر البحث.
+    function showQuoteView() {
+      document.body.classList.remove('app-view-stats');
+      leaveDashboardView();
+      leaveAddView();
+      leaveMeterView();
+      document.body.classList.add('app-view-quote');
+      // نفس تعبئة قائمة المطوّرين اللي كانت بتحصل وقت فتح المودال (بدون تغيير منطق).
+      if (typeof window.__aqarPopulateCalcDevs === 'function') window.__aqarPopulateCalcDevs();
+      setActiveNav('quote');
+      window.scrollTo(0, 0);
+    }
+    // "سعر المتر" — نفس المعالجة بالظبط.
+    function showMeterView() {
+      document.body.classList.remove('app-view-stats');
+      leaveDashboardView();
+      leaveAddView();
+      leaveQuoteView();
+      document.body.classList.add('app-view-meter');
+      // نفس نداء getDistrictPriceStats اللي كان وقت فتح المودال — بلا تغيير في البيانات/المنطق.
+      if (typeof window.__aqarLoadMeterStats === 'function') window.__aqarLoadMeterStats();
+      setActiveNav('meter');
       window.scrollTo(0, 0);
     }
 
@@ -7545,39 +7692,15 @@
       else if (key === 'audit' && typeof window.__aqarLoadAudit === 'function') window.__aqarLoadAudit();
     }
 
-    function dashBars(containerId, rows, unitWord) {
-      var el = document.getElementById(containerId);
-      if (!el) return;
-      if (!rows || !rows.length) { el.innerHTML = '<div class="empty-note">لا توجد بيانات بعد</div>'; return; }
-      var max = Math.max.apply(null, rows.map(function (r) { return r.count; }).concat([1]));
-      el.innerHTML = rows.map(function (r) {
-        return '<div class="bar-row"><div class="bar-label"><span>' + r.label + '</span><b>' + r.count + (unitWord ? ' ' + unitWord : '') + '</b></div>' +
-               '<div class="bar-track"><div class="bar-fill" style="width:' + (r.count / max * 100) + '%"></div></div></div>';
-      }).join('');
-    }
+    // (dashBars اتشالت: كانت تُستخدم فقط في ملخّص الرئيسية القديم — انتقل الملخّص لقسم
+    //  "الإحصائيات والمخزون" اللي له دالة رسمه الخاصة renderStats. لا مستدعي آخر.)
 
     function dashLoadHome() {
-      if (dashHomeLoadedFor === 'ok') { dashStartLivePoll(); return; }
-      var grid = document.getElementById('dashKpiGrid');
-      google.script.run.withSuccessHandler(function (res) {
-        if (!res || !res.success) {
-          if (grid) grid.innerHTML = '<div class="empty-note">تعذّر تحميل الملخّص — صلاحية العرض غير متاحة لدورك الحالي.</div>';
-          return;
-        }
-        dashHomeLoadedFor = 'ok';
-        var f = function (n) { return (n === null || n === undefined || n === '') ? '-' : Number(n).toLocaleString('en-US'); };
-        var bs = res.byStatus || {};
-        if (grid) grid.innerHTML =
-          '<div class="kpi-card"><div class="kpi-value">' + f(res.total) + '</div><div class="kpi-label">إجمالي الوحدات</div></div>' +
-          '<div class="kpi-card available"><div class="kpi-value">' + f(bs['متاح'] || 0) + '</div><div class="kpi-label">متاحة</div></div>' +
-          '<div class="kpi-card reserved"><div class="kpi-value">' + f(bs['محجوز'] || 0) + '</div><div class="kpi-label">محجوزة</div></div>' +
-          '<div class="kpi-card sold"><div class="kpi-value">' + f(bs['مباع'] || 0) + '</div><div class="kpi-label">مباعة</div></div>' +
-          '<div class="kpi-card"><div class="kpi-value">' + f(res.totalAvailableValue) + '</div><div class="kpi-label">إجمالي قيمة الوحدات المتاحة (جنيه)</div></div>';
-        var cats = res.byCategory || {};
-        dashBars('dashCategoryBars', Object.keys(cats).map(function (k) { return { label: k, count: cats[k] }; }), '');
-        dashBars('dashDeveloperBars', (res.topDevelopers || []).map(function (d) { return { label: d.name, count: d.count }; }), 'وحدة');
-        dashStartLivePoll();
-      }).getDashboardStats(dashState());
+      // الصفحة الرئيسية بقت مختصرة: بطاقة "المتصلون الآن" + روابط سريعة فقط.
+      // ملخّص الوحدات والتصنيفات انتقل بالكامل لقسم "الإحصائيات والمخزون" (نفس البيانات
+      // نفس النداء getDashboardStats — لم تُحذف أي وظيفة، فقط لا تُعرض هنا).
+      dashHomeLoadedFor = 'ok';
+      dashStartLivePoll();
     }
 
     function dashStartLivePoll() {
@@ -7848,6 +7971,11 @@
       // (مش زر يفتح مودال) — التحميل من dashSelect('developers') / dashSelect('users').
       var stB = document.getElementById('dashOpenStatsBtn');
       if (stB) stB.addEventListener('click', function () { openStats(); });
+      // روابط الصفحة الرئيسية المختصرة → نفس مسارات التنقّل الموجودة (بنفس حراسة الصلاحيات).
+      var homeStB = document.getElementById('dashHomeStatsBtn');
+      if (homeStB) homeStB.addEventListener('click', function () { openStats(); });
+      var homeSrB = document.getElementById('dashHomeSearchBtn');
+      if (homeSrB) homeSrB.addEventListener('click', goToSearchHash);
 
       var lo = document.getElementById('dashLogoutBtn');
       if (lo) lo.addEventListener('click', function () {
@@ -7865,6 +7993,8 @@
       dashWireOnce();
       document.body.classList.remove('app-view-stats');
       leaveAddView();
+      leaveQuoteView();
+      leaveMeterView();
       document.body.classList.add('app-view-dashboard');
       dashApplyRoleVisibility();
       dashSelect(dashProfileOnly ? 'profile' : (dashCurrent || 'home'));
@@ -7894,6 +8024,14 @@
       if (location.hash) history.pushState('', document.title, location.pathname + location.search);
       route();
     }
+    function goToQuoteHash() {
+      if (location.hash !== '#quote') location.hash = 'quote'; else route();
+    }
+    function goToMeterHash() {
+      if (location.hash !== '#meter') location.hash = 'meter'; else route();
+    }
+    // جسر للـ scope اللي فيه أزرار/مستمعات المودالين القديمة — للرجوع لشاشة البحث.
+    window.__aqarGoSearch = goToSearchHash;
     function openStats() { unlockStatsThen(goToStatsHash); }
     function openAdd()   { unlockAddThen(goToAddHash); }
 
@@ -7913,6 +8051,12 @@
         // SALES/DATA_ENTRY يفتحونه في وضع "الملف الشخصي فقط" (profileOnly).
         if (dashUnlocked()) { dashCurrent = 'profile'; showDashboardView(); }
         else { showSearchView(); unlockDashboardThen(function () { dashCurrent = 'profile'; showDashboardView(); }, { profileOnly: true }); }
+      } else if (location.hash === '#quote') {
+        // "عرض السعر" — ميزة عامة بلا صلاحية (زيّ ما هي اليوم). صفحة داخل مساحة المحتوى.
+        showQuoteView();
+      } else if (location.hash === '#meter') {
+        // "سعر المتر" — ميزة عامة بلا صلاحية. صفحة داخل مساحة المحتوى.
+        showMeterView();
       } else {
         showSearchView();
       }
@@ -7940,6 +8084,8 @@
     if (editModalEl && 'MutationObserver' in window) {
       new MutationObserver(function () {
         if (document.body.classList.contains('app-view-dashboard')) { setActiveNav('dashboard'); return; }
+        if (document.body.classList.contains('app-view-quote')) { setActiveNav('quote'); return; }
+        if (document.body.classList.contains('app-view-meter')) { setActiveNav('meter'); return; }
         if (document.body.classList.contains('app-view-add')) { setActiveNav('add'); return; }
         if (editModalEl.classList.contains('open')) { setActiveNav('add'); return; }
         setActiveNav(document.body.classList.contains('app-view-stats') ? 'stats' : 'search');
@@ -8161,6 +8307,11 @@
           <div class="kpi-label">${s.label}</div>
         </div>`;
       });
+      kpiHtml += `
+        <div class="kpi-card archived">
+          <div class="kpi-value">${fmtNum(res.archivedCount || 0)}</div>
+          <div class="kpi-label">مؤرشفة</div>
+        </div>`;
       kpiHtml += `
         <div class="kpi-card">
           <div class="kpi-value">${fmtNum(res.totalAvailableValue)}</div>
