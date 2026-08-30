@@ -7,8 +7,15 @@
   <!-- ===== Link Preview / SEO — Open Graph + Twitter Card =====
        ثابتة داخل <head> في الـ HTML الأولي (لا JavaScript) حتى تقرأها زواحف
        WhatsApp / Facebook / Telegram / X / LinkedIn من أول استجابة للخادم.
-       الصورة = صورة غلاف/خلفية الموقع الحالية (city-bg.png، 1200×675) وتُقدَّم
-       مباشرةً من Render كملف ثابت عام على HTTPS بلا تسجيل دخول ولا JavaScript. -->
+
+       og:image = *صورة الغلاف* الفعلية للموقع (#coverImg / .cover-wrap، التي يرفعها
+       المالك من الإعدادات وتُحمَّل وقت التشغيل عبر getCoverImageUrl()) — وليست صورة
+       الخلفية (city-bg.png). صورة الغلاف مصدرها ملف على Google Drive برابط
+       drive.google.com/thumbnail?id=…&sz=w2000، وهذا الرابط يردّ 302/application/binary
+       لزواحف السوشيال (غير صالح للـ preview). لذلك تُقدَّم *نفس صورة الغلاف بالضبط*
+       (نسخة بايت-لبايت من ملف Drive، 1600×538، بلا قص/تحجيم) كملف ثابت og-cover.png
+       من Render — عام، HTTPS، بلا تسجيل دخول/كوكيز/JavaScript، قابل للتحميل مباشرةً.
+       عرض الغلاف داخل الموقع لم يتغيّر إطلاقًا (لا يزال يحمّل من Drive). -->
   <title>AqaR Digital</title>
   <meta name="description" content="منصّة رقمية لتنظيم المعرفة العقارية ودعم قرارات التسويق">
   <link rel="canonical" href="https://aqardigital.onrender.com/">
@@ -18,18 +25,18 @@
   <meta property="og:title" content="AqaR Digital">
   <meta property="og:description" content="منصّة رقمية لتنظيم المعرفة العقارية ودعم قرارات التسويق">
   <meta property="og:url" content="https://aqardigital.onrender.com/">
-  <meta property="og:image" content="https://aqardigital.onrender.com/city-bg.png">
-  <meta property="og:image:secure_url" content="https://aqardigital.onrender.com/city-bg.png">
+  <meta property="og:image" content="https://aqardigital.onrender.com/og-cover.png">
+  <meta property="og:image:secure_url" content="https://aqardigital.onrender.com/og-cover.png">
   <meta property="og:image:type" content="image/png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="675">
+  <meta property="og:image:width" content="1600">
+  <meta property="og:image:height" content="538">
   <meta property="og:image:alt" content="AqaR Digital">
   <meta property="og:locale" content="ar_AR">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="AqaR Digital">
   <meta name="twitter:description" content="منصّة رقمية لتنظيم المعرفة العقارية ودعم قرارات التسويق">
-  <meta name="twitter:image" content="https://aqardigital.onrender.com/city-bg.png">
+  <meta name="twitter:image" content="https://aqardigital.onrender.com/og-cover.png">
   <meta name="twitter:image:alt" content="AqaR Digital">
   <!-- ===== /Link Preview ===== -->
 
