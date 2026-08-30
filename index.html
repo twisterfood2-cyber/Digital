@@ -3948,15 +3948,19 @@
   // VIEW_ACTIVITY_LOG = سجل نشاط إدخال الوحدات (OWNER/MANAGER/DATA_ENTRY — لا SALES)؛
   // VIEW_ADMIN_ANALYTICS = تحليلات إدارية دقيقة: Details View Count / الأكثر مشاهدة أو طلبًا /
   // المتصلون الآن (OWNER/MANAGER فقط).
-  // EDIT_UNIT_EXISTING (زر "نسخ" لـ SALES): تعديل سجل وحدة **موجودة** فقط عبر updateUnit()
-  //   (UPDATE لنفس Unit ID). لا يمنح ADD_UNIT/CLONE_UNIT/DELETE_UNIT ولا أي صلاحية إدارية —
-  //   مرآة الباك-إند: updateUnit وحدها تقبل EDIT_UNIT_EXISTING، وبقية دوال الكتابة ترفض SALES.
+  // SALES: بلا أي صلاحية كتابة على الوحدات. زر "نسخ" في كارت الوحدة يفتح لـ SALES نموذج
+  //   الوحدة **للعرض فقط** (كل البيانات + الصور + تصدير PDF + مشاركة واتساب) — بلا زر "حفظ
+  //   التعديلات" (يُزال من الـ DOM) وبلا أي مسار حفظ، والباك-إند يرفض updateUnit من SALES.
   var CLIENT_PERMS = {
     OWNER:      ['*'],
     MANAGER:    CLIENT_BASE_PERMS.concat(['ADD_UNIT','EDIT_UNIT','DELETE_UNIT','CLONE_UNIT','CHANGE_UNIT_STATUS','VIEW_STATISTICS','UPDATE_UNIT_TERMS','VIEW_ACTIVITY_LOG','VIEW_ADMIN_ANALYTICS']),
     DATA_ENTRY: CLIENT_BASE_PERMS.concat(['ADD_UNIT','UPDATE_UNIT_TERMS','VIEW_STATISTICS','VIEW_ACTIVITY_LOG']),
-    SALES:      CLIENT_BASE_PERMS.concat(['VIEW_STATISTICS','EDIT_UNIT_EXISTING'])
+    SALES:      CLIENT_BASE_PERMS.concat(['VIEW_STATISTICS'])
   };
+  // هل يملك الدور الحالي أي صلاحية كتابة على الوحدات من نموذج الوحدة؟ (يقرّر ظهور زر الحفظ + حارس الإرسال)
+  function canWriteUnitFromForm_() {
+    return hasPermission('EDIT_UNIT') || hasPermission('ADD_UNIT') || hasPermission('UPDATE_UNIT_TERMS') || hasPermission('CLONE_UNIT');
+  }
   function currentUserRole() {
     return (window.__currentUser && window.__currentUser.role) || 'SALES';
   }
@@ -4009,6 +4013,13 @@
       var canAdd = uiAllows('ADD_UNIT');
       addBtn.hidden = !canAdd;
       addBtn.style.display = canAdd ? '' : 'none';
+    }
+    // زر "حفظ التعديلات/الوحدة" في نموذج الوحدة (#editSaveBtn): يُزال من الـ DOM كليًا لأي دور
+    // مؤكَّد بلا أي صلاحية كتابة على الوحدات (SALES) — ليس إخفاء CSS، وليس disable، ولا نسخة ثانية.
+    // OWNER/MANAGER/DATA_ENTRY يملكون صلاحية كتابة → يبقى الزر. الحماية الحقيقية: حارس الإرسال + الباك-إند.
+    if (roleActive() && !canWriteUnitFromForm_()) {
+      var _sv = document.getElementById('editSaveBtn');
+      if (_sv) _sv.remove();
     }
     // لو النتائج اترسمت قبل ما نعرف الدور، نعيد رسمها بالصلاحيات الصحيحة
     if (roleActive() && typeof lastResults !== 'undefined' && lastResults && lastResults.length) {
@@ -4150,8 +4161,8 @@
             <button type="button" class="icon-action-btn" onclick='showSimilarUnits(${JSON.stringify(u)})' title="وحدات مشابهة">مشابهة</button>
             ${ hasPermission('CLONE_UNIT')
               ? `<button type="button" class="icon-action-btn" onclick="cloneUnit('${u['Unit ID']}')" title="استنساخ الوحدة">نسخ</button>`
-              : uiAllows('EDIT_UNIT_EXISTING')
-                ? `<button type="button" class="icon-action-btn" onclick="salesEditExistingUnit('${u['Unit ID']}')" title="فتح الوحدة للتعديل">نسخ</button>`
+              : (currentUserRole() === 'SALES')
+                ? `<button type="button" class="icon-action-btn" onclick="salesOpenUnitView('${u['Unit ID']}')" title="فتح الوحدة">نسخ</button>`
                 : ''}
           </div>
           <div class="card-provenance">
@@ -5562,33 +5573,39 @@
     showToast('صلاحيتك الحالية لا تسمح بتعديل بيانات الوحدات', 'error');
   }
 
-  /* زر "نسخ" لدور SALES — نفس زرّ البطاقة (الاسم/الشكل/المكان بلا تغيير)، لكن السلوك:
-   *   نسخ → فتح الوحدة الحالية في وضع EDIT → تعديل كامل → حفظ UPDATE على نفس Unit ID.
-   * ليس استنساخًا ولا إنشاء وحدة جديدة. الحفظ يمرّ على updateUnit(currentEditUnitId, data)
-   * (نفس مسار حفظ التعديل الحالي)، والباك-إند يتحقق من EDIT_UNIT_EXISTING في updateUnit فقط.
-   * لا يمنح SALES أي مسار إضافة/استنساخ/حذف: editModalMode يظل 'edit'، وdata.isClone غير مضبوط. */
-  function salesEditExistingUnit(unitId) {
-    if (!(roleActive() && (hasPermission('EDIT_UNIT_EXISTING') || hasPermission('EDIT_UNIT')))) {
-      showToast('صلاحيتك الحالية لا تسمح بتعديل بيانات الوحدات', 'error');
+  /* زر "نسخ" لدور SALES — نفس زرّ البطاقة (الاسم/الشكل/المكان بلا تغيير)، لكن السلوك = **عرض فقط**:
+   *   نسخ → فتح نفس نموذج الوحدة بكل بياناتها وصورها وترتيب خاناتها وتصميمها،
+   *   بلا زر "حفظ التعديلات" (يُزال من الـ DOM)، وأسفل النموذج: [تصدير ملف] [مشاركة على واتساب] فقط.
+   * SALES لا يملك أي صلاحية كتابة على الوحدات؛ حارس إرسال النموذج + updateUnit في الباك-إند يرفضانه. */
+  function salesOpenUnitView(unitId) {
+    if (currentUserRole() !== 'SALES' && !canWriteUnitFromForm_()) {
+      // (لا ينبغي الوصول هنا عمليًا — الزر لا يظهر إلا لدور SALES) — احتياط.
+      showToast('صلاحيتك الحالية لا تسمح بفتح هذه الشاشة', 'error');
       return;
     }
     verifiedPin = '';
-    loadUnitIntoEditForm(unitId);   // يضبط editModalMode='edit' و currentEditUnitId=unitId ويحمّل كل الحقول + الصور
-    // "تصدير ملف" + "مشاركة واتساب" لنفس الوحدة داخل النموذج (إعادة استخدام صفّ أزرار "عرض السعر").
+    loadUnitIntoEditForm(unitId);   // يحمّل كل الحقول + الصور بنفس الترتيب/التصميم
+    // نموذج عرض: لا زر حفظ (يُزال من الـ DOM)، لا قسم تعبئة بالذكاء الاصطناعي، عنوان "تفاصيل الوحدة".
+    var _sv = document.getElementById('editSaveBtn'); if (_sv) _sv.remove();
+    var _ai = document.getElementById('unitAddAiSection'); if (_ai) _ai.style.display = 'none';
+    var _title = document.querySelector('#editModal .modal-title');
+    if (_title && _title.firstChild) _title.firstChild.textContent = 'تفاصيل الوحدة ';
+    // أسفل النموذج: [تصدير ملف] [مشاركة على واتساب] — نفس صفّ أزرار "عرض السعر" ونفس تصميمه.
     var _qr = document.getElementById('quoteActionRow');
     if (_qr) {
       _qr.classList.add('show');
       var _ex = _qr.querySelector('#quoteExportBtn .qlbl'); if (_ex) _ex.textContent = 'تصدير ملف';
-      var _wa = _qr.querySelector('#quoteWhatsAppBtn .qlbl'); if (_wa) _wa.textContent = 'مشاركة واتساب';
+      var _wa = _qr.querySelector('#quoteWhatsAppBtn .qlbl'); if (_wa) _wa.textContent = 'مشاركة على واتساب';
     }
   }
-  window.salesEditExistingUnit = salesEditExistingUnit;
+  window.salesOpenUnitView = salesOpenUnitView;
+  window.salesEditExistingUnit = salesOpenUnitView;  // توافق خلفي مع أي onclick قديم مُخبَّأ
 
   function loadUnitIntoEditForm(unitId) {
     editModalMode = 'edit';
     currentEditUnitId = unitId;
     // افتراضيًا صفّ (تصدير/واتساب) مخفي في وضع التعديل العادي (OWNER/MANAGER)؛
-    // مسار salesEditExistingUnit يُظهره بعد هذا الاستدعاء.
+    // مسار salesOpenUnitView (عرض فقط لـ SALES) يُظهره بعد هذا الاستدعاء.
     var _qrHide = document.getElementById('quoteActionRow'); if (_qrHide) _qrHide.classList.remove('show');
     document.getElementById('editUnitIdLabel').textContent = '(' + unitId + ')';
     document.querySelector('#editModal .modal-title').firstChild.textContent = 'تعديل بيانات الوحدة ';
@@ -5825,6 +5842,9 @@
     e.preventDefault();
     // وضع "عرض السعر": النموذج للعرض/التصدير فقط — لا حفظ في الباك-إند.
     if (editModalMode === 'quote') return;
+    // حارس دفاعي: دور بلا صلاحية كتابة وحدات (SALES) لا يحفظ من هذا النموذج إطلاقًا —
+    // فوق إزالة #editSaveBtn من الـ DOM ورفض الباك-إند. يغطّي إرسال النموذج بمفتاح Enter أيضًا.
+    if (!canWriteUnitFromForm_()) { if (typeof showToast === 'function') showToast('صلاحيتك الحالية لا تسمح بحفظ التعديلات', 'error'); return; }
     if (editModalMode === 'edit' && !currentEditUnitId) return;
     editSaveBtn.disabled = true;
     editSaveBtn.textContent = editModalMode === 'clone' ? 'جاري الإضافة...' : 'جاري الحفظ...';
