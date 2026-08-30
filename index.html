@@ -4148,9 +4148,9 @@
             <button type="button" class="icon-action-btn" onclick='shareOnWhatsApp(${JSON.stringify(u)})' title="مشاركة على واتساب">واتساب</button>
             <button type="button" class="icon-action-btn" onclick='downloadUnitPDF(${JSON.stringify(u)}, this)' title="تصدير PDF">PDF</button>
             <button type="button" class="icon-action-btn" onclick='showSimilarUnits(${JSON.stringify(u)})' title="وحدات مشابهة">مشابهة</button>
-            ${(roleActive() && hasPermission('CLONE_UNIT'))
+            ${ hasPermission('CLONE_UNIT')
               ? `<button type="button" class="icon-action-btn" onclick="cloneUnit('${u['Unit ID']}')" title="استنساخ الوحدة">نسخ</button>`
-              : (roleActive() && hasPermission('EDIT_UNIT_EXISTING'))
+              : uiAllows('EDIT_UNIT_EXISTING')
                 ? `<button type="button" class="icon-action-btn" onclick="salesEditExistingUnit('${u['Unit ID']}')" title="فتح الوحدة للتعديل">نسخ</button>`
                 : ''}
           </div>
