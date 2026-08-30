@@ -3456,7 +3456,13 @@
     editDeleteBtn.style.display = 'none';
     editResetBtn.style.display = ''; // زر "تفريغ النموذج" يظهر في وضع إضافة وحدة فقط (زي add.html)
     document.getElementById('editFetchLastSimilarBtn').style.display = ''; // زر "جيب آخر وحدة مشابهة" — وضع الإضافة فقط (زي add.html)
-    var _qr = document.getElementById('quoteActionRow'); if (_qr) _qr.classList.remove('show');
+    var _qr = document.getElementById('quoteActionRow');
+    if (_qr) {
+      _qr.classList.remove('show');
+      // إعادة نصوص أزرار الصفّ لوضع "عرض السعر" الافتراضي (قد يكون مسار "نسخ" لـ SALES غيّرها)
+      var _ex0 = _qr.querySelector('#quoteExportBtn .qlbl'); if (_ex0) _ex0.textContent = 'تصدير عرض السعر (PDF)';
+      var _wa0 = _qr.querySelector('#quoteWhatsAppBtn .qlbl'); if (_wa0) _wa0.textContent = 'مشاركة عبر WhatsApp';
+    }
     editMsg.style.display = 'none';
     editMsg.className = '';
 
@@ -3503,7 +3509,7 @@
   /* بناء كائن وحدة (بمفاتيح أعمدة الشيت) من نموذج #editForm — لإعادة استخدام
    * downloadUnitPDF / shareOnWhatsApp / buildUnitShareText كما هي. الحسابات نفس
    * منطق calcEditMonthlyInstallment (خصم/مقدم/قسط) + سعر المتر = بعد الخصم ÷ المساحة. */
-  function buildQuoteUnitObject() {
+  function buildQuoteUnitObject(withRealId) {
     var g = function (name) { var el = editForm.elements[name]; return el ? String(el.value || '').trim() : ''; };
     var num = function (v) { var n = parseFloat(String(v).replace(/,/g, '')); return isNaN(n) ? 0 : n; };
 
@@ -3531,7 +3537,7 @@
     }
 
     return {
-      'Unit ID': '',                               // عرض سعر تقديري — بلا رقم وحدة حقيقي
+      'Unit ID': withRealId ? ((typeof currentEditUnitId !== 'undefined' && currentEditUnitId) ? currentEditUnitId : '') : '', // مسار "نسخ"/تعديل SALES → رقم الوحدة الحقيقي؛ "عرض السعر" → فارغ
       'Status': g('status') || 'متاح',
       'Property Type': g('propertyType') || 'وحدة',
       'Category': g('category'),
@@ -3589,11 +3595,14 @@
     };
   }
   document.getElementById('quoteExportBtn').addEventListener('click', function () {
+    // وضع تعديل SALES ("نسخ"): تصدير نفس الوحدة المفتوحة (برقمها الحقيقي) — لا إنشاء وحدة.
+    if (editModalMode === 'edit') { downloadUnitPDF(buildQuoteUnitObject(true), quoteBtnShim(this)); return; }
     if (!quoteValidateMinimum()) return;
     // إعادة استخدام مسار تصدير الوحدة نفسه بالكامل (نافذة بيانات المسؤول + generateUnitPDF)
     downloadUnitPDF(buildQuoteUnitObject(), quoteBtnShim(this));
   });
   document.getElementById('quoteWhatsAppBtn').addEventListener('click', function () {
+    if (editModalMode === 'edit') { shareOnWhatsApp(buildQuoteUnitObject(true)); return; }  // وضع تعديل SALES: نفس الوحدة المفتوحة
     if (!quoteValidateMinimum()) return;
     shareOnWhatsApp(buildQuoteUnitObject());   // نفس buildUnitShareText — لا بيانات ناقصة
   });
@@ -3939,11 +3948,14 @@
   // VIEW_ACTIVITY_LOG = سجل نشاط إدخال الوحدات (OWNER/MANAGER/DATA_ENTRY — لا SALES)؛
   // VIEW_ADMIN_ANALYTICS = تحليلات إدارية دقيقة: Details View Count / الأكثر مشاهدة أو طلبًا /
   // المتصلون الآن (OWNER/MANAGER فقط).
+  // EDIT_UNIT_EXISTING (زر "نسخ" لـ SALES): تعديل سجل وحدة **موجودة** فقط عبر updateUnit()
+  //   (UPDATE لنفس Unit ID). لا يمنح ADD_UNIT/CLONE_UNIT/DELETE_UNIT ولا أي صلاحية إدارية —
+  //   مرآة الباك-إند: updateUnit وحدها تقبل EDIT_UNIT_EXISTING، وبقية دوال الكتابة ترفض SALES.
   var CLIENT_PERMS = {
     OWNER:      ['*'],
     MANAGER:    CLIENT_BASE_PERMS.concat(['ADD_UNIT','EDIT_UNIT','DELETE_UNIT','CLONE_UNIT','CHANGE_UNIT_STATUS','VIEW_STATISTICS','UPDATE_UNIT_TERMS','VIEW_ACTIVITY_LOG','VIEW_ADMIN_ANALYTICS']),
     DATA_ENTRY: CLIENT_BASE_PERMS.concat(['ADD_UNIT','UPDATE_UNIT_TERMS','VIEW_STATISTICS','VIEW_ACTIVITY_LOG']),
-    SALES:      CLIENT_BASE_PERMS.concat(['VIEW_STATISTICS'])
+    SALES:      CLIENT_BASE_PERMS.concat(['VIEW_STATISTICS','EDIT_UNIT_EXISTING'])
   };
   function currentUserRole() {
     return (window.__currentUser && window.__currentUser.role) || 'SALES';
@@ -4136,7 +4148,11 @@
             <button type="button" class="icon-action-btn" onclick='shareOnWhatsApp(${JSON.stringify(u)})' title="مشاركة على واتساب">واتساب</button>
             <button type="button" class="icon-action-btn" onclick='downloadUnitPDF(${JSON.stringify(u)}, this)' title="تصدير PDF">PDF</button>
             <button type="button" class="icon-action-btn" onclick='showSimilarUnits(${JSON.stringify(u)})' title="وحدات مشابهة">مشابهة</button>
-            ${(roleActive() && hasPermission('CLONE_UNIT')) ? `<button type="button" class="icon-action-btn" onclick="cloneUnit('${u['Unit ID']}')" title="استنساخ الوحدة">نسخ</button>` : ''}
+            ${(roleActive() && hasPermission('CLONE_UNIT'))
+              ? `<button type="button" class="icon-action-btn" onclick="cloneUnit('${u['Unit ID']}')" title="استنساخ الوحدة">نسخ</button>`
+              : (roleActive() && hasPermission('EDIT_UNIT_EXISTING'))
+                ? `<button type="button" class="icon-action-btn" onclick="salesEditExistingUnit('${u['Unit ID']}')" title="فتح الوحدة للتعديل">نسخ</button>`
+                : ''}
           </div>
           <div class="card-provenance">
             <span class="prov-dev">${u['Developer Name'] ? `${ICON.building} المطور: <a href="javascript:void(0)" onclick='showDeveloperProfile(${JSON.stringify(u['Developer Name'])})'>${u['Developer Name']}</a>` : ''}</span>
@@ -5546,9 +5562,34 @@
     showToast('صلاحيتك الحالية لا تسمح بتعديل بيانات الوحدات', 'error');
   }
 
+  /* زر "نسخ" لدور SALES — نفس زرّ البطاقة (الاسم/الشكل/المكان بلا تغيير)، لكن السلوك:
+   *   نسخ → فتح الوحدة الحالية في وضع EDIT → تعديل كامل → حفظ UPDATE على نفس Unit ID.
+   * ليس استنساخًا ولا إنشاء وحدة جديدة. الحفظ يمرّ على updateUnit(currentEditUnitId, data)
+   * (نفس مسار حفظ التعديل الحالي)، والباك-إند يتحقق من EDIT_UNIT_EXISTING في updateUnit فقط.
+   * لا يمنح SALES أي مسار إضافة/استنساخ/حذف: editModalMode يظل 'edit'، وdata.isClone غير مضبوط. */
+  function salesEditExistingUnit(unitId) {
+    if (!(roleActive() && (hasPermission('EDIT_UNIT_EXISTING') || hasPermission('EDIT_UNIT')))) {
+      showToast('صلاحيتك الحالية لا تسمح بتعديل بيانات الوحدات', 'error');
+      return;
+    }
+    verifiedPin = '';
+    loadUnitIntoEditForm(unitId);   // يضبط editModalMode='edit' و currentEditUnitId=unitId ويحمّل كل الحقول + الصور
+    // "تصدير ملف" + "مشاركة واتساب" لنفس الوحدة داخل النموذج (إعادة استخدام صفّ أزرار "عرض السعر").
+    var _qr = document.getElementById('quoteActionRow');
+    if (_qr) {
+      _qr.classList.add('show');
+      var _ex = _qr.querySelector('#quoteExportBtn .qlbl'); if (_ex) _ex.textContent = 'تصدير ملف';
+      var _wa = _qr.querySelector('#quoteWhatsAppBtn .qlbl'); if (_wa) _wa.textContent = 'مشاركة واتساب';
+    }
+  }
+  window.salesEditExistingUnit = salesEditExistingUnit;
+
   function loadUnitIntoEditForm(unitId) {
     editModalMode = 'edit';
     currentEditUnitId = unitId;
+    // افتراضيًا صفّ (تصدير/واتساب) مخفي في وضع التعديل العادي (OWNER/MANAGER)؛
+    // مسار salesEditExistingUnit يُظهره بعد هذا الاستدعاء.
+    var _qrHide = document.getElementById('quoteActionRow'); if (_qrHide) _qrHide.classList.remove('show');
     document.getElementById('editUnitIdLabel').textContent = '(' + unitId + ')';
     document.querySelector('#editModal .modal-title').firstChild.textContent = 'تعديل بيانات الوحدة ';
     editSaveBtn.textContent = 'حفظ التعديلات';
