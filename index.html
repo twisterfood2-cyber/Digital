@@ -1119,6 +1119,54 @@
     #dashboardView .dash-cta.secondary { background: rgba(255,255,255,0.05); color: var(--text-light); }
     #dashboardView .dash-note { font-size: 12px; color: var(--text-muted); line-height: 1.8; margin: 8px 0 0; }
 
+    /* ===== محتوى "الرئيسية" التعريفي — يعيد استخدام .section (زجاج داكن + خط ذهبي علوي)
+       ونفس خط Cairo وأوزانه وألوان Navy/Gold. RTL بالكامل، والكلمات اللاتينية معزولة bidi. ===== */
+    .ltr { unicode-bidi: isolate; direction: ltr; }
+    #dashboardView .dash-about {
+      direction: rtl;
+      overflow-wrap: break-word; word-wrap: break-word;
+      padding: 22px 22px 24px;
+    }
+    #dashboardView .dash-about .about-title {
+      font-size: 26px; font-weight: 800; color: var(--gold-soft);
+      line-height: 1.35; letter-spacing: 0.2px; margin: 0 0 6px;
+      border: 0; padding: 0;
+    }
+    #dashboardView .dash-about .about-subtitle {
+      font-size: 14.5px; font-weight: 700; color: var(--text-light);
+      line-height: 1.8; margin: 0 0 18px;
+    }
+    #dashboardView .dash-about .about-lead {
+      font-size: 14px; font-weight: 600; color: var(--text-light);
+      line-height: 2.05; margin: 0;
+    }
+    #dashboardView .dash-about h3 {
+      font-size: 14px; font-weight: 800; letter-spacing: 0.3px; color: var(--gold-soft);
+      margin: 24px 0 0; padding-bottom: 7px;
+      border-bottom: 1px solid var(--border-gold);
+    }
+    #dashboardView .dash-about p {
+      font-size: 13.5px; color: var(--text-muted); line-height: 2.05; margin: 11px 0 0;
+    }
+    #dashboardView .dash-about .about-list { margin: 12px 0 0; padding: 0; list-style: none; }
+    #dashboardView .dash-about .about-list li {
+      position: relative; padding-right: 20px; margin-bottom: 7px;
+      font-size: 13.5px; color: var(--text-muted); line-height: 1.95;
+    }
+    #dashboardView .dash-about .about-list li::before {
+      content: "•"; position: absolute; right: 3px; top: 0;
+      color: var(--gold); font-weight: 800;
+    }
+    #dashboardView .dash-about .about-tagline {
+      margin-top: 24px; padding-top: 15px; border-top: 1px solid var(--border-gold);
+      font-size: 13.5px; font-weight: 700; color: var(--gold-soft); line-height: 2;
+    }
+    @media (max-width: 480px) {
+      #dashboardView .dash-about { padding: 18px 16px 20px; }
+      #dashboardView .dash-about .about-title { font-size: 22px; }
+      #dashboardView .dash-about .about-subtitle { font-size: 13.5px; }
+    }
+
     /* الملف الشخصي */
     .dash-profile-head { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
     .dash-avatar {
@@ -2371,15 +2419,38 @@
             <div class="live-count" id="dashLiveCount"><span class="live-dot"></span>المستخدمون المتصلون الآن: <b id="dashLiveCountValue">-</b></div>
             <div id="dashLiveEmailsList"></div>
           </div>
-          <!-- الصفحة الرئيسية مختصرة: الإحصاءات والمخزون والتصنيفات انتقلت إلى قسم مستقل
-               "الإحصائيات والمخزون" (نفس الصلاحية VIEW_STATISTICS). لا حذف لأي وظيفة. -->
-          <div class="section" id="dashHomeQuick">
-            <p class="dash-note" style="margin-top:0;">الملخّص التفصيلي (إجمالي الوحدات / المتاحة / المحجوزة / المباعة / <b>المؤرشفة</b> / قيمة المخزون / التصنيفات / المطوّرون) في قسم "الإحصائيات والمخزون".</p>
-            <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
-              <button type="button" class="dash-cta" id="dashHomeStatsBtn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>فتح الإحصائيات والمخزون</button>
-              <button type="button" class="dash-cta secondary" id="dashHomeSearchBtn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>الذهاب إلى شاشة البحث</button>
-            </div>
-          </div>
+          <!-- محتوى تعريفي احترافي داخل مساحة المحتوى الرئيسية للوحة التحكم (لا Modal/Popup/نافذة).
+               نُعيد استخدام .section / .section h3 من الـ design system الحالي (Cairo، Navy/Gold).
+               كل ظهور لـ "AqaR Digital" داخل نص عربي معزول bidi عبر <span class="ltr" dir="ltr">. -->
+          <article class="section dash-about" dir="rtl" aria-labelledby="aboutTitle">
+            <h1 class="about-title" id="aboutTitle"><span class="ltr" dir="ltr">AqaR Digital</span></h1>
+            <p class="about-subtitle">منصّة رقمية لتنظيم المعرفة العقارية ودعم قرارات التسويق</p>
+
+            <p class="about-lead"><span class="ltr" dir="ltr">AqaR Digital</span> هي منصّة رقمية صُممت لتجميع وتنظيم البيانات العقارية في بيئة واحدة تساعد فرق التسويق والمبيعات على الوصول إلى المعلومات التي يحتاجون إليها بسرعة ووضوح، وتحويل البيانات العقارية من معلومات متفرقة إلى أدوات عملية يمكن الاعتماد عليها في العمل اليومي.</p>
+
+            <h3>رؤيتنا</h3>
+            <p>نسعى إلى بناء منظومة رقمية أكثر تنظيمًا وشفافية لسوق التسويق العقاري المصري، من خلال تسهيل الوصول إلى بيانات الوحدات والمشروعات والأسعار وأنظمة السداد، وتقديم المعلومات بصورة تساعد المتخصصين على فهم السوق واتخاذ قرارات أفضل.</p>
+            <p>فنحن نؤمن أن المعلومة العقارية الدقيقة والمنظمة هي أحد أهم أصول شركات التسويق العقاري، وأن التكنولوجيا يمكن أن تجعل إدارتها ومشاركتها والاستفادة منها أكثر كفاءة.</p>
+
+            <h3>ماذا تقدم <span class="ltr" dir="ltr">AqaR Digital</span> للمستخدم؟</h3>
+            <p>تمنح المنصّة المستخدم بيئة عمل موحدة تساعده على:</p>
+            <ul class="about-list">
+              <li>البحث والوصول إلى الوحدات والبيانات العقارية بسهولة.</li>
+              <li>الاطلاع على الأسعار وأنظمة السداد والمعلومات المرتبطة بالوحدات.</li>
+              <li>تنظيم البيانات وتحديثها بدلًا من الاعتماد على ملفات ومصادر متفرقة.</li>
+              <li>مشاركة المعلومات العقارية بصورة أكثر احترافية.</li>
+              <li>متابعة البيانات والعمليات وفقًا للصلاحيات والمسؤوليات المحددة لكل مستخدم.</li>
+            </ul>
+
+            <h3>ماذا يمكن أن تستفيد شركات التسويق العقاري؟</h3>
+            <p>بالنسبة لشركات التسويق العقاري، لا تقتصر قيمة <span class="ltr" dir="ltr">AqaR Digital</span> على كونها قاعدة بيانات للوحدات، بل تمتد إلى بناء بيئة عمل رقمية أكثر تنظيمًا تساعد الشركة على إدارة المعرفة العقارية داخل فريقها، وتقليل الوقت الضائع في البحث عن المعلومات، وتحسين سرعة وصول فريق المبيعات إلى البيانات التي يحتاجها أثناء التعامل مع العملاء.</p>
+            <p>كما يمكن للمنصّة أن تساعد الشركات على بناء سجل أكثر وضوحًا للمعلومات والعمليات، بما يدعم الإدارة في فهم أداء العمل واتخاذ قرارات مبنية على بيانات حقيقية.</p>
+
+            <h3>نحو سوق عقاري أكثر تنظيمًا</h3>
+            <p>نطمح إلى أن تكون <span class="ltr" dir="ltr">AqaR Digital</span> جزءًا من التحول الرقمي الذي يحتاجه سوق العقارات المصري؛ سوقٌ تكون فيه المعلومة أكثر تنظيمًا، والوصول إليها أكثر سهولة، واستخدام التكنولوجيا وسيلة لرفع كفاءة شركات التسويق العقاري وتحسين تجربة العاملين والعملاء على حد سواء.</p>
+
+            <p class="about-tagline"><span class="ltr" dir="ltr">AqaR Digital</span> — لأن البيانات العقارية عندما تُنظَّم جيدًا، تتحول من معلومات إلى قيمة.</p>
+          </article>
         </div>
 
         <div class="dash-panel" id="dashPanel-units" hidden>
@@ -7473,11 +7544,9 @@
       // (مش زر يفتح مودال) — التحميل من dashSelect('developers') / dashSelect('users').
       var stB = document.getElementById('dashOpenStatsBtn');
       if (stB) stB.addEventListener('click', function () { openStats(); });
-      // روابط الصفحة الرئيسية المختصرة → نفس مسارات التنقّل الموجودة (بنفس حراسة الصلاحيات).
-      var homeStB = document.getElementById('dashHomeStatsBtn');
-      if (homeStB) homeStB.addEventListener('click', function () { openStats(); });
-      var homeSrB = document.getElementById('dashHomeSearchBtn');
-      if (homeSrB) homeSrB.addEventListener('click', goToSearchHash);
+      // (أُزيل زرّا "فتح الإحصائيات والمخزون" / "الذهاب إلى شاشة البحث" من تبويب "الرئيسية" —
+      //  المحتوى صار مقالًا تعريفيًا. الوصول لـ Statistics من الشريط الجانبي (data-dash="stats")،
+      //  ولـ Search من الشريط العلوي — كلاهما بلا تغيير. openStats/goToSearchHash تبقى كما هي.)
 
       var lo = document.getElementById('dashLogoutBtn');
       if (lo) lo.addEventListener('click', function () {
