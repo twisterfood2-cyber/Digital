@@ -6515,8 +6515,15 @@
   let liveCountTimer = null;
 
   adminFab.addEventListener('click', function() {
-    // زر "لوحة الإدارة" → لوحة التحكم كعرض صفحة كامل (#dashboard). التفويض مبنيّ على
-    // جلسة الدخول والدور فقط (unlockDashboardThen → VIEW_STATISTICS). مافيش كلمة سر قسم.
+    // OWNER / MANAGER (VIEW_STATISTICS) → لوحة التحكم الكاملة (#dashboard).
+    // باقي الأدوار المُسجَّلة (SALES / DATA_ENTRY) → "الملف الشخصي" فقط (#profile) —
+    // خدمة ذاتية، والتحقق النهائي لكل عملية في السيرفر.
+    if (typeof roleActive === 'function' && roleActive() &&
+        typeof hasPermission === 'function' && !hasPermission('VIEW_STATISTICS')) {
+      if (location.hash !== '#profile') location.hash = 'profile';
+      else if (typeof window.__aqarReroute === 'function') window.__aqarReroute();
+      return;
+    }
     if (typeof window.__aqarOpenDashboard === 'function') window.__aqarOpenDashboard();
   });
 
@@ -7406,6 +7413,11 @@
      * - إظهار عناصر الشريط الجانبي حسب الدور = راحة/تنظيم فقط، مش أمان.
      * ============================================================ */
     var dashUnlockedFlag = false;
+    // وضع "الملف الشخصي فقط": يُفتح شِل لوحة التحكم لمستخدم مُسجَّل دخول بلا صلاحية
+    // VIEW_STATISTICS (SALES / DATA_ENTRY) لعرض/تعديل ملفه الشخصي وحده. الشريط الجانبي
+    // يُقيَّد على قسم "الملف الشخصي"، وأي قسم آخر يُرفض في dashSelect، والتحقق النهائي
+    // لكل نداء خلفي يظل في السيرفر (getMyProfile/updateMyProfile يشتقّان الهوية سيرفر-سايد).
+    var dashProfileOnly = false;
     var dashCurrent = 'home';
     var dashWired = false;
     var dashReparented = false;
@@ -7438,10 +7450,21 @@
       if (bd) bd.classList.add('open');
     }
 
-    function unlockDashboardThen(onOk) {
+    function unlockDashboardThen(onOk, opts) {
       if (dashUnlocked()) { onOk(); return; }
-      // دور مؤكَّد فيه VIEW_STATISTICS (OWNER / MANAGER) → دخول مباشر، السيرفر بيتحقق بالدور.
-      if (gateHasPerm_('VIEW_STATISTICS')) { dashUnlockedFlag = true; onOk(); return; }
+      // دور مؤكَّد فيه VIEW_STATISTICS (OWNER / MANAGER) → دخول كامل، السيرفر بيتحقق بالدور.
+      if (gateHasPerm_('VIEW_STATISTICS')) { dashUnlockedFlag = true; dashProfileOnly = false; onOk(); return; }
+      // "الملف الشخصي" = خدمة ذاتية لأي مستخدم مُسجَّل دخول (SALES / DATA_ENTRY كمان).
+      // نفتح الشِل في وضع "الملف الشخصي فقط": dashApplyRoleVisibility بيخفي كل عناصر
+      // الشريط الجانبي عدا "الملف الشخصي"، وdashSelect بيرفض أي قسم آخر. مافيش صلاحية
+      // إدارية بتتمنح هنا — كل نداء خلفي بيتحقق من الهوية/الدور في السيرفر.
+      if (opts && opts.profileOnly && window.__currentUser && window.__currentUser.email) {
+        dashUnlockedFlag = true;
+        dashProfileOnly = true;
+        dashCurrent = 'profile';
+        onOk();
+        return;
+      }
       if (sessionRestorePending_()) return;   // استنى استعادة الجلسة بعد إعادة التحميل — بلا أي بوابة كلمة سر
       denyGatedSection_('dashboard', 'صلاحيتك الحالية لا تسمح بفتح لوحة التحكم');
     }
@@ -7451,9 +7474,11 @@
       var items = document.querySelectorAll('#dashNav .dash-nav-item[data-roles]');
       var firstVisible = null;
       items.forEach(function (b) {
+        var dd = b.getAttribute('data-dash');
         var allowed = (b.getAttribute('data-roles') || '').split(',').indexOf(role) !== -1;
+        if (dashProfileOnly) allowed = (dd === 'profile');   // وضع "الملف الشخصي فقط" — لا شيء غيره
         b.hidden = !allowed;
-        if (allowed && !firstVisible) firstVisible = b.getAttribute('data-dash');
+        if (allowed && !firstVisible) firstVisible = dd;
       });
       // زر "إدخال وحدة جديدة" داخل قسم الوحدات — يظهر فقط لمن يملك ADD_UNIT فعليًا
       var addBtn = document.getElementById('dashAddUnitBtn');
@@ -7471,6 +7496,8 @@
 
     var DASH_PANEL_KEYS = ['home', 'units', 'developers', 'users', 'stats', 'profile', 'settings', 'audit'];
     function dashSelect(key) {
+      // وضع "الملف الشخصي فقط": أي محاولة للانتقال لقسم آخر تُعاد إلى "الملف الشخصي".
+      if (dashProfileOnly && key !== 'profile') key = 'profile';
       dashCurrent = key;
       // "سجل العمليات" (audit) قسم فرعي من "المستخدمون" → نبقّي "المستخدمون" مُفعَّلًا في الشريط الجانبي.
       var navKey = (key === 'audit') ? 'users' : key;
@@ -7794,6 +7821,7 @@
       var lo = document.getElementById('dashLogoutBtn');
       if (lo) lo.addEventListener('click', function () {
         dashUnlockedFlag = false;
+        dashProfileOnly = false;
         if (dashLiveTimer) { clearInterval(dashLiveTimer); dashLiveTimer = null; }
         dashHomeLoadedFor = null;
         var t = document.getElementById('adminLogoutBtn'); // يعيد استخدام منطق تسجيل خروج الإدارة الموجود
@@ -7808,7 +7836,7 @@
       leaveAddView();
       document.body.classList.add('app-view-dashboard');
       dashApplyRoleVisibility();
-      dashSelect(dashCurrent || 'home');
+      dashSelect(dashProfileOnly ? 'profile' : (dashCurrent || 'home'));
       setActiveNav('dashboard');
       window.scrollTo(0, 0);
     }
@@ -7849,6 +7877,11 @@
       } else if (location.hash === '#dashboard') {
         if (dashUnlocked()) { showDashboardView(); }
         else { showSearchView(); unlockDashboardThen(showDashboardView); }
+      } else if (location.hash === '#profile') {
+        // "الملف الشخصي" — خدمة ذاتية لأي دور. OWNER/MANAGER يفتحونه داخل الشِل الكامل؛
+        // SALES/DATA_ENTRY يفتحونه في وضع "الملف الشخصي فقط" (profileOnly).
+        if (dashUnlocked()) { dashCurrent = 'profile'; showDashboardView(); }
+        else { showSearchView(); unlockDashboardThen(function () { dashCurrent = 'profile'; showDashboardView(); }, { profileOnly: true }); }
       } else {
         showSearchView();
       }
