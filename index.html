@@ -2200,7 +2200,8 @@
 <script>
   (function () {
     try {
-      if (localStorage.getItem('loginEmail') && localStorage.getItem('loginPassword')) {
+      if (localStorage.getItem('loginEmail') && localStorage.getItem('loginPassword') &&
+          sessionStorage.getItem('aqar_logged_out') !== '1') {   // خروج متعمَّد → لا سبلاش استعادة، تظهر شاشة الدخول
         document.documentElement.classList.add('session-restoring');
       }
     } catch (e) {}
@@ -6062,9 +6063,10 @@
 
     setTimeout(function() {
       sendHeartbeat();
-      setInterval(sendHeartbeat, 45000);
+      heartbeatTimer = setInterval(sendHeartbeat, 45000);   // مؤقّت عمر الجلسة — نُوقفه عند تسجيل الخروج
     }, 1500);
   }
+  var heartbeatTimer = null;
 
   /* ---------- بوابة دخول المستخدمين ---------- */
   function showApp() {
@@ -6090,6 +6092,7 @@
           try {
             localStorage.setItem('loginEmail', email);
             localStorage.setItem('loginPassword', password);
+            sessionStorage.removeItem('aqar_logged_out'); // دخول ناجح متعمَّد → أعِد تفعيل الدخول التلقائي
           } catch (e) {}
           setCurrentUserFromLogin(res, email); // المرحلة 1: نبني طبقة "المستخدم الحالي" من ردّ السيرفر
           showApp();
@@ -6109,6 +6112,51 @@
       })
       .verifyUserAccess(email, password);
   }
+
+  /* ---------- تسجيل الخروج الحقيقي — إنهاء حالة المصادقة فعليًا ----------
+   * مصدر واحد موحَّد لكل أزرار الخروج (شريط لوحة التحكم + زر خروج الإدارة القديم).
+   * يُنهي المصادقة أولًا (ذاكرة + دخول محفوظ + مؤقتات) ثم يُقلع الصفحة نظيفة —
+   * الانتقال ليس هو الحل، بل ضمان ألا يبقى أي مؤقّت/مستمع/طلب معلّق. */
+  function logout() {
+    // 1) أوقف كل المؤقتات/النبضات/المستمعات المرتبطة بجلسة المستخدم
+    try { stopPresenceHeartbeat(); } catch (e) {}                                   // نبضة حضور المستخدم
+    try { if (heartbeatTimer) { clearInterval(heartbeatTimer); heartbeatTimer = null; } } catch (e) {} // نبضة الزوار
+    try { if (typeof window.__aqarStopUsersPresencePoll === 'function') window.__aqarStopUsersPresencePoll(); } catch (e) {}
+    try { if (typeof window.__aqarStatsLock === 'function') window.__aqarStatsLock(); } catch (e) {}     // قفل موديول الإحصائيات
+    try { if (typeof closeAdminPanel === 'function') closeAdminPanel(); } catch (e) {}                   // يوقف liveCountTimer
+
+    // 2) امسح حالة المصادقة في الذاكرة
+    window.__currentUser = null;
+    window.__aqarAuthRestoring = false;
+
+    // 3) ألغِ الدخول المحفوظ / الدخول التلقائي المرتبط بالمستخدم
+    try {
+      localStorage.removeItem('loginEmail');
+      localStorage.removeItem('loginPassword');
+      localStorage.removeItem('adminPin');
+    } catch (e) {}
+    // علامة "خروج متعمَّد" (لهذا التبويب): تمنع أي سباق مع دخول تلقائي قيد التنفيذ،
+    // وتُقرأ في إقلاع الصفحة قبل أي محاولة استعادة جلسة.
+    try {
+      sessionStorage.setItem('aqar_logged_out', '1');
+      sessionStorage.setItem('aqar_logout_msg', 'تم تسجيل الخروج بنجاح');
+    } catch (e) {}
+
+    // 4) أعِد الواجهة إلى شاشة الدخول فورًا — لا نافذة زمنية يظهر فيها التطبيق
+    document.documentElement.classList.remove('session-restoring');
+    var _app  = document.getElementById('mainContainer');
+    var _gate = document.getElementById('loginGate');
+    if (_app)  _app.style.display = 'none';
+    if (_gate) _gate.style.display = '';
+    var _pw = document.getElementById('loginPassword');
+    if (_pw) _pw.value = '';
+
+    // 5) إقلاع نظيف مضمون (المصادقة أُنهيت بالفعل أعلاه): انتقال بلا hash يُنهي
+    //    كل مؤقّت/مستمع/طلب معلّق، ويمنع زرّ الرجوع من إظهار #dashboard كمستخدم مُصادَق.
+    if (location.hash) location.replace(location.pathname + location.search);
+    else location.reload();
+  }
+  window.__aqarLogout = logout;
 
   document.getElementById('loginBtn').addEventListener('click', function() {
     const email = document.getElementById('loginEmail').value.trim();
@@ -6130,15 +6178,27 @@
 
   // خانة الإيميل بتفضل متذكّرة دايمًا حتى لو الدخول التلقائي فشل أو كلمة السر مش محفوظة
   (function prefillAndCheckSavedLogin() {
+    // خروج متعمَّد في هذا التبويب؟ لا دخول تلقائي — تظل شاشة الدخول ظاهرة حتى يسجّل المستخدم بنفسه.
+    let loggedOut = false;
+    try { loggedOut = sessionStorage.getItem('aqar_logged_out') === '1'; } catch (e) {}
+    // أظهر رسالة "تم تسجيل الخروج بنجاح" مرة واحدة بعد الإقلاع النظيف عقب الخروج.
+    try {
+      var _lm = sessionStorage.getItem('aqar_logout_msg');
+      if (_lm) {
+        sessionStorage.removeItem('aqar_logout_msg');
+        var _st = document.getElementById('loginStatus');
+        if (_st) { _st.className = 'access-gate-status success'; _st.textContent = _lm; }
+      }
+    } catch (e) {}
     let savedEmail = '', savedPassword = '';
     try {
       savedEmail = localStorage.getItem('loginEmail') || '';
       savedPassword = localStorage.getItem('loginPassword') || '';
     } catch (e) {}
-    if (savedEmail) {
+    if (savedEmail && !loggedOut) {
       document.getElementById('loginEmail').value = savedEmail;
     }
-    if (savedEmail && savedPassword) {
+    if (savedEmail && savedPassword && !loggedOut) {
       // المرحلة 3.6: علامة إن استعادة الجلسة شغّالة دلوقتي — البوابات تأجّل قرارها لحد ما
       // نعرف هوية المستخدم ودوره، بدل ما تطلب كلمة سر ثانوية قديمة بعد إعادة تحميل الصفحة.
       window.__aqarAuthRestoring = true;
@@ -6154,7 +6214,7 @@
           if (b) { b.disabled = false; b.textContent = 'دخول'; }
         }
       }, 15000);
-    } else if (savedEmail) {
+    } else if (savedEmail && !loggedOut) {
       document.getElementById('loginPassword').focus();
     }
   })();
@@ -6205,6 +6265,20 @@
   window.addEventListener('beforeunload', function () {
     if (window.__currentUser) { try { google.script.run.heartbeatPresence(getAuthCreds()); } catch (e) {} }
   });
+  // زرّ الرجوع / استعادة من bfcache بعد تسجيل الخروج: لو التبويب مُعلَّم بخروج متعمَّد
+  // ولا يوجد دخول محفوظ → أعِد التحميل حتى لا تظهر نسخة قديمة من التطبيق كمستخدم مُصادَق.
+  window.addEventListener('pageshow', function (e) {
+    var loggedOut = false, hasSaved = false;
+    try { loggedOut = sessionStorage.getItem('aqar_logged_out') === '1'; } catch (x) {}
+    try { hasSaved = !!(localStorage.getItem('loginEmail') && localStorage.getItem('loginPassword')); } catch (x) {}
+    if (loggedOut && !hasSaved) {
+      var app = document.getElementById('mainContainer');
+      var gate = document.getElementById('loginGate');
+      if (app) app.style.display = 'none';
+      if (gate) gate.style.display = '';
+      if (e.persisted) location.reload();   // صفحة مُستعادة من الكاش — أقلعها نظيفة
+    }
+  });
 
   /* ---------- صورة الغلاف ---------- */
   function loadCoverImage() {
@@ -6249,16 +6323,10 @@
   document.getElementById('adminPanelClose').addEventListener('click', closeAdminPanel);
   document.getElementById('adminPanelOverlay').addEventListener('click', closeAdminPanel);
 
-  // "تسجيل خروج الإدارة" (يُستدعى من زر خروج لوحة التحكم): يقفل عرض الإحصائيات،
-  // يغلق أي لوحة قديمة، وينظّف أي مفتاح كلمة سر متبقٍّ، ثم يعيد جلب النتائج بدون
-  // امتيازات إدارية. لا يمسّ جلسة تسجيل الدخول للمستخدم.
+  // مصدر واحد موحَّد للخروج: هذا الزر القديم (داخل لوحة الإدارة) وزرّ "تسجيل الخروج"
+  // في شريط لوحة التحكم يستدعيان نفس logout() — لا مسارين متعارضين، ولا "خروج شكلي".
   document.getElementById('adminLogoutBtn').addEventListener('click', function() {
-    try { localStorage.removeItem('adminPin'); } catch (e) {}
-    if (typeof window.__aqarStatsLock === 'function') window.__aqarStatsLock();
-    closeAdminPanel();
-    clearClientSearchCache();
-    runSearch();
-    showToast('تم تسجيل خروج الإدارة', 'success');
+    logout();
   });
 
   function refreshLiveCount() {
@@ -7637,13 +7705,12 @@
 
       var lo = document.getElementById('dashLogoutBtn');
       if (lo) lo.addEventListener('click', function () {
+        // تنظيف محلي للوحة التحكم (المؤقّت + الأعلام) ثم تسجيل خروج فعلي من الموقع.
         dashUnlockedFlag = false;
         dashProfileOnly = false;
         if (dashLiveTimer) { clearInterval(dashLiveTimer); dashLiveTimer = null; }
         dashHomeLoadedFor = null;
-        var t = document.getElementById('adminLogoutBtn'); // يعيد استخدام منطق تسجيل خروج الإدارة الموجود
-        if (t) t.click();
-        goToSearchHash();
+        if (typeof window.__aqarLogout === 'function') window.__aqarLogout();
       });
     }
 
