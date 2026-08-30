@@ -2215,7 +2215,7 @@
     <div class="dash-drawer-backdrop" id="dashDrawerBackdrop"></div>
     <div class="dash-shell">
       <aside class="dash-sidebar" id="dashSidebar">
-        <div class="dash-brand">AqAR Digital<span>لوحة التحكم</span></div>
+        <div class="dash-brand">AqaR Digital<span>لوحة التحكم</span></div>
         <nav class="dash-nav" id="dashNav" aria-label="أقسام لوحة التحكم">
           <button type="button" class="dash-nav-item is-active" data-dash="home" data-roles="OWNER,MANAGER,DATA_ENTRY,SALES"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg><span>الرئيسية</span></button>
           <button type="button" class="dash-nav-item" data-dash="units" data-roles="OWNER,MANAGER,DATA_ENTRY,SALES"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M6 21V7l6-4 6 4v14M10 12h4M10 16h4"/></svg><span>الوحدات</span></button>
@@ -7511,15 +7511,18 @@
     function dashRefreshLive() {
       var vEl = document.getElementById('dashLiveCountValue');
       var lEl = document.getElementById('dashLiveEmailsList');
+      // المصدر الموحّد للحضور: نفس مخزن ونفس تعريف "متصل الآن" المستخدم في صفحة "المستخدمون"
+      // (USER_PRESENCE_V1 عبر getOnlineUsers) — بدل ACTIVE_SESSIONS الذي كان يعدّ كل تبويب مفتوح
+      // بالاسم فيتناقض الرقم مع صفحة المستخدمين.
       google.script.run.withSuccessHandler(function (res) {
         if (!res || !res.success) return;
         if (vEl) vEl.textContent = res.count;
         if (lEl) {
-          lEl.innerHTML = (res.visitors && res.visitors.length)
-            ? res.visitors.map(function (x) { return (x.name || x.email || 'زائر بدون اسم') + (x.email && x.name ? ' (' + x.email + ')' : ''); }).join('<br>')
+          lEl.innerHTML = (res.users && res.users.length)
+            ? res.users.map(function (x) { return (x.name || x.email || 'مستخدم'); }).join('<br>')
             : '';
         }
-      }).getActiveUsersCount(dashState());
+      }).getOnlineUsers(dashState());
     }
 
     function dashRenderProfile() {
