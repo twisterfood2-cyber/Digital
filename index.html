@@ -4723,6 +4723,27 @@
     btnEl.disabled = true;
     btnEl.textContent = 'جاري التجهيز...';
 
+    // فحص مبكر: المكتبتان (html2canvas / jsPDF) لازم يكونا محمَّلتين قبل أي محاولة رسم -
+    // بدل خطأ داخلي غامض لو فشل تحميل الـ CDN لأي سبب (شبكة/حظر).
+    if (typeof html2canvas !== 'function' || !window.jspdf || !window.jspdf.jsPDF) {
+      showToast('تعذّر تحميل مكوّنات إنشاء الملف - تحقق من الاتصال بالإنترنت وأعد المحاولة', 'error');
+      btnEl.disabled = false;
+      btnEl.textContent = originalLabel;
+      return;
+    }
+
+    // حارس زمني: لو التجهيز (تحميل الصور/الرسم على Canvas/بناء PDF) تعلّق لأي سبب (شبكة،
+    // متصفح، تبويب غير نشط...)، لا يبقى الزر "جاري التجهيز..." معلّقًا إلى ما لا نهاية —
+    // بعد 30 ثانية نعرض خطأ واضح ونُعيد الزر لحالته الطبيعية. لا يغيّر المسار السليم إطلاقًا
+    // (يُلغى في finally بمجرد انتهاء العملية بنجاح أو بفشل عادي).
+    let timedOut = false;
+    const timeoutId = setTimeout(function () {
+      timedOut = true;
+      showToast('تعذّر إنشاء الملف (استغرقت العملية وقتًا طويلًا) - جرّب مرة أخرى', 'error');
+      btnEl.disabled = false;
+      btnEl.textContent = originalLabel;
+    }, 30000);
+
     try {
       const images = (u['Images'] || '').split(',').map(s => s.trim()).filter(Boolean);
       const hasDiscount = Number(u['Discount Percentage']) > 0;
@@ -4952,10 +4973,14 @@
       const pdfFileName = (u['Property Type'] || 'Unit') + ' - ' + (u['Unit Area (sqm)'] || '') + ' sqm';
       pdf.save(pdfFileName.replace(/[\\/:*?"<>|]/g, '') + '.pdf');
     } catch (err) {
-      showToast('حدث خطأ أثناء تجهيز الملف: ' + err.message, 'error');
+      if (!timedOut) showToast('حدث خطأ أثناء تجهيز الملف: ' + err.message, 'error');
     } finally {
-      btnEl.disabled = false;
-      btnEl.textContent = originalLabel;
+      clearTimeout(timeoutId);
+      // لو الحارس الزمني بالفعل أعاد الزر لحالته وعرض رسالة الخطأ، لا نكتب فوقه هنا.
+      if (!timedOut) {
+        btnEl.disabled = false;
+        btnEl.textContent = originalLabel;
+      }
     }
   }
 
