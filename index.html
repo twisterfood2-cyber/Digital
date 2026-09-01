@@ -441,6 +441,22 @@
     .lightbox-prev { right: 20px; }
     .lightbox-next { left: 20px; }
 
+    /* Overlay كارت الوحدة (من "الوحدات المشابهة") — بين .modal-overlay (1600) و.lightbox-overlay
+       (1700) عمدًا: يظهر فوق نافذة "الوحدات المشابهة"، وتظل صورة الكارت (lightbox) قابلة للفتح
+       فوقه بدورها لو ضُغطت. خلفية داكنة متّسقة مع تصميم .unit-card الزجاجي (نفس أسلوب الصفحة). */
+    .unit-card-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(4,12,22,0.78);
+      -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+      z-index: 1650; align-items: flex-start; justify-content: center; padding: 64px 16px 40px; overflow-y: auto;
+    }
+    .unit-card-overlay.open { display: flex; }
+    .unit-card-overlay-box { position: relative; width: 100%; max-width: 380px; }
+    .unit-card-overlay-close {
+      position: absolute; top: -46px; left: 0; background: rgba(255,255,255,0.15); color: #fff;
+      border: none; width: 38px; height: 38px; border-radius: 50%; font-size: 18px; cursor: pointer;
+    }
+    .unit-card-overlay-close:hover { background: rgba(255,255,255,0.28); }
+
     .unit-id { font-size: 12px; color: var(--text-muted); font-weight: 700; letter-spacing: 0.4px; }
     .unit-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 2px 0 12px; padding: 2px 38px 0 44px; }
     .status-badge {
@@ -2734,6 +2750,17 @@
   </div>
 </div>
 
+<!-- Overlay كارت الوحدة — يظهر فوق نافذة "الوحدات المشابهة" بلا تدميرها ولا إغلاقها.
+     #unitCardOverlayBody يحمل class="results-grid" عمدًا: نفس حاوية الشاشة الرئيسية،
+     فيرث الكارت داخلها نفس عرضه واستجابته المعتادة بلا أي CSS جديد. المحتوى يُبنى بـ
+     buildUnitCardHtml(u) — نفس دالة كارت الشاشة الرئيسية، بلا نسخة ثانية من التصميم. -->
+<div class="unit-card-overlay" id="unitCardOverlay">
+  <div class="unit-card-overlay-box">
+    <button type="button" class="unit-card-overlay-close" id="unitCardOverlayCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <div class="results-grid" id="unitCardOverlayBody"></div>
+  </div>
+</div>
+
 <!-- مودال متوسط سعر المتر لكل منطقة - متاح للكل من غير كلمة سر -->
 <div class="modal-overlay" id="priceStatsModal">
   <div class="modal-box">
@@ -4028,6 +4055,139 @@
   }
   window.hasPermission = hasPermission; // مفيدة للتشخيص فقط
 
+  /* بناء HTML كارت وحدة واحدة (نفس التصميم/البيانات/الأزرار/شروط الصلاحيات بلا أي تغيير) —
+   * مُستخرَجة من renderResults() لتصبح implementation واحد فقط لكارت الوحدة، قابل لإعادة
+   * الاستخدام من أي مكان آخر في الموقع (مثال: عرض كارت وحدة مشابهة فوق نافذتها). */
+  function buildUnitCardHtml(u) {
+    const images = (u['Images'] || '').split(',').map(s => s.trim()).filter(Boolean);
+    const coverHtml = images.length > 0 ? `
+      <div class="unit-cover" onclick='openLightbox(${JSON.stringify(images)}, 0)'>
+        <img src="${getThumbUrl(images[0])}" alt="صورة الوحدة" loading="lazy" decoding="async">
+        ${images.length > 1 ? `<span class="img-count-badge">${ICON.camera} ${images.length} صور</span>` : ''}
+      </div>` : '';
+
+    const favPrice = getFavoritePrice(u['Unit ID']);
+    const resalePurchasePPM = Number(u['Resale Price Per Meter At Purchase']) || 0;
+    const resaleCurrentPPM = Number(u['Resale Current Price Per Meter']) || 0;
+    const resalePPMDiff = (resalePurchasePPM > 0 && resaleCurrentPPM > 0) ? (resaleCurrentPPM - resalePurchasePPM) : null;
+    const currentPrice = Number(u['Price']) || 0;
+    const priceDropped = favPrice && currentPrice > 0 && currentPrice < favPrice;
+    const priceIncreased = favPrice && currentPrice > 0 && currentPrice > favPrice;
+    let priceDropBadge = '';
+    if (priceDropped) {
+      priceDropBadge = `
+      <div class="price-drop-badge" title="السعر نزل من ${fmtNum(favPrice)} لـ ${fmtNum(currentPrice)} جنيه">
+        ${ICON.trendDown} نزل السعر ${fmtNum(favPrice - currentPrice)} جنيه
+      </div>`;
+    } else if (priceIncreased) {
+      priceDropBadge = `
+      <div class="price-drop-badge price-up-badge" title="السعر زاد من ${fmtNum(favPrice)} لـ ${fmtNum(currentPrice)} جنيه">
+        ${ICON.trendUp} زاد السعر ${fmtNum(currentPrice - favPrice)} جنيه
+      </div>`;
+    }
+
+    return `
+    <div class="unit-card status-${u['Status']}">
+      ${coverHtml}
+      ${priceDropBadge}
+      <button type="button" class="fav-btn ${isFavorite(u['Unit ID']) ? 'active' : ''}" onclick="toggleFavorite('${u['Unit ID']}', this, ${currentPrice})" title="إضافة للمفضلة">${ICON.star}</button>
+      <label class="compare-checkbox" title="إضافة للمقارنة">
+        <input type="checkbox" ${compareList.indexOf(u['Unit ID']) !== -1 ? 'checked' : ''} onchange="toggleCompare('${u['Unit ID']}', this)">
+      </label>
+      <div class="unit-top">
+        <span class="unit-id">${u['Unit ID']}</span>
+        <span class="status-badge ${u['Status']}">${u['Status']}</span>
+      </div>
+      <div class="unit-info-block">
+        <div class="unit-title">${u['Property Type']} - ${u['Project Name'] || u['City']}</div>
+        <div class="unit-loc">${ICON.pin} ${u['City']} - ${u['Area/District']}</div>
+        <div class="unit-added">${ICON.clock} أُضيفت في ${u['Date Added']}${u['Last Updated'] ? ' - آخر تحديث: ' + u['Last Updated'] : ''}</div>
+        <div class="unit-specs">
+          <span class="spec-chip">${ICON.area} ${u['Unit Area (sqm)']} م²</span>
+          ${u['Rooms'] ? `<span class="spec-chip">${ICON.bed} ${u['Rooms']} غرف</span>` : ''}
+          ${u['Bathrooms'] ? `<span class="spec-chip">${ICON.bath} ${u['Bathrooms']} حمام</span>` : ''}
+          ${u['Floor'] ? `<span class="spec-chip">${ICON.floor} دور ${u['Floor']}</span>` : ''}
+          ${u['Finishing'] ? `<span class="spec-chip">${ICON.brush} ${u['Finishing']}</span>` : ''}
+          ${u['Garden Area (sqm)'] ? `<span class="spec-chip">${ICON.tree} حديقة ${u['Garden Area (sqm)']} م²</span>` : ''}
+          ${u['Terrace Area (sqm)'] ? `<span class="spec-chip">${ICON.terrace} تراس ${u['Terrace Area (sqm)']} م²</span>` : ''}
+          ${u['Roof Area (sqm)'] ? `<span class="spec-chip">${ICON.roof} روف ${u['Roof Area (sqm)']} م²</span>` : ''}
+        </div>
+      </div>
+      <div style="margin-top:auto;">
+      ${u['Listing Type'] === 'ريسيل' ? `
+      <div class="resale-current-box">
+        <div class="resale-box-title">${ICON.wallet} الوضع المالي الحالي</div>
+        <div class="resale-row-grid">
+          ${u['Resale Paid Amount'] ? `<div class="resale-item"><span class="resale-label">المدفوع حتى الآن</span><span class="resale-value">${fmtNum(u['Resale Paid Amount'])} جنيه</span></div>` : ''}
+          ${u['Resale Remaining Amount'] ? `<div class="resale-item"><span class="resale-label">المتبقي على الوحدة</span><span class="resale-value">${fmtNum(u['Resale Remaining Amount'])} جنيه</span></div>` : ''}
+          ${u['Resale Over Price'] ? `<div class="resale-item highlight"><span class="resale-label">الأوفر المطلوب</span><span class="resale-value">${u['Resale Over Price']}</span></div>` : ''}
+          ${u['Resale Remaining Period'] ? `<div class="resale-item"><span class="resale-label">الفترة المتبقية للسداد</span><span class="resale-value">${u['Resale Remaining Period']}</span></div>` : ''}
+          ${resalePurchasePPM ? `<div class="resale-item"><span class="resale-label">سعر المتر عند الشراء</span><span class="resale-value">${fmtNum(resalePurchasePPM)} ج/م²</span></div>` : ''}
+          ${resaleCurrentPPM ? `<div class="resale-item"><span class="resale-label">سعر المتر الحالي بالشركة</span><span class="resale-value">${fmtNum(resaleCurrentPPM)} ج/م²</span></div>` : ''}
+          ${resalePPMDiff !== null ? `<div class="resale-item highlight"><span class="resale-label">فرق سعر المتر</span><span class="resale-value">${resalePPMDiff >= 0 ? '+' : ''}${fmtNum(resalePPMDiff)} ج/م²</span></div>` : ''}
+        </div>
+      </div>
+      ` : ''}
+      ${Number(u['Discount Percentage']) > 0 ? `
+      <div class="unit-price-box">
+        <span class="old-price">${fmtNum(u['Price'])} جنيه</span>
+        <span class="discount-tag">خصم ${u['Discount Percentage']}%</span>
+        <div class="final-price">${fmtNum(u['Price After Discount'])} جنيه</div>
+        ${u['Price per Meter'] ? `<div class="per-meter">${fmtNum(u['Price per Meter'])} ج/م²</div>` : ''}
+      </div>
+      ` : `
+      <div class="unit-price-box">
+        <div class="final-price">${fmtNum(u['Price'])} جنيه</div>
+        ${u['Price per Meter'] ? `<div class="per-meter">${fmtNum(u['Price per Meter'])} ج/م²</div>` : ''}
+      </div>
+      `}
+      </div>
+      <button type="button" class="toggle-details-btn" onclick="toggleUnitDetails(this, '${u['Unit ID']}')">
+        <span class="label">عرض التفاصيل الكاملة</span><span class="chevron">▾</span>
+      </button>
+      <div class="unit-extra">
+        ${u['Payment Method'] ? `<div><b>الدفع:</b> ${u['Payment Method']}${u['Installment Years'] ? ' ' + u['Installment Years'] + ' سنوات' : ''}</div>` : ''}
+        ${u['Down Payment'] ? `<div><b>المقدم:</b> (${u['Down Payment']}%) = ${fmtNum(u['Down Payment Value'])} جنيه</div>` : ''}
+        ${u['Payment Count'] ? `<div><b>الدفعات:</b> ${u['Payment Count']} دفعة × ${fmtNum(u['Payment Amount Value'])} جنيه${u['Payment Schedule'] ? ' - ' + u['Payment Schedule'] : ''}</div>` : ''}
+        ${u['Monthly Installment'] ? `<div><b>القسط الشهري التقريبي:</b> ${fmtNum(u['Monthly Installment'])} جنيه/شهريًا</div>` : ''}
+        ${u['Monthly Installment'] ? `<div><b>القسط الربع سنوي التقريبي:</b> ${fmtNum(Number(u['Monthly Installment']) * 3)} جنيه/كل 3 شهور</div>` : ''}
+        ${u['View'] ? `<div><b>الفيو:</b> ${u['View']}</div>` : ''}
+        ${u['Other Payment Plans'] === 'نعم' ? `<div><b>${ICON.check} متاح أنظمة سداد أخرى</b></div>` : ''}
+        ${u['Delivery Date'] ? `<div><b>التسليم:</b> ${u['Delivery Date']}</div>` : ''}
+        ${u['Owner Phone'] ? `<div><b>هاتف المالك:</b> ${u['Owner Phone']}</div>` : ''}
+        ${u['Sales/Agent'] ? `<div><b>المسؤول:</b> ${u['Sales/Agent']}</div>` : ''}
+        ${u['Notes'] ? `<div><b>ملاحظات:</b> ${u['Notes']}</div>` : ''}
+      </div>
+      <div class="card-actions-bottom">
+        <div class="card-actions">
+          ${uiAllows('CHANGE_UNIT_STATUS') ? `<select class="status-select" onchange="changeStatus('${u['Unit ID']}', this.value)">
+            <option value="متاح" ${u['Status']==='متاح'?'selected':''}>متاح</option>
+            <option value="محجوز" ${u['Status']==='محجوز'?'selected':''}>محجوز</option>
+            <option value="مباع" ${u['Status']==='مباع'?'selected':''}>مباع</option>
+          </select>` : ''}
+        </div>
+        <div class="card-icon-row">
+          ${uiAllows('EDIT_UNIT') ? `<button type="button" class="icon-action-btn" onclick="openEditModal('${u['Unit ID']}')" title="تعديل الوحدة">تعديل</button>` : ''}
+          <button type="button" class="icon-action-btn" onclick='shareOnWhatsApp(${JSON.stringify(u)})' title="مشاركة على واتساب">واتساب</button>
+          <button type="button" class="icon-action-btn" onclick='downloadUnitPDF(${JSON.stringify(u)}, this)' title="تصدير PDF">PDF</button>
+          <button type="button" class="icon-action-btn" onclick='showSimilarUnits(${JSON.stringify(u)})' title="وحدات مشابهة">مشابهة</button>
+          ${ hasPermission('CLONE_UNIT')
+            ? `<button type="button" class="icon-action-btn" onclick="cloneUnit('${u['Unit ID']}')" title="استنساخ الوحدة">نسخ</button>`
+            : (currentUserRole() === 'SALES')
+              ? `<button type="button" class="icon-action-btn" onclick="salesOpenUnitView('${u['Unit ID']}')" title="فتح الوحدة">نسخ</button>`
+              : ''}
+        </div>
+        <div class="card-provenance">
+          <span class="prov-dev">${u['Developer Name'] ? `${ICON.building} المطور: <a href="javascript:void(0)" onclick='showDeveloperProfile(${JSON.stringify(u['Developer Name'])})'>${u['Developer Name']}</a>` : ''}</span>
+          <span class="prov-meta">
+            <span class="prov-added" title="مُدخِل الوحدة">${u['Entered By'] ? `${ICON.user} ${u['Entered By']}` : ''}</span>
+            ${(roleActive() && hasPermission('VIEW_ADMIN_ANALYTICS') && u['Details View Count'] !== undefined) ? `<span class="prov-views" title="عدد مرات مشاهدة تفاصيل الوحدة (إداري)">${ICON.eye} <span class="views-num">${Number(u['Details View Count']) || 0}</span> مشاهدة</span>` : ''}
+          </span>
+        </div>
+      </div>
+    </div>`;
+  }
+
   function renderResults(units) {
     if (showFavoritesOnly) {
       const favIds = getFavoriteIds();
@@ -4046,135 +4206,7 @@
         </div>`;
       return;
     }
-    container.innerHTML = units.map(u => {
-      const images = (u['Images'] || '').split(',').map(s => s.trim()).filter(Boolean);
-      const coverHtml = images.length > 0 ? `
-        <div class="unit-cover" onclick='openLightbox(${JSON.stringify(images)}, 0)'>
-          <img src="${getThumbUrl(images[0])}" alt="صورة الوحدة" loading="lazy" decoding="async">
-          ${images.length > 1 ? `<span class="img-count-badge">${ICON.camera} ${images.length} صور</span>` : ''}
-        </div>` : '';
-
-      const favPrice = getFavoritePrice(u['Unit ID']);
-      const resalePurchasePPM = Number(u['Resale Price Per Meter At Purchase']) || 0;
-      const resaleCurrentPPM = Number(u['Resale Current Price Per Meter']) || 0;
-      const resalePPMDiff = (resalePurchasePPM > 0 && resaleCurrentPPM > 0) ? (resaleCurrentPPM - resalePurchasePPM) : null;
-      const currentPrice = Number(u['Price']) || 0;
-      const priceDropped = favPrice && currentPrice > 0 && currentPrice < favPrice;
-      const priceIncreased = favPrice && currentPrice > 0 && currentPrice > favPrice;
-      let priceDropBadge = '';
-      if (priceDropped) {
-        priceDropBadge = `
-        <div class="price-drop-badge" title="السعر نزل من ${fmtNum(favPrice)} لـ ${fmtNum(currentPrice)} جنيه">
-          ${ICON.trendDown} نزل السعر ${fmtNum(favPrice - currentPrice)} جنيه
-        </div>`;
-      } else if (priceIncreased) {
-        priceDropBadge = `
-        <div class="price-drop-badge price-up-badge" title="السعر زاد من ${fmtNum(favPrice)} لـ ${fmtNum(currentPrice)} جنيه">
-          ${ICON.trendUp} زاد السعر ${fmtNum(currentPrice - favPrice)} جنيه
-        </div>`;
-      }
-
-      return `
-      <div class="unit-card status-${u['Status']}">
-        ${coverHtml}
-        ${priceDropBadge}
-        <button type="button" class="fav-btn ${isFavorite(u['Unit ID']) ? 'active' : ''}" onclick="toggleFavorite('${u['Unit ID']}', this, ${currentPrice})" title="إضافة للمفضلة">${ICON.star}</button>
-        <label class="compare-checkbox" title="إضافة للمقارنة">
-          <input type="checkbox" ${compareList.indexOf(u['Unit ID']) !== -1 ? 'checked' : ''} onchange="toggleCompare('${u['Unit ID']}', this)">
-        </label>
-        <div class="unit-top">
-          <span class="unit-id">${u['Unit ID']}</span>
-          <span class="status-badge ${u['Status']}">${u['Status']}</span>
-        </div>
-        <div class="unit-info-block">
-          <div class="unit-title">${u['Property Type']} - ${u['Project Name'] || u['City']}</div>
-          <div class="unit-loc">${ICON.pin} ${u['City']} - ${u['Area/District']}</div>
-          <div class="unit-added">${ICON.clock} أُضيفت في ${u['Date Added']}${u['Last Updated'] ? ' - آخر تحديث: ' + u['Last Updated'] : ''}</div>
-          <div class="unit-specs">
-            <span class="spec-chip">${ICON.area} ${u['Unit Area (sqm)']} م²</span>
-            ${u['Rooms'] ? `<span class="spec-chip">${ICON.bed} ${u['Rooms']} غرف</span>` : ''}
-            ${u['Bathrooms'] ? `<span class="spec-chip">${ICON.bath} ${u['Bathrooms']} حمام</span>` : ''}
-            ${u['Floor'] ? `<span class="spec-chip">${ICON.floor} دور ${u['Floor']}</span>` : ''}
-            ${u['Finishing'] ? `<span class="spec-chip">${ICON.brush} ${u['Finishing']}</span>` : ''}
-            ${u['Garden Area (sqm)'] ? `<span class="spec-chip">${ICON.tree} حديقة ${u['Garden Area (sqm)']} م²</span>` : ''}
-            ${u['Terrace Area (sqm)'] ? `<span class="spec-chip">${ICON.terrace} تراس ${u['Terrace Area (sqm)']} م²</span>` : ''}
-            ${u['Roof Area (sqm)'] ? `<span class="spec-chip">${ICON.roof} روف ${u['Roof Area (sqm)']} م²</span>` : ''}
-          </div>
-        </div>
-        <div style="margin-top:auto;">
-        ${u['Listing Type'] === 'ريسيل' ? `
-        <div class="resale-current-box">
-          <div class="resale-box-title">${ICON.wallet} الوضع المالي الحالي</div>
-          <div class="resale-row-grid">
-            ${u['Resale Paid Amount'] ? `<div class="resale-item"><span class="resale-label">المدفوع حتى الآن</span><span class="resale-value">${fmtNum(u['Resale Paid Amount'])} جنيه</span></div>` : ''}
-            ${u['Resale Remaining Amount'] ? `<div class="resale-item"><span class="resale-label">المتبقي على الوحدة</span><span class="resale-value">${fmtNum(u['Resale Remaining Amount'])} جنيه</span></div>` : ''}
-            ${u['Resale Over Price'] ? `<div class="resale-item highlight"><span class="resale-label">الأوفر المطلوب</span><span class="resale-value">${u['Resale Over Price']}</span></div>` : ''}
-            ${u['Resale Remaining Period'] ? `<div class="resale-item"><span class="resale-label">الفترة المتبقية للسداد</span><span class="resale-value">${u['Resale Remaining Period']}</span></div>` : ''}
-            ${resalePurchasePPM ? `<div class="resale-item"><span class="resale-label">سعر المتر عند الشراء</span><span class="resale-value">${fmtNum(resalePurchasePPM)} ج/م²</span></div>` : ''}
-            ${resaleCurrentPPM ? `<div class="resale-item"><span class="resale-label">سعر المتر الحالي بالشركة</span><span class="resale-value">${fmtNum(resaleCurrentPPM)} ج/م²</span></div>` : ''}
-            ${resalePPMDiff !== null ? `<div class="resale-item highlight"><span class="resale-label">فرق سعر المتر</span><span class="resale-value">${resalePPMDiff >= 0 ? '+' : ''}${fmtNum(resalePPMDiff)} ج/م²</span></div>` : ''}
-          </div>
-        </div>
-        ` : ''}
-        ${Number(u['Discount Percentage']) > 0 ? `
-        <div class="unit-price-box">
-          <span class="old-price">${fmtNum(u['Price'])} جنيه</span>
-          <span class="discount-tag">خصم ${u['Discount Percentage']}%</span>
-          <div class="final-price">${fmtNum(u['Price After Discount'])} جنيه</div>
-          ${u['Price per Meter'] ? `<div class="per-meter">${fmtNum(u['Price per Meter'])} ج/م²</div>` : ''}
-        </div>
-        ` : `
-        <div class="unit-price-box">
-          <div class="final-price">${fmtNum(u['Price'])} جنيه</div>
-          ${u['Price per Meter'] ? `<div class="per-meter">${fmtNum(u['Price per Meter'])} ج/م²</div>` : ''}
-        </div>
-        `}
-        </div>
-        <button type="button" class="toggle-details-btn" onclick="toggleUnitDetails(this, '${u['Unit ID']}')">
-          <span class="label">عرض التفاصيل الكاملة</span><span class="chevron">▾</span>
-        </button>
-        <div class="unit-extra">
-          ${u['Payment Method'] ? `<div><b>الدفع:</b> ${u['Payment Method']}${u['Installment Years'] ? ' ' + u['Installment Years'] + ' سنوات' : ''}</div>` : ''}
-          ${u['Down Payment'] ? `<div><b>المقدم:</b> (${u['Down Payment']}%) = ${fmtNum(u['Down Payment Value'])} جنيه</div>` : ''}
-          ${u['Payment Count'] ? `<div><b>الدفعات:</b> ${u['Payment Count']} دفعة × ${fmtNum(u['Payment Amount Value'])} جنيه${u['Payment Schedule'] ? ' - ' + u['Payment Schedule'] : ''}</div>` : ''}
-          ${u['Monthly Installment'] ? `<div><b>القسط الشهري التقريبي:</b> ${fmtNum(u['Monthly Installment'])} جنيه/شهريًا</div>` : ''}
-          ${u['Monthly Installment'] ? `<div><b>القسط الربع سنوي التقريبي:</b> ${fmtNum(Number(u['Monthly Installment']) * 3)} جنيه/كل 3 شهور</div>` : ''}
-          ${u['View'] ? `<div><b>الفيو:</b> ${u['View']}</div>` : ''}
-          ${u['Other Payment Plans'] === 'نعم' ? `<div><b>${ICON.check} متاح أنظمة سداد أخرى</b></div>` : ''}
-          ${u['Delivery Date'] ? `<div><b>التسليم:</b> ${u['Delivery Date']}</div>` : ''}
-          ${u['Owner Phone'] ? `<div><b>هاتف المالك:</b> ${u['Owner Phone']}</div>` : ''}
-          ${u['Sales/Agent'] ? `<div><b>المسؤول:</b> ${u['Sales/Agent']}</div>` : ''}
-          ${u['Notes'] ? `<div><b>ملاحظات:</b> ${u['Notes']}</div>` : ''}
-        </div>
-        <div class="card-actions-bottom">
-          <div class="card-actions">
-            ${uiAllows('CHANGE_UNIT_STATUS') ? `<select class="status-select" onchange="changeStatus('${u['Unit ID']}', this.value)">
-              <option value="متاح" ${u['Status']==='متاح'?'selected':''}>متاح</option>
-              <option value="محجوز" ${u['Status']==='محجوز'?'selected':''}>محجوز</option>
-              <option value="مباع" ${u['Status']==='مباع'?'selected':''}>مباع</option>
-            </select>` : ''}
-          </div>
-          <div class="card-icon-row">
-            ${uiAllows('EDIT_UNIT') ? `<button type="button" class="icon-action-btn" onclick="openEditModal('${u['Unit ID']}')" title="تعديل الوحدة">تعديل</button>` : ''}
-            <button type="button" class="icon-action-btn" onclick='shareOnWhatsApp(${JSON.stringify(u)})' title="مشاركة على واتساب">واتساب</button>
-            <button type="button" class="icon-action-btn" onclick='downloadUnitPDF(${JSON.stringify(u)}, this)' title="تصدير PDF">PDF</button>
-            <button type="button" class="icon-action-btn" onclick='showSimilarUnits(${JSON.stringify(u)})' title="وحدات مشابهة">مشابهة</button>
-            ${ hasPermission('CLONE_UNIT')
-              ? `<button type="button" class="icon-action-btn" onclick="cloneUnit('${u['Unit ID']}')" title="استنساخ الوحدة">نسخ</button>`
-              : (currentUserRole() === 'SALES')
-                ? `<button type="button" class="icon-action-btn" onclick="salesOpenUnitView('${u['Unit ID']}')" title="فتح الوحدة">نسخ</button>`
-                : ''}
-          </div>
-          <div class="card-provenance">
-            <span class="prov-dev">${u['Developer Name'] ? `${ICON.building} المطور: <a href="javascript:void(0)" onclick='showDeveloperProfile(${JSON.stringify(u['Developer Name'])})'>${u['Developer Name']}</a>` : ''}</span>
-            <span class="prov-meta">
-              <span class="prov-added" title="مُدخِل الوحدة">${u['Entered By'] ? `${ICON.user} ${u['Entered By']}` : ''}</span>
-              ${(roleActive() && hasPermission('VIEW_ADMIN_ANALYTICS') && u['Details View Count'] !== undefined) ? `<span class="prov-views" title="عدد مرات مشاهدة تفاصيل الوحدة (إداري)">${ICON.eye} <span class="views-num">${Number(u['Details View Count']) || 0}</span> مشاهدة</span>` : ''}
-            </span>
-          </div>
-        </div>
-      </div>`;
-    }).join('');
+    container.innerHTML = units.map(buildUnitCardHtml).join('');
   }
 
   function toggleUnitDetails(btnEl, unitId) {
@@ -4671,13 +4703,17 @@
     content.innerHTML = units.map(u => {
       const images = u['Images'] ? u['Images'].split(',').map(s => s.trim()).filter(Boolean) : [];
       const coverImg = images.length > 0 ? images[0] : '';
+      // منطقة الصورة+البيانات فقط قابلة للنقر لفتح كارت الوحدة الكامل (buildUnitCardHtml) — عنصر
+      // مستقل عن زر واتساب (شقيقه في نفس الصف)، فلا تعارض نقر بينهما ولا حاجة لـ stopPropagation.
       return `
         <div style="display:flex; gap:12px; background:var(--white); border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:10px; align-items:center;">
-          ${coverImg ? `<img src="${getThumbUrl(coverImg)}" style="width:70px; height:70px; border-radius:8px; object-fit:cover; flex-shrink:0;" loading="lazy">` : `<div style="width:70px; height:70px; border-radius:8px; background:var(--bg); flex-shrink:0; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:11px;">لا صورة</div>`}
-          <div style="flex:1; min-width:0;">
-            <div style="font-weight:800; color:var(--navy); font-size:13px;">${u['Property Type'] || ''} - ${u['Unit Area (sqm)'] || '-'} م²</div>
-            <div style="font-size:11px; color:var(--muted); margin-top:2px;">${u['Project Name'] || ''} - ${u['Area/District'] || ''}</div>
-            <div style="font-weight:800; color:var(--gold); font-size:14px; margin-top:4px;">${fmtNum(u['Price'])} جنيه</div>
+          <div style="display:flex; gap:12px; align-items:center; flex:1; min-width:0; cursor:pointer;" onclick='showUnitCardOverlay(${JSON.stringify(u)})' title="عرض كارت الوحدة">
+            ${coverImg ? `<img src="${getThumbUrl(coverImg)}" style="width:70px; height:70px; border-radius:8px; object-fit:cover; flex-shrink:0;" loading="lazy">` : `<div style="width:70px; height:70px; border-radius:8px; background:var(--bg); flex-shrink:0; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:11px;">لا صورة</div>`}
+            <div style="flex:1; min-width:0;">
+              <div style="font-weight:800; color:var(--navy); font-size:13px;">${u['Property Type'] || ''} - ${u['Unit Area (sqm)'] || '-'} م²</div>
+              <div style="font-size:11px; color:var(--muted); margin-top:2px;">${u['Project Name'] || ''} - ${u['Area/District'] || ''}</div>
+              <div style="font-weight:800; color:var(--gold); font-size:14px; margin-top:4px;">${fmtNum(u['Price'])} جنيه</div>
+            </div>
           </div>
           <button type="button" onclick='shareOnWhatsApp(${JSON.stringify(u)})' style="flex-shrink:0; padding:8px 12px; border:none; border-radius:8px; background:#4FA579; color:#fff; font-weight:700; font-size:11px; cursor:pointer;">واتساب</button>
         </div>
@@ -4687,6 +4723,23 @@
 
   document.getElementById('similarUnitsCloseBtn').addEventListener('click', () => similarUnitsModal.classList.remove('open'));
   similarUnitsModal.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
+
+  /* ---------- Overlay كارت الوحدة (من "الوحدات المشابهة") ----------
+   * VIEW CARD ONLY — لا تعديل، لا نسخ، لا حفظ. نفس كارت الوحدة الرئيسي بالحرف
+   * (buildUnitCardHtml)، من نفس كائن الوحدة المشابهة الموجود بالذاكرة (بلا getUnitById
+   * ولا نداء سيرفر جديد). إغلاقه لا يمسّ #similarUnitsModal ولا يُفرِّغ محتواه —
+   * عودة فورية لنفس قائمة "الوحدات المشابهة" بنفس ترتيبها. */
+  const unitCardOverlay = document.getElementById('unitCardOverlay');
+  function showUnitCardOverlay(u) {
+    document.getElementById('unitCardOverlayBody').innerHTML = buildUnitCardHtml(u);
+    unitCardOverlay.classList.add('open');
+  }
+  window.showUnitCardOverlay = showUnitCardOverlay;
+  function closeUnitCardOverlay() {
+    unitCardOverlay.classList.remove('open');
+  }
+  document.getElementById('unitCardOverlayCloseBtn').addEventListener('click', closeUnitCardOverlay);
+  unitCardOverlay.addEventListener('click', function(e) { if (e.target === this) closeUnitCardOverlay(); });
 
   function closePdfContactModal() {
     pdfContactModal.classList.remove('open');
