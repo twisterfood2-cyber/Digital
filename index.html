@@ -2216,7 +2216,9 @@
 <script>
   (function () {
     try {
-      if (localStorage.getItem('loginEmail') && localStorage.getItem('loginPassword') &&
+      // Phase 1B: الاستعادة الآن بتوكن جلسة سيرفري فقط — كلمة السر لم تعد تُخزَّن إطلاقًا.
+      try { localStorage.removeItem('loginPassword'); } catch (e2) {}  // تنظيف أي كلمة سر قديمة مخزنة من نسخ سابقة
+      if (localStorage.getItem('aqarSession') &&
           sessionStorage.getItem('aqar_logged_out') !== '1') {   // خروج متعمَّد → لا سبلاش استعادة، تظهر شاشة الدخول
         document.documentElement.classList.add('session-restoring');
       }
@@ -3277,7 +3279,7 @@
   }
 
   function loadFilterOptions() {
-    google.script.run.withSuccessHandler(applyFilterOptionsToUI).getFilterOptions();
+    google.script.run.withSuccessHandler(applyFilterOptionsToUI).getFilterOptions(getAuthCreds());
   }
 
   // فلاتر المدينة والمنطقة المترابطة
@@ -3457,7 +3459,7 @@
       if (!res || !res.success) { if (c) c.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:24px;">حصل خطأ في التحميل</div>'; return; }
       lastPriceStats = res.districtStats;
       renderPriceStatsTable(lastPriceStats);
-    }).getDistrictPriceStats();
+    }).getDistrictPriceStats(getAuthCreds());
   };
   // "سعر المتر" — يفتح كصفحة داخل مساحة المحتوى الرئيسية (مش Modal). البيانات/المنطق كما هي.
   document.getElementById('priceInfoFabBtn').addEventListener('click', function() {
@@ -3710,7 +3712,7 @@
           msg.style.color = 'var(--error-fg)';
           msg.textContent = 'حدث خطأ: ' + err.message;
         })
-        .extractUnitDataWithAI(text, fileBase64, mimeType);
+        .extractUnitDataWithAI(text, fileBase64, mimeType, getAuthCreds());
     }
 
     if (file) {
@@ -3814,7 +3816,7 @@
       editMsg.className = '';
       editMsg.textContent = 'تم استنساخ بيانات الوحدة ' + unitId + ' - راجع كل حاجة (خصوصًا الدور والسعر) وضيف صور جديدة قبل الحفظ';
       editMsg.style.display = 'block';
-    }).getUnitById(unitId);
+    }).getUnitById(unitId, getAuthCreds());
   }
   window.cloneUnit = cloneUnit;
 
@@ -4005,10 +4007,21 @@
   function uiAllows(perm) {
     return !roleActive() || hasPermission(perm);
   }
+  /* Phase 1B: المتصفح لا يخزّن كلمة السر إطلاقًا — التفويض بتوكن جلسة سيرفري فقط.
+   * (الاسم القديم getAuthCreds مُبقى لتقليل التغييرات في مواضع النداء.) */
   function getAuthCreds() {
-    var e = '', p = '';
-    try { e = localStorage.getItem('loginEmail') || ''; p = localStorage.getItem('loginPassword') || ''; } catch (x) {}
-    return { authEmail: e, authPassword: p };
+    var t = '';
+    try { t = localStorage.getItem('aqarSession') || ''; } catch (x) {}
+    return { sessionToken: t };
+  }
+  /* معالجة موحّدة لانتهاء/بطلان الجلسة من أي ردّ سيرفر: رسالة ثم عودة لشاشة الدخول. */
+  function handleAuthLost_(res) {
+    if (res && res.authRequired) {
+      try { showToast(res.message || 'انتهت الجلسة — سجّل الدخول من جديد', 'error'); } catch (e) {}
+      setTimeout(function () { try { logout(); } catch (e) { location.reload(); } }, 900);
+      return true;
+    }
+    return false;
   }
   function setCurrentUserFromLogin(res, fallbackEmail) {
     window.__currentUser = {
@@ -4252,19 +4265,15 @@
           console.error('AqarDigital: تسجيل مشاهدة الوحدة ' + unitId + ' فشل (شبكة/سيرفر):',
             (err && err.message) ? err.message : err);
         })
-        .incrementUnitDetailsView(unitId);
+        .incrementUnitDetailsView(unitId, getAuthCreds());
     } catch (e) {
       console.error('AqarDigital: استثناء غير متوقع أثناء تسجيل مشاهدة الوحدة:', e);
     }
   }
 
   function changeStatus(unitId, newStatus) {
-    // المرحلة 1: نرفق التفويض (بيانات الدخول + كلمة سر الأدمن لو موجودة).
-    // CHANGE_UNIT_STATUS = OWNER فقط (أو ADMIN_PIN) — السيرفر بيرفض غير كده.
-    var auth = Object.assign(
-      { pin: (typeof adminPin !== 'undefined' && adminPin) ? adminPin : '' },
-      getAuthCreds()
-    );
+    // Phase 1B: التفويض بجلسة المستخدم فقط — CHANGE_UNIT_STATUS (OWNER/MANAGER)، السيرفر يحسم.
+    var auth = getAuthCreds();
     google.script.run
       .withSuccessHandler(function (res) {
         if (res && res.success === false) {
@@ -4339,7 +4348,7 @@
       return;
     }
     // على اللابتوب/الكمبيوتر: نص بس مباشرة على واتساب (Web Share API بالصور مش مدعومة كويس هنا)
-    if (u['Unit ID']) google.script.run.logUnitActivity(u['Unit ID'], u['Project Name'], 'WhatsApp'); // عرض السعر التقديري بلا رقم وحدة — لا نسجّل نشاطًا
+    if (u['Unit ID']) google.script.run.logUnitActivity(u['Unit ID'], u['Project Name'], 'WhatsApp', getAuthCreds()); // عرض السعر التقديري بلا رقم وحدة — لا نسجّل نشاطًا
     const lines = buildUnitShareText(u);
 
     const waDomain = ['h', 't', 't', 'p', 's', ':', '/', '/'].join('') + ['w', 'a', '.', 'm', 'e'].join('');
@@ -4436,7 +4445,7 @@
         showToast('الجهاز ده مش بيدعم مشاركة الصور، هتتشارك التفاصيل بس', 'error');
       }
 
-      google.script.run.logUnitActivity(shareImagesUnit['Unit ID'], shareImagesUnit['Project Name'], 'WhatsApp');
+      google.script.run.logUnitActivity(shareImagesUnit['Unit ID'], shareImagesUnit['Project Name'], 'WhatsApp', getAuthCreds());
       await navigator.share(shareData);
       shareImagesModal.classList.remove('open');
     } catch (err) {
@@ -4455,7 +4464,7 @@
       google.script.run
         .withSuccessHandler(res => resolve(res && res.success ? res.dataUrl : null))
         .withFailureHandler(() => resolve(null))
-        .getUnitImageBase64(url);
+        .getUnitImageBase64(url, getAuthCreds());
     });
   }
 
@@ -4475,7 +4484,7 @@
       pdfAgentPhoneInput.value = localStorage.getItem('pdfAgentPhone') || '';
     } catch (e) {}
     pdfContactModal.classList.add('open');
-    if (u['Unit ID']) google.script.run.logUnitActivity(u['Unit ID'], u['Project Name'], 'PDF'); // عرض سعر تقديري بلا رقم وحدة — لا نسجّل نشاطًا
+    if (u['Unit ID']) google.script.run.logUnitActivity(u['Unit ID'], u['Project Name'], 'PDF', getAuthCreds()); // عرض سعر تقديري بلا رقم وحدة — لا نسجّل نشاطًا
   }
   window.downloadUnitPDF = downloadUnitPDF;
 
@@ -4494,6 +4503,11 @@
 
     google.script.run
       .withSuccessHandler(function(candidates) {
+        if (!Array.isArray(candidates)) {      // Phase 1B: رفض تفويض/جلسة منتهية
+          if (handleAuthLost_(candidates)) return;
+          content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:24px;">' + ((candidates && candidates.message) || 'حصل خطأ في البحث') + '</div>';
+          return;
+        }
         const refPrice = Number(referenceUnit['Price']) || 0;
         const refArea = Number(referenceUnit['Unit Area (sqm)']) || 0;
 
@@ -4513,7 +4527,7 @@
       .withFailureHandler(function() {
         content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:24px;">حصل خطأ في البحث</div>';
       })
-      .searchUnits(searchFilters);
+      .searchUnits(searchFilters, getAuthCreds());
   }
   window.showSimilarUnits = showSimilarUnits;
 
@@ -4542,7 +4556,7 @@
       .withFailureHandler(function() {
         content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:24px;">حصل خطأ في التحميل</div>';
       })
-      .getDeveloperProfile(developerName);
+      .getDeveloperProfile(developerName, getAuthCreds());
   }
   window.showDeveloperProfile = showDeveloperProfile;
 
@@ -5089,6 +5103,12 @@
     return new Promise(function(resolve) {
       google.script.run
         .withSuccessHandler(function(units) {
+          if (!Array.isArray(units)) {           // Phase 1B: رفض تفويض/جلسة منتهية → رد كائن لا مصفوفة
+            if (handleAuthLost_(units)) { resolve(); return; }
+            document.getElementById('results').innerHTML = '<div class="empty-state"><h3>' + ((units && units.message) || 'حصل خطأ أثناء تحميل النتائج') + '</h3></div>';
+            document.getElementById('resultsCount').textContent = '';
+            resolve(); return;
+          }
           lastResults = units;
           clientSearchCache[cacheKey] = { units: units, time: Date.now() };
           renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
@@ -5177,7 +5197,7 @@
         msg.style.color = 'var(--error-fg)';
         msg.textContent = 'حدث خطأ: ' + err.message;
       })
-      .parseNaturalLanguageSearch(query);
+      .parseNaturalLanguageSearch(query, getAuthCreds());
   });
 
   document.getElementById('nlSearchInput').addEventListener('keydown', function(e) {
@@ -5589,7 +5609,7 @@
     });
     const sortedProjects = Array.from(allProjects).sort((a, b) => a.localeCompare(b, 'ar'));
     document.getElementById('f_projectDatalist').innerHTML = sortedProjects.map(p => `<option value="${p}">`).join('');
-  }).getDeveloperProjectMap();
+  }).getDeveloperProjectMap(getAuthCreds());
 
   function refreshEditProjectSuggestions() {
     const dev = editDeveloperInput.value.trim();
@@ -5635,7 +5655,7 @@
       if (typeDefaults.otherPaymentPlans) editForm.elements['otherPaymentPlans'].value = typeDefaults.otherPaymentPlans;
       calcEditMonthlyInstallment();
       showToast('اتملت بيانات الدفع والتشطيب تلقائيًا من آخر وحدة بنفس المشروع والنوع - راجعها وعدّل اللي محتاج تغيير', 'info');
-    }).getProjectTypeDefaults(dev, proj, currentType);
+    }).getProjectTypeDefaults(dev, proj, currentType, getAuthCreds());
   }
   document.getElementById('editFetchLastSimilarBtn').addEventListener('click', editFetchLastSimilarUnitData);
 
@@ -5732,7 +5752,7 @@
       // تحميل الصور الحالية
       editUnitImages = (u['Images'] || '').split(',').map(s => s.trim()).filter(Boolean);
       renderEditImagesPreview();
-    }).getUnitById(unitId);
+    }).getUnitById(unitId, getAuthCreds());
   }
 
   /* ---------- إدارة صور الوحدة في فورم التعديل ---------- */
@@ -5851,7 +5871,7 @@
           editImagesUploadMsg.style.color = 'var(--gold)';
           editImagesUploadMsg.textContent = 'حدث خطأ أثناء رفع الصورة: ' + err.message;
         })
-        .uploadUnitImage(base64Data, file.type);
+        .uploadUnitImage(base64Data, file.type, getAuthCreds());
     };
     reader.readAsDataURL(file);
   }
@@ -5935,7 +5955,7 @@
     // data.pin (كلمة السر المشتركة) بيتبعت كمان كطريق احتياطي — السيرفر يقبل أي منهم.
     Object.assign(data, getAuthCreds());
     // إضافة/استنساخ وحدة: نرفق كلمة السر اللي اتحققنا منها عشان السيرفر يتأكد من التفويض قبل أي كتابة
-    if (editModalMode === 'add' || editModalMode === 'clone') data.pin = unitWritePin;
+    // Phase 1B: لا حقل pin بعد الآن — التفويض داخل data.sessionToken (من getAuthCreds أعلاه)
 
     if (editModalMode === 'add') {
       data.enteredBy = visitorName || '';
@@ -6065,7 +6085,7 @@
       return;
     }
 
-    data.pin = verifiedPin;
+    // Phase 1B: لا pin — التفويض بالجلسة داخل data
 
     google.script.run
       .withSuccessHandler(function(res) {
@@ -6134,7 +6154,7 @@
         editMsg.textContent = 'حدث خطأ: ' + err.message;
         editMsg.style.display = 'block';
       })
-      .deleteUnit(currentEditUnitId, Object.assign({ pin: verifiedPin || '' }, getAuthCreds()));
+      .deleteUnit(currentEditUnitId, getAuthCreds());
   });
 
   const INITIAL_UNIT_ID = new URLSearchParams(window.location.search).get('unit') || "";
@@ -6161,6 +6181,7 @@
         // لازم نتأكد إن الرد فعلاً شكله سليم قبل ما نعتبره نتيجة حقيقية -
         // رد ناقص أو غير متوقع مينفعش نتعامل معه على إنه "صفر نتائج"
         if (!data || !Array.isArray(data.units)) {
+          if (handleAuthLost_(data)) return;   // Phase 1B: جلسة منتهية → عودة لشاشة الدخول
           document.getElementById('results').innerHTML = `
             <div class="empty-state">
               <div class="icon">${ICON.alert}</div>
@@ -6229,8 +6250,9 @@
         btn.disabled = false; btn.textContent = 'دخول';
         if (res.success) {
           try {
-            localStorage.setItem('loginEmail', email);
-            localStorage.setItem('loginPassword', password);
+            localStorage.setItem('loginEmail', email);              // للتعبئة المسبقة فقط — ليست وسيلة تفويض
+            if (res.sessionToken) localStorage.setItem('aqarSession', res.sessionToken); // Phase 1B: توكن الجلسة
+            localStorage.removeItem('loginPassword');               // تنظيف أي بقايا من النسخ القديمة
             sessionStorage.removeItem('aqar_logged_out'); // دخول ناجح متعمَّد → أعِد تفعيل الدخول التلقائي
           } catch (e) {}
           setCurrentUserFromLogin(res, email); // المرحلة 1: نبني طبقة "المستخدم الحالي" من ردّ السيرفر
@@ -6257,6 +6279,11 @@
    * يُنهي المصادقة أولًا (ذاكرة + دخول محفوظ + مؤقتات) ثم يُقلع الصفحة نظيفة —
    * الانتقال ليس هو الحل، بل ضمان ألا يبقى أي مؤقّت/مستمع/طلب معلّق. */
   function logout() {
+    // 0) Phase 1B: أبطل الجلسة على السيرفر أولًا (fire-and-forget) — التوكن القديم يُرفض بعدها نهائيًا.
+    try {
+      var _tk = localStorage.getItem('aqarSession') || '';
+      if (_tk) google.script.run.logoutSession(_tk);
+    } catch (e) {}
     // 1) أوقف كل المؤقتات/النبضات/المستمعات المرتبطة بجلسة المستخدم
     try { stopPresenceHeartbeat(); } catch (e) {}                                   // نبضة حضور المستخدم
     try { if (heartbeatTimer) { clearInterval(heartbeatTimer); heartbeatTimer = null; } } catch (e) {} // نبضة الزوار
@@ -6270,8 +6297,9 @@
 
     // 3) ألغِ الدخول المحفوظ / الدخول التلقائي المرتبط بالمستخدم
     try {
+      localStorage.removeItem('aqarSession');   // Phase 1B: توكن الجلسة
       localStorage.removeItem('loginEmail');
-      localStorage.removeItem('loginPassword');
+      localStorage.removeItem('loginPassword'); // بقايا النسخ القديمة — تنظيف دائم
       localStorage.removeItem('adminPin');
     } catch (e) {}
     // علامة "خروج متعمَّد" (لهذا التبويب): تمنع أي سباق مع دخول تلقائي قيد التنفيذ،
@@ -6329,19 +6357,36 @@
         if (_st) { _st.className = 'access-gate-status success'; _st.textContent = _lm; }
       }
     } catch (e) {}
-    let savedEmail = '', savedPassword = '';
+    let savedEmail = '', savedToken = '';
     try {
       savedEmail = localStorage.getItem('loginEmail') || '';
-      savedPassword = localStorage.getItem('loginPassword') || '';
+      savedToken = localStorage.getItem('aqarSession') || '';
     } catch (e) {}
     if (savedEmail && !loggedOut) {
       document.getElementById('loginEmail').value = savedEmail;
     }
-    if (savedEmail && savedPassword && !loggedOut) {
-      // المرحلة 3.6: علامة إن استعادة الجلسة شغّالة دلوقتي — البوابات تأجّل قرارها لحد ما
-      // نعرف هوية المستخدم ودوره، بدل ما تطلب كلمة سر ثانوية قديمة بعد إعادة تحميل الصفحة.
+    if (savedToken && !loggedOut) {
+      // Phase 1B: استعادة الجلسة بالتحقق السيرفري من التوكن — كلمة السر لا تُخزَّن ولا تُرسَل هنا.
       window.__aqarAuthRestoring = true;
-      attemptLogin(savedEmail, savedPassword);
+      google.script.run
+        .withSuccessHandler(function (res) {
+          if (res && res.success) {
+            setCurrentUserFromLogin(res, res.email);
+            showApp();
+          } else {
+            // جلسة منتهية/باطلة → تنظيف وعرض بوابة الدخول (بلا أي دخول تلقائي بكلمة سر)
+            try { localStorage.removeItem('aqarSession'); } catch (e) {}
+            window.__aqarAuthRestoring = false;
+            document.documentElement.classList.remove('session-restoring');
+            var st = document.getElementById('loginStatus');
+            if (st) { st.className = 'access-gate-status error'; st.textContent = (res && res.message) || 'انتهت الجلسة — سجّل الدخول من جديد'; }
+          }
+        })
+        .withFailureHandler(function () {
+          window.__aqarAuthRestoring = false;
+          document.documentElement.classList.remove('session-restoring');
+        })
+        .validateSession(savedToken);
       // السبلاش ظاهر بالفعل (الكلاس أُضيف في سكربت <body> السطري). فشل آمن: لو ما وصلش
       // ردّ خلال 15 ثانية (تعليق فعلي — withFailureHandler بيغطّي أخطاء الشبكة الصريحة)،
       // أزل السبلاش وأظهر بوابة الدخول بدل ما يعلق المستخدم عليه.
@@ -6380,7 +6425,7 @@
   let visitorName = '';
 
   function sendHeartbeat() {
-    google.script.run.heartbeat(sessionId, visitorName);
+    google.script.run.heartbeat(sessionId, visitorName, getAuthCreds());
   }
 
   /* ---------- المرحلة 3.6+ — نبضة حضور المستخدم المُسجَّل دخول (Presence) ----------
@@ -6409,7 +6454,7 @@
   window.addEventListener('pageshow', function (e) {
     var loggedOut = false, hasSaved = false;
     try { loggedOut = sessionStorage.getItem('aqar_logged_out') === '1'; } catch (x) {}
-    try { hasSaved = !!(localStorage.getItem('loginEmail') && localStorage.getItem('loginPassword')); } catch (x) {}
+    try { hasSaved = !!localStorage.getItem('aqarSession'); } catch (x) {}
     if (loggedOut && !hasSaved) {
       var app = document.getElementById('mainContainer');
       var gate = document.getElementById('loginGate');
@@ -6426,7 +6471,7 @@
         document.getElementById('coverImg').src = url;
         document.getElementById('coverWrap').classList.add('has-image');
       }
-    }).getCoverImageUrl();
+    }).getCoverImageUrl(getAuthCreds());
   }
 
   /* ---------- لوحة تحكم المسؤول (مخفية، محمية بكلمة سر) ---------- */
@@ -6522,7 +6567,7 @@
    * - إضافة بحتة فوق نظام 2.2. لا مساس بـ RBAC / المصادقة / تسجيل الدخول.
    * - الأمان في الباك-إند: كل نداء يمرّ بـ authorizeOwnerAdmin_ + checkOwnerProtection_.
    *   إخفاء/تعطيل الأزرار هنا **راحة فقط** ولا يُعتمد عليه.
-   * - auth المُرسل = { pin: adminPin, authEmail, authPassword } → السيرفر يقبل أي مسار.
+   * - Phase 1B: auth المُرسل = { sessionToken } فقط — السيرفر يتحقق من الجلسة والدور.
    * ============================================================ */
   // المرحلة 3.6: "إدارة المستخدمين" الرئيسية بقت قسم كامل داخل لوحة التحكم (#dashPanel-users)،
   // مش مودال. مودال "تفاصيل المستخدم" (#umUserModal) لسه مودال — نافذة فرعية مركّزة للتعديل.
@@ -6534,7 +6579,7 @@
   let umServerNow = 0;                 // وقت السيرفر من آخر ردّ (لحساب "آخر ظهور" باتساق)
   let umPresenceTimer = null;          // مؤقّت واحد فقط لتحديث الحضور أثناء عرض قسم المستخدمين
 
-  function umAuth() { return Object.assign({ pin: adminPin || '' }, getAuthCreds()); }
+  function umAuth() { return getAuthCreds(); } // Phase 1B: جلسة فقط — لا PIN
 
   /* المرحلة 3.6+ — صياغة "آخر ظهور" (توقيت مصر — نفس اصطلاح التطبيق: dd/MM/yyyy + 12h ص/م). */
   function umFormatLastSeen(lastSeen, serverNow, online) {
@@ -7008,7 +7053,7 @@
      — عشان المالك الداخل بدوره يشتغل زيّ ما كان بيشتغل داخل بكلمة السر. مفيش صلاحية جديدة. */
   function devMgmtAuth() {
     if (typeof window.__aqarDashAuth === 'function') return window.__aqarDashAuth();
-    return { pin: (adminPin || ''), authEmail: '', authPassword: '' };
+    return getAuthCreds(); // Phase 1B: جلسة فقط — لا PIN
   }
 
   // الزر القديم في اللوحة المنزلقة القديمة (لسه موجود كـ fallback) — يوجّه لقسم المطوّرين في لوحة التحكم.
@@ -7025,7 +7070,7 @@
     google.script.run.withSuccessHandler(function (res) {
       var dl = document.getElementById('devProfileNameDatalist');
       if (dl && res && res.developers) dl.innerHTML = res.developers.map(function (d) { return '<option value="' + d + '">'; }).join('');
-    }).getDeveloperProjectMap();
+    }).getDeveloperProjectMap(getAuthCreds());
   }
   window.__aqarLoadDevelopers = function () {
     if (typeof hasPermission === 'function' && !hasPermission('MANAGE_USERS')) return;   // إدارة بيانات المطوّرين — مالك فقط (authorizeOwnerAdmin_)
@@ -7242,7 +7287,7 @@
     }
     if (calcFabBtn) calcFabBtn.setAttribute('data-app-view', 'quote');
     if (priceInfoFabBtn) priceInfoFabBtn.setAttribute('data-app-view', 'meter');
-    var addVerifiedPin = null;   // data-entry PIN (or admin PIN) verified this session — kept in memory only
+    var addVerifiedPin = null;   // Phase 1B: أثر قديم — لا PIN؛ يبقى null دائمًا (التفويض بالجلسة)
     var addUnlockedFlag = false;
     var navDashBtn = document.getElementById('adminFab'); // المرحلة 3.4: زر "لوحة الإدارة"
 
@@ -7348,7 +7393,8 @@
      * مافيش verifyAdminPin / verifyDataEntryPin / askForPin هنا خالص.
      * ============================================================ */
     function hasSavedLogin_() {
-      try { return !!(localStorage.getItem('loginEmail') && localStorage.getItem('loginPassword')); }
+      // Phase 1B: "دخول محفوظ" = توكن جلسة موجود (يتأكد سيرفريًا عبر validateSession)
+      try { return !!localStorage.getItem('aqarSession'); }
       catch (e) { return false; }
     }
     function sessionRestorePending_() {
@@ -7374,7 +7420,7 @@
       if (statsUnlocked()) { onOk(); return; }
       // دور فيه VIEW_STATISTICS (OWNER / MANAGER) → دخول مباشر. نمرّر بيانات الدخول؛ السيرفر يتحقق (authorizeAdminView_).
       if (gateHasPerm_('VIEW_STATISTICS')) {
-        window.__aqarStatsUnlock(Object.assign({ pin: '' }, getAuthCreds()));
+        window.__aqarStatsUnlock(getAuthCreds()); // Phase 1B: جلسة فقط
         onOk(); return;
       }
       if (sessionRestorePending_()) return;
@@ -7396,7 +7442,7 @@
      * - التفويض: نفس آلية لوحة الإدارة الحالية بالظبط:
      *     · دور مؤكَّد فيه VIEW_STATISTICS (OWNER/MANAGER) → دخول مباشر (بيانات الدخول).
      *     · أو جلسة أدمن مفتوحة (adminPin).
-     *     · أو بوابة كلمة سر لوحة التحكم (verifyAdminPin) — زيّ #stats بالظبط.
+     *     · Phase 1B: لا بوابة PIN — الجلسة والدور فقط.
      *   مافيش نظام صلاحيات جديد، ولا باك-إند جديد، ولا تغيير في أي authorize*_.
      * - كل وحدة في اللوحة بتفوّت على الأدوات/الدوال الموجودة زيّ ما هي (إدارة المستخدمين،
      *   إدارة المطورين، الإحصائيات، صورة الغلاف). التحقق النهائي دايمًا في السيرفر.
@@ -7417,7 +7463,7 @@
     function dashUnlocked() { return dashUnlockedFlag; }
     function dashState() {
       var creds = (typeof getAuthCreds === 'function') ? getAuthCreds() : { authEmail: '', authPassword: '' };
-      return Object.assign({ pin: (typeof adminPin !== 'undefined' && adminPin) ? adminPin : '' }, creds);
+      return creds; // Phase 1B: جلسة فقط — لا PIN
     }
     // المرحلة 3.5: نفس مصدر المصادقة يُستخدم لقسم "إدارة بيانات المطورين" (backend: authorizeOwnerAdmin_).
     window.__aqarDashAuth = dashState;
@@ -7513,7 +7559,7 @@
       var mount = document.getElementById('dashStatsMount');
       var sv = document.getElementById('statsView');
       if (mount && sv && sv.parentElement !== mount) mount.appendChild(sv);
-      var auth = Object.assign({ pin: '' }, (typeof getAuthCreds === 'function' ? getAuthCreds() : {}));
+      var auth = (typeof getAuthCreds === 'function' ? getAuthCreds() : {}); // Phase 1B: جلسة فقط
       if (typeof window.__aqarStatsUnlocked === 'function' && window.__aqarStatsUnlocked()) {
         if (typeof window.__aqarStatsReload === 'function') window.__aqarStatsReload();  // إعادة فتح → تحديث الأرقام
       } else if (typeof window.__aqarStatsUnlock === 'function') {
