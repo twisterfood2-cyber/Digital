@@ -84,3 +84,58 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire);
   else wire();
 })();
+
+/* ============================================================================
+ * Phase 3C — Page Header الموحّد (عرض فقط)
+ * ----------------------------------------------------------------------------
+ * مصدر واحد للعنوان/الوصف/مسار الصفحة: ROUTE_REGISTRY (title/subtitle/crumbs) عبر
+ * window.__aqarRoutes. يُستدعى sync() من route() بعد حسم المسار. لا صلاحيات، لا نداءات سيرفر.
+ *   window.__aqarPageHeader.render({ title, subtitle, crumbs, actions })  — رسم مباشر
+ *   window.__aqarPageHeader.sync()                                        — من المسار الحالي
+ *   window.__aqarPageHeader.setActions(el|null)                           — خانة الإجراءات
+ * ==========================================================================*/
+(function () {
+  'use strict';
+  function el(id) { return document.getElementById(id); }
+  function render(opts) {
+    opts = opts || {};
+    var root = el('aqPageHeader'); if (!root) return;
+    var t = el('aqPageTitle'), st = el('aqPageSubtitle'), cr = el('aqPageCrumbs');
+    if (t) t.textContent = opts.title || '';
+    if (st) { st.textContent = opts.subtitle || ''; st.hidden = !opts.subtitle; }
+    if (cr) {
+      cr.textContent = '';
+      var crumbs = Array.isArray(opts.crumbs) ? opts.crumbs : [];
+      crumbs.forEach(function (c, i) {
+        var span = document.createElement('span'); span.className = 'aq-page-crumb'; span.textContent = String(c);
+        cr.appendChild(span);
+        var sep = document.createElement('span'); sep.className = 'aq-page-crumb-sep'; sep.setAttribute('aria-hidden', 'true'); sep.textContent = '›';
+        cr.appendChild(sep);
+      });
+      if (crumbs.length && opts.title) {
+        var cur = document.createElement('span'); cur.className = 'aq-page-crumb is-current'; cur.setAttribute('aria-current', 'page'); cur.textContent = opts.title;
+        cr.appendChild(cur);
+      }
+      cr.hidden = !crumbs.length;
+    }
+    if (opts.actions !== undefined) setActions(opts.actions);
+    root.hidden = !opts.title;
+  }
+  function setActions(node) {
+    var a = el('aqPageActions'); if (!a) return;
+    a.textContent = '';
+    if (node && node.nodeType === 1) a.appendChild(node);
+    a.hidden = !a.childNodes.length;
+  }
+  function sync() {
+    var R = window.__aqarRoutes; if (!R || !R.registry) return;
+    var key = (typeof R.current === 'function') ? R.current() : null;
+    var r = (key && R.registry[key]) || R.registry.search || null;
+    if (!r) return;
+    render({ title: r.title || r.label || '', subtitle: r.subtitle || '', crumbs: r.crumbs || [] });
+  }
+  window.__aqarPageHeader = { render: render, sync: sync, setActions: setActions };
+  /* السكربت مؤجَّل (defer) فيُنفَّذ بعد route() الأولى للصفحة → مزامنة أولية هنا؛ بعدها route() تزامن عند كل تغيير. */
+  function init() { try { sync(); } catch (e) {} }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();

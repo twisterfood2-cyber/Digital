@@ -1,22 +1,20 @@
 /* ============================================================================
- * AqaR Digital — Design Tokens (Phase 2A)
+ * AqaR Digital — Design Tokens (Phase 2A foundation · Phase 2B semantic layer)
  * ----------------------------------------------------------------------------
- * طبقة الـ Tokens المركزية للمنصة. تُحمَّل قبل ستايلات الصفحة.
- * قاعدة: لا قيم لونية/مسافات/ظلال مكررة في الشاشات — كل جديد يستهلك من هنا.
+ * المصدر الوحيد للغة البصرية للمنصة. يُحمَّل قبل كل الستايلات.
+ * قاعدة: لا قيم لونية/مسافات/ظلال/أحجام خط مكررة في الشاشات — كل شيء يستهلك من هنا.
  *
- * ملاحظة معمارية (مقصودة): عائلة الألوان الأساسية (--navy/--gold/الأسطح/الحالات)
- * كانت مُعرَّفة مركزيًا بالفعل داخل :root في index.html وتستهلكها مئات القواعد.
- * لتفادي أي كسر، تبقى تلك التعريفات في مكانها كمصدر وحيد، وهذا الملف:
- *   1) يضيف عائلات الـ tokens الناقصة (spacing / typography / z-index / shell / breakpoints)
- *   2) يوفّر أسماء --aq-* موحّدة تُستخدم في كل مكونات aq-* الجديدة
- *   3) يوثّق خريطة الطبقات والقياسات القياسية للمنصة
+ * البنية (طبقتان):
+ *   1) PRIMITIVES  — عائلات الألوان الكانونية (navy/gold/الأسطح/الحالات). القيم الخام
+ *      لا تزال معرَّفة أيضًا في index.html :root بأسمائها القديمة (--navy, --gold …)
+ *      لأن مئات القواعد تستهلكها؛ الأسماء --aq-* هنا تشير إليها (alias) بلا ازدواج قيم.
+ *   2) SEMANTIC    — أسماء بالمعنى (bg/surface/border/text/status/accent) تستهلكها
+ *      المكونات والشاشات. الشاشات القديمة تُهاجَر إليها تدريجيًا (Phase 2B: بلوك index.html).
  * ==========================================================================*/
-
 :root {
-  /* ------------------------------------------------------------------
-   * COLOR ALIASES — تشير إلى المصدر الكانوني في index.html :root
-   * (Deep Navy primary · Refined Gold accent · أسطح فاتحة دافئة)
-   * ------------------------------------------------------------------ */
+  /* ==================================================================
+   * 1) PRIMITIVES — Brand palette (alias → index.html :root canonical)
+   * ================================================================== */
   --aq-navy:        var(--navy,        #0A1C2F);
   --aq-navy-deep:   var(--navy-deep,   #061321);
   --aq-navy-dark:   var(--navy-dark,   #081727);
@@ -41,9 +39,103 @@
   --aq-error-bg:    var(--error-bg,    #F7E4E4);
   --aq-error-fg:    var(--error-fg,    #B0271F);
 
-  /* ------------------------------------------------------------------
+  /* ==================================================================
+   * 2) SEMANTIC — Backgrounds & surfaces (المنصة داكنة أساسًا)
+   * ================================================================== */
+  --aq-bg-page:              var(--page-bg,     #0D2438);              /* خلفية الصفحة */
+  --aq-bg-surface:           var(--glass-panel, rgba(19,42,63,0.72));  /* سطح قياسي (ألواح/فلاتر) */
+  --aq-bg-surface-elevated:  var(--glass-card,  rgba(20,43,67,0.74));  /* سطح مرتفع (كروت الوحدات) */
+  --aq-bg-surface-deep:      var(--glass-strong,rgba(6,19,33,0.76));   /* سطح عميق (AI console / مودالات) */
+  --aq-bg-surface-nav:       var(--glass,       rgba(10,28,47,0.55));  /* أسطح التنقل الشفافة */
+  --aq-bg-surface-light:     var(--off-white,   #F7F6F2);              /* سطح فاتح (لوحات فاتحة/طباعة) */
+  --aq-bg-input:             var(--input-dark,  rgba(27,52,74,0.6));   /* خلفية الحقول على الداكن */
+  --aq-bg-input-focus:       rgba(27,52,74,0.78);
+  --aq-bg-muted-1:           rgba(255,255,255,0.04);                   /* أخف تظليل (صفوف/شرائط) */
+  --aq-bg-muted-2:           rgba(255,255,255,0.06);                   /* hover خفيف */
+  --aq-bg-muted-3:           rgba(255,255,255,0.08);                   /* شارات محايدة */
+  --aq-bg-muted-4:           rgba(255,255,255,0.15);                   /* أزرار عائمة فوق الصور */
+  --aq-overlay:              rgba(4,12,22,0.55);                       /* خلفية drawer / مودال */
+  --aq-overlay-strong:       rgba(4,12,22,0.75);
+
+  /* ------------------------------------------------ Borders */
+  --aq-border-dark:          var(--aq-line-dark);                      /* hairline على الداكن */
+  --aq-border-strong:        rgba(255,255,255,0.14);                   /* حد أوضح (حقول/كروت) */
+  --aq-border-light:         var(--aq-border);                         /* hairline على الفاتح */
+  --aq-border-accent:        var(--aq-border-gold);                    /* حد ذهبي هادئ */
+  --aq-border-accent-strong: rgba(201,154,46,0.5);                     /* حد ذهبي واضح */
+
+  /* ------------------------------------------------ Text */
+  --aq-text-primary:         var(--aq-text-light);                     /* نص أساسي على الداكن */
+  --aq-text-secondary:       rgba(234,240,246,0.82);                   /* نص ثانوي على الداكن */
+  --aq-text-tertiary:        rgba(234,240,246,0.68);                   /* نص خافت على الداكن */
+  --aq-text-disabled:        rgba(234,240,246,0.5);
+  --aq-text-inverse:         var(--aq-text);                           /* نص داكن على الفاتح */
+  --aq-text-inverse-muted:   var(--aq-text-muted);
+  --aq-text-on-accent:       var(--aq-navy-deep);                      /* نص فوق الذهبي */
+  --aq-text-placeholder:     #A9B2BD;
+
+  /* ------------------------------------------------ Brand / accent */
+  --aq-brand-navy:           var(--aq-navy);
+  --aq-brand-gold:           var(--aq-gold);
+  --aq-accent:               var(--aq-gold);
+  --aq-accent-soft:          var(--aq-gold-soft);
+  --aq-accent-strong:        var(--aq-gold-dark);
+  --aq-accent-tint-1:        rgba(201,154,46,0.07);                    /* خلفية ذهبية شبه معدومة */
+  --aq-accent-tint-2:        rgba(201,154,46,0.14);                    /* خلفية ذهبية خفيفة (active) */
+  --aq-accent-tint-3:        rgba(201,154,46,0.22);                    /* حد/خلفية ذهبية أوضح */
+  --aq-accent-tint-4:        rgba(201,154,46,0.35);                    /* hover على active */
+  --aq-focus-ring:           0 0 0 3px rgba(201,154,46,0.16);          /* حلقة التركيز الموحدة */
+  --aq-focus-outline:        2px solid var(--aq-gold);
+
+  /* ------------------------------------------------ Status (على الداكن: *-soft / على الفاتح: *-fg + *-bg) */
+  --aq-success:              #4FA579;
+  --aq-success-strong:       #46946C;
+  --aq-success-soft:         #7FD3A3;
+  --aq-success-tint:         rgba(30,110,69,0.16);
+  --aq-success-border:       rgba(30,110,69,0.32);
+  --aq-success-solid-bg:     rgba(30,110,69,0.92);
+  --aq-success-solid-fg:     #EAF7EF;
+  --aq-success-dot:          #1E7145;
+
+  --aq-danger:               var(--aq-error-fg);
+  --aq-danger-soft:          #E9908A;
+  --aq-danger-tint:          rgba(176,39,31,0.16);
+  --aq-danger-border:        rgba(176,39,31,0.35);
+  --aq-danger-border-strong: rgba(176,39,31,0.6);
+  --aq-danger-solid-bg:      rgba(176,39,31,0.92);
+  --aq-danger-solid-fg:      #FBEAEA;
+  --aq-danger-bg-light:      #FFF8F7;
+
+  --aq-warning:              var(--aq-warn-fg);
+  --aq-warning-soft:         var(--aq-gold-soft);
+  --aq-warning-tint:         rgba(122,86,0,0.2);
+  --aq-warning-border:       rgba(201,154,46,0.4);
+
+  --aq-info:                 #1C4A75;
+  --aq-info-soft:            #8FC1EA;
+  --aq-info-tint:            rgba(28,74,117,0.22);
+  --aq-info-border:          rgba(143,193,234,0.35);
+  --aq-info-bg-light:        #DBE7F3;
+
+  --aq-neutral-disabled:     #9AA4AE;
+
+  /* أدوار المستخدمين (شارات على الأسطح الفاتحة) */
+  --aq-role-owner-bg:        var(--aq-gold);
+  --aq-role-owner-fg:        #3A2A05;
+  --aq-role-manager-bg:      var(--aq-info-bg-light);
+  --aq-role-manager-fg:      var(--aq-info);
+  --aq-role-sales-bg:        #E6EFE9;
+  --aq-role-sales-fg:        var(--aq-success-fg);
+  --aq-role-entry-bg:        #EFE7F5;
+  --aq-role-entry-fg:        #5A3A86;
+
+  /* توافق خلفي: --ok كان مستخدمًا في الإحصاءات بلا تعريف (يرث اللون) → يُعرَّف هنا */
+  --ok: var(--aq-success-soft);
+  --danger: var(--aq-danger-soft);
+
+  /* ==================================================================
    * SPACING SCALE — 4px base. ممنوع margins/paddings عشوائية.
-   * ------------------------------------------------------------------ */
+   * ================================================================== */
   --aq-space-1: 4px;
   --aq-space-2: 8px;
   --aq-space-3: 12px;
@@ -55,19 +147,28 @@
   --aq-space-12: 48px;
   --aq-space-16: 64px;
 
-  /* ------------------------------------------------------------------
-   * TYPOGRAPHY — Cairo (عربي أولًا) مع تدرّج هرمي ثابت.
-   * ------------------------------------------------------------------ */
+  /* ==================================================================
+   * TYPOGRAPHY — Cairo (عربي أولًا). سلّم واحد تستهلكه كل الشاشات.
+   * ================================================================== */
   --aq-font: 'Cairo', 'Segoe UI', Tahoma, Arial, sans-serif;
-  --aq-fs-page-title:    26px;   /* عنوان الصفحة */
-  --aq-fs-section-title: 19px;   /* عنوان القسم */
-  --aq-fs-card-title:    16px;   /* عنوان الكارت */
-  --aq-fs-body:          14px;   /* النص الأساسي */
+  --aq-fs-micro:         10px;   /* شارات دقيقة / وسوم */
+  --aq-fs-caption-sm:    11px;   /* شارات، بيانات مساعدة */
   --aq-fs-caption:       12px;   /* شرح ثانوي */
   --aq-fs-label:         12.5px; /* عناوين الحقول */
-  --aq-fs-kpi:           30px;   /* أرقام المؤشرات */
-  --aq-fs-table:         13px;   /* نص الجداول */
+  --aq-fs-small:         13px;   /* نص صغير / جداول */
+  --aq-fs-table:         var(--aq-fs-small);
   --aq-fs-button:        13.5px; /* الأزرار */
+  --aq-fs-input:         var(--aq-fs-body);
+  --aq-fs-body:          14px;   /* النص الأساسي */
+  --aq-fs-body-lg:       15px;   /* نص بارز */
+  --aq-fs-card-title:    16px;   /* عنوان الكارت */
+  --aq-fs-title-sm:      18px;   /* عنوان فرعي */
+  --aq-fs-section-title: 20px;   /* عنوان القسم */
+  --aq-fs-title-lg:      22px;   /* عنوان بارز (هيدر الموقع) */
+  --aq-fs-page-title:    26px;   /* عنوان الصفحة */
+  --aq-fs-kpi:           30px;   /* أرقام المؤشرات */
+  --aq-fs-hero:          32px;   /* عنوان الغلاف */
+  --aq-fs-display:       40px;   /* أرقام/عناوين عرض */
   --aq-lh-tight: 1.25;
   --aq-lh-body: 1.65;
   --aq-fw-regular: 400;
@@ -75,49 +176,59 @@
   --aq-fw-bold: 700;
   --aq-fw-black: 800;
 
-  /* ------------------------------------------------------------------
+  /* ==================================================================
    * RADIUS / SHADOWS / MOTION — Premium = ارتفاع خفيف وحدود مصقولة.
-   * ------------------------------------------------------------------ */
-  --aq-radius-sm: var(--radius-sm, 8px);
-  --aq-radius-md: var(--radius-md, 13px);
-  --aq-radius-lg: var(--radius-lg, 16px);
+   * ================================================================== */
+  --aq-radius-xs:   6px;
+  --aq-radius-sm:   var(--radius-sm, 8px);
+  --aq-radius-md:   var(--radius-md, 13px);
+  --aq-radius-lg:   var(--radius-lg, 16px);
+  --aq-radius-card: var(--aq-radius-md);
   --aq-radius-pill: 999px;
-  --aq-shadow-1: 0 1px 3px rgba(4,12,22,0.10);              /* حد أدنى */
-  --aq-shadow-2: 0 4px 14px rgba(4,12,22,0.16);             /* كروت */
-  --aq-shadow-3: var(--shadow-soft, 0 10px 30px rgba(0,0,0,0.18)); /* عائم */
+
+  --aq-shadow-subtle:   0 1px 3px rgba(4,12,22,0.10);
+  --aq-shadow-card:     var(--shadow-card, 0 6px 20px rgba(4,12,22,0.26));
+  --aq-shadow-elevated: var(--shadow-soft, 0 10px 30px rgba(0,0,0,0.18));
+  --aq-shadow-overlay:  0 -8px 28px rgba(0,0,0,0.28);
+  /* أسماء 2A (تبقى صالحة) */
+  --aq-shadow-1: var(--aq-shadow-subtle);
+  --aq-shadow-2: 0 4px 14px rgba(4,12,22,0.16);
+  --aq-shadow-3: var(--aq-shadow-elevated);
+
   --aq-ease: var(--ease, 180ms ease);
   --aq-motion-fast: 150ms;
   --aq-motion-base: 200ms;
   --aq-motion-slow: 250ms;
 
-  /* ------------------------------------------------------------------
+  /* ==================================================================
    * Z-INDEX MAP — خريطة الطبقات الموحّدة للمنصة.
    * الاصطلاح القائم (لا يُغيَّر): المودالات 1600 · كارت فوق المشابهة 1650 · اللايتبوكس 1700.
-   * طبقات الـ Shell أدناه دائمًا تحت المودالات.
-   * ------------------------------------------------------------------ */
+   * ================================================================== */
   --aq-z-base: 1;
   --aq-z-sticky: 100;
   --aq-z-shell-overlay: 900;   /* خلفية drawer الموبايل */
   --aq-z-shell-sidebar: 910;
   --aq-z-shell-header: 920;
+  --aq-z-dash-backdrop: 1390;  /* drawer لوحة التحكم الداخلي (قائم) */
+  --aq-z-dash-drawer: 1400;
   --aq-z-toast: 1500;
   --aq-z-modal: 1600;
   --aq-z-overlay-card: 1650;
   --aq-z-lightbox: 1700;
 
-  /* ------------------------------------------------------------------
+  /* ==================================================================
    * SHELL DIMENSIONS + CONTAINERS
-   * ------------------------------------------------------------------ */
+   * ================================================================== */
   --aq-header-h: 60px;
   --aq-sidebar-w: 250px;
   --aq-sidebar-w-collapsed: 72px;   /* محجوز لطور مستقبلي */
   --aq-container-max: var(--app-max, 1720px);
   --aq-content-pad: var(--aq-space-5);
 
-  /* ------------------------------------------------------------------
-   * BREAKPOINTS (توثيقي — تُستخدم كقيم حرفية في @media):
-   *   --aq-bp-mobile:  640px   (هاتف)
-   *   --aq-bp-tablet:  1024px  (تابلت / drawer mode)
-   *   --aq-bp-desktop: 1280px  (مكتب)
-   * ------------------------------------------------------------------ */
+  /* ==================================================================
+   * BREAKPOINTS (توثيقي — تُستخدم كقيم حرفية في @media). ثلاث درجات فقط:
+   *   xs ≤ 420px  (هاتف صغير — تكديس كامل)
+   *   sm ≤ 640px  (هاتف)
+   *   md ≤ 1024px (تابلت / drawer mode للشل ولوحة التحكم)
+   * ================================================================== */
 }

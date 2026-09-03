@@ -104,6 +104,34 @@
          طويلة على الشاشات فائقة العرض، وبيصغّر تلقائيًا مع المنافذ الأضيق. */
       --app-max: 1720px;
     }
+
+    /* ======================================================================
+     * Phase 2B — SHARED COMPONENT BASE (additive · low specificity)
+     * قواعد أساس موحّدة ترثها العائلات القائمة دون إعادة تسمية أي class/id.
+     * تُوضع أول البلوك عمدًا: أي قاعدة قديمة أدناه تغلبها بالترتيب/الـ specificity.
+     * ==================================================================== */
+    /* أزرار: حالة disabled موحّدة لكل عائلات الأزرار القائمة */
+    :where(button, .top-action-btn, .fav-btn, .pdf-btn, .whatsapp-btn, .edit-btn, .icon-action-btn,
+           .ai-extract-btn, .toggle-details-btn, .images-choose-btn, .small-btn, .dash-nav-item,
+           .um-primary, .um-add-toggle, .close-panel):disabled,
+    :where(button)[aria-disabled="true"] { opacity: 0.55; cursor: not-allowed; }
+    /* حقول: أساس مشترك (خط/حجم/زوايا/انتقال) — القواعد القديمة المحددة تغلبه */
+    :where(#mainContainer, #loginGate) :where(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]), select, textarea) {
+      font-family: inherit; font-size: var(--aq-fs-input); border-radius: var(--aq-radius-sm);
+      transition: border-color var(--aq-motion-base), box-shadow var(--aq-motion-base), background-color var(--aq-motion-base);
+    }
+    :where(#mainContainer) :where(input, select, textarea):disabled { opacity: 0.6; cursor: not-allowed; }
+    :where(#mainContainer) :where(input, textarea)[readonly] { opacity: 0.85; }
+    /* عناصر تنقل اللوحة: نفس حالات تنقل الشل (focus) */
+    .dash-nav-item:focus-visible, .top-action-btn:focus-visible { outline: var(--aq-focus-outline); outline-offset: 2px; }
+    /* RTL/BIDI: عزل العناصر الرقمية/اللاتينية (أكواد، أسعار، مؤشرات) عن تأثير الجيران — بلا فرض اتجاه */
+    .unit-id, .unit-price-box .final-price, .unit-price-box .old-price, .unit-price-box .per-meter,
+    .kpi-value, .prov-views, .prov-added, .unit-added, .um-sub, .resale-value, .calc-result-row .val,
+    .price-drop-badge { unicode-bidi: isolate; }
+    .kpi-value, .unit-price-box .final-price, .calc-result-row .val, .compare-table td { font-variant-numeric: tabular-nums; }
+    /* Skeleton قديم: نفس إيقاع shimmer الهادئ للنظام */
+    .skeleton-card .skel { animation-duration: 1.4s; }
+
     * { box-sizing: border-box; }
     button, input, select, textarea, optgroup, option {
       font-family: inherit;
@@ -147,7 +175,7 @@
       backdrop-filter: blur(4px);
     }
     .container { max-width: var(--app-max); margin: 0 auto; }
-    h1 { font-size: 20px; color: var(--text-light); font-weight: 700; margin: 6px 0 20px; }
+    h1 { font-size:  var(--aq-fs-section-title); color: var(--text-light); font-weight: 700; margin: 6px 0 20px; }
 
     /* ===== page heading block ===== */
     .site-header {
@@ -162,7 +190,7 @@
     }
     .site-header h1 {
       flex: none;
-      font-size: 21px;
+      font-size:  var(--aq-fs-title-lg);
       font-weight: 700;
       color: var(--text-light);
       margin: 0;
@@ -173,8 +201,8 @@
     .site-tagline {
       flex: 1 1 auto;
       min-width: 0;
-      font-size: 12.5px;
-      color: rgba(234,240,246,0.68);
+      font-size:  var(--aq-fs-label);
+      color: var(--aq-text-tertiary);
       margin: 0;
       line-height: 1.6;
       max-width: 620px;
@@ -193,17 +221,17 @@
     }
     .ai-search-head { display: inline-flex; align-items: center; gap: 8px; margin: 0; vertical-align: baseline; }
     .ai-search-head .ico { width: 15px; height: 15px; color: var(--gold-soft); flex: none; }
-    .ai-search-head span { font-size: 14px; font-weight: 700; color: var(--text-light); }
-    .ai-search-desc { display: inline; font-size: 11.5px; color: var(--text-muted); margin: 0; padding-right: 10px; line-height: 1.6; }
+    .ai-search-head span { font-size:  var(--aq-fs-body); font-weight: 700; color: var(--text-light); }
+    .ai-search-desc { display: inline; font-size:  var(--aq-fs-caption-sm); color: var(--text-muted); margin: 0; padding-right: 10px; line-height: 1.6; }
     .ai-search-row { display: flex; gap: 8px; margin-top: 10px; }
     #nlSearchInput {
       flex: 1;
       padding: 11px 14px;
-      border: 1px solid rgba(201,154,46,0.22);
+      border: 1px solid var(--aq-accent-tint-3);
       border-radius: var(--radius-sm);
-      font-size: 14px;
+      font-size:  var(--aq-fs-body);
       font-family: inherit;
-      background: rgba(255,255,255,0.05);
+      background: var(--aq-bg-muted-2);
       color: var(--text-light);
       transition: border-color var(--ease), box-shadow var(--ease), background-color var(--ease);
     }
@@ -211,8 +239,8 @@
     #nlSearchInput:focus {
       outline: none;
       border-color: var(--gold);
-      box-shadow: 0 0 0 3px rgba(201,154,46,0.16);
-      background: rgba(255,255,255,0.07);
+      box-shadow: var(--aq-focus-ring);
+      background: var(--aq-bg-muted-3);
     }
     #nlSearchBtn {
       padding: 11px 22px;
@@ -221,17 +249,17 @@
       background: var(--navy);
       color: var(--gold-soft);
       font-weight: 700;
-      font-size: 13px;
+      font-size:  var(--aq-fs-small);
       cursor: pointer;
       white-space: nowrap;
       transition: background-color var(--ease), border-color var(--ease), transform var(--ease);
     }
-    #nlSearchBtn:hover { background: var(--navy-deep); border-color: rgba(201,154,46,0.5); transform: translateY(-1px); }
-    #nlSearchMsg { font-size: 12px; margin-top: 10px; font-weight: 600; display: none; }
+    #nlSearchBtn:hover { background: var(--navy-deep); border-color: var(--aq-border-accent-strong); transform: translateY(-1px); }
+    #nlSearchMsg { font-size:  var(--aq-fs-caption); margin-top: 10px; font-weight: 600; display: none; }
     /* JS writes inline color: var(--error-fg)/var(--success-fg) (tuned for light surfaces);
        on this dark console force readable tints — inline style otherwise wins */
-    #nlSearchMsg[style*="error-fg"] { color: #E9908A !important; }
-    #nlSearchMsg[style*="success-fg"] { color: #7FD3A3 !important; }
+    #nlSearchMsg[style*="error-fg"] { color: var(--aq-danger-soft) !important; }
+    #nlSearchMsg[style*="success-fg"] { color: var(--aq-success-soft) !important; }
 
     /* structured filter panel — dark navy glass, sibling of the AI console */
     .filters-card {
@@ -249,15 +277,15 @@
     .filters-card select {
       background: var(--input-dark);
       color: var(--text-light);
-      border: 1px solid rgba(255,255,255,0.12);
+      border: 1px solid var(--aq-border-strong);
     }
     .filters-card select { color-scheme: dark; }
     .filters-card input::placeholder { color: var(--text-muted); }
     .filters-card input:focus,
     .filters-card select:focus {
       border-color: var(--gold);
-      box-shadow: 0 0 0 3px rgba(201,154,46,0.16);
-      background: rgba(27,52,74,0.78);
+      box-shadow: var(--aq-focus-ring);
+      background: var(--aq-bg-input-focus);
     }
     .grid {
       display: grid;
@@ -266,7 +294,7 @@
     }
     label {
       display: block;
-      font-size: 11px;
+      font-size:  var(--aq-fs-caption-sm);
       font-weight: 700;
       letter-spacing: 0.4px;
       text-transform: uppercase;
@@ -278,17 +306,17 @@
       padding: 9px 11px;
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      font-size: 13px;
+      font-size:  var(--aq-fs-small);
       font-family: inherit;
       background: var(--white);
       color: var(--text);
       transition: border-color var(--ease), box-shadow var(--ease);
     }
-    input::placeholder { color: #A9B2BD; }
+    input::placeholder { color: var(--aq-text-placeholder); }
     input:focus, select:focus {
       outline: none;
       border-color: var(--gold);
-      box-shadow: 0 0 0 3px rgba(201,154,46,0.16);
+      box-shadow: var(--aq-focus-ring);
       background: var(--white);
     }
     .btn-row { margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
@@ -296,7 +324,7 @@
       padding: 10px 20px;
       border: none;
       border-radius: var(--radius-sm);
-      font-size: 13px;
+      font-size:  var(--aq-fs-small);
       font-weight: 700;
       letter-spacing: 0.2px;
       cursor: pointer;
@@ -307,13 +335,13 @@
       background: var(--navy); color: var(--gold-soft);
       border: 1px solid var(--border-gold); padding: 10px 28px;
     }
-    #searchBtn:hover { background: var(--navy-deep); border-color: rgba(201,154,46,0.5); transform: translateY(-1px); }
-    #clearBtn { background: rgba(255,255,255,0.06); color: var(--text-light); border: 1px solid rgba(255,255,255,0.14); }
-    #clearBtn:hover { background: rgba(255,255,255,0.1); }
+    #searchBtn:hover { background: var(--navy-deep); border-color: var(--aq-border-accent-strong); transform: translateY(-1px); }
+    #clearBtn { background: var(--aq-bg-muted-2); color: var(--text-light); border: 1px solid var(--aq-border-strong); }
+    #clearBtn:hover { background: var(--aq-border-dark); }
     .fav-toggle-btn { background: transparent; color: var(--gold-soft); border: 1px solid var(--border-gold); }
     .fav-toggle-btn:hover { background: rgba(201,154,46,0.12); }
     .fav-toggle-btn.active { background: var(--navy); color: var(--gold-soft); border-color: var(--gold); }
-    #resultsCount { font-size: 12px; color: rgba(234,240,246,0.72); margin: 10px 2px; font-weight: 600; letter-spacing: 0.3px; }
+    #resultsCount { font-size:  var(--aq-fs-caption); color: var(--aq-text-tertiary); margin: 10px 2px; font-weight: 600; letter-spacing: 0.3px; }
     .results-grid {
       display: grid;
       /* auto-fill + minmax: عدد الكروت في الصف بيزيد تلقائيًا مع عرض الحاوية.
@@ -334,8 +362,8 @@
       background: var(--glass-card);
       -webkit-backdrop-filter: blur(12px);
       backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-right: 2px solid rgba(201,154,46,0.5);
+      border: 1px solid var(--aq-border-strong);
+      border-right: 2px solid var(--aq-border-accent-strong);
       border-radius: var(--radius-md);
       padding: 18px;
       /* السبب الجذري لطفح الموبايل: عنصر الشبكة افتراضيًا min-width:auto، فالعناوين
@@ -361,20 +389,20 @@
       border: 1px solid var(--line-dark);
       background: rgba(6,19,33,0.55);
       -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
-      color: rgba(234,240,246,0.45); font-size: 16px;
+      color: rgba(234,240,246,0.45); font-size:  var(--aq-fs-card-title);
       cursor: pointer; display: flex; align-items: center; justify-content: center;
       transition: transform var(--ease), color var(--ease), border-color var(--ease);
     }
     .fav-btn:hover { transform: scale(1.1); border-color: var(--border-gold); }
     .fav-btn.active { color: var(--gold); border-color: var(--border-gold); }
     .price-drop-badge {
-      background: rgba(30,110,69,0.92); color: #EAF7EF; font-size: 11px; font-weight: 700;
+      background: var(--aq-success-solid-bg); color: var(--aq-success-solid-fg); font-size:  var(--aq-fs-caption-sm); font-weight: 700;
       letter-spacing: 0.2px; padding: 6px 12px; text-align: center;
     }
-    .price-drop-badge.price-up-badge { background: rgba(176,39,31,0.92); color: #FBEAEA; }
+    .price-drop-badge.price-up-badge { background: var(--aq-danger-solid-bg); color: var(--aq-danger-solid-fg); }
     .compare-checkbox {
       position: absolute; top: 12px; right: 12px; z-index: 5;
-      width: 26px; height: 26px; border-radius: 7px;
+      width: 26px; height: 26px; border-radius:  var(--aq-radius-xs);
       border: 1px solid var(--line-dark);
       background: rgba(6,19,33,0.55);
       -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
@@ -407,22 +435,22 @@
     .unit-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .unit-cover .img-count-badge {
       position: absolute; bottom: 8px; left: 8px; z-index: 2;
-      background: rgba(6,19,33,0.7); color: var(--text-light); font-size: 11px; font-weight: 600;
+      background: rgba(6,19,33,0.7); color: var(--text-light); font-size:  var(--aq-fs-caption-sm); font-weight: 600;
       border: 1px solid var(--line-dark);
-      padding: 3px 10px; border-radius: 999px;
+      padding: 3px 10px; border-radius:  var(--aq-radius-pill);
     }
 
     /* زرار مشاركة واتساب وزرار تحميل PDF */
     .whatsapp-btn {
-      background: #4FA579; color: #fff; padding: 8px 10px; font-size: 12px; font-weight: 700;
-      border-radius: 7px; white-space: nowrap; flex: 1;
+      background: var(--aq-success); color: var(--aq-white); padding: 8px 10px; font-size:  var(--aq-fs-caption); font-weight: 700;
+      border-radius:  var(--aq-radius-xs); white-space: nowrap; flex: 1;
       display: flex; align-items: center; justify-content: center; gap: 6px;
     }
-    .whatsapp-btn:hover { background: #46946c; }
+    .whatsapp-btn:hover { background: var(--aq-success-strong); }
     .whatsapp-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
     .pdf-btn {
-      background: var(--navy); color: #fff; padding: 8px 10px; font-size: 12px; font-weight: 700;
-      border-radius: 7px; white-space: nowrap; flex: 1;
+      background: var(--navy); color: var(--aq-white); padding: 8px 10px; font-size:  var(--aq-fs-caption); font-weight: 700;
+      border-radius:  var(--aq-radius-xs); white-space: nowrap; flex: 1;
     }
     .pdf-btn:hover { opacity: 0.9; }
     .pdf-btn:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -433,15 +461,15 @@
       z-index: 1700; align-items: center; justify-content: center; padding: 20px;
     }
     .lightbox-overlay.open { display: flex; }
-    .lightbox-overlay img { max-width: 90vw; max-height: 80vh; border-radius: 10px; }
+    .lightbox-overlay img { max-width: 90vw; max-height: 80vh; border-radius:  var(--aq-radius-sm); }
     .lightbox-close {
-      position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.15); color: #fff;
-      border: none; width: 38px; height: 38px; border-radius: 50%; font-size: 18px; cursor: pointer;
+      position: absolute; top: 20px; left: 20px; background: var(--aq-bg-muted-4); color: var(--aq-white);
+      border: none; width: 38px; height: 38px; border-radius: 50%; font-size:  var(--aq-fs-title-sm); cursor: pointer;
     }
     .lightbox-nav {
       position: absolute; top: 50%; transform: translateY(-50%);
-      background: rgba(255,255,255,0.15); color: #fff; border: none;
-      width: 44px; height: 44px; border-radius: 50%; font-size: 20px; cursor: pointer;
+      background: var(--aq-bg-muted-4); color: var(--aq-white); border: none;
+      width: 44px; height: 44px; border-radius: 50%; font-size:  var(--aq-fs-section-title); cursor: pointer;
     }
     .lightbox-prev { right: 20px; }
     .lightbox-next { left: 20px; }
@@ -457,29 +485,29 @@
     .unit-card-overlay.open { display: flex; }
     .unit-card-overlay-box { position: relative; width: 100%; max-width: 380px; }
     .unit-card-overlay-close {
-      position: absolute; top: -46px; left: 0; background: rgba(255,255,255,0.15); color: #fff;
-      border: none; width: 38px; height: 38px; border-radius: 50%; font-size: 18px; cursor: pointer;
+      position: absolute; top: -46px; left: 0; background: var(--aq-bg-muted-4); color: var(--aq-white);
+      border: none; width: 38px; height: 38px; border-radius: 50%; font-size:  var(--aq-fs-title-sm); cursor: pointer;
     }
     .unit-card-overlay-close:hover { background: rgba(255,255,255,0.28); }
 
-    .unit-id { font-size: 12px; color: var(--text-muted); font-weight: 700; letter-spacing: 0.4px; }
+    .unit-id { font-size:  var(--aq-fs-caption); color: var(--text-muted); font-weight: 700; letter-spacing: 0.4px; }
     .unit-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 2px 0 12px; padding: 2px 38px 0 44px; }
     .status-badge {
-      font-size: 11px; padding: 3px 9px; border-radius: 6px; font-weight: 800; letter-spacing: 0; line-height: 1.35;
-      background: rgba(30,110,69,0.16); color: #7FD3A3; border: 1px solid rgba(30,110,69,0.32);
+      font-size:  var(--aq-fs-caption-sm); padding: 3px 9px; border-radius:  var(--aq-radius-xs); font-weight: 800; letter-spacing: 0; line-height: 1.35;
+      background: var(--aq-success-tint); color: var(--aq-success-soft); border: 1px solid var(--aq-success-border);
     }
-    .status-badge.محجوز { background: rgba(201,154,46,0.16); color: var(--gold-soft); border-color: rgba(201,154,46,0.35); }
-    .status-badge.مباع { background: rgba(176,39,31,0.16); color: #E9908A; border-color: rgba(176,39,31,0.35); }
-    .unit-title { font-size: 15.5px; font-weight: 700; letter-spacing: 0; line-height: 1.4; margin-bottom: 5px; color: var(--text-light); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .unit-loc { font-size: 12px; color: rgba(234,240,246,0.9); font-weight: 600; line-height: 1.5; margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .unit-added { font-size: 11px; color: rgba(234,240,246,0.78); letter-spacing: 0; line-height: 1.5; margin-bottom: 12px; }
+    .status-badge.محجوز { background: rgba(201,154,46,0.16); color: var(--gold-soft); border-color: var(--aq-accent-tint-4); }
+    .status-badge.مباع { background: var(--aq-danger-tint); color: var(--aq-danger-soft); border-color: var(--aq-danger-border); }
+    .unit-title { font-size: var(--aq-fs-card-title); font-weight: 700; letter-spacing: 0; line-height: 1.4; margin-bottom: 5px; color: var(--text-light); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .unit-loc { font-size:  var(--aq-fs-caption); color: rgba(234,240,246,0.9); font-weight: 600; line-height: 1.5; margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .unit-added { font-size:  var(--aq-fs-caption-sm); color: var(--aq-text-secondary); letter-spacing: 0; line-height: 1.5; margin-bottom: 12px; }
     .unit-info-block { min-height: 132px; }
-    .unit-specs { display: flex; flex-wrap: wrap; gap: 7px; font-size: 12px; margin-bottom: 12px; min-height: 58px; align-content: flex-start; }
+    .unit-specs { display: flex; flex-wrap: wrap; gap: 7px; font-size:  var(--aq-fs-caption); margin-bottom: 12px; min-height: 58px; align-content: flex-start; }
     .spec-chip {
       display: inline-flex; align-items: center;
       background: rgba(201,154,46,0.12); color: var(--gold-soft);
-      border: 1px solid rgba(201,154,46,0.22);
-      padding: 4px 9px; border-radius: 6px; font-weight: 600; font-size: 11px;
+      border: 1px solid var(--aq-accent-tint-3);
+      padding: 4px 9px; border-radius:  var(--aq-radius-xs); font-weight: 600; font-size:  var(--aq-fs-caption-sm);
     }
     .unit-price-box {
       background: linear-gradient(155deg, var(--navy-soft) 0%, var(--navy-deep) 100%);
@@ -489,13 +517,13 @@
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       text-align: center; overflow: hidden;
     }
-    .unit-price-box .old-price { text-decoration: line-through; color: rgba(234,240,246,0.58); font-size: 12px; font-weight: 600; line-height: 1.4; }
+    .unit-price-box .old-price { text-decoration: line-through; color: var(--aq-text-disabled); font-size:  var(--aq-fs-caption); font-weight: 600; line-height: 1.4; }
     .unit-price-box .discount-tag {
-      background: var(--gold); color: var(--navy-deep); font-size: 11px; font-weight: 800;
-      padding: 2px 10px; border-radius: 999px; margin-right: 8px; line-height: 1.6;
+      background: var(--gold); color: var(--navy-deep); font-size:  var(--aq-fs-caption-sm); font-weight: 800;
+      padding: 2px 10px; border-radius:  var(--aq-radius-pill); margin-right: 8px; line-height: 1.6;
     }
-    .unit-price-box .final-price { font-size: 21px; font-weight: 800; color: var(--gold-soft); letter-spacing: 0.2px; margin-top: 2px; line-height: 1.3; }
-    .unit-price-box .per-meter { font-size: 12px; font-weight: 600; color: rgba(234,240,246,0.82); margin-top: 3px; line-height: 1.4; }
+    .unit-price-box .final-price { font-size:  var(--aq-fs-title-lg); font-weight: 800; color: var(--gold-soft); letter-spacing: 0.2px; margin-top: 2px; line-height: 1.3; }
+    .unit-price-box .per-meter { font-size:  var(--aq-fs-caption); font-weight: 600; color: var(--aq-text-secondary); margin-top: 3px; line-height: 1.4; }
 
     /* كارت الوضع المالي الحالي لوحدات الريسيل */
     .resale-current-box {
@@ -503,24 +531,24 @@
       border: 1px solid rgba(30,110,69,0.4);
       border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 8px;
     }
-    .resale-box-title { font-size: 12px; font-weight: 800; letter-spacing: 0.3px; color: var(--text-light); margin-bottom: 8px; }
+    .resale-box-title { font-size:  var(--aq-fs-caption); font-weight: 800; letter-spacing: 0.3px; color: var(--text-light); margin-bottom: 8px; }
     .resale-row-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; }
     .resale-item { display: flex; flex-direction: column; gap: 1px; }
-    .resale-current-box .resale-label { font-size: 10.5px; color: rgba(234,240,246,0.82); }
-    .resale-current-box .resale-value { font-size: 13px; font-weight: 800; color: var(--text-light); }
+    .resale-current-box .resale-label { font-size: var(--aq-fs-caption-sm); color: var(--aq-text-secondary); }
+    .resale-current-box .resale-value { font-size:  var(--aq-fs-small); font-weight: 800; color: var(--text-light); }
     .resale-current-box .resale-item.highlight .resale-value { color: var(--gold-soft); }
     .toggle-details-btn {
-      width: 100%; background: rgba(255,255,255,0.05); color: var(--gold-soft);
+      width: 100%; background: var(--aq-bg-muted-2); color: var(--gold-soft);
       border: 1px solid var(--line-dark); border-radius: var(--radius-sm);
-      padding: 9px; font-size: 12px; font-weight: 600; cursor: pointer; margin-top: 10px;
+      padding: 9px; font-size:  var(--aq-fs-caption); font-weight: 600; cursor: pointer; margin-top: 10px;
       display: flex; align-items: center; justify-content: center; gap: 6px;
       transition: background-color var(--ease), border-color var(--ease);
     }
     .toggle-details-btn:hover { background: rgba(255,255,255,0.09); border-color: var(--border-gold); }
-    .toggle-details-btn .chevron { transition: transform .2s; font-size: 10px; }
+    .toggle-details-btn .chevron { transition: transform .2s; font-size:  var(--aq-fs-micro); }
     .toggle-details-btn.open .chevron { transform: rotate(180deg); }
     .unit-extra {
-      font-size: 12px; color: rgba(234,240,246,0.82); line-height: 1.8;
+      font-size:  var(--aq-fs-caption); color: var(--aq-text-secondary); line-height: 1.8;
       margin-top: 9px;
       padding: 11px 13px; border-radius: var(--radius-sm);
       background: rgba(6,19,33,0.45);
@@ -548,12 +576,12 @@
        cards are a single column and there is nothing to align against. */
     .card-actions-bottom { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line-dark); min-height: 176px; }
     .status-select {
-      flex: 1; padding: 8px 10px; font-size: 12px; font-weight: 600; border-radius: var(--radius-sm);
+      flex: 1; padding: 8px 10px; font-size:  var(--aq-fs-caption); font-weight: 600; border-radius: var(--radius-sm);
       background: rgba(6,19,33,0.55); color: var(--text-light); border: 1px solid var(--line-dark);
       color-scheme: dark;
     }
     .edit-btn {
-      padding: 8px 14px; font-size: 12px; font-weight: 700; border-radius: var(--radius-sm);
+      padding: 8px 14px; font-size:  var(--aq-fs-caption); font-weight: 700; border-radius: var(--radius-sm);
       background: var(--navy); color: var(--gold-soft); border: 1px solid var(--border-gold); white-space: nowrap;
     }
     .edit-btn:hover { background: var(--navy-deep); }
@@ -570,11 +598,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 11px;
+      font-size:  var(--aq-fs-caption-sm);
       font-weight: 600;
       letter-spacing: 0.2px;
       color: rgba(234,240,246,0.9);
-      background: rgba(255,255,255,0.05);
+      background: var(--aq-bg-muted-2);
       cursor: pointer;
       transition: background-color var(--ease), border-color var(--ease), color var(--ease), transform var(--ease);
       flex: 1;
@@ -584,50 +612,50 @@
       text-overflow: ellipsis;
       padding: 0 4px;
     }
-    .icon-action-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--border-gold); color: var(--gold-soft); transform: translateY(-1px); }
+    .icon-action-btn:hover { background: var(--aq-border-dark); border-color: var(--border-gold); color: var(--gold-soft); transform: translateY(-1px); }
     .share-img-row-btn {
       width: 100%;
       margin-top: 6px;
       height: 36px;
       border-radius: var(--radius-sm);
       border: 1px solid var(--line-dark);
-      font-size: 11px;
+      font-size:  var(--aq-fs-caption-sm);
       font-weight: 600;
       letter-spacing: 0.2px;
       color: rgba(234,240,246,0.9);
-      background: rgba(255,255,255,0.05);
+      background: var(--aq-bg-muted-2);
       cursor: pointer;
       transition: background-color var(--ease), border-color var(--ease), color var(--ease), transform var(--ease);
       padding: 0 8px;
       white-space: nowrap;
     }
-    .share-img-row-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--border-gold); color: var(--gold-soft); transform: translateY(-1px); }
-    .loading, .empty { text-align: center; padding: 50px; color: var(--text-muted); font-size: 14px; }
+    .share-img-row-btn:hover { background: var(--aq-border-dark); border-color: var(--border-gold); color: var(--gold-soft); transform: translateY(-1px); }
+    .loading, .empty { text-align: center; padding: 50px; color: var(--text-muted); font-size:  var(--aq-fs-body); }
 
     /* Skeleton Loading */
     .skeleton-card {
       cursor: default;
-      border: 1px solid rgba(255,255,255,0.14);
-      border-right: 1px solid rgba(255,255,255,0.14);
+      border: 1px solid var(--aq-border-strong);
+      border-right: 1px solid var(--aq-border-strong);
       box-shadow: none;
-      background: rgba(255,255,255,0.07);
+      background: var(--aq-bg-muted-3);
       backdrop-filter: blur(2px);
       -webkit-backdrop-filter: blur(2px);
     }
     .skel {
-      background: linear-gradient(90deg, rgba(255,255,255,0.10) 25%, rgba(255,255,255,0.22) 37%, rgba(255,255,255,0.10) 63%);
+      background: linear-gradient(90deg, var(--aq-border-dark) 25%, rgba(255,255,255,0.22) 37%, var(--aq-border-dark) 63%);
       background-size: 400% 100%;
       animation: skel-shimmer 1.4s ease infinite;
-      border-radius: 6px;
+      border-radius:  var(--aq-radius-xs);
       margin-bottom: 10px;
     }
-    .skel-cover { height: 160px; margin: -18px -18px 14px; border-radius: 14px 14px 0 0; }
+    .skel-cover { height: 160px; margin: -18px -18px 14px; border-radius:  var(--aq-radius-md) var(--aq-radius-md) 0 0; }
     .skel-line { height: 12px; }
     /* شريط الـ chips الوهمية (مكان مواصفات الوحدة زي المساحة والغرف) */
     .skel-chip-row { display: flex; gap: 8px; margin-bottom: 10px; }
-    .skel-chip { width: 64px; height: 24px; border-radius: 6px; margin-bottom: 0; }
+    .skel-chip { width: 64px; height: 24px; border-radius:  var(--aq-radius-xs); margin-bottom: 0; }
     /* صندوق وهمي مكان صندوق السعر (الكبير) أو صف الأزرار السفلي (الأصغر بارتفاع مخصص inline) */
-    .skel-box { width: 100%; height: 108px; border-radius: 12px; }
+    .skel-box { width: 100%; height: 108px; border-radius:  var(--aq-radius-md); }
     @keyframes skel-shimmer {
       0% { background-position: 100% 50%; }
       100% { background-position: 0 50%; }
@@ -645,12 +673,12 @@
       border-radius: var(--radius-md);
       box-shadow: var(--shadow-card);
     }
-    .empty-state .icon { font-size: 40px; margin-bottom: 14px; opacity: 0.85; }
-    .empty-state h3 { font-size: 15px; color: var(--text-light); font-weight: 700; margin-bottom: 8px; }
-    .empty-state p { font-size: 13px; color: var(--text-muted); margin-bottom: 18px; line-height: 1.8; }
+    .empty-state .icon { font-size:  var(--aq-fs-display); margin-bottom: 14px; opacity: 0.85; }
+    .empty-state h3 { font-size:  var(--aq-fs-body-lg); color: var(--text-light); font-weight: 700; margin-bottom: 8px; }
+    .empty-state p { font-size:  var(--aq-fs-small); color: var(--text-muted); margin-bottom: 18px; line-height: 1.8; }
     .empty-state button {
       background: var(--navy); color: var(--gold-soft); border: 1px solid var(--border-gold);
-      padding: 10px 22px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 700; cursor: pointer;
+      padding: 10px 22px; border-radius: var(--radius-sm); font-size:  var(--aq-fs-small); font-weight: 700; cursor: pointer;
     }
     .empty-state button:hover { background: var(--navy-deep); }
 
@@ -663,13 +691,13 @@
       background: var(--glass-strong); color: var(--text-light); padding: 12px 18px;
       border: 1px solid var(--line-dark); border-radius: var(--radius-sm);
       -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
-      font-size: 13px; font-weight: 600; box-shadow: var(--shadow-soft);
+      font-size:  var(--aq-fs-small); font-weight: 600; box-shadow: var(--shadow-soft);
       opacity: 0; transform: translateY(10px); transition: opacity .25s, transform .25s;
       max-width: 320px;
     }
     .toast.show { opacity: 1; transform: translateY(0); }
     .toast-success { background: rgba(30,110,69,0.95); border-color: rgba(30,110,69,0.6); }
-    .toast-error { background: rgba(176,39,31,0.95); border-color: rgba(176,39,31,0.6); }
+    .toast-error { background: rgba(176,39,31,0.95); border-color: var(--aq-danger-border-strong); }
     .toast-warn { background: rgba(122,86,0,0.95); border-color: rgba(122,86,0,0.6); }
     .toast-info { background: var(--glass-strong); }
 
@@ -685,7 +713,7 @@
       background: var(--glass-strong);
       -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
       color: var(--gold-soft);
-      font-size: 17px;
+      font-size:  var(--aq-fs-title-sm);
       font-weight: 700;
       cursor: pointer;
       box-shadow: var(--shadow-soft);
@@ -703,18 +731,18 @@
       border-top: 1px solid var(--border-gold);
       -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
       display: none; align-items: center; justify-content: center; gap: 16px;
-      box-shadow: 0 -8px 28px rgba(0,0,0,0.28); font-size: 14px; font-weight: 600;
+      box-shadow:  var(--aq-shadow-overlay); font-size:  var(--aq-fs-body); font-weight: 600;
     }
     .compare-bar.open { display: flex; }
     .compare-bar button {
-      border: none; border-radius: var(--radius-sm); padding: 9px 20px; font-size: 13px; font-weight: 700; cursor: pointer;
+      border: none; border-radius: var(--radius-sm); padding: 9px 20px; font-size:  var(--aq-fs-small); font-weight: 700; cursor: pointer;
     }
     #compareGoBtn { background: var(--gold); color: var(--navy-deep); }
-    #compareGoBtn:disabled { background: rgba(255,255,255,0.12); color: rgba(234,240,246,0.5); cursor: not-allowed; }
+    #compareGoBtn:disabled { background: var(--aq-border-strong); color: var(--aq-text-disabled); cursor: not-allowed; }
     .compare-bar .clear-link { background: transparent; color: var(--text-muted); text-decoration: underline; }
 
     /* جدول المقارنة — dark navy surface, explicit light text so data stays readable */
-    .compare-table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+    .compare-table { width: 100%; border-collapse: collapse; font-size:  var(--aq-fs-small); table-layout: fixed; }
     .compare-table th, .compare-table td {
       padding: 11px 12px; text-align: center; border: 1px solid var(--line-dark);
       white-space: normal; word-break: break-word; overflow-wrap: break-word;
@@ -725,7 +753,7 @@
       border-color: var(--border-gold);
     }
     .compare-table td.row-label {
-      background: rgba(255,255,255,0.05); color: var(--gold-soft);
+      background: var(--aq-bg-muted-2); color: var(--gold-soft);
       font-weight: 700; text-align: right; white-space: normal; word-break: break-word;
     }
     .compare-table img { border: 1px solid var(--line-dark); }
@@ -736,12 +764,12 @@
     }
     .calc-result-row {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text);
+      padding: 9px 0; border-bottom: 1px solid var(--border); font-size:  var(--aq-fs-small); color: var(--text);
     }
     .calc-result-row:last-child { border-bottom: none; }
-    .calc-result-row b { color: var(--navy); font-size: 14px; }
-    .calc-result-row.highlight { background: rgba(201,154,46,0.14); margin: 4px -16px; padding: 10px 16px; border-radius: 6px; }
-    .calc-result-row.highlight b { color: var(--gold-dark); font-size: 15px; }
+    .calc-result-row b { color: var(--navy); font-size:  var(--aq-fs-body); }
+    .calc-result-row.highlight { background: var(--aq-accent-tint-2); margin: 4px -16px; padding: 10px 16px; border-radius:  var(--aq-radius-xs); }
+    .calc-result-row.highlight b { color: var(--gold-dark); font-size:  var(--aq-fs-body-lg); }
 
     /* صورة الغلاف أعلى الصفحة */
     .cover-wrap {
@@ -780,7 +808,7 @@
       -webkit-backdrop-filter: blur(8px);
       backdrop-filter: blur(8px);
       color: var(--gold-soft);
-      font-size: 13px;
+      font-size:  var(--aq-fs-small);
       letter-spacing: 0.3px;
       font-weight: 700;
       line-height: 1;
@@ -824,7 +852,7 @@
       max-width: none;
       white-space: nowrap;
       padding: 8px 11px;
-      font-size: 12.5px;
+      font-size:  var(--aq-fs-label);
       gap: 6px;
     }
     #appNav .app-nav-btn svg { width: 15px; height: 15px; }
@@ -964,7 +992,7 @@
 
     /* ---- dashboard styles, all scoped under #statsView so nothing leaks into Search ---- */
     #statsView h1 {
-      font-size: 22px; font-weight: 700; color: var(--text-light);
+      font-size:  var(--aq-fs-title-lg); font-weight: 700; color: var(--text-light);
       margin: 4px 0 14px; line-height: 1.3;
       padding-right: 13px; border-right: 3px solid var(--gold);
     }
@@ -974,11 +1002,11 @@
     #statsView .refresh-btn {
       background: var(--navy); color: var(--gold-soft);
       border: 1px solid var(--border-gold); border-radius: var(--radius-sm);
-      padding: 9px 18px; font-size: 13px; font-weight: 700; cursor: pointer;
+      padding: 9px 18px; font-size:  var(--aq-fs-small); font-weight: 700; cursor: pointer;
       margin-bottom: 12px;
       transition: background-color var(--ease), border-color var(--ease);
     }
-    #statsView .refresh-btn:hover { background: var(--navy-deep); border-color: rgba(201,154,46,0.5); }
+    #statsView .refresh-btn:hover { background: var(--navy-deep); border-color: var(--aq-border-accent-strong); }
     #statsView .kpi-grid {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(172px, 1fr));
       gap: 12px; margin-bottom: 14px;
@@ -994,11 +1022,11 @@
     #statsView .kpi-card.reserved  { border-color: rgba(230,201,120,0.40); }
     #statsView .kpi-card.sold      { border-color: rgba(233,144,138,0.34); }
     #statsView .kpi-card.archived  { border-color: rgba(174,185,198,0.30); }
-    #statsView .kpi-value { font-size: 26px; font-weight: 800; color: var(--gold-soft); line-height: 1.15; letter-spacing: 0.3px; }
+    #statsView .kpi-value { font-size:  var(--aq-fs-page-title); font-weight: 800; color: var(--gold-soft); line-height: 1.15; letter-spacing: 0.3px; }
     #statsView .kpi-card.available .kpi-value { color: var(--ok); }
     #statsView .kpi-card.sold      .kpi-value { color: var(--danger); }
     #statsView .kpi-card.archived  .kpi-value { color: var(--text-muted); }
-    #statsView .kpi-label { font-size: 12px; color: var(--text-muted); margin-top: 3px; font-weight: 600; line-height: 1.4; }
+    #statsView .kpi-label { font-size:  var(--aq-fs-caption); color: var(--text-muted); margin-top: 3px; font-weight: 600; line-height: 1.4; }
     #statsView .section {
       background: var(--glass-panel);
       -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
@@ -1007,58 +1035,58 @@
       padding: 16px 18px; margin-bottom: 12px; box-shadow: var(--shadow-card);
     }
     #statsView .section h3 {
-      font-size: 13px; font-weight: 800; letter-spacing: 0.5px; color: var(--gold-soft);
+      font-size:  var(--aq-fs-small); font-weight: 800; letter-spacing: 0.5px; color: var(--gold-soft);
       margin: 0 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border-gold);
     }
     #statsView .bar-row { margin-bottom: 10px; }
     #statsView .bar-row:last-child { margin-bottom: 0; }
     #statsView .bar-label {
       display: flex; justify-content: space-between; gap: 12px;
-      font-size: 12px; margin-bottom: 5px; color: var(--text-light);
+      font-size:  var(--aq-fs-caption); margin-bottom: 5px; color: var(--text-light);
     }
     #statsView .bar-label b { color: var(--gold-soft); font-weight: 700; white-space: nowrap; }
-    #statsView .bar-track { background: rgba(255,255,255,0.06); border-radius: 999px; height: 9px; overflow: hidden; }
-    #statsView .bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--gold-dark), var(--gold-soft)); }
-    #statsView table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    #statsView .bar-track { background: var(--aq-bg-muted-2); border-radius:  var(--aq-radius-pill); height: 9px; overflow: hidden; }
+    #statsView .bar-fill { height: 100%; border-radius:  var(--aq-radius-pill); background: linear-gradient(90deg, var(--gold-dark), var(--gold-soft)); }
+    #statsView table { width: 100%; border-collapse: collapse; font-size:  var(--aq-fs-small); }
     #statsView th, #statsView td { padding: 9px 8px; text-align: right; border-bottom: 1px solid var(--line-dark); }
     #statsView th { color: var(--text-muted); font-weight: 700; }
     #statsView td { color: var(--text-light); }
     #statsView td.num { font-weight: 700; color: var(--gold-soft); }
     #statsView tbody tr:last-child td { border-bottom: none; }
-    #statsView .empty-note { color: var(--text-muted); font-size: 13px; text-align: center; padding: 18px; }
+    #statsView .empty-note { color: var(--text-muted); font-size:  var(--aq-fs-small); text-align: center; padding: 18px; }
     #statsView .chart-select {
       width: 100%; padding: 9px 12px;
       border: 1px solid var(--border-gold); border-radius: var(--radius-sm);
-      font-size: 13px; margin-bottom: 12px;
+      font-size:  var(--aq-fs-small); margin-bottom: 12px;
       background: var(--navy-deep); color: var(--text-light); color-scheme: dark;
       transition: border-color var(--ease), box-shadow var(--ease);
     }
     #statsView .chart-select:focus {
-      outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,154,46,0.16);
+      outline: none; border-color: var(--gold); box-shadow: var(--aq-focus-ring);
     }
     #statsView .chart-wrap {
       position: relative; height: 240px;
-      background: rgba(255,255,255,0.04); border: 1px solid var(--line-dark);
+      background: var(--aq-bg-muted-1); border: 1px solid var(--line-dark);
       border-radius: var(--radius-sm); padding: 8px;
     }
     #statsView .chart-summary { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
     #statsView .chart-summary .stat {
-      background: rgba(255,255,255,0.04); border: 1px solid var(--line-dark);
+      background: var(--aq-bg-muted-1); border: 1px solid var(--line-dark);
       border-radius: var(--radius-sm); padding: 9px 14px; flex: 1; min-width: 132px;
     }
-    #statsView .chart-summary .stat .lbl { font-size: 11px; color: var(--text-muted); }
-    #statsView .chart-summary .stat .val { font-size: 15px; font-weight: 800; color: var(--gold-soft); margin-top: 2px; }
+    #statsView .chart-summary .stat .lbl { font-size:  var(--aq-fs-caption-sm); color: var(--text-muted); }
+    #statsView .chart-summary .stat .val { font-size:  var(--aq-fs-body-lg); font-weight: 800; color: var(--gold-soft); margin-top: 2px; }
     #statsView .chart-summary .stat.up .val { color: var(--danger); }
     #statsView .chart-summary .stat.down .val { color: var(--ok); }
     @media (max-width: 640px) {
-      #statsView h1 { font-size: 20px; padding-right: 11px; }
+      #statsView h1 { font-size:  var(--aq-fs-section-title); padding-right: 11px; }
       #statsView .section { padding: 14px; }
       #statsView .kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-      #statsView .kpi-value { font-size: 23px; }
+      #statsView .kpi-value { font-size:  var(--aq-fs-title-lg); }
       #statsView #mostViewedTable, #statsView #mostRequestedTable { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
       #statsView .chart-summary .stat { min-width: 100%; }
     }
-    @media (max-width: 380px) {
+    @media (max-width: 420px) {
       #statsView .kpi-grid { grid-template-columns: 1fr; }
     }
 
@@ -1092,28 +1120,28 @@
     }
     .dash-brand {
       display: flex; flex-direction: column; gap: 2px;
-      font-weight: 800; font-size: 15px; color: var(--gold-soft);
+      font-weight: 800; font-size:  var(--aq-fs-body-lg); color: var(--gold-soft);
       padding: 4px 10px 12px; margin-bottom: 8px;
       border-bottom: 1px solid var(--border-gold); letter-spacing: 0.3px;
     }
-    .dash-brand span { font-size: 11px; font-weight: 600; color: var(--text-muted); letter-spacing: 0; }
+    .dash-brand span { font-size:  var(--aq-fs-caption-sm); font-weight: 600; color: var(--text-muted); letter-spacing: 0; }
     .dash-nav { display: flex; flex-direction: column; gap: 4px; }
     .dash-nav-item {
       display: flex; align-items: center; gap: 10px;
       width: 100%; text-align: right;
       padding: 10px 12px; border: 1px solid transparent; border-radius: var(--radius-sm);
       background: transparent; color: var(--text-light);
-      font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+      font-family: inherit; font-size:  var(--aq-fs-small); font-weight: 700; cursor: pointer;
       transition: background-color var(--ease), border-color var(--ease), color var(--ease);
     }
     .dash-nav-item svg { width: 16px; height: 16px; flex-shrink: 0; opacity: 0.9; }
-    .dash-nav-item:hover { background: rgba(255,255,255,0.06); border-color: var(--line-dark); }
+    .dash-nav-item:hover { background: var(--aq-bg-muted-2); border-color: var(--line-dark); }
     .dash-nav-item.is-active {
-      background: rgba(201,154,46,0.14); border-color: var(--border-gold); color: var(--gold-soft);
+      background: var(--aq-accent-tint-2); border-color: var(--border-gold); color: var(--gold-soft);
     }
     .dash-nav-item.dash-logout {
       margin-top: 8px; color: var(--danger);
-      background: rgba(233,144,138,0.10); border-color: rgba(233,144,138,0.4);
+      background: rgba(233,144,138,0.10); border-color: var(--aq-danger-border);
     }
     .dash-nav-item.dash-logout:hover { background: rgba(233,144,138,0.18); }
 
@@ -1124,10 +1152,10 @@
       margin-bottom: 12px; padding: 9px 14px;
       border: 1px solid var(--border-gold); border-radius: var(--radius-sm);
       background: var(--navy); color: var(--gold-soft);
-      font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+      font-family: inherit; font-size:  var(--aq-fs-small); font-weight: 700; cursor: pointer;
     }
     .dash-page-title {
-      font-size: 20px; font-weight: 700; color: var(--text-light);
+      font-size:  var(--aq-fs-section-title); font-weight: 700; color: var(--text-light);
       margin: 2px 0 14px; padding-right: 12px; border-right: 3px solid var(--gold);
     }
     .dash-panel { animation: dashFade 160ms ease; }
@@ -1148,10 +1176,10 @@
     #dashboardView .kpi-card.available { border-color: rgba(127,211,163,0.32); }
     #dashboardView .kpi-card.reserved  { border-color: rgba(230,201,120,0.40); }
     #dashboardView .kpi-card.sold      { border-color: rgba(233,144,138,0.34); }
-    #dashboardView .kpi-value { font-size: 25px; font-weight: 800; color: var(--gold-soft); line-height: 1.15; }
+    #dashboardView .kpi-value { font-size:  var(--aq-fs-page-title); font-weight: 800; color: var(--gold-soft); line-height: 1.15; }
     #dashboardView .kpi-card.available .kpi-value { color: var(--ok); }
     #dashboardView .kpi-card.sold      .kpi-value { color: var(--danger); }
-    #dashboardView .kpi-label { font-size: 12px; color: var(--text-muted); margin-top: 3px; font-weight: 600; line-height: 1.4; }
+    #dashboardView .kpi-label { font-size:  var(--aq-fs-caption); color: var(--text-muted); margin-top: 3px; font-weight: 600; line-height: 1.4; }
     #dashboardView .section {
       background: var(--glass-panel);
       -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
@@ -1160,27 +1188,27 @@
       box-shadow: var(--shadow-card);
     }
     #dashboardView .section h3 {
-      font-size: 13px; font-weight: 800; letter-spacing: 0.5px; color: var(--gold-soft);
+      font-size:  var(--aq-fs-small); font-weight: 800; letter-spacing: 0.5px; color: var(--gold-soft);
       margin: 0 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border-gold);
     }
     #dashboardView .bar-row { margin-bottom: 10px; }
     #dashboardView .bar-row:last-child { margin-bottom: 0; }
-    #dashboardView .bar-label { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; margin-bottom: 5px; color: var(--text-light); }
+    #dashboardView .bar-label { display: flex; justify-content: space-between; gap: 12px; font-size:  var(--aq-fs-caption); margin-bottom: 5px; color: var(--text-light); }
     #dashboardView .bar-label b { color: var(--gold-soft); font-weight: 700; white-space: nowrap; }
-    #dashboardView .bar-track { background: rgba(255,255,255,0.06); border-radius: 999px; height: 9px; overflow: hidden; }
-    #dashboardView .bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--gold-dark), var(--gold-soft)); }
-    #dashboardView .empty-note { color: var(--text-muted); font-size: 13px; text-align: center; padding: 18px; }
+    #dashboardView .bar-track { background: var(--aq-bg-muted-2); border-radius:  var(--aq-radius-pill); height: 9px; overflow: hidden; }
+    #dashboardView .bar-fill { height: 100%; border-radius:  var(--aq-radius-pill); background: linear-gradient(90deg, var(--gold-dark), var(--gold-soft)); }
+    #dashboardView .empty-note { color: var(--text-muted); font-size:  var(--aq-fs-small); text-align: center; padding: 18px; }
     #dashboardView .dash-cta {
       display: inline-flex; align-items: center; gap: 8px;
       padding: 10px 16px; margin: 4px 8px 4px 0;
       border: 1px solid var(--border-gold); border-radius: var(--radius-sm);
       background: var(--navy); color: var(--gold-soft);
-      font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+      font-family: inherit; font-size:  var(--aq-fs-small); font-weight: 700; cursor: pointer;
       transition: background-color var(--ease), border-color var(--ease);
     }
-    #dashboardView .dash-cta:hover { background: var(--navy-deep); border-color: rgba(201,154,46,0.5); }
-    #dashboardView .dash-cta.secondary { background: rgba(255,255,255,0.05); color: var(--text-light); }
-    #dashboardView .dash-note { font-size: 12px; color: var(--text-muted); line-height: 1.8; margin: 8px 0 0; }
+    #dashboardView .dash-cta:hover { background: var(--navy-deep); border-color: var(--aq-border-accent-strong); }
+    #dashboardView .dash-cta.secondary { background: var(--aq-bg-muted-2); color: var(--text-light); }
+    #dashboardView .dash-note { font-size:  var(--aq-fs-caption); color: var(--text-muted); line-height: 1.8; margin: 8px 0 0; }
 
     /* ===== محتوى "الرئيسية" التعريفي — يعيد استخدام .section (زجاج داكن + خط ذهبي علوي)
        ونفس خط Cairo وأوزانه وألوان Navy/Gold. RTL بالكامل، والكلمات اللاتينية معزولة bidi. ===== */
@@ -1191,30 +1219,30 @@
       padding: 22px 22px 24px;
     }
     #dashboardView .dash-about .about-title {
-      font-size: 26px; font-weight: 800; color: var(--gold-soft);
+      font-size:  var(--aq-fs-page-title); font-weight: 800; color: var(--gold-soft);
       line-height: 1.35; letter-spacing: 0.2px; margin: 0 0 6px;
       border: 0; padding: 0;
     }
     #dashboardView .dash-about .about-subtitle {
-      font-size: 14.5px; font-weight: 700; color: var(--text-light);
+      font-size: var(--aq-fs-body-lg); font-weight: 700; color: var(--text-light);
       line-height: 1.8; margin: 0 0 18px;
     }
     #dashboardView .dash-about .about-lead {
-      font-size: 14px; font-weight: 600; color: var(--text-light);
+      font-size:  var(--aq-fs-body); font-weight: 600; color: var(--text-light);
       line-height: 2.05; margin: 0;
     }
     #dashboardView .dash-about h3 {
-      font-size: 14px; font-weight: 800; letter-spacing: 0.3px; color: var(--gold-soft);
+      font-size:  var(--aq-fs-body); font-weight: 800; letter-spacing: 0.3px; color: var(--gold-soft);
       margin: 24px 0 0; padding-bottom: 7px;
       border-bottom: 1px solid var(--border-gold);
     }
     #dashboardView .dash-about p {
-      font-size: 13.5px; color: var(--text-muted); line-height: 2.05; margin: 11px 0 0;
+      font-size:  var(--aq-fs-button); color: var(--text-muted); line-height: 2.05; margin: 11px 0 0;
     }
     #dashboardView .dash-about .about-list { margin: 12px 0 0; padding: 0; list-style: none; }
     #dashboardView .dash-about .about-list li {
       position: relative; padding-right: 20px; margin-bottom: 7px;
-      font-size: 13.5px; color: var(--text-muted); line-height: 1.95;
+      font-size:  var(--aq-fs-button); color: var(--text-muted); line-height: 1.95;
     }
     #dashboardView .dash-about .about-list li::before {
       content: "•"; position: absolute; right: 3px; top: 0;
@@ -1222,12 +1250,12 @@
     }
     #dashboardView .dash-about .about-tagline {
       margin-top: 24px; padding-top: 15px; border-top: 1px solid var(--border-gold);
-      font-size: 13.5px; font-weight: 700; color: var(--gold-soft); line-height: 2;
+      font-size:  var(--aq-fs-button); font-weight: 700; color: var(--gold-soft); line-height: 2;
     }
-    @media (max-width: 480px) {
+    @media (max-width: 640px) {
       #dashboardView .dash-about { padding: 18px 16px 20px; }
-      #dashboardView .dash-about .about-title { font-size: 22px; }
-      #dashboardView .dash-about .about-subtitle { font-size: 13.5px; }
+      #dashboardView .dash-about .about-title { font-size:  var(--aq-fs-title-lg); }
+      #dashboardView .dash-about .about-subtitle { font-size:  var(--aq-fs-button); }
     }
 
     /* الملف الشخصي */
@@ -1236,19 +1264,19 @@
       width: 72px; height: 72px; border-radius: 50%; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
       background: rgba(201,154,46,0.16); border: 2px solid var(--border-gold);
-      color: var(--gold-soft); font-size: 26px; font-weight: 800; overflow: hidden;
+      color: var(--gold-soft); font-size:  var(--aq-fs-page-title); font-weight: 800; overflow: hidden;
     }
     .dash-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .dash-profile-head .who .nm { font-size: 17px; font-weight: 800; color: var(--text-light); }
-    .dash-profile-head .who .rl { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .dash-profile-head .who .nm { font-size:  var(--aq-fs-title-sm); font-weight: 800; color: var(--text-light); }
+    .dash-profile-head .who .rl { font-size:  var(--aq-fs-caption); color: var(--text-muted); margin-top: 2px; }
     .dash-role-badge {
-      display: inline-block; margin-top: 6px; padding: 3px 10px; border-radius: 999px;
+      display: inline-block; margin-top: 6px; padding: 3px 10px; border-radius:  var(--aq-radius-pill);
       background: rgba(201,154,46,0.16); border: 1px solid var(--border-gold);
-      color: var(--gold-soft); font-size: 11px; font-weight: 800;
+      color: var(--gold-soft); font-size:  var(--aq-fs-caption-sm); font-weight: 800;
     }
     .dash-field-row {
       display: flex; justify-content: space-between; align-items: center; gap: 14px;
-      padding: 11px 2px; border-bottom: 1px solid var(--line-dark); font-size: 13px;
+      padding: 11px 2px; border-bottom: 1px solid var(--line-dark); font-size:  var(--aq-fs-small);
     }
     .dash-field-row:last-child { border-bottom: none; }
     .dash-field-row .k { color: var(--text-muted); font-weight: 600; flex-shrink: 0; }
@@ -1258,13 +1286,13 @@
       flex: 1; min-width: 0; text-align: left; direction: ltr;
       background: var(--input-dark); border: 1px solid var(--line-dark);
       border-radius: var(--radius-sm); color: var(--text-light);
-      font-family: inherit; font-size: 13px; font-weight: 700; padding: 8px 10px;
+      font-family: inherit; font-size:  var(--aq-fs-small); font-weight: 700; padding: 8px 10px;
     }
     .dash-prof-input:focus { outline: none; border-color: var(--border-gold); background: rgba(27,52,74,0.85); }
     .dash-prof-input::placeholder { color: var(--text-muted); font-weight: 500; }
     .dash-prof-photo-actions { margin-inline-start: auto; }
     .dash-prof-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
-    .dash-prof-msg { font-size: 12px; font-weight: 700; }
+    .dash-prof-msg { font-size:  var(--aq-fs-caption); font-weight: 700; }
     .dash-prof-msg.ok { color: var(--ok); }
     .dash-prof-msg.err { color: var(--danger); }
     /* بطاقة "المستخدمون المتصلون الآن" — سطح كحلي معتم (مش شفّاف) لضمان تباين قوي مريح
@@ -1276,19 +1304,19 @@
     }
     #dashboardView .live-count {
       display: flex; align-items: center; gap: 8px;
-      font-size: 13.5px; font-weight: 700; color: var(--text-light); margin: 0;
+      font-size:  var(--aq-fs-button); font-weight: 700; color: var(--text-light); margin: 0;
       /* إلغاء تنسيق "الحبّة" الفاتح القادم من .live-count العام (صفحة البحث) — كان بيحط
          خلفية كريمي فاتحة جوه البطاقة الكحلي فيبان الاسم/الرقم باهتين. */
       background: transparent; border: 0; padding: 0; border-radius: 0;
     }
     #dashboardView .dash-live-card .live-dot { flex-shrink: 0; }
-    #dashboardView .dash-live-card .live-count b { font-size: 18px; font-weight: 800; color: var(--gold-soft); }
+    #dashboardView .dash-live-card .live-count b { font-size:  var(--aq-fs-title-sm); font-weight: 800; color: var(--gold-soft); }
     #dashLiveEmailsList {
-      font-size: 12.5px; font-weight: 700; line-height: 1.95;
+      font-size:  var(--aq-fs-label); font-weight: 700; line-height: 1.95;
       color: var(--text-light); opacity: 1; margin: 6px 0 0;
     }
 
-    @media (max-width: 860px) {
+    @media (max-width: 1024px) {
       .dash-shell { grid-template-columns: 1fr; }
       .dash-drawer-toggle { display: inline-flex; }
       .dash-sidebar {
@@ -1301,11 +1329,11 @@
       .dash-sidebar.open { transform: none; }
       .dash-drawer-backdrop {
         display: none; position: fixed; inset: 0; z-index: 1390;
-        background: rgba(4,12,22,0.55);
+        background: var(--aq-overlay);
       }
       .dash-drawer-backdrop.open { display: block; }
     }
-    @media (max-width: 380px) {
+    @media (max-width: 420px) {
       #dashboardView .kpi-grid { grid-template-columns: 1fr 1fr; }
     }
 
@@ -1315,19 +1343,19 @@
        ألواح لوحة التحكم الداكنة (نفس أسلوب #calcModal / #editModal في الريبو). */
     #dashPanel-developers .section-title { color: var(--gold-soft); border-bottom-color: var(--border-gold); }
     #dashPanel-developers label { color: var(--text-light); }
-    #dashPanel-developers .ai-fill-panel { background: rgba(201,154,46,0.07); }
+    #dashPanel-developers .ai-fill-panel { background: var(--aq-accent-tint-1); }
     #dashPanel-developers .ai-fill-panel .section-title { color: var(--gold-soft); }
     #dashPanel-developers input,
     #dashPanel-developers textarea {
       background: var(--input-dark); color: var(--text-light);
-      border: 1px solid rgba(255,255,255,0.14);
+      border: 1px solid var(--aq-border-strong);
     }
     #dashPanel-developers input::placeholder,
     #dashPanel-developers textarea::placeholder { color: var(--text-muted); }
     #dashPanel-developers input:focus,
     #dashPanel-developers textarea:focus {
-      outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,154,46,0.16);
-      background: rgba(27,52,74,0.78);
+      outline: none; border-color: var(--gold); box-shadow: var(--aq-focus-ring);
+      background: var(--aq-bg-input-focus);
     }
     #dashPanel-developers .access-req-item { border-color: var(--border-gold); }
     #dashPanel-developers .access-req-item .name { color: var(--text-light); }
@@ -1345,41 +1373,41 @@
     #dashPanel-users label { color: var(--text-light); }
     #dashPanel-users .um-count { color: var(--text-muted); }
     #dashPanel-users .um-count b { color: var(--gold-soft); }
-    #dashPanel-users .um-addform { background: rgba(255,255,255,0.04); border-color: var(--border-gold); }
+    #dashPanel-users .um-addform { background: var(--aq-bg-muted-1); border-color: var(--border-gold); }
     #dashPanel-users #umSearch,
     #dashPanel-users .um-addform input,
     #dashPanel-users .um-addform select {
-      background: var(--input-dark); color: var(--text-light); border: 1px solid rgba(255,255,255,0.14);
+      background: var(--input-dark); color: var(--text-light); border: 1px solid var(--aq-border-strong);
     }
     #dashPanel-users #umSearch::placeholder,
     #dashPanel-users .um-addform input::placeholder { color: var(--text-muted); }
     #dashPanel-users #umSearch:focus,
     #dashPanel-users .um-addform input:focus,
     #dashPanel-users .um-addform select:focus {
-      outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,154,46,0.16);
-      background: rgba(27,52,74,0.78);
+      outline: none; border-color: var(--gold); box-shadow: var(--aq-focus-ring);
+      background: var(--aq-bg-input-focus);
     }
     #dashPanel-users .um-chips button {
-      background: rgba(255,255,255,0.05); color: var(--text-muted); border-color: rgba(255,255,255,0.14);
+      background: var(--aq-bg-muted-2); color: var(--text-muted); border-color: var(--aq-border-strong);
     }
     #dashPanel-users .um-chips button.active { background: var(--navy); color: var(--gold-soft); border-color: var(--gold); }
     #dashPanel-users .um-list { max-height: none; }
     #dashPanel-users .um-card {
-      background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.12);
+      background: var(--aq-bg-muted-1); border-color: var(--aq-border-strong);
     }
     #dashPanel-users .um-card:hover { border-color: var(--border-gold); }
     #dashPanel-users .um-card.is-owner { background: rgba(201,154,46,0.10); border-color: var(--gold); }
     #dashPanel-users .um-name { color: var(--text-light); }
     /* تصحيح تباين: .um-sub كان بلون رمادي للأسطح الفاتحة (--muted) فوق لوح داكن → غير مقروء */
-    #dashPanel-users .um-sub { color: rgba(234,240,246,0.72); }
+    #dashPanel-users .um-sub { color: var(--aq-text-tertiary); }
     #dashPanel-users .um-empty { color: var(--text-muted); }
 
     /* ===== المرحلة 3.6+ — الحضور (متصل الآن / آخر ظهور) + ملخّص المتصلين ===== */
-    .um-online-sum { font-size: 13px; color: var(--text-muted); font-weight: 600; margin-inline-start: 12px; }
-    .um-online-sum b { color: var(--ok); font-size: 15px; }
+    .um-online-sum { font-size:  var(--aq-fs-small); color: var(--text-muted); font-weight: 600; margin-inline-start: 12px; }
+    .um-online-sum b { color: var(--ok); font-size:  var(--aq-fs-body-lg); }
     .um-presence {
       display: inline-flex; align-items: center; gap: 6px;
-      font-size: 11px; font-weight: 700; margin-top: 4px; white-space: nowrap;
+      font-size:  var(--aq-fs-caption-sm); font-weight: 700; margin-top: 4px; white-space: nowrap;
     }
     .um-presence .um-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: var(--text-muted); }
     .um-presence.is-online { color: var(--ok); }
@@ -1392,46 +1420,46 @@
     /* ===== المرحلة 3.6+ — "سجل عمليات إدارة المستخدمين" كقسم كامل داخل لوحة التحكم (#dashPanel-audit) ===== */
     #dashPanel-audit .um-filters { margin-bottom: 12px; }
     #dashPanel-audit #umAuditSearch {
-      width: 100%; padding: 10px 12px; border-radius: var(--radius-sm); font-family: inherit; font-size: 13px;
-      background: var(--input-dark); color: var(--text-light); border: 1px solid rgba(255,255,255,0.14);
+      width: 100%; padding: 10px 12px; border-radius: var(--radius-sm); font-family: inherit; font-size:  var(--aq-fs-small);
+      background: var(--input-dark); color: var(--text-light); border: 1px solid var(--aq-border-strong);
     }
     #dashPanel-audit #umAuditSearch::placeholder { color: var(--text-muted); }
     #dashPanel-audit #umAuditSearch:focus {
-      outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,154,46,0.16); background: rgba(27,52,74,0.78);
+      outline: none; border-color: var(--gold); box-shadow: var(--aq-focus-ring); background: var(--aq-bg-input-focus);
     }
     #dashPanel-audit .umlog-list { max-height: none; display: flex; flex-direction: column; gap: 8px; }
     #dashPanel-audit .umlog-row {
-      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12);
-      border-radius: var(--radius-md); padding: 11px 13px; font-size: 12px;
+      background: var(--aq-bg-muted-1); border: 1px solid var(--aq-border-strong);
+      border-radius: var(--radius-md); padding: 11px 13px; font-size:  var(--aq-fs-caption);
     }
-    #dashPanel-audit .umlog-row.denied { border-color: rgba(233,144,138,0.4); background: rgba(233,144,138,0.07); }
+    #dashPanel-audit .umlog-row.denied { border-color: var(--aq-danger-border); background: rgba(233,144,138,0.07); }
     #dashPanel-audit .umlog-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     #dashPanel-audit .umlog-action {
       font-weight: 800; letter-spacing: .3px; color: var(--gold-soft);
-      background: rgba(201,154,46,0.14); border: 1px solid var(--border-gold);
-      border-radius: 999px; padding: 2px 9px; font-size: 11px;
+      background: var(--aq-accent-tint-2); border: 1px solid var(--border-gold);
+      border-radius:  var(--aq-radius-pill); padding: 2px 9px; font-size:  var(--aq-fs-caption-sm);
     }
-    #dashPanel-audit .umlog-res { font-size: 10px; font-weight: 800; padding: 2px 9px; border-radius: 999px; }
+    #dashPanel-audit .umlog-res { font-size:  var(--aq-fs-micro); font-weight: 800; padding: 2px 9px; border-radius:  var(--aq-radius-pill); }
     #dashPanel-audit .umlog-res.SUCCESS { background: rgba(127,211,163,0.16); color: var(--ok); }
     #dashPanel-audit .umlog-res.DENIED { background: rgba(233,144,138,0.16); color: var(--danger); }
-    #dashPanel-audit .umlog-time { margin-inline-start: auto; color: var(--text-muted); font-size: 11px; }
+    #dashPanel-audit .umlog-time { margin-inline-start: auto; color: var(--text-muted); font-size:  var(--aq-fs-caption-sm); }
     #dashPanel-audit .umlog-meta { color: var(--text-muted); margin-top: 5px; line-height: 1.7; }
     #dashPanel-audit .umlog-meta b { color: var(--text-light); font-weight: 700; }
     #dashPanel-audit .umlog-details {
       color: var(--text-light); margin-top: 4px; word-break: break-word;
       background: rgba(255,255,255,0.03); border-radius: var(--radius-sm); padding: 6px 9px;
     }
-    #dashPanel-audit .um-empty { color: var(--text-muted); text-align: center; padding: 18px; font-size: 12px; }
+    #dashPanel-audit .um-empty { color: var(--text-muted); text-align: center; padding: 18px; font-size:  var(--aq-fs-caption); }
     .dash-back-link {
       display: inline-flex; align-items: center; gap: 6px; margin-bottom: 12px;
       background: none; border: none; color: var(--gold-soft); font-family: inherit;
-      font-size: 13px; font-weight: 700; cursor: pointer; padding: 4px 0;
+      font-size:  var(--aq-fs-small); font-weight: 700; cursor: pointer; padding: 4px 0;
     }
     .dash-back-link:hover { text-decoration: underline; }
 
     .price-stats-search {
       width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);
-      font-size: 14px; margin-bottom: 14px;
+      font-size:  var(--aq-fs-body); margin-bottom: 14px;
     }
 
     /* لوحة التحكم */
@@ -1462,14 +1490,14 @@
       border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 10px; margin-bottom: 6px;
     }
     .access-req-item .name { font-weight: 700; color: var(--navy); }
-    .access-req-item .meta { color: var(--muted); font-size: 11px; margin: 2px 0 6px; }
+    .access-req-item .meta { color: var(--muted); font-size:  var(--aq-fs-caption-sm); margin: 2px 0 6px; }
     .access-req-item .actions { display: flex; gap: 6px; }
     .access-req-item button {
-      flex: 1; border: none; border-radius: 6px; padding: 5px; font-size: 11px; font-weight: 700; cursor: pointer;
+      flex: 1; border: none; border-radius:  var(--aq-radius-xs); padding: 5px; font-size:  var(--aq-fs-caption-sm); font-weight: 700; cursor: pointer;
     }
     .access-req-item .approve-btn { background: var(--success-bg); color: var(--success-fg); }
     .access-req-item .reject-btn { background: var(--error-bg); color: var(--error-fg); }
-    .access-req-item .status-tag { font-size: 10px; padding: 2px 8px; border-radius: 999px; font-weight: 700; }
+    .access-req-item .status-tag { font-size:  var(--aq-fs-micro); padding: 2px 8px; border-radius:  var(--aq-radius-pill); font-weight: 700; }
     .access-req-item .status-tag.Approved { background: var(--success-bg); color: var(--success-fg); }
     .access-req-item .status-tag.Pending { background: var(--warn-bg); color: var(--warn-fg); }
     .access-req-item .status-tag.Rejected { background: var(--error-bg); color: var(--error-fg); }
@@ -1483,11 +1511,11 @@
       display: flex; align-items: center; justify-content: space-between; gap: 10px;
       margin: 4px 0 12px; flex-wrap: wrap;
     }
-    .um-count { font-size: 13px; color: var(--muted); font-weight: 600; }
-    .um-count b { color: var(--navy); font-size: 15px; }
+    .um-count { font-size:  var(--aq-fs-small); color: var(--muted); font-weight: 600; }
+    .um-count b { color: var(--navy); font-size:  var(--aq-fs-body-lg); }
     .um-add-toggle {
       border: 1px solid var(--border-gold); background: var(--navy); color: var(--gold-soft);
-      font-weight: 700; font-size: 12px; padding: 8px 14px; border-radius: var(--radius-sm); cursor: pointer;
+      font-weight: 700; font-size:  var(--aq-fs-caption); padding: 8px 14px; border-radius: var(--radius-sm); cursor: pointer;
     }
     .um-add-toggle:hover { background: var(--navy-deep); }
     .um-addform {
@@ -1496,33 +1524,33 @@
     }
     .um-addform .section-title { margin-top: 0; }
     .um-hint {
-      font-size: 11px; color: var(--muted); background: var(--warn-bg); color: var(--warn-fg);
-      border-radius: 6px; padding: 6px 9px; margin: 8px 0 0; line-height: 1.7;
+      font-size:  var(--aq-fs-caption-sm); color: var(--muted); background: var(--warn-bg); color: var(--warn-fg);
+      border-radius:  var(--aq-radius-xs); padding: 6px 9px; margin: 8px 0 0; line-height: 1.7;
     }
     .um-primary {
-      width: 100%; margin-top: 12px; padding: 11px; border: none; border-radius: 9px;
-      background: var(--navy); color: var(--gold-soft); font-weight: 700; font-size: 14px; cursor: pointer;
+      width: 100%; margin-top: 12px; padding: 11px; border: none; border-radius:  var(--aq-radius-sm);
+      background: var(--navy); color: var(--gold-soft); font-weight: 700; font-size:  var(--aq-fs-body); cursor: pointer;
     }
     .um-primary:disabled { opacity: .6; cursor: default; }
-    .um-msg { font-size: 12px; margin-top: 8px; min-height: 14px; }
+    .um-msg { font-size:  var(--aq-fs-caption); margin-top: 8px; min-height: 14px; }
     .um-msg.ok { color: var(--success-fg); }
     .um-msg.err { color: var(--error-fg); }
 
     .um-filters { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
     #umSearch {
       width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);
-      font-family: inherit; font-size: 13px; background: var(--white);
+      font-family: inherit; font-size:  var(--aq-fs-small); background: var(--white);
     }
     .um-chips { display: flex; flex-wrap: wrap; gap: 6px; }
     .um-chips button {
       border: 1px solid var(--border); background: var(--white); color: var(--muted);
-      font-size: 11px; font-weight: 700; padding: 5px 11px; border-radius: 999px; cursor: pointer;
+      font-size:  var(--aq-fs-caption-sm); font-weight: 700; padding: 5px 11px; border-radius:  var(--aq-radius-pill); cursor: pointer;
       transition: var(--ease);
     }
     .um-chips button.active { background: var(--navy); color: var(--gold-soft); border-color: var(--navy); }
 
     .um-list { max-height: 46vh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 2px; }
-    .um-empty { text-align: center; color: var(--muted); padding: 18px; font-size: 12px; }
+    .um-empty { text-align: center; color: var(--muted); padding: 18px; font-size:  var(--aq-fs-caption); }
     .um-card {
       display: flex; align-items: center; gap: 12px; padding: 10px 12px;
       border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--white);
@@ -1533,49 +1561,49 @@
     .um-avatar {
       width: 42px; height: 42px; border-radius: 50%; object-fit: cover; flex-shrink: 0;
       background: var(--navy); color: var(--gold-soft); display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 15px; border: 1px solid var(--border);
+      font-weight: 800; font-size:  var(--aq-fs-body-lg); border: 1px solid var(--border);
     }
     .um-card.is-owner .um-avatar { border: 2px solid var(--gold); }
     .um-main { flex: 1; min-width: 0; }
-    .um-name { font-weight: 800; color: var(--navy); font-size: 14px; letter-spacing: 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-    .um-sub { font-size: 11.5px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .um-name { font-weight: 800; color: var(--navy); font-size:  var(--aq-fs-body); letter-spacing: 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .um-sub { font-size:  var(--aq-fs-caption-sm); color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .um-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
     .um-badge {
-      font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 999px; letter-spacing: .3px;
+      font-size:  var(--aq-fs-micro); font-weight: 800; padding: 2px 8px; border-radius:  var(--aq-radius-pill); letter-spacing: .3px;
       border: 1px solid transparent;
     }
-    .um-badge.role-OWNER { background: var(--gold); color: #3a2a05; }
-    .um-badge.role-MANAGER { background: #dbe7f3; color: #1c4a75; }
-    .um-badge.role-SALES { background: #e6efe9; color: #1e6e45; }
-    .um-badge.role-DATA_ENTRY { background: #efe7f5; color: #5a3a86; }
-    .um-status { font-size: 10px; font-weight: 800; padding: 2px 9px; border-radius: 999px; }
+    .um-badge.role-OWNER { background: var(--gold); color: var(--aq-role-owner-fg); }
+    .um-badge.role-MANAGER { background: var(--aq-role-manager-bg); color: var(--aq-role-manager-fg); }
+    .um-badge.role-SALES { background: var(--aq-role-sales-bg); color: var(--aq-role-sales-fg); }
+    .um-badge.role-DATA_ENTRY { background: var(--aq-role-entry-bg); color: var(--aq-role-entry-fg); }
+    .um-status { font-size:  var(--aq-fs-micro); font-weight: 800; padding: 2px 9px; border-radius:  var(--aq-radius-pill); }
     .um-status.active { background: var(--success-bg); color: var(--success-fg); }
     .um-status.inactive { background: var(--error-bg); color: var(--error-fg); }
 
     #umUserBody .um-uhead { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-    #umUserBody .um-avatar { width: 60px; height: 60px; font-size: 20px; }
+    #umUserBody .um-avatar { width: 60px; height: 60px; font-size:  var(--aq-fs-section-title); }
     #umUserBody .um-field { margin-bottom: 10px; }
-    #umUserBody .um-field label { font-size: 11px; font-weight: 700; color: var(--muted); display: block; margin-bottom: 4px; }
+    #umUserBody .um-field label { font-size:  var(--aq-fs-caption-sm); font-weight: 700; color: var(--muted); display: block; margin-bottom: 4px; }
     #umUserBody .um-field input, #umUserBody .um-field select {
       width: 100%; padding: 9px 11px; border: 1px solid var(--border); border-radius: var(--radius-sm);
-      font-family: inherit; font-size: 13px; background: var(--white);
+      font-family: inherit; font-size:  var(--aq-fs-small); background: var(--white);
     }
     #umUserBody .um-field input:disabled { background: var(--bg); color: var(--muted); }
-    #umUserBody .um-readonly { font-size: 13px; color: var(--navy); font-weight: 600; }
-    #umUserBody .um-uid { font-size: 10px; color: var(--muted); word-break: break-all; margin-top: 2px; }
-    #umUserBody .um-note { font-size: 10px; color: var(--muted); margin-top: 3px; }
+    #umUserBody .um-readonly { font-size:  var(--aq-fs-small); color: var(--navy); font-weight: 600; }
+    #umUserBody .um-uid { font-size:  var(--aq-fs-micro); color: var(--muted); word-break: break-all; margin-top: 2px; }
+    #umUserBody .um-note { font-size:  var(--aq-fs-micro); color: var(--muted); margin-top: 3px; }
     #umUserBody .um-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
     #umUserBody .um-actions button {
       padding: 9px; border: 1px solid var(--border); border-radius: var(--radius-sm);
-      font-size: 12px; font-weight: 700; cursor: pointer; background: var(--white); color: var(--navy);
+      font-size:  var(--aq-fs-caption); font-weight: 700; cursor: pointer; background: var(--white); color: var(--navy);
     }
     #umUserBody .um-actions button.primary { background: var(--navy); color: var(--gold-soft); border-color: var(--navy); }
     #umUserBody .um-actions button.danger { background: var(--error-bg); color: var(--error-fg); border-color: transparent; }
     #umUserBody .um-actions button:disabled { opacity: .45; cursor: not-allowed; }
     #umUserBody .um-inline { display: flex; gap: 6px; margin-top: 6px; }
     #umUserBody .um-inline input { flex: 1; }
-    #umUserBody .um-inline button { padding: 8px 12px; border: none; border-radius: var(--radius-sm); background: var(--navy); color: var(--gold-soft); font-weight: 700; font-size: 12px; cursor: pointer; }
-    @media (max-width: 560px) {
+    #umUserBody .um-inline button { padding: 8px 12px; border: none; border-radius: var(--radius-sm); background: var(--navy); color: var(--gold-soft); font-weight: 700; font-size:  var(--aq-fs-caption); cursor: pointer; }
+    @media (max-width: 640px) {
       .um-sub { white-space: normal; }
       #umUserBody .um-actions { grid-template-columns: 1fr; }
     }
@@ -1584,26 +1612,26 @@
     .umlog-list { max-height: 52vh; }
     .umlog-row {
       border: 1px solid var(--border); border-radius: var(--radius-sm);
-      padding: 9px 11px; background: var(--white); font-size: 12px;
+      padding: 9px 11px; background: var(--white); font-size:  var(--aq-fs-caption);
     }
-    .umlog-row.denied { border-color: rgba(176,39,31,0.35); background: #fff8f7; }
+    .umlog-row.denied { border-color: var(--aq-danger-border); background: var(--aq-danger-bg-light); }
     .umlog-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .umlog-action { font-weight: 800; color: var(--navy); letter-spacing: .3px; }
-    .umlog-res { font-size: 10px; font-weight: 800; padding: 1px 8px; border-radius: 999px; }
+    .umlog-res { font-size:  var(--aq-fs-micro); font-weight: 800; padding: 1px 8px; border-radius:  var(--aq-radius-pill); }
     .umlog-res.SUCCESS { background: var(--success-bg); color: var(--success-fg); }
     .umlog-res.DENIED { background: var(--error-bg); color: var(--error-fg); }
-    .umlog-time { margin-inline-start: auto; color: var(--muted); font-size: 11px; }
+    .umlog-time { margin-inline-start: auto; color: var(--muted); font-size:  var(--aq-fs-caption-sm); }
     .umlog-meta { color: var(--muted); margin-top: 3px; line-height: 1.7; }
     .umlog-meta b { color: var(--navy); font-weight: 700; }
     .umlog-details { color: var(--text); margin-top: 2px; word-break: break-word; }
 
-    .admin-panel h3 { font-size: 14px; color: var(--navy); margin: 0 0 12px; }
+    .admin-panel h3 { font-size:  var(--aq-fs-body); color: var(--navy); margin: 0 0 12px; }
     .live-count {
       display: flex; align-items: center; gap: 8px;
       background: var(--bg); border: 1px solid var(--border); padding: 10px 14px; border-radius: var(--radius-sm); margin-bottom: 14px;
     }
     .live-dot {
-      width: 9px; height: 9px; border-radius: 50%; background: #1e7145;
+      width: 9px; height: 9px; border-radius: 50%; background: var(--aq-success-dot);
       box-shadow: 0 0 0 rgba(30,113,69,0.5); animation: pulse 1.5s infinite;
     }
     @keyframes pulse {
@@ -1611,19 +1639,19 @@
       70% { box-shadow: 0 0 0 8px rgba(30,113,69,0); }
       100% { box-shadow: 0 0 0 0 rgba(30,113,69,0); }
     }
-    .live-count b { font-size: 18px; color: var(--navy); }
-    .admin-panel label { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 6px; display: block; }
-    .admin-panel input[type="file"] { font-size: 12px; margin-bottom: 8px; }
+    .live-count b { font-size:  var(--aq-fs-title-sm); color: var(--navy); }
+    .admin-panel label { font-size:  var(--aq-fs-caption); font-weight: 700; color: var(--muted); margin-bottom: 6px; display: block; }
+    .admin-panel input[type="file"] { font-size:  var(--aq-fs-caption); margin-bottom: 8px; }
     .admin-panel .small-btn {
-      width: 100%; padding: 10px; font-size: 12px; background: var(--navy); color: var(--gold-soft);
+      width: 100%; padding: 10px; font-size:  var(--aq-fs-caption); background: var(--navy); color: var(--gold-soft);
       border: 1px solid var(--border-gold); border-radius: var(--radius-sm);
     }
     .admin-panel .small-btn:hover { background: var(--navy-deep); }
     .admin-panel .close-panel {
       position: absolute; top: 10px; left: 10px; background: transparent; color: var(--muted);
-      font-size: 14px; width: auto; padding: 2px 6px;
+      font-size:  var(--aq-fs-body); width: auto; padding: 2px 6px;
     }
-    #coverMsg { font-size: 11px; margin-top: 6px; display: none; }
+    #coverMsg { font-size:  var(--aq-fs-caption-sm); margin-top: 6px; display: none; }
     #coverMsg.success { color: var(--success-fg); display: block; }
     #coverMsg.error { color: var(--error-fg); display: block; }
 
@@ -1662,7 +1690,7 @@
       border: 3px solid rgba(230,201,120,0.25); border-top-color: var(--gold-soft);
       animation: srsSpin 0.9s linear infinite;
     }
-    #sessionRestoreSplash .srs-text { font-size: 14px; font-weight: 600; letter-spacing: 0; }
+    #sessionRestoreSplash .srs-text { font-size:  var(--aq-fs-body); font-weight: 600; letter-spacing: 0; }
     @keyframes srsSpin { to { transform: rotate(360deg); } }
     /* خلفية المدينة أطلسية/ناعمة خلف اللوحة، بنفس أسلوب باقي الصفحات */
     .access-gate::before {
@@ -1685,42 +1713,42 @@
       box-shadow: var(--shadow-card);
       border: 1px solid var(--border-gold); border-top: 2px solid var(--gold);
     }
-    .access-gate-box .icon { font-size: 32px; margin-bottom: 16px; color: var(--gold); }
+    .access-gate-box .icon { font-size:  var(--aq-fs-hero); margin-bottom: 16px; color: var(--gold); }
     .access-gate-box h2 {
-      font-size: 22px; color: var(--text-light); margin-bottom: 8px;
+      font-size:  var(--aq-fs-title-lg); color: var(--text-light); margin-bottom: 8px;
       font-weight: 700; letter-spacing: 0.2px; line-height: 1.35;
     }
-    .access-gate-box p { font-size: 13px; color: var(--text-muted); line-height: 1.7; margin-bottom: 20px; }
+    .access-gate-box p { font-size:  var(--aq-fs-small); color: var(--text-muted); line-height: 1.7; margin-bottom: 20px; }
     .access-gate-box input {
       width: 100%; padding: 11px 14px;
-      border: 1px solid rgba(255,255,255,0.12); border-radius: var(--radius-sm);
-      background: rgba(255,255,255,0.05); color: var(--text-light);
-      font-size: 14px; margin-bottom: 10px; text-align: center;
+      border: 1px solid var(--aq-border-strong); border-radius: var(--radius-sm);
+      background: var(--aq-bg-muted-2); color: var(--text-light);
+      font-size:  var(--aq-fs-body); margin-bottom: 10px; text-align: center;
       transition: border-color var(--ease), box-shadow var(--ease), background-color var(--ease);
     }
     .access-gate-box input::placeholder { color: var(--text-muted); }
     .access-gate-box input:focus {
       outline: none; border-color: var(--gold);
-      box-shadow: 0 0 0 3px rgba(201,154,46,0.16);
-      background: rgba(255,255,255,0.07);
+      box-shadow: var(--aq-focus-ring);
+      background: var(--aq-bg-muted-3);
     }
     .access-gate-box button {
       width: 100%; padding: 12px; border: 1px solid var(--border-gold); border-radius: var(--radius-sm); background: var(--navy);
-      color: var(--gold-soft); font-weight: 700; font-size: 14px; cursor: pointer; margin-top: 4px;
+      color: var(--gold-soft); font-weight: 700; font-size:  var(--aq-fs-body); cursor: pointer; margin-top: 4px;
       transition: background-color var(--ease), border-color var(--ease), transform var(--ease);
     }
-    .access-gate-box button:hover { background: var(--navy-deep); border-color: rgba(201,154,46,0.5); }
+    .access-gate-box button:hover { background: var(--navy-deep); border-color: var(--aq-border-accent-strong); }
     .access-gate-box button:disabled {
-      background: rgba(255,255,255,0.12); color: rgba(234,240,246,0.5);
+      background: var(--aq-border-strong); color: var(--aq-text-disabled);
       border-color: transparent; cursor: not-allowed;
     }
     .access-gate-owner-link {
-      display: block; margin-top: 18px; font-size: 12px; color: var(--text-muted); text-decoration: underline; cursor: pointer;
+      display: block; margin-top: 18px; font-size:  var(--aq-fs-caption); color: var(--text-muted); text-decoration: underline; cursor: pointer;
       background: none; border: none; width: auto; padding: 0; font-weight: 600;
     }
-    .access-gate-status { font-size: 12px; margin-top: 10px; display: none; font-weight: 600; }
-    .access-gate-status.error { color: #E9908A; display: block; }
-    .access-gate-status.success { color: #7FD3A3; display: block; }
+    .access-gate-status { font-size:  var(--aq-fs-caption); margin-top: 10px; display: none; font-weight: 600; }
+    .access-gate-status.error { color: var(--aq-danger-soft); display: block; }
+    .access-gate-status.success { color: var(--aq-success-soft); display: block; }
 
     /* Modal */
     .modal-overlay {
@@ -1738,14 +1766,14 @@
       display: flex; justify-content: space-between; align-items: center;
       margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border);
     }
-    .modal-title { font-size: 16px; font-weight: 700; letter-spacing: 0.2px; color: var(--navy); }
+    .modal-title { font-size:  var(--aq-fs-card-title); font-weight: 700; letter-spacing: 0.2px; color: var(--navy); }
     .modal-close {
       background: var(--bg); color: var(--muted); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); width: 30px; height: 30px; font-size: 15px; padding: 0;
+      border-radius: var(--radius-sm); width: 30px; height: 30px; font-size:  var(--aq-fs-body-lg); padding: 0;
     }
     .modal-close:hover { background: rgba(10,28,47,0.08); }
     .section-title {
-      font-size: 11px; font-weight: 800; letter-spacing: 0.6px; color: var(--navy); margin: 14px 0 8px;
+      font-size:  var(--aq-fs-caption-sm); font-weight: 800; letter-spacing: 0.6px; color: var(--navy); margin: 14px 0 8px;
       padding-bottom: 5px; border-bottom: 1px solid var(--border-gold); text-transform: uppercase;
     }
 
@@ -1778,11 +1806,11 @@
     #priceStatsModal .modal-title { color: var(--text-light); }
     #calcModal .modal-close,
     #priceStatsModal .modal-close {
-      background: rgba(255,255,255,0.06); color: var(--text-light);
-      border-color: rgba(255,255,255,0.14);
+      background: var(--aq-bg-muted-2); color: var(--text-light);
+      border-color: var(--aq-border-strong);
     }
     #calcModal .modal-close:hover,
-    #priceStatsModal .modal-close:hover { background: rgba(255,255,255,0.12); }
+    #priceStatsModal .modal-close:hover { background: var(--aq-border-strong); }
     #calcModal .section-title,
     #priceStatsModal .section-title { color: var(--gold-soft); }
     #calcModal label,
@@ -1791,7 +1819,7 @@
     #priceStatsModal input, #priceStatsModal select, #priceStatsModal textarea {
       background: var(--input-dark) !important;
       color: var(--text-light) !important;
-      border: 1px solid rgba(255,255,255,0.12) !important;
+      border: 1px solid var(--aq-border-strong) !important;
     }
     #calcModal select, #priceStatsModal select { color-scheme: dark; }
     #calcModal input::placeholder, #calcModal textarea::placeholder,
@@ -1799,7 +1827,7 @@
     #calcModal input:focus, #calcModal select:focus, #calcModal textarea:focus,
     #priceStatsModal input:focus, #priceStatsModal select:focus {
       border-color: var(--gold) !important;
-      box-shadow: 0 0 0 3px rgba(201,154,46,0.16) !important;
+      box-shadow: var(--aq-focus-ring) !important;
     }
     /* calculator result panel (same language as #editModal .installment-preview) */
     #calcModal .calc-results {
@@ -1816,57 +1844,57 @@
     #calcModal #calcAiExtractMsg, #calcModal #calcImagesUploadMsg { color: var(--text-muted); }
     #calcModal .ai-paste-zone,
     #calcModal .images-zone {
-      background: rgba(255,255,255,0.04); border-color: var(--border-gold); color: var(--gold-soft);
+      background: var(--aq-bg-muted-1); border-color: var(--border-gold); color: var(--gold-soft);
     }
     #calcModal .images-zone p { color: var(--text-muted); }
     #calcModal .image-link-row button {
-      background: rgba(255,255,255,0.06); color: var(--text-light); border-color: rgba(255,255,255,0.14);
+      background: var(--aq-bg-muted-2); color: var(--text-light); border-color: var(--aq-border-strong);
     }
     /* "سعر المتر" search box + district cards (cards are built in renderPriceStatsTable) */
     #priceStatsModal .price-stats-search {
       background: var(--input-dark); color: var(--text-light);
-      border: 1px solid rgba(255,255,255,0.12);
+      border: 1px solid var(--aq-border-strong);
     }
     #priceStatsModal .price-stats-search::placeholder { color: var(--text-muted); }
     #priceStatsModal .price-stats-search:focus {
-      outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,154,46,0.16);
+      outline: none; border-color: var(--gold); box-shadow: var(--aq-focus-ring);
     }
-    #editMsg { margin-top: 10px; padding: 8px 12px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; display: none; }
+    #editMsg { margin-top: 10px; padding: 8px 12px; border-radius: var(--radius-sm); font-size:  var(--aq-fs-small); font-weight: 600; display: none; }
     #editMsg.success { background: var(--success-bg); color: var(--success-fg); display: block; }
     #editMsg.error { background: var(--error-bg); color: var(--error-fg); display: block; }
     #editSaveBtn { background: var(--navy); color: var(--gold-soft); border: 1px solid var(--border-gold); width: 100%; margin-top: 12px; padding: 11px; }
     #editSaveBtn:hover { background: var(--navy-deep); }
-    #editSaveBtn:disabled { background: #9aa4ae; color: #fff; border-color: transparent; }
+    #editSaveBtn:disabled { background: var(--aq-neutral-disabled); color: var(--aq-white); border-color: transparent; }
 
     .installment-preview {
-      margin-top: 8px; background: rgba(201,154,46,0.14); color: var(--gold-dark);
+      margin-top: 8px; background: var(--aq-accent-tint-2); color: var(--gold-dark);
       border: 1px solid var(--border-gold); padding: 9px 14px;
-      border-radius: var(--radius-sm); font-size: 13px; font-weight: 600;
+      border-radius: var(--radius-sm); font-size:  var(--aq-fs-small); font-weight: 600;
     }
-    .installment-preview b { font-size: 15px; }
+    .installment-preview b { font-size:  var(--aq-fs-body-lg); }
 
     /* منطقة رفع صور الوحدة (مطابقة لصفحة الإدخال) */
     .images-zone {
       border: 1.5px dashed var(--border); border-radius: var(--radius-sm); padding: 12px; text-align: center;
       background: var(--bg); cursor: pointer; transition: border-color var(--ease), background-color var(--ease);
     }
-    .images-zone:hover, .images-zone.drag-over, .images-zone:focus { border-color: var(--gold); background: rgba(201,154,46,0.07); outline: none; }
-    .images-zone p { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
-    .images-choose-btn { background: var(--navy); color: var(--gold-soft); border: 1px solid var(--border-gold); padding: 7px 16px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 700; cursor: pointer; }
+    .images-zone:hover, .images-zone.drag-over, .images-zone:focus { border-color: var(--gold); background: var(--aq-accent-tint-1); outline: none; }
+    .images-zone p { font-size:  var(--aq-fs-caption); color: var(--muted); margin-bottom: 6px; }
+    .images-choose-btn { background: var(--navy); color: var(--gold-soft); border: 1px solid var(--border-gold); padding: 7px 16px; border-radius: var(--radius-sm); font-size:  var(--aq-fs-caption); font-weight: 700; cursor: pointer; }
     .image-link-row { display: flex; gap: 8px; margin-top: 6px; }
     .image-link-row input { flex: 1; }
-    .image-link-row button { background: rgba(10,28,47,0.06); color: var(--navy); border: 1px solid var(--border); padding: 0 18px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .image-link-row button { background: rgba(10,28,47,0.06); color: var(--navy); border: 1px solid var(--border); padding: 0 18px; border-radius: var(--radius-sm); font-size:  var(--aq-fs-small); font-weight: 700; cursor: pointer; white-space: nowrap; }
     .images-preview { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
     .image-thumb {
-      position: relative; width: 70px; height: 70px; border-radius: 8px; overflow: hidden;
+      position: relative; width: 70px; height: 70px; border-radius:  var(--aq-radius-sm); overflow: hidden;
       border: 1px solid var(--border); cursor: grab; transition: transform .15s, opacity .15s, border-color .15s;
     }
     .image-thumb:active { cursor: grabbing; }
     .image-thumb.dragging { opacity: 0.4; }
     .image-thumb.drag-over { border: 2px dashed var(--gold); transform: scale(1.05); }
     .image-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
-    .image-thumb .remove-img { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: rgba(179,38,30,0.9); color: #fff; border: none; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .image-thumb .uploading-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.75); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--navy); }
+    .image-thumb .remove-img { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: rgba(179,38,30,0.9); color: var(--aq-white); border: none; font-size:  var(--aq-fs-caption); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .image-thumb .uploading-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.75); display: flex; align-items: center; justify-content: center; font-size:  var(--aq-fs-micro); color: var(--navy); }
     #editDeleteBtn {
       background: transparent; color: var(--error-fg); border: 1px solid var(--error-fg);
       border-radius: var(--radius-sm);
@@ -1876,24 +1904,24 @@
     #editDeleteBtn:disabled { opacity: 0.6; cursor: not-allowed; }
     /* زر "تفريغ النموذج" - نفس نمط زر تفريغ الفورم الثانوي في add.html (#resetBtn) */
     #editResetBtn {
-      background: rgba(255,255,255,0.06); color: var(--text-light); border: 1px solid rgba(255,255,255,0.14);
+      background: var(--aq-bg-muted-2); color: var(--text-light); border: 1px solid var(--aq-border-strong);
       border-radius: var(--radius-sm);
       width: 100%; margin-top: 10px; padding: 11px; font-weight: 700;
     }
-    #editResetBtn:hover { background: rgba(255,255,255,0.1); }
+    #editResetBtn:hover { background: var(--aq-border-dark); }
     #editResetBtn:disabled { opacity: 0.6; cursor: not-allowed; }
     /* البند 1+2: صف أزرار "عرض السعر" (تصدير + واتساب) — نفس لغة أزرار النظام */
     #quoteActionRow { display: none; gap: 10px; margin-top: 12px; }
     #quoteActionRow.show { display: flex; flex-wrap: wrap; }
     #quoteActionRow button {
-      flex: 1 1 200px; padding: 12px; border-radius: 9px;
-      font-family: inherit; font-weight: 700; font-size: 14px; cursor: pointer;
+      flex: 1 1 200px; padding: 12px; border-radius:  var(--aq-radius-sm);
+      font-family: inherit; font-weight: 700; font-size:  var(--aq-fs-body); cursor: pointer;
       display: flex; align-items: center; justify-content: center; gap: 8px;
     }
     #quoteExportBtn { background: var(--navy); color: var(--gold-soft); border: 1px solid var(--border-gold); }
     #quoteExportBtn:hover { background: var(--navy-deep); }
-    #quoteWhatsAppBtn { background: #4FA579; color: #fff; border: 1px solid #4FA579; }
-    #quoteWhatsAppBtn:hover { background: #46946c; }
+    #quoteWhatsAppBtn { background: var(--aq-success); color: var(--aq-white); border: 1px solid var(--aq-success); }
+    #quoteWhatsAppBtn:hover { background: var(--aq-success-strong); }
     #quoteActionRow button:disabled { opacity: 0.6; cursor: not-allowed; }
     #quoteActionRow button svg { width: 16px; height: 16px; flex-shrink: 0; }
 
@@ -1931,7 +1959,7 @@
     .card-provenance {
       margin-top: 8px; padding-top: 8px;
       border-top: 1px dashed var(--line-dark);
-      font-size: 11.5px; font-weight: 500; color: rgba(234,240,246,0.78);
+      font-size:  var(--aq-fs-caption-sm); font-weight: 500; color: var(--aq-text-secondary);
       display: flex; align-items: center; justify-content: space-between;
       gap: 10px; flex-wrap: wrap;
     }
@@ -1953,7 +1981,7 @@
       color: var(--gold-soft); font-weight: 700;
     }
     .card-provenance a { color: var(--gold-soft); font-weight: 700; text-decoration: underline; cursor: pointer; }
-    @media (max-width: 380px) { .card-provenance { font-size: 10px; gap: 5px 8px; } }
+    @media (max-width: 420px) { .card-provenance { font-size:  var(--aq-fs-micro); gap: 5px 8px; } }
 
     /* ===== conditional card header padding: only reserve gutter when there is no cover image ===== */
     .unit-card:has(.unit-cover) .unit-top { padding: 2px 0 0; }
@@ -1969,19 +1997,19 @@
     .ai-paste-zone {
       margin-top: 8px; border: 1.5px dashed var(--border-gold); border-radius: var(--radius-sm);
       padding: 14px; text-align: center; cursor: pointer; color: var(--gold-dark);
-      font-size: 12px; font-weight: 600; background: var(--white); outline: none;
+      font-size:  var(--aq-fs-caption); font-weight: 600; background: var(--white); outline: none;
       transition: border-color var(--ease), background-color var(--ease);
     }
-    .ai-paste-zone:hover, .ai-paste-zone:focus { border-color: var(--gold); background: rgba(201,154,46,0.07); }
+    .ai-paste-zone:hover, .ai-paste-zone:focus { border-color: var(--gold); background: var(--aq-accent-tint-1); }
     .ai-paste-zone.is-armed { border-color: var(--gold); background: rgba(201,154,46,0.1); color: var(--gold-dark); }
     .ai-extract-btn {
       width: 100%; margin-top: 10px; padding: 11px;
       border: 1px solid var(--border-gold); border-radius: var(--radius-sm);
       background: var(--navy); color: var(--gold-soft);
-      font-weight: 700; font-size: 13px; cursor: pointer;
+      font-weight: 700; font-size:  var(--aq-fs-small); cursor: pointer;
       transition: background-color var(--ease), border-color var(--ease);
     }
-    .ai-extract-btn:hover { background: var(--navy-deep); border-color: rgba(201,154,46,0.5); }
+    .ai-extract-btn:hover { background: var(--navy-deep); border-color: var(--aq-border-accent-strong); }
 
     /* ===== modal interior rhythm ===== */
     .modal-box .section-title:first-of-type { margin-top: 2px; }
@@ -2005,25 +2033,25 @@
     #compareModal .modal-title { color: var(--text-light); }
     #editModal .modal-close,
     #compareModal .modal-close {
-      background: rgba(255,255,255,0.06); color: var(--text-light);
-      border-color: rgba(255,255,255,0.14);
+      background: var(--aq-bg-muted-2); color: var(--text-light);
+      border-color: var(--aq-border-strong);
     }
     #editModal .modal-close:hover,
-    #compareModal .modal-close:hover { background: rgba(255,255,255,0.12); }
+    #compareModal .modal-close:hover { background: var(--aq-border-strong); }
     #editModal .section-title { color: var(--gold-soft); }
     #editModal label { color: var(--text-muted); }
     #editModal .images-zone {
-      background: rgba(255,255,255,0.04); border-color: var(--border-gold);
+      background: var(--aq-bg-muted-1); border-color: var(--border-gold);
     }
     #editModal .images-zone p { color: var(--text-muted); }
     #editModal .image-link-row button {
-      background: rgba(255,255,255,0.06); color: var(--text-light); border-color: rgba(255,255,255,0.14);
+      background: var(--aq-bg-muted-2); color: var(--text-light); border-color: var(--aq-border-strong);
     }
     #editModal .image-thumb { border-color: var(--line-dark); }
     #editModal .image-thumb .uploading-overlay { background: rgba(6,19,33,0.72); color: var(--text-light); }
     #editModal .installment-preview { color: var(--gold-soft); }
     #editModal .installment-preview b { color: var(--text-light); }
-    #editModal #editDeleteBtn { color: #E9908A; border-color: rgba(176,39,31,0.6); }
+    #editModal #editDeleteBtn { color: var(--aq-danger-soft); border-color: var(--aq-danger-border-strong); }
     #editModal #editDeleteBtn:hover { background: rgba(176,39,31,0.14); }
 
     /* AI auto-fill panel inside the Add-Unit modal — deep glass like the main AI search console */
@@ -2034,20 +2062,20 @@
     #editModal #unitAddAiSection .section-title { color: var(--gold-soft); }
     #editModal #unitAddAiSection p { color: var(--text-muted); }
     #editModal #unitAddAiSection textarea {
-      background: rgba(255,255,255,0.05); color: var(--text-light);
-      border: 1px solid rgba(201,154,46,0.22);
+      background: var(--aq-bg-muted-2); color: var(--text-light);
+      border: 1px solid var(--aq-accent-tint-3);
     }
     #editModal #unitAddAiSection textarea::placeholder { color: var(--text-muted); }
     #editModal #unitAddAiSection textarea:focus {
-      border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,154,46,0.16);
-      background: rgba(255,255,255,0.07);
+      border-color: var(--gold); box-shadow: var(--aq-focus-ring);
+      background: var(--aq-bg-muted-3);
     }
     #editModal #unitAddAiSection .ai-paste-zone {
-      background: rgba(255,255,255,0.04); color: var(--gold-soft);
+      background: var(--aq-bg-muted-1); color: var(--gold-soft);
     }
     #editModal #unitAddAiSection input[type="file"] {
-      color-scheme: dark; color: var(--text-light); font-size: 12px;
-      background: rgba(255,255,255,0.05); border: 1px solid rgba(201,154,46,0.22);
+      color-scheme: dark; color: var(--text-light); font-size:  var(--aq-fs-caption);
+      background: var(--aq-bg-muted-2); border: 1px solid var(--aq-accent-tint-3);
       border-radius: var(--radius-sm); padding: 8px 10px;
     }
 
@@ -2056,22 +2084,22 @@
       border: 1px solid var(--border-gold); border-radius: var(--radius-sm);
       transition: background-color var(--ease), border-color var(--ease);
     }
-    #compareModal #compareExportPdfBtn:hover { background: var(--navy-deep); border-color: rgba(201,154,46,0.5); }
+    #compareModal #compareExportPdfBtn:hover { background: var(--navy-deep); border-color: var(--aq-border-accent-strong); }
     #compareModal .compare-empty {
       text-align: center; padding: 30px 16px;
-      color: var(--text-muted); font-size: 13px; line-height: 1.9;
+      color: var(--text-muted); font-size:  var(--aq-fs-small); line-height: 1.9;
     }
 
     /* ===== responsive breakpoints ===== */
     @media (max-width: 640px) {
       body { padding: 18px 14px 40px; }
-      h1 { font-size: 19px; margin: 4px 0 16px; }
+      h1 { font-size:  var(--aq-fs-section-title); margin: 4px 0 16px; }
       .site-header { flex-direction: column; align-items: stretch; row-gap: 6px; margin-bottom: 16px; padding-bottom: 12px; }
-      .site-header h1 { font-size: 20px; padding-right: 11px; }
-      .site-tagline { font-size: 12.5px; }
-      .top-action-btn { min-width: calc(50% - 4px); max-width: none; font-size: 12px; padding: 10px 12px; }
+      .site-header h1 { font-size:  var(--aq-fs-section-title); padding-right: 11px; }
+      .site-tagline { font-size:  var(--aq-fs-label); }
+      .top-action-btn { min-width: calc(50% - 4px); max-width: none; font-size:  var(--aq-fs-caption); padding: 10px 12px; }
       /* #appNav stays ONE row on mobile too — it scrolls horizontally (see base rule) */
-      #appNav .app-nav-btn { font-size: 12px; padding: 8px 10px; min-width: max-content; }
+      #appNav .app-nav-btn { font-size:  var(--aq-fs-caption); padding: 8px 10px; min-width: max-content; }
       .grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px 12px; }
       /* minmax(0,1fr) مش 1fr: عمود واحد لا يتوسّع بمحتوى غير قابل للّف (nowrap) خارج الحاوية */
       .results-grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
@@ -2086,12 +2114,12 @@
       .filters-card { padding: 14px; }
       .modal-overlay { padding: 20px 10px; }
       .modal-box { padding: 16px; }
-      .compare-bar { flex-wrap: wrap; gap: 10px; padding: 12px 16px; font-size: 13px; }
+      .compare-bar { flex-wrap: wrap; gap: 10px; padding: 12px 16px; font-size:  var(--aq-fs-small); }
       .access-gate-box { padding: 26px 22px; }
-      .access-gate-box h2 { font-size: 20px; }
+      .access-gate-box h2 { font-size:  var(--aq-fs-section-title); }
     }
     @media (max-width: 420px) {
-      .top-action-btn { min-width: calc(50% - 4px); font-size: 11px; padding: 10px 8px; gap: 6px; }
+      .top-action-btn { min-width: calc(50% - 4px); font-size:  var(--aq-fs-caption-sm); padding: 10px 8px; gap: 6px; }
       .top-action-btn svg { width: 15px; height: 15px; }
       .grid { grid-template-columns: minmax(0, 1fr); }
     }
@@ -2133,13 +2161,13 @@
     }
     .pre-search-mark .ico { width: 24px; height: 24px; }
     .pre-search-state h3 {
-      font-size: 16px;
+      font-size:  var(--aq-fs-card-title);
       font-weight: 700;
       color: var(--text-light);
       margin: 0 0 8px;
     }
     .pre-search-state p {
-      font-size: 13px;
+      font-size:  var(--aq-fs-small);
       color: rgba(234,240,246,0.66);
       line-height: 1.8;
       margin: 0 auto;
@@ -2276,13 +2304,13 @@
   </div>
   <div class="aq-side-caption">التنقل</div>
   <nav id="appNav" aria-label="أقسام التطبيق">
-    <button type="button" class="top-action-btn app-nav-btn is-active" id="navSearchBtn" data-app-view="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span>البحث</span></button>
-    <button type="button" class="top-action-btn app-nav-btn top-action-calc" id="calcFabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/><line x1="16" y1="18" x2="16" y2="18"/></svg><span>عرض السعر</span></button>
-    <button type="button" class="top-action-btn app-nav-btn top-action-price" id="priceInfoFabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>سعر المتر</span></button>
-    <button type="button" class="top-action-btn app-nav-btn" id="navAddUnitBtn" data-app-view="add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>إدخال وحدة</span></button>
+    <button type="button" class="top-action-btn app-nav-btn is-active" id="navSearchBtn" data-app-view="search" data-route="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span>البحث</span></button>
+    <button type="button" class="top-action-btn app-nav-btn top-action-calc" id="calcFabBtn" data-route="quote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/><line x1="16" y1="18" x2="16" y2="18"/></svg><span>عرض السعر</span></button>
+    <button type="button" class="top-action-btn app-nav-btn top-action-price" id="priceInfoFabBtn" data-route="meter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>سعر المتر</span></button>
+    <button type="button" class="top-action-btn app-nav-btn" id="navAddUnitBtn" data-app-view="add" data-route="add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>إدخال وحدة</span></button>
     <a href="https://resale-units.vercel.app/" target="_blank" rel="noopener" class="top-action-btn app-nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg><span>وحدات إعادة البيع</span></a>
     <!-- "الإحصائيات والمخزون" أُزيل من الشريط الرئيسي — الوصول إليه من لوحة التحكم / الشريط الجانبي فقط، وحسب صلاحية VIEW_STATISTICS. -->
-    <button type="button" class="top-action-btn app-nav-btn top-action-admin" id="adminFab" data-app-view="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>لوحة التحكم</span></button>
+    <button type="button" class="top-action-btn app-nav-btn top-action-admin" id="adminFab" data-app-view="dashboard" data-route="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>لوحة التحكم</span></button>
   </nav>
   <div class="aq-side-spacer"></div>
   <button type="button" class="aq-side-logout" id="aqSideLogoutBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg><span>تسجيل الخروج</span></button>
@@ -2295,6 +2323,16 @@
   <header class="site-header">
     <h1>ابحث عن وحدتك العقارية</h1>
     <p class="site-tagline">اعثر على الوحدة المناسبة، قارن الأسعار، واحسب خطة السداد — كل ذلك في مكان واحد.</p>
+  </header>
+  <!-- Phase 3C: Page Header الموحّد للشِل — يُرسم مرة واحدة من ROUTE_REGISTRY (window.__aqarPageHeader.sync)
+       عند كل تغيير مسار. لا منطق عمل هنا؛ عنوان/وصف/مسار + خانة إجراءات فارغة تُملأ برمجيًا عند الحاجة. -->
+  <header class="aq-page-header" id="aqPageHeader" hidden aria-live="polite">
+    <div class="aq-page-header-main">
+      <nav class="aq-page-crumbs" id="aqPageCrumbs" aria-label="مسار الصفحة" hidden></nav>
+      <h1 class="aq-page-title" id="aqPageTitle"></h1>
+      <p class="aq-page-subtitle" id="aqPageSubtitle" hidden></p>
+    </div>
+    <div class="aq-page-actions" id="aqPageActions" hidden></div>
   </header>
 
   <!-- Phase 2A: شريط التنقّل الموحّد (#appNav) انتقل إلى السايدبار الدائم — نفس الأزرار والـ ids والمعالجات -->
@@ -2512,6 +2550,15 @@
 
         <div class="dash-panel" id="dashPanel-home">
           <div class="dash-page-title">نظرة عامة</div>
+          <!-- Phase 3D: مؤشرات ملخّصة (KPI) للصفحة الرئيسية — تُرسم برمجيًا من getDashboardStats عبر AqarDataService
+               (نفس الدالة/الصلاحية VIEW_STATISTICS المستخدمة في "الإحصاءات والمخزون")؛ لا أرقام ثابتة في الـ markup. -->
+          <section class="aq-section-block dash-home-kpis" id="dashHomeKpis" aria-labelledby="dashHomeKpisTitle">
+            <div class="aq-section-header">
+              <h2 class="aq-section-title" id="dashHomeKpisTitle">مؤشرات المخزون</h2>
+              <button type="button" class="aq-btn aq-btn--ghost aq-btn--icon" id="dashHomeKpisRefresh" aria-label="تحديث المؤشرات" title="تحديث المؤشرات"></button>
+            </div>
+            <div class="aq-kpi-grid" id="dashHomeKpiGrid" aria-live="polite" aria-busy="true"></div>
+          </section>
           <div class="dash-live-card">
             <div class="live-count" id="dashLiveCount"><span class="live-dot"></span>المستخدمون المتصلون الآن: <b id="dashLiveCountValue">-</b></div>
             <div id="dashLiveEmailsList"></div>
@@ -2525,6 +2572,11 @@
 
             <p class="about-lead"><span class="ltr" dir="ltr">AqaR Digital</span> هي منصّة رقمية صُممت لتجميع وتنظيم البيانات العقارية في بيئة واحدة تساعد فرق التسويق والمبيعات على الوصول إلى المعلومات التي يحتاجون إليها بسرعة ووضوح، وتحويل البيانات العقارية من معلومات متفرقة إلى أدوات عملية يمكن الاعتماد عليها في العمل اليومي.</p>
 
+            <button type="button" class="toggle-details-btn dash-about-toggle" id="dashAboutToggle" aria-expanded="false" aria-controls="dashAboutDetails">
+              <span class="label">قراءة المزيد عن AqaR Digital</span><span class="chevron">▾</span>
+            </button>
+
+            <div class="dash-about-details" id="dashAboutDetails" style="display:none;">
             <h3>رؤيتنا</h3>
             <p>نسعى إلى بناء منظومة رقمية أكثر تنظيمًا وشفافية لسوق التسويق العقاري المصري، من خلال تسهيل الوصول إلى بيانات الوحدات والمشروعات والأسعار وأنظمة السداد، وتقديم المعلومات بصورة تساعد المتخصصين على فهم السوق واتخاذ قرارات أفضل.</p>
             <p>فنحن نؤمن أن المعلومة العقارية الدقيقة والمنظمة هي أحد أهم أصول شركات التسويق العقاري، وأن التكنولوجيا يمكن أن تجعل إدارتها ومشاركتها والاستفادة منها أكثر كفاءة.</p>
@@ -2547,6 +2599,7 @@
             <p>نطمح إلى أن تكون <span class="ltr" dir="ltr">AqaR Digital</span> جزءًا من التحول الرقمي الذي يحتاجه سوق العقارات المصري؛ سوقٌ تكون فيه المعلومة أكثر تنظيمًا، والوصول إليها أكثر سهولة، واستخدام التكنولوجيا وسيلة لرفع كفاءة شركات التسويق العقاري وتحسين تجربة العاملين والعملاء على حد سواء.</p>
 
             <p class="about-tagline"><span class="ltr" dir="ltr">AqaR Digital</span> — لأن البيانات العقارية عندما تُنظَّم جيدًا، تتحول من معلومات إلى قيمة.</p>
+            </div>
           </article>
         </div>
 
@@ -4057,6 +4110,53 @@
     }
     return false;
   }
+  /* ============================================================
+   * Phase 3C — AqarDataService: طبقة رقيقة موحّدة فوق الـ API shim القائم
+   * (callBackendAPI → fetch(EXEC_URL, POST) → Code.gs). لا تغيير في العقود ولا في الجلسة:
+   *   - نفس أسماء الدوال والمعاملات؛ التوكن يُمرَّر كما تمرّره الشاشات (getAuthCreds) — لا role.
+   *   - توحيد الأخطاء: NETWORK (فشل اتصال) · MALFORMED (رد غير JSON/غير كائن) ·
+   *     AUTH (authRequired → handleAuthLost_ القائم ما لم يُطلب تجاهله) · BACKEND (success:false).
+   *   - لا cache، لا بيانات وهمية، لا تغيير في شكل الرد (الرد الناجح يُعاد كما هو).
+   * الاستخدام التدريجي: الشاشات الجديدة/المُرحَّلة فقط؛ النداءات القائمة تبقى حتى تُلمس.
+   * ============================================================ */
+  var AqarDataService = (function () {
+    function DataError(code, message, raw) {
+      this.name = 'AqarDataError'; this.code = code; this.message = message || code; this.raw = raw;
+    }
+    DataError.prototype = Object.create(Error.prototype);
+    DataError.prototype.constructor = DataError;
+    /** request(action, params[], opts?) → Promise<res>. opts.auth=true يلحق getAuthCreds() تلقائيًا؛
+     *  opts.onAuthLost='ignore' يمنع تسجيل الخروج التلقائي (لنداءات الخلفية/الاستطلاع). */
+    function request(action, params, opts) {
+      opts = opts || {};
+      var args = Array.isArray(params) ? params.slice() : (params === undefined ? [] : [params]);
+      if (opts.auth) args.push(getAuthCreds());
+      return callBackendAPI(action, args).then(function (res) {
+        if (res === null || typeof res !== 'object') throw new DataError('MALFORMED', 'رد غير صالح من السيرفر', res);
+        if (res.authRequired) {
+          if (opts.onAuthLost !== 'ignore') { try { handleAuthLost_(res); } catch (e) {} }
+          throw new DataError('AUTH', res.message || 'انتهت الجلسة — سجّل الدخول من جديد', res);
+        }
+        if (res.success === false) throw new DataError('BACKEND', res.message || 'تعذّر تنفيذ الطلب', res);
+        return res;
+      }, function (err) {
+        if (err instanceof DataError) throw err;
+        var msg = (err && err.message) || '';
+        if (/رد غير صالح/.test(msg)) throw new DataError('MALFORMED', msg, err);
+        throw new DataError('NETWORK', 'تعذّر الاتصال بالسيرفر', err);
+      });
+    }
+    function get(action, params, opts) { return request(action, params, opts); }
+    function mutate(action, params, opts) { return request(action, params, opts); }
+    /** رسالة خطأ موحّدة عبر آلية toast القائمة */
+    function notify(err, fallbackMsg) {
+      var m = (err && err.message) || fallbackMsg || 'حدث خطأ';
+      try { showToast(m, 'error'); } catch (e) {}
+    }
+    return { request: request, get: get, mutate: mutate, notify: notify, DataError: DataError };
+  })();
+  window.AqarDataService = AqarDataService; // للتشخيص/الاختبار — لا يحمل أي حالة أو صلاحية
+
   function setCurrentUserFromLogin(res, fallbackEmail) {
     window.__currentUser = {
       email: (res && res.email) || fallbackEmail || '',
@@ -4082,12 +4182,13 @@
     // زر "إدخال وحدة" في التنقّل: لا يُعرَض أصلًا لدور مؤكَّد بلا ADD_UNIT (SALES/MANAGER).
     // الحماية الحقيقية ليست الإخفاء: مسار #add محميّ بـ unlockAddThen (gateHasPerm_ ADD_UNIT)
     // والسيرفر يتحقق (authorizeUnitOp_) — الإخفاء هنا فقط كي لا يظهر زر لوظيفة غير مسموحة.
-    var addBtn = document.getElementById('navAddUnitBtn');
-    if (addBtn) {
-      var canAdd = uiAllows('ADD_UNIT');
-      addBtn.hidden = !canAdd;
-      addBtn.style.display = canAdd ? '' : 'none';
-    }
+    // Phase 3A: إظهار/إخفاء عناصر #appNav من ROUTE_REGISTRY (navPerm) — نفس القاعدة السابقة
+    // (زر "إدخال وحدة" ↔ ADD_UNIT) لكن من مصدر واحد؛ العناصر بلا navPerm تظهر لكل الأدوار.
+    Array.prototype.forEach.call(document.querySelectorAll('#appNav [data-route]'), function (btn) {
+      var r = ROUTE_REGISTRY[btn.getAttribute('data-route')];
+      if (!r || !r.navPerm) return;
+      setNavItemVisible_(btn, uiAllows(r.navPerm));   // Phase 3C Hotfix: القاعدة الوحيدة للإخفاء
+    });
     // زر "حفظ التعديلات/الوحدة" في نموذج الوحدة (#editSaveBtn): يُزال من الـ DOM كليًا لأي دور
     // مؤكَّد بلا أي صلاحية كتابة على الوحدات (SALES) — ليس إخفاء CSS، وليس disable، ولا نسخة ثانية.
     // OWNER/MANAGER/DATA_ENTRY يملكون صلاحية كتابة → يبقى الزر. الحماية الحقيقية: حارس الإرسال + الباك-إند.
@@ -4103,6 +4204,96 @@
     try { if (window.__aqarShellIdentity) window.__aqarShellIdentity(); } catch (e) {}
   }
   window.hasPermission = hasPermission; // مفيدة للتشخيص فقط
+
+  /* ============================================================
+   * Phase 3A — ROUTE REGISTRY: المصدر الوحيد لتعريف مسارات الواجهة (client-side فقط).
+   * ------------------------------------------------------------
+   * كل مسار = { hash, view, navId, navPerm, perm, label, denyMsg, title, subtitle?, crumbs? }:
+   *   - title/subtitle/crumbs (Phase 3C): بيانات عرض فقط لـ Page Header الموحّد — لا أثر على السلوك.
+   *   - hash     : قيمة location.hash التي تفتحه ('' = المسار الافتراضي: البحث).
+   *   - view     : مفتاح data-app-view للحالة النشطة (setActiveNav) — الإحصائيات/الملف الشخصي
+   *                تُعرض داخل عرض لوحة التحكم، لذا view = 'dashboard' لها.
+   *   - navId    : زر التنقّل في #appNav (data-route) المرتبط بالمسار.
+   *   - navPerm  : صلاحية **إظهار** الزر (null = يظهر لكل الأدوار). تُطبَّق في applyRoleUiVisibility.
+   *   - perm     : صلاحية **الوصول** للمسار: null = عام · 'AUTH' = أي مستخدم مسجَّل ·
+   *                غير ذلك = مفتاح من CLIENT_PERMS (لا مفاتيح جديدة — نفس المصفوفة القائمة).
+   * ملاحظة سلوكية محفوظة: زر "لوحة التحكم" (adminFab) يظهر لكل الأدوار لأنه يفتح #profile
+   * لمن لا يملك VIEW_STATISTICS (معالجه القائم) — لذلك navPerm=null بينما perm للمسار نفسه محمي.
+   * الحماية الحقيقية تبقى في الباك-إند (requirePermission_) — هذه الطبقة تنظيم للتنقّل فقط.
+   * ============================================================ */
+  var ROUTE_REGISTRY = {
+    search:    { hash: '',           view: 'search',    navId: 'navSearchBtn',    navPerm: null,       perm: null,              label: 'البحث',
+                  title: 'ابحث عن وحدتك العقارية', subtitle: 'اعثر على الوحدة المناسبة، قارن الأسعار، واحسب خطة السداد — كل ذلك في مكان واحد.' },
+    quote:     { hash: '#quote',     view: 'quote',     navId: 'calcFabBtn',      navPerm: null,       perm: null,              label: 'عرض السعر',
+                  title: 'عرض السعر', subtitle: 'احسب عرض السعر وخطة السداد لوحدة' },
+    meter:     { hash: '#meter',     view: 'meter',     navId: 'priceInfoFabBtn', navPerm: null,       perm: null,              label: 'سعر المتر',
+                  title: 'سعر المتر', subtitle: 'متوسط سعر المتر لكل منطقة' },
+    add:       { hash: '#add',       view: 'add',       navId: 'navAddUnitBtn',   navPerm: 'ADD_UNIT', perm: 'ADD_UNIT',        label: 'إدخال وحدة',
+                  title: 'إدخال وحدة جديدة', subtitle: 'أضف وحدة جديدة إلى قاعدة البيانات',
+                 denyMsg: 'صلاحيتك الحالية لا تسمح بإضافة وحدات' },
+    /* ---- Phase 3B: أقسام لوحة التحكم كمسارات داخلية (#dashboard/<section>) ----
+     *   section : مفتاح القسم في #dashNav (data-dash) / اللوحة #dashPanel-<section>.
+     *   aliases : الهاشات القديمة تبقى صالحة (backward compatibility) وتُحلّ إلى نفس المسار:
+     *             '#dashboard' → آخر قسم مفتوح (السلوك القائم) · '#stats' · '#profile'.
+     *   perm    : نفس صلاحيات الأقسام القائمة (DASH_PANEL_PERMS): الأقسام الإدارية MANAGE_* (OWNER فقط
+     *             عبر '*')، الإحصائيات VIEW_STATISTICS، الملف الشخصي أي مستخدم مسجَّل ('AUTH'). */
+    dashboard:  { hash: '#dashboard/home',       aliases: ['#dashboard'], view: 'dashboard', navId: 'adminFab', navPerm: null,
+                  perm: 'VIEW_STATISTICS',   section: 'home',       label: 'لوحة التحكم',
+                  title: 'لوحة التحكم', subtitle: 'نظرة عامة',
+                  denyMsg: 'صلاحيتك الحالية لا تسمح بفتح لوحة التحكم' },
+    stats:      { hash: '#dashboard/stats',      aliases: ['#stats'],     view: 'dashboard', navId: 'adminFab', navPerm: null,
+                  perm: 'VIEW_STATISTICS',   section: 'stats',      label: 'الإحصائيات والمخزون',
+                  title: 'الإحصاءات والمخزون', crumbs: ['لوحة التحكم'],
+                  denyMsg: 'صلاحيتك الحالية لا تسمح بفتح لوحة التحكم' },
+    profile:    { hash: '#dashboard/profile',    aliases: ['#profile'],   view: 'dashboard', navId: 'adminFab', navPerm: null,
+                  perm: 'AUTH',              section: 'profile',    label: 'الملف الشخصي',
+                  title: 'الملف الشخصي', crumbs: ['لوحة التحكم'],
+                  denyMsg: 'صلاحيتك الحالية لا تسمح بفتح لوحة التحكم' },
+    users:      { hash: '#dashboard/users',      aliases: [],             view: 'dashboard', navId: 'adminFab', navPerm: null,
+                  perm: 'MANAGE_USERS',      section: 'users',      label: 'المستخدمون',
+                  title: 'إدارة المستخدمين', crumbs: ['لوحة التحكم'],
+                  denyMsg: 'صلاحيتك الحالية لا تسمح بفتح هذا القسم' },
+    developers: { hash: '#dashboard/developers', aliases: [],             view: 'dashboard', navId: 'adminFab', navPerm: null,
+                  perm: 'MANAGE_DEVELOPERS', section: 'developers', label: 'المطوّرون',
+                  title: 'إدارة بيانات المطوّرين', crumbs: ['لوحة التحكم'],
+                  denyMsg: 'صلاحيتك الحالية لا تسمح بفتح هذا القسم' },
+    settings:   { hash: '#dashboard/settings',   aliases: [],             view: 'dashboard', navId: 'adminFab', navPerm: null,
+                  perm: 'MANAGE_SETTINGS',   section: 'settings',   label: 'الإعدادات',
+                  title: 'الإعدادات', crumbs: ['لوحة التحكم'],
+                  denyMsg: 'صلاحيتك الحالية لا تسمح بفتح هذا القسم' },
+    audit:      { hash: '#dashboard/audit',      aliases: [],             view: 'dashboard', navId: 'adminFab', navPerm: null,
+                  perm: 'MANAGE_USERS',      section: 'audit',      label: 'سجل العمليات',
+                  title: 'سجل عمليات إدارة المستخدمين', crumbs: ['لوحة التحكم', 'المستخدمون'],   // قسم فرعي من "المستخدمون" (بلا عنصر شريط)
+                  denyMsg: 'صلاحيتك الحالية لا تسمح بفتح هذا القسم' }
+  };
+  var ROUTE_FALLBACK = 'search';
+  /** hash → مفتاح المسار، أو null لمسار غير معروف (يُعامل كـ fallback آمن = البحث). */
+  function resolveRouteKey(hash) {
+    var h = String(hash || '');
+    if (h === '' || h === '#') return ROUTE_FALLBACK;
+    for (var k in ROUTE_REGISTRY) {
+      if (!Object.prototype.hasOwnProperty.call(ROUTE_REGISTRY, k)) continue;
+      var r = ROUTE_REGISTRY[k];
+      if (r.hash === h) return k;
+      if (r.aliases && r.aliases.indexOf(h) !== -1) return k;   // Phase 3B: الهاشات القديمة (#dashboard/#stats/#profile)
+    }
+    return null;
+  }
+  /** Phase 3C Hotfix: القاعدة الوحيدة لإظهار/إخفاء أي عنصر تنقّل (الشل + سايدبار اللوحة الداخلي):
+   *  hidden + display:none → لا يُرسم، لا يشغل مساحة، لا يُركَّز، لا يُنقر. القرار نفسه يأتي دائمًا من
+   *  ROUTE_REGISTRY → perm → canAccessRoute/uiAllows — لا قواعد إخفاء أخرى. */
+  function setNavItemVisible_(el, allowed) {
+    if (!el) return;
+    el.hidden = !allowed;
+    el.style.display = allowed ? '' : 'none';
+  }
+  /** Phase 3B: قسم لوحة التحكم (data-dash) → مفتاح مساره في الـ registry، أو null. */
+  function routeKeyForDashSection(section) {
+    for (var k in ROUTE_REGISTRY) {
+      if (Object.prototype.hasOwnProperty.call(ROUTE_REGISTRY, k) && ROUTE_REGISTRY[k].section === section) return k;
+    }
+    return null;
+  }
 
   /* بناء HTML كارت وحدة واحدة (نفس التصميم/البيانات/الأزرار/شروط الصلاحيات بلا أي تغيير) —
    * مُستخرَجة من renderResults() لتصبح implementation واحد فقط لكارت الوحدة، قابل لإعادة
@@ -5635,6 +5826,10 @@
   const editProjectDatalist = document.getElementById('editProjectDatalist');
 
   google.script.run.withSuccessHandler(function(res) {
+    // Phase 3D Hotfix: قبل الدخول (أو بلا صلاحية) السيرفر يرد { authRequired: true } بلا developers —
+    // نتجاهل الرد بصمت بدل رمي استثناء غير مُعالَج (كان يظهر في Console قبل تسجيل الدخول فقط؛ لا تغيير
+    // في سلوك المستخدم المسجَّل دخوله — نفس النمط المستخدم بالفعل في نداء getDeveloperProjectMap الآخر).
+    if (!res || !res.developers) return;
     editDevProjectMap = res;
     editDeveloperDatalist.innerHTML = res.developers.map(d => `<option value="${d}">`).join('');
 
@@ -7526,6 +7721,11 @@
       return (typeof currentUserRole === 'function') && currentUserRole() === 'OWNER';
     }
     function dashNavAllowed_(dd) {
+      // Phase 3B: ظهور عنصر القسم = قرار الوصول المركزي لمساره (canAccessRoute) — نفس نتيجة
+      // القاعدة الصريحة السابقة (OWNER كاملة · غير OWNER: الرئيسية/الإحصائيات/الملف الشخصي) لأن
+      // MANAGE_* حصرية للمالك في CLIENT_PERMS. القاعدة الصريحة تبقى كاحتياط لو غاب المسار.
+      var rk = routeKeyForDashSection(dd);
+      if (rk) return canAccessRoute(rk) === true;
       if (dashIsOwner_()) return true;            // OWNER → القائمة كاملة
       return !!DASH_NONOWNER_MENU[dd];            // غير OWNER → القائمة المقيّدة فقط
     }
@@ -7569,7 +7769,10 @@
         var dd = b.getAttribute('data-dash');
         var allowed = dashNavAllowed_(dd);
         if (dashProfileOnly) allowed = (dd === 'profile');   // وضع "الملف الشخصي فقط" — لا شيء غيره
-        b.hidden = !allowed;
+        // Phase 3C Hotfix: القرار من ROUTE_REGISTRY → canAccessRoute (dashNavAllowed_)، والإخفاء بالقاعدة
+        // الوحيدة المشتركة مع سايدبار الشل (setNavItemVisible_): سمة hidden وحدها كانت تغلبها قاعدة
+        // `.dash-nav-item { display:flex }` فيبقى العنصر مرئيًا وقابلًا للنقر.
+        setNavItemVisible_(b, allowed);
         if (allowed && !firstVisible) firstVisible = dd;
       });
       // لو القسم الحالي مش متاح للدور ده → ارجع لأول قسم متاح.
@@ -7609,6 +7812,10 @@
     function dashSelect(key) {
       // وضع "الملف الشخصي فقط": أي محاولة للانتقال لقسم آخر تُعاد إلى "الملف الشخصي".
       if (dashProfileOnly && key !== 'profile') key = 'profile';
+      // Phase 3C Hotfix: نفس مصدر القرار المركزي (ROUTE_REGISTRY → canAccessRoute) قبل الحراس القديمة —
+      // أي قسم له مسار وليس متاحًا للمستخدم الحالي يُعاد إلى "الرئيسية" (الحراس التالية تبقى كاحتياط).
+      var rk_ = routeKeyForDashSection(key);
+      if (rk_ && key !== 'home' && canAccessRoute(rk_) !== true) key = 'home';
       // المستوى الثاني — تفويض صريح: قسم إداري حصري للمالك + المستخدم ليس OWNER → "الرئيسية".
       // يمنع الوصول عبر dashSelect المباشر / hash / Console / أي نداء برمجي (مش مجرد إخفاء الزر).
       if (DASH_PANEL_OWNER_ONLY[key] && !dashIsOwner_()) key = 'home';
@@ -7646,7 +7853,81 @@
       // ملخّص الوحدات والتصنيفات انتقل بالكامل لقسم "الإحصائيات والمخزون" (نفس البيانات
       // نفس النداء getDashboardStats — لم تُحذف أي وظيفة، فقط لا تُعرض هنا).
       dashHomeLoadedFor = 'ok';
+      dashLoadHomeKpis_();   // Phase 3D
       dashStartLivePoll();
+    }
+
+    /* ============================================================
+     * Phase 3D — مؤشرات الصفحة الرئيسية للوحة (KPI): مكوّن واحد قابل لإعادة الاستخدام (aq-kpi)
+     * - البيانات: getDashboardStats عبر AqarDataService (نفس الدالة والصلاحية VIEW_STATISTICS التي
+     *   تستخدمها "الإحصاءات والمخزون") — لا API جديد، لا أرقام ثابتة، لا أصفار وهمية.
+     * - الصلاحية: القسم كله يُخفى بالقاعدة الوحيدة (setNavItemVisible_) لمن لا يملك VIEW_STATISTICS.
+     * - الحالات: skeleton خفيف (aq-skeleton--card) → بطاقات؛ فشل → aq-alert--danger + إعادة المحاولة.
+     * ============================================================ */
+    var DASH_HOME_KPIS = [
+      { key: 'total',     label: 'إجمالي الوحدات',        icon: 'building', tone: 'accent',  caption: 'الوحدات النشطة في المخزون', get: function (r) { return r.total; } },
+      { key: 'available', label: 'متاح',                  icon: 'check',    tone: 'success', caption: 'جاهزة للعرض والبيع',        get: function (r) { return r.byStatus ? (r.byStatus['متاح'] || 0) : undefined; } },
+      { key: 'reserved',  label: 'محجوز',                 icon: 'clock',    tone: 'warning', caption: 'قيد الحجز',                 get: function (r) { return r.byStatus ? (r.byStatus['محجوز'] || 0) : undefined; } },
+      { key: 'sold',      label: 'مباع',                  icon: 'award',    tone: 'danger',  caption: 'تم بيعها',                  get: function (r) { return r.byStatus ? (r.byStatus['مباع'] || 0) : undefined; } },
+      { key: 'archived',  label: 'مؤرشفة',                icon: 'folder',   tone: 'neutral', caption: 'خارج المخزون النشط',         get: function (r) { return r.archivedCount; } },
+      { key: 'value',     label: 'قيمة الوحدات المتاحة',  icon: 'wallet',   tone: 'accent',  caption: 'بالجنيه المصري',            get: function (r) { return r.totalAvailableValue; } }
+    ];
+    var dashKpiInflight = false;
+    function dashKpiCard_(item, raw) {
+      var card = document.createElement('article');
+      card.className = 'aq-card aq-card--kpi aq-kpi aq-kpi--' + item.tone;
+      card.setAttribute('data-kpi', item.key);
+      var head = document.createElement('div'); head.className = 'aq-kpi-head';
+      var ico = document.createElement('span'); ico.className = 'aq-kpi-icon'; ico.setAttribute('aria-hidden', 'true');
+      if (typeof ICON !== 'undefined' && ICON[item.icon]) ico.innerHTML = ICON[item.icon];   // أيقونات ثابتة موثوقة من مجموعة ICON القائمة
+      var lbl = document.createElement('span'); lbl.className = 'aq-kpi-label'; lbl.textContent = item.label;
+      head.appendChild(ico); head.appendChild(lbl);
+      var num = document.createElement('div'); num.className = 'aq-kpi-number aq-num';
+      var has = (typeof raw === 'number' && isFinite(raw));
+      var txt = has ? fmtNum(raw) : '—';
+      num.textContent = txt;
+      if (txt.length > 9) num.classList.add('aq-kpi-number--long');
+      num.setAttribute('aria-label', item.label + ': ' + txt);
+      var cap = document.createElement('div'); cap.className = 'aq-kpi-caption aq-caption'; cap.textContent = item.caption || '';
+      card.appendChild(head); card.appendChild(num); card.appendChild(cap);
+      return card;
+    }
+    function dashRenderKpis_(res) {
+      var grid = document.getElementById('dashHomeKpiGrid'); if (!grid) return;
+      grid.textContent = '';
+      DASH_HOME_KPIS.forEach(function (item) {
+        var v; try { v = item.get(res); } catch (e) { v = undefined; }
+        grid.appendChild(dashKpiCard_(item, v));
+      });
+      grid.setAttribute('aria-busy', 'false');
+    }
+    function dashRenderKpiSkeleton_() {
+      var grid = document.getElementById('dashHomeKpiGrid'); if (!grid) return;
+      grid.textContent = '';
+      for (var i = 0; i < DASH_HOME_KPIS.length; i++) { var sk = document.createElement('div'); sk.className = 'aq-skeleton aq-skeleton--card'; grid.appendChild(sk); }
+      grid.setAttribute('aria-busy', 'true');
+    }
+    function dashRenderKpiError_(err) {
+      var grid = document.getElementById('dashHomeKpiGrid'); if (!grid) return;
+      grid.textContent = '';
+      var box = document.createElement('div'); box.className = 'aq-alert aq-alert--danger aq-kpi-error'; box.setAttribute('role', 'alert');
+      var msg = document.createElement('span'); msg.textContent = (err && err.message) ? err.message : 'تعذّر تحميل المؤشرات';
+      var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'aq-btn aq-btn--secondary'; btn.textContent = 'إعادة المحاولة';
+      btn.addEventListener('click', function () { dashLoadHomeKpis_(true); });
+      box.appendChild(msg); box.appendChild(btn); grid.appendChild(box);
+      grid.setAttribute('aria-busy', 'false');
+    }
+    function dashLoadHomeKpis_(force) {
+      var sec = document.getElementById('dashHomeKpis'); if (!sec) return;
+      var allowed = typeof hasPermission === 'function' && hasPermission('VIEW_STATISTICS');
+      setNavItemVisible_(sec, allowed);   // نفس قاعدة الإخفاء الوحيدة: لا يُرسم القسم لمن لا يملك الصلاحية (السيرفر يرفض أيضًا)
+      if (!allowed || dashKpiInflight) return;
+      if (!force && document.querySelector('#dashHomeKpiGrid .aq-kpi')) return;   // مرسوم فعلًا — "تحديث" يعيد التحميل صراحةً
+      dashKpiInflight = true;
+      dashRenderKpiSkeleton_();
+      AqarDataService.get('getDashboardStats', [getAuthCreds()])
+        .then(function (res) { dashKpiInflight = false; dashRenderKpis_(res); })
+        .catch(function (err) { dashKpiInflight = false; dashRenderKpiError_(err); });
     }
 
     function dashStartLivePoll() {
@@ -7669,15 +7950,15 @@
       // المصدر الموحّد للحضور: نفس مخزن ونفس تعريف "متصل الآن" المستخدم في صفحة "المستخدمون"
       // (USER_PRESENCE_V1 عبر getOnlineUsers) — بدل ACTIVE_SESSIONS الذي كان يعدّ كل تبويب مفتوح
       // بالاسم فيتناقض الرقم مع صفحة المستخدمين.
-      google.script.run.withSuccessHandler(function (res) {
-        if (!res || !res.success) return;
+      // Phase 3C: عبر AqarDataService (نفس الدالة/المعاملات/الرد) — استطلاع خلفي: فشله صامت كما كان
+      AqarDataService.get('getOnlineUsers', [dashState()], { onAuthLost: 'ignore' }).then(function (res) {
         if (vEl) vEl.textContent = res.count;
         if (lEl) {
           lEl.innerHTML = (res.users && res.users.length)
             ? res.users.map(function (x) { return (x.name || x.email || 'مستخدم'); }).join('<br>')
             : '';
         }
-      }).getOnlineUsers(dashState());
+      }).catch(function () { /* نفس السلوك السابق: لا رسالة للمستخدم */ });
     }
 
     /* ============================================================
@@ -7732,28 +8013,26 @@
       };
       // فشل آمن: لو السيرفر ما ردّش خلال 12 ثانية، اعرض البطاقة من بيانات الجلسة بدل التعليق على "جارٍ التحميل".
       var guard = setTimeout(function () { fallback('تأخّر ردّ السيرفر — يظهر ما هو محفوظ في جلستك. أعد فتح الملف الشخصي للمحاولة من جديد.'); }, 12000);
-      google.script.run
-        .withSuccessHandler(function (res) {
+      // Phase 3C: قراءة عبر AqarDataService (نفس الدالة/المعاملات/الرد). الأخطاء موحّدة:
+      //   BACKEND/MALFORMED → نفس رسالة الفشل السابقة · NETWORK → نفس رسالة الاتصال ·
+      //   AUTH → handleAuthLost_ القائم (خروج موحّد) + عرض بيانات الجلسة حتى إعادة التحميل.
+      AqarDataService.get('getMyProfile', [dashProfileAuth()])
+        .then(function (res) {
           clearTimeout(guard);
           if (settled) return;
-          if (res && res.success) {
-            settled = true;
-            dashProfilePaint({
-              name: res.name || u.name || '', email: res.email || u.email || '',
-              phone: res.phone || '', photo: res.photo || u.photo || '',
-              role: res.role || u.role || '', status: res.status || u.status || 'نشط',
-              addedDate: res.addedDate || '', lastLogin: res.lastLogin || ''
-            });
-          } else {
-            // ردّ فشل (مثال: نشر Code.gs لسه ما اتمّش) → عرض قابل للتعديل من بيانات الجلسة
-            fallback((res && res.message) || 'تعذّر جلب أحدث بياناتك — يظهر ما هو محفوظ في جلستك.');
-          }
+          settled = true;
+          dashProfilePaint({
+            name: res.name || u.name || '', email: res.email || u.email || '',
+            phone: res.phone || '', photo: res.photo || u.photo || '',
+            role: res.role || u.role || '', status: res.status || u.status || 'نشط',
+            addedDate: res.addedDate || '', lastLogin: res.lastLogin || ''
+          });
         })
-        .withFailureHandler(function (err) {
+        .catch(function (err) {
           clearTimeout(guard);
-          fallback('حدث خطأ في الاتصال — يظهر ما هو محفوظ في جلستك.');
-        })
-        .getMyProfile(dashProfileAuth());
+          if (err && err.code === 'NETWORK') fallback('حدث خطأ في الاتصال — يظهر ما هو محفوظ في جلستك.');
+          else fallback((err && err.message) || 'تعذّر جلب أحدث بياناتك — يظهر ما هو محفوظ في جلستك.');
+        });
     }
 
     function dashProfilePaint(p) {
@@ -7902,10 +8181,25 @@
       if (dashWired) return;
       dashWired = true;
       document.querySelectorAll('#dashNav .dash-nav-item[data-dash]').forEach(function (b) {
-        b.addEventListener('click', function () { dashSelect(b.getAttribute('data-dash')); });
+        // Phase 3B: النقر يغيّر المسار (hash) والـ router يفعّل القسم — بدل تبديل الحالة الداخلية مباشرة.
+        b.addEventListener('click', function () { dashNavigate(b.getAttribute('data-dash')); });
       });
       var dt = document.getElementById('dashDrawerToggle');
       if (dt) dt.addEventListener('click', dashOpenDrawer);
+      // Phase 3D: زر تحديث مؤشرات الصفحة الرئيسية (أيقونة من مجموعة ICON القائمة)
+      var kr = document.getElementById('dashHomeKpisRefresh');
+      if (kr) { if (typeof ICON !== 'undefined' && ICON.refresh) kr.innerHTML = ICON.refresh; kr.addEventListener('click', function () { dashLoadHomeKpis_(true); }); }
+      // Phase 3D Hotfix: طيّ/فتح مقال "AqaR Digital" التعريفي — نفس نمط #advancedFiltersToggle القائم
+      // (display none/block + تبديل نص + دوران السهم)، بلا مكوّن جديد وبلا مودال.
+      var dat = document.getElementById('dashAboutToggle');
+      if (dat) dat.addEventListener('click', function () {
+        var block = document.getElementById('dashAboutDetails');
+        var isOpen = block.style.display === 'none';
+        block.style.display = isOpen ? 'block' : 'none';
+        this.classList.toggle('open', isOpen);
+        this.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        this.querySelector('.label').textContent = isOpen ? 'إخفاء التفاصيل' : 'قراءة المزيد عن AqaR Digital';
+      });
       var bd = document.getElementById('dashDrawerBackdrop');
       if (bd) bd.addEventListener('click', dashCloseDrawer);
 
@@ -7941,9 +8235,16 @@
       if (location.hash !== '#dashboard') location.hash = 'dashboard'; else route();
     }
     // target اختياري: قسم لوحة التحكم اللي نفتح عليه مباشرة (مثال: 'developers' من الزر القديم).
+    // Phase 3B: الانتقال لقسم داخل لوحة التحكم = تغيير الـ hash إلى مسار القسم (المصدر الوحيد للحالة).
+    function dashNavigate(section) {
+      var rk = routeKeyForDashSection(section);
+      if (!rk) { dashSelect(section); return; }                        // احتياط: قسم بلا مسار (لا يوجد حاليًا)
+      var h = ROUTE_REGISTRY[rk].hash;
+      if (location.hash !== h) location.hash = h.slice(1); else route();
+    }
     function openDashboard(target) {
       unlockDashboardThen(function () {
-        if (target && typeof target === 'string') dashCurrent = target;
+        if (target && typeof target === 'string') { dashNavigate(target); return; }
         goToDashboardHash();
       });
     }
@@ -7973,32 +8274,89 @@
     function openStats() { goToStatsHash(); }
     function openAdd()   { unlockAddThen(goToAddHash); }
 
-    // مزامنة العرض مع الـ hash — رجوع/تقديم/تحديث والوصول المباشر لـ #stats أو #add.
-    function route() {
-      if (location.hash === '#stats') {
-        if (dashUnlocked()) { dashCurrent = 'stats'; showDashboardView(); }
-        else { showSearchView(); unlockDashboardThen(function () { dashCurrent = 'stats'; showDashboardView(); }); }
-      } else if (location.hash === '#add') {
+    /* ============================================================
+     * Phase 3A — ROUTER (مركزي): hash → ROUTE_REGISTRY → فحص الوصول → عرض.
+     * - enter لكل مسار = نفس منطق المرحلة السابقة حرفيًا (بوابات unlockXThen وأعلامها) —
+     *   لا تغيير في السلوك، فقط جدول بدل سلسلة if.
+     * - canAccessRoute(key) = المصدر الوحيد لقرار الوصول من الواجهة (يعكس نفس شروط البوابات):
+     *     true | false | 'pending' (الجلسة تُستعاد بعد reload → ننتظر __aqarReroute).
+     * - مسار غير معروف → fallback آمن (البحث) دون لمس الـ hash (كما كان).
+     * - مسار معروف بلا صلاحية → لا يُعرض؛ denyGatedSection_ (toast هادئ + تنظيف الـ hash) + البحث.
+     * الباك-إند يظل مصدر الحقيقة الأمني (requirePermission_) — هذه الطبقة تنظيم تنقّل فقط.
+     * ============================================================ */
+    function canAccessRoute(key) {
+      var r = ROUTE_REGISTRY[key];
+      if (!r) return false;
+      if (!r.perm) return true;
+      if (r.perm === 'ADD_UNIT') {
+        if (addUnlocked() || gateHasPerm_('ADD_UNIT')) return true;
+      } else if (r.perm === 'AUTH') {
+        // الملف الشخصي: OWNER/MANAGER داخل اللوحة الكاملة، وأي مستخدم مسجَّل بوضع profileOnly
+        if (dashUnlocked() || gateHasPerm_('VIEW_STATISTICS') || (window.__currentUser && window.__currentUser.email)) return true;
+      } else if (r.perm === 'VIEW_STATISTICS') {
+        if (dashUnlocked() || gateHasPerm_(r.perm)) return true;
+      } else {
+        // Phase 3B: الأقسام الإدارية (MANAGE_*) تتطلب الصلاحية نفسها — فتح اللوحة لا يمنحها
+        if (gateHasPerm_(r.perm)) return true;
+      }
+      return sessionRestorePending_() ? 'pending' : false;
+    }
+    var ROUTE_ENTER = {
+      search:    function () { showSearchView(); },
+      quote:     function () { showQuoteView(); },   // ميزة عامة بلا صلاحية — صفحة داخل مساحة المحتوى
+      meter:     function () { showMeterView(); },   // ميزة عامة بلا صلاحية
+      add:       function () {
         if (addUnlocked()) { showAddView(); }
         else { showSearchView(); unlockAddThen(showAddView); }
-      } else if (location.hash === '#dashboard') {
-        if (dashUnlocked()) { showDashboardView(); }
-        else { showSearchView(); unlockDashboardThen(showDashboardView); }
-      } else if (location.hash === '#profile') {
-        // "الملف الشخصي" — خدمة ذاتية لأي دور. OWNER/MANAGER يفتحونه داخل الشِل الكامل؛
-        // SALES/DATA_ENTRY يفتحونه في وضع "الملف الشخصي فقط" (profileOnly).
-        if (dashUnlocked()) { dashCurrent = 'profile'; showDashboardView(); }
-        else { showSearchView(); unlockDashboardThen(function () { dashCurrent = 'profile'; showDashboardView(); }, { profileOnly: true }); }
-      } else if (location.hash === '#quote') {
-        // "عرض السعر" — ميزة عامة بلا صلاحية (زيّ ما هي اليوم). صفحة داخل مساحة المحتوى.
-        showQuoteView();
-      } else if (location.hash === '#meter') {
-        // "سعر المتر" — ميزة عامة بلا صلاحية. صفحة داخل مساحة المحتوى.
-        showMeterView();
-      } else {
-        showSearchView();
+      },
+      /* Phase 3B: كل قسم في لوحة التحكم مسار — نفس بوابة unlockDashboardThen القائمة، ثم
+       * showDashboardView التي تفعّل القسم عبر dashSelect (تحميل القسم/الإيقاف/الحالة النشطة كما هي). */
+      dashboard:  function () { enterDashSection_('home'); },
+      stats:      function () { enterDashSection_('stats'); },
+      profile:    function () { enterDashSection_('profile', true); },   // profileOnly لمن لا يملك VIEW_STATISTICS (كما كان)
+      users:      function () { enterDashSection_('users'); },
+      developers: function () { enterDashSection_('developers'); },
+      settings:   function () { enterDashSection_('settings'); },
+      audit:      function () { enterDashSection_('audit'); }
+    };
+    function enterDashSection_(section, profileOnly) {
+      // '#dashboard' العارية (alias) = آخر قسم مفتوح — السلوك القائم لزر "لوحة التحكم"؛
+      // ونثبّت الـ hash على مسار القسم الفعلي حتى يعكس الرابط الحالة (بلا إدخال سجل جديد).
+      if (section === 'home' && (location.hash === '#dashboard' || location.hash === '#dashboard/')) {
+        section = dashCurrent || 'home';
+        var rk = routeKeyForDashSection(section);
+        if (rk && canAccessRoute(rk) !== true) { section = 'home'; rk = 'dashboard'; }
+        if (rk) history.replaceState('', document.title, location.pathname + location.search + ROUTE_REGISTRY[rk].hash);
       }
+      var open = function () { dashCurrent = section; showDashboardView(); };
+      if (dashUnlocked()) { open(); return; }
+      showSearchView();
+      unlockDashboardThen(open, profileOnly ? { profileOnly: true } : undefined);
     }
+    // مزامنة العرض مع الـ hash — رجوع/تقديم/تحديث والوصول المباشر لأي مسار.
+    function route() {
+      routeResolve_();
+      // Phase 3C: Page Header يعكس المسار الفعلي بعد الحسم (alias/deny/pending) — عرض فقط
+      if (window.__aqarPageHeader) { try { window.__aqarPageHeader.sync(); } catch (e) {} }
+    }
+    function routeResolve_() {
+      var key = resolveRouteKey(location.hash);
+      if (!key || !ROUTE_ENTER[key]) { showSearchView(); return; }           // مسار غير معروف → fallback آمن
+      var access = canAccessRoute(key);
+      if (access === true) { ROUTE_ENTER[key](); return; }
+      showSearchView();                                                       // لا نعرض أي محتوى محمي
+      if (access === false) denyGatedSection_(location.hash.slice(1), ROUTE_REGISTRY[key].denyMsg);
+      // access === 'pending' → الجلسة تُستعاد؛ __aqarReroute يعيد التقييم بعد الاستعادة (كما كان)
+    }
+    // واجهة تشخيص/اختبار للقراءة فقط — لا تُستخدم للتفويض
+    window.__aqarRoutes = {
+      registry: ROUTE_REGISTRY,
+      resolve: resolveRouteKey,
+      canAccess: canAccessRoute,
+      current: function () { return resolveRouteKey(location.hash) || ROUTE_FALLBACK; },
+      sectionKey: routeKeyForDashSection,                                   // Phase 3B
+      currentSection: function () { return document.body.classList.contains('app-view-dashboard') ? dashCurrent : null; }
+    };
 
     navSearchBtn.addEventListener('click', goToSearchHash);
     if (navStatsBtn) navStatsBtn.addEventListener('click', openStats); // الزر أُزيل من #appNav؛ يبقى الحارس لو رجع مستقبلًا
