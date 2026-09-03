@@ -1,0 +1,202 @@
+/* ============================================================================
+ * AqaR Digital — Component Foundation (Phase 2A)
+ * ----------------------------------------------------------------------------
+ * مكتبة المكونات الأساسية للمنصة. كل الأصناف بادئتها aq- (namespaced) —
+ * لا تمس أي صنف قائم، وتُعتمد تدريجيًا شاشةً بشاشة في المراحل التالية.
+ * تستهلك حصريًا tokens من aqar-tokens.css.
+ * ==========================================================================*/
+
+/* ---------------------------------------------------------------- RTL CORE
+ * قواعد RTL المركزية: كلمة لاتينية داخل نص عربي (AqaR Digital · OWNER · PDF …)
+ * تُعزل بـ .aq-ltr كي لا ينكسر ترتيبها البصري. لا حلول متفرقة لكل عنصر. */
+.aq-ltr { direction: ltr; unicode-bidi: isolate; display: inline-block; }
+.aq-num { direction: ltr; unicode-bidi: isolate; font-variant-numeric: tabular-nums; }
+
+/* ------------------------------------------------------------- TYPOGRAPHY */
+.aq-page-title    { font-size: var(--aq-fs-page-title); font-weight: var(--aq-fw-black); line-height: var(--aq-lh-tight); color: var(--aq-text-light); margin: 0; }
+.aq-section-title { font-size: var(--aq-fs-section-title); font-weight: var(--aq-fw-bold); line-height: var(--aq-lh-tight); color: var(--aq-text-light); margin: 0; }
+.aq-card-title    { font-size: var(--aq-fs-card-title); font-weight: var(--aq-fw-bold); line-height: var(--aq-lh-tight); margin: 0; }
+.aq-body          { font-size: var(--aq-fs-body); line-height: var(--aq-lh-body); }
+.aq-caption       { font-size: var(--aq-fs-caption); color: var(--aq-text-muted-d); line-height: 1.5; }
+.aq-label         { font-size: var(--aq-fs-label); font-weight: var(--aq-fw-medium); letter-spacing: 0.2px; }
+.aq-kpi-number    { font-size: var(--aq-fs-kpi); font-weight: var(--aq-fw-black); line-height: 1.1; font-variant-numeric: tabular-nums; }
+
+/* ---------------------------------------------------------------- BUTTONS */
+.aq-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--aq-space-2);
+  font-family: var(--aq-font); font-size: var(--aq-fs-button); font-weight: var(--aq-fw-bold);
+  padding: 9px 18px; border-radius: var(--aq-radius-sm); border: 1px solid transparent;
+  cursor: pointer; user-select: none; white-space: nowrap;
+  transition: background var(--aq-motion-base), border-color var(--aq-motion-base), color var(--aq-motion-base), box-shadow var(--aq-motion-base), transform var(--aq-motion-fast);
+}
+.aq-btn:active { transform: translateY(1px); }
+.aq-btn svg { width: 16px; height: 16px; flex: 0 0 auto; }
+
+.aq-btn--primary { background: var(--aq-gold); color: var(--aq-navy-deep); border-color: var(--aq-gold-dark); }
+.aq-btn--primary:hover { background: var(--aq-gold-soft); }
+.aq-btn--secondary { background: transparent; color: var(--aq-text-light); border-color: var(--aq-line-dark); }
+.aq-btn--secondary:hover { border-color: var(--aq-gold); color: var(--aq-gold-soft); }
+.aq-btn--ghost { background: transparent; color: var(--aq-text-muted-d); border-color: transparent; }
+.aq-btn--ghost:hover { color: var(--aq-gold-soft); background: rgba(255,255,255,0.05); }
+.aq-btn--danger { background: transparent; color: #E88; border-color: rgba(230,120,120,0.4); }
+.aq-btn--danger:hover { background: rgba(176,39,31,0.15); color: #F6A9A4; }
+.aq-btn--icon { padding: 9px; border-radius: var(--aq-radius-sm); }
+.aq-btn:disabled, .aq-btn[aria-disabled="true"] { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+.aq-btn--loading { position: relative; color: transparent !important; pointer-events: none; }
+.aq-btn--loading::after {
+  content: ""; position: absolute; width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.35); border-top-color: var(--aq-gold-soft);
+  animation: aq-spin 700ms linear infinite;
+}
+@keyframes aq-spin { to { transform: rotate(360deg); } }
+
+/* ------------------------------------------------------------------ CARDS */
+.aq-card {
+  background: var(--glass-card, rgba(20,43,67,0.74));
+  border: 1px solid var(--aq-line-dark);
+  border-radius: var(--aq-radius-md);
+  box-shadow: var(--aq-shadow-1);
+  padding: var(--aq-space-5);
+  color: var(--aq-text-light);
+}
+.aq-card--premium { border-color: var(--aq-border-gold); box-shadow: var(--aq-shadow-2); }
+.aq-card--kpi { display: flex; flex-direction: column; gap: var(--aq-space-1); align-items: flex-start; }
+.aq-card--kpi .aq-kpi-number { color: var(--aq-gold-soft); }
+.aq-card--interactive { cursor: pointer; transition: border-color var(--aq-motion-base), box-shadow var(--aq-motion-base), transform var(--aq-motion-fast); }
+.aq-card--interactive:hover { border-color: var(--aq-border-gold); box-shadow: var(--aq-shadow-2); transform: translateY(-1px); }
+
+/* ----------------------------------------------------------------- INPUTS */
+.aq-input, .aq-select, .aq-textarea {
+  width: 100%; font-family: var(--aq-font); font-size: var(--aq-fs-body);
+  background: var(--input-dark, rgba(27,52,74,0.6)); color: var(--aq-text-light);
+  border: 1px solid var(--aq-line-dark); border-radius: var(--aq-radius-sm);
+  padding: 9px 12px; transition: border-color var(--aq-motion-base), box-shadow var(--aq-motion-base);
+}
+.aq-input::placeholder, .aq-textarea::placeholder { color: var(--aq-text-muted-d); opacity: 0.8; }
+.aq-input:focus, .aq-select:focus, .aq-textarea:focus {
+  outline: none; border-color: var(--aq-gold); box-shadow: 0 0 0 3px rgba(201,154,46,0.18);
+}
+.aq-textarea { min-height: 92px; resize: vertical; }
+.aq-input--search { padding-inline-start: 36px; }
+.aq-field { display: flex; flex-direction: column; gap: var(--aq-space-1); }
+.aq-field > .aq-label { color: var(--aq-text-muted-d); }
+
+/* ----------------------------------------------------------------- BADGES */
+.aq-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: var(--aq-fs-caption); font-weight: var(--aq-fw-bold);
+  padding: 3px 10px; border-radius: var(--aq-radius-pill);
+  border: 1px solid transparent; line-height: 1.6; white-space: nowrap;
+}
+.aq-badge--neutral { background: rgba(255,255,255,0.08); color: var(--aq-text-muted-d); border-color: var(--aq-line-dark); }
+.aq-badge--success { background: rgba(30,110,69,0.18); color: #7FD6A4; border-color: rgba(30,110,69,0.4); }
+.aq-badge--warning { background: rgba(122,86,0,0.2); color: var(--aq-gold-soft); border-color: rgba(201,154,46,0.35); }
+.aq-badge--error   { background: rgba(176,39,31,0.18); color: #F0938C; border-color: rgba(176,39,31,0.4); }
+.aq-badge--role    { background: rgba(201,154,46,0.14); color: var(--aq-gold-soft); border-color: var(--aq-border-gold); }
+.aq-badge--status  { background: rgba(255,255,255,0.06); color: var(--aq-text-light); border-color: var(--aq-line-dark); }
+.aq-badge .aq-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+
+/* ----------------------------------------------------------------- TABLES */
+.aq-table-wrap { overflow-x: auto; border-radius: var(--aq-radius-md); border: 1px solid var(--aq-line-dark); }
+.aq-table { width: 100%; border-collapse: collapse; font-size: var(--aq-fs-table); color: var(--aq-text-light); }
+.aq-table th {
+  text-align: right; font-weight: var(--aq-fw-bold); color: var(--aq-gold-soft);
+  background: rgba(6,19,33,0.55); padding: 10px 14px; border-bottom: 1px solid var(--aq-border-gold);
+  white-space: nowrap;
+}
+.aq-table td { padding: 10px 14px; border-bottom: 1px solid var(--aq-line-dark); }
+.aq-table tbody tr:last-child td { border-bottom: none; }
+.aq-table tbody tr { transition: background var(--aq-motion-fast); }
+.aq-table tbody tr:hover { background: rgba(255,255,255,0.035); }
+
+/* ----------------------------------------------------------------- MODALS
+ * أساس لمودالات المراحل القادمة — المودالات القائمة (.modal-overlay) لا تُمس. */
+.aq-modal-overlay {
+  position: fixed; inset: 0; z-index: var(--aq-z-modal);
+  background: rgba(4,12,22,0.72); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  display: none; align-items: center; justify-content: center; padding: var(--aq-space-5);
+}
+.aq-modal-overlay.aq-open { display: flex; }
+.aq-modal {
+  background: var(--aq-navy-dark); border: 1px solid var(--aq-border-gold);
+  border-radius: var(--aq-radius-lg); box-shadow: var(--aq-shadow-3);
+  width: 100%; max-width: 560px; max-height: 88vh; overflow-y: auto;
+  padding: var(--aq-space-6); color: var(--aq-text-light);
+}
+
+/* -------------------------------------------------------------- DROPDOWNS */
+.aq-menu {
+  position: absolute; min-width: 180px; z-index: var(--aq-z-sticky);
+  background: var(--aq-navy-dark); border: 1px solid var(--aq-line-dark);
+  border-radius: var(--aq-radius-md); box-shadow: var(--aq-shadow-2); padding: var(--aq-space-1);
+}
+.aq-menu-item {
+  display: flex; align-items: center; gap: var(--aq-space-2); width: 100%;
+  padding: 8px 12px; border: none; background: transparent; cursor: pointer;
+  font-family: var(--aq-font); font-size: var(--aq-fs-body); color: var(--aq-text-light);
+  border-radius: var(--aq-radius-sm); text-align: right; transition: background var(--aq-motion-fast);
+}
+.aq-menu-item:hover { background: rgba(201,154,46,0.12); color: var(--aq-gold-soft); }
+
+/* ------------------------------------------------------------------ TOAST */
+.aq-toast {
+  display: flex; align-items: center; gap: var(--aq-space-2);
+  background: var(--glass-strong, rgba(6,19,33,0.76)); color: var(--aq-text-light);
+  border: 1px solid var(--aq-line-dark); border-inline-start: 3px solid var(--aq-gold);
+  border-radius: var(--aq-radius-md); box-shadow: var(--aq-shadow-2);
+  padding: 10px 16px; font-size: var(--aq-fs-body);
+}
+.aq-toast--success { border-inline-start-color: #2E9E68; }
+.aq-toast--error   { border-inline-start-color: var(--aq-error-fg); }
+
+/* --------------------------------------------------------------- SKELETON */
+.aq-skeleton {
+  position: relative; overflow: hidden; border-radius: var(--aq-radius-sm);
+  background: rgba(255,255,255,0.07); min-height: 12px;
+}
+.aq-skeleton::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.09), transparent);
+  transform: translateX(100%); animation: aq-shimmer 1.4s ease infinite;
+}
+@keyframes aq-shimmer { to { transform: translateX(-100%); } }
+.aq-skeleton--text  { height: 12px; }
+.aq-skeleton--title { height: 20px; width: 45%; }
+.aq-skeleton--card  { height: 120px; border-radius: var(--aq-radius-md); }
+.aq-skeleton--avatar{ width: 40px; height: 40px; border-radius: 50%; }
+
+/* --------------------------------------------------- EMPTY / ERROR STATES */
+.aq-empty, .aq-error-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--aq-space-3); text-align: center; padding: var(--aq-space-12) var(--aq-space-5);
+  color: var(--aq-text-muted-d);
+}
+.aq-empty svg, .aq-error-state svg { width: 42px; height: 42px; opacity: 0.6; }
+.aq-empty h3, .aq-error-state h3 { margin: 0; color: var(--aq-text-light); font-size: var(--aq-fs-section-title); }
+.aq-error-state { color: #E8A19B; }
+.aq-error-state h3 { color: #F0938C; }
+
+/* --------------------------------------------------------------- TOOLTIPS */
+.aq-tip { position: relative; }
+.aq-tip::after {
+  content: attr(data-tip); position: absolute; bottom: calc(100% + 7px); right: 50%; transform: translateX(50%);
+  background: var(--aq-navy-deep); color: var(--aq-text-light); border: 1px solid var(--aq-line-dark);
+  font-size: var(--aq-fs-caption); white-space: nowrap; padding: 5px 10px; border-radius: var(--aq-radius-sm);
+  opacity: 0; pointer-events: none; transition: opacity var(--aq-motion-base); z-index: var(--aq-z-sticky);
+}
+.aq-tip:hover::after, .aq-tip:focus-visible::after { opacity: 1; }
+
+/* ---------------------------------------------------------- ACCESSIBILITY */
+.aq-btn:focus-visible, .aq-menu-item:focus-visible,
+.aq-input:focus-visible, .aq-select:focus-visible, .aq-textarea:focus-visible,
+.aq-nav-item:focus-visible {
+  outline: 2px solid var(--aq-gold); outline-offset: 2px;
+}
+.aq-visually-hidden {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .aq-btn, .aq-card--interactive, .aq-menu-item, .aq-toast { transition: none; }
+  .aq-skeleton::after { animation: none; }
+}
