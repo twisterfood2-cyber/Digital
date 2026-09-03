@@ -1,0 +1,176 @@
+/* ============================================================================
+ * AqaR Digital — App Shell (Phase 2A)
+ * ----------------------------------------------------------------------------
+ * الهيكل الدائم للمنصة: Header علوي + Sidebar يمين + مساحة محتوى.
+ *   - #mainContainer الحالي هو مساحة المحتوى نفسها (لم يُلف بغلاف جديد —
+ *     كي تبقى كل عمليات appendChild الديناميكية القائمة سليمة).
+ *   - .aq-header / .aq-sidebar شقيقان له، يظهران فقط مع body.aq-app-on
+ *     (تُضاف في showApp بعد نجاح الدخول/استعادة الجلسة — عرض فقط، لا منطق).
+ *   - #appNav المُنتقل إلى السايدبار يحتفظ بكل عناصره وids ومعالجاته كما هي.
+ *   - كل الطبقات تحت المودالات القائمة (1600+) — انظر خريطة z في aqar-tokens.css.
+ * ==========================================================================*/
+
+/* ------------------------------------------------------------------ HEADER */
+.aq-header {
+  display: none;
+  position: fixed; top: 0; right: 0; left: 0; height: var(--aq-header-h);
+  z-index: var(--aq-z-shell-header);
+  background: linear-gradient(180deg, var(--aq-navy-deep) 0%, var(--aq-navy-dark) 100%);
+  border-bottom: 1px solid var(--aq-border-gold);
+  align-items: center; gap: var(--aq-space-4);
+  padding: 0 var(--aq-space-5);
+}
+body.aq-app-on .aq-header { display: flex; }
+
+.aq-header-brand { display: flex; align-items: center; gap: var(--aq-space-2); min-width: 0; }
+.aq-header-brand .aq-brand-name {
+  font-size: 17px; font-weight: var(--aq-fw-black); color: var(--aq-white); letter-spacing: 0.2px;
+}
+.aq-header-brand .aq-brand-name b { color: var(--aq-gold); font-weight: inherit; }
+.aq-header-brand .aq-brand-mark {
+  width: 30px; height: 30px; border-radius: 8px; flex: 0 0 auto;
+  background: linear-gradient(135deg, var(--aq-gold) 0%, var(--aq-gold-dark) 100%);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--aq-navy-deep); font-weight: var(--aq-fw-black); font-size: 15px;
+}
+
+.aq-header-spacer { flex: 1 1 auto; }
+
+/* هوية المستخدم في الهيدر — تُرسم من window.__currentUser (عرض فقط) */
+.aq-header-identity { display: flex; align-items: center; gap: var(--aq-space-3); min-width: 0; }
+.aq-header-identity .aq-id-text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.3; min-width: 0; }
+.aq-header-identity .aq-id-name {
+  font-size: 13.5px; font-weight: var(--aq-fw-bold); color: var(--aq-text-light);
+  max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.aq-header-identity .aq-id-role { font-size: 11px; color: var(--aq-gold-soft); font-weight: var(--aq-fw-medium); }
+.aq-avatar {
+  width: 36px; height: 36px; border-radius: 50%; flex: 0 0 auto; overflow: hidden;
+  background: var(--aq-navy-soft); border: 1px solid var(--aq-border-gold);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--aq-gold-soft); font-weight: var(--aq-fw-black); font-size: 14px;
+}
+.aq-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* زر القائمة (drawer) — يظهر تحت 1025px فقط */
+.aq-menu-toggle {
+  display: none; background: transparent; border: 1px solid var(--aq-line-dark);
+  border-radius: var(--aq-radius-sm); color: var(--aq-text-light); cursor: pointer;
+  width: 38px; height: 38px; align-items: center; justify-content: center; flex: 0 0 auto;
+  transition: border-color var(--aq-motion-base), color var(--aq-motion-base);
+}
+.aq-menu-toggle:hover { border-color: var(--aq-gold); color: var(--aq-gold-soft); }
+.aq-menu-toggle svg { width: 18px; height: 18px; min-width: 18px; flex: 0 0 18px; }
+
+/* ----------------------------------------------------------------- SIDEBAR */
+.aq-sidebar {
+  display: none;
+  position: fixed; top: var(--aq-header-h); bottom: 0; right: 0;
+  width: var(--aq-sidebar-w); z-index: var(--aq-z-shell-sidebar);
+  background: linear-gradient(180deg, var(--aq-navy-dark) 0%, var(--aq-navy-deep) 100%);
+  border-inline-end: 1px solid var(--aq-line-dark);
+  flex-direction: column; overflow-y: auto; overscroll-behavior: contain;
+  padding: var(--aq-space-4) var(--aq-space-3);
+  scrollbar-width: thin;
+}
+body.aq-app-on .aq-sidebar { display: flex; }
+
+/* هوية مختصرة أعلى السايدبار */
+.aq-side-identity {
+  display: flex; align-items: center; gap: var(--aq-space-3);
+  padding: var(--aq-space-3); border-radius: var(--aq-radius-md);
+  background: rgba(255,255,255,0.04); border: 1px solid var(--aq-line-dark);
+  margin-bottom: var(--aq-space-4);
+}
+.aq-side-identity .aq-id-name {
+  font-size: 13px; font-weight: var(--aq-fw-bold); color: var(--aq-text-light);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px;
+}
+.aq-side-identity .aq-id-role { font-size: 11px; color: var(--aq-gold-soft); }
+.aq-side-identity .aq-id-text { display: flex; flex-direction: column; line-height: 1.35; min-width: 0; }
+
+/* عنوان مجموعة التنقّل */
+.aq-side-caption {
+  font-size: 11px; font-weight: var(--aq-fw-bold); color: var(--aq-text-muted-d);
+  letter-spacing: 0.6px; margin: 0 var(--aq-space-2) var(--aq-space-2);
+}
+
+/* ---- #appNav داخل السايدبار: نفس الأزرار/الـ ids — التخطيط يصبح عموديًا ---- */
+.aq-sidebar #appNav {
+  display: flex; flex-direction: column; gap: 3px;
+  margin: 0; padding: 0; border-bottom: none; overflow: visible;
+}
+.aq-sidebar #appNav .app-nav-btn {
+  flex: 0 0 auto; width: 100%; max-width: none; min-width: 0;
+  display: flex; align-items: center; justify-content: flex-start; gap: var(--aq-space-3);
+  padding: 10px 12px; font-size: 13.5px; border-radius: var(--aq-radius-sm);
+  background: transparent; border: 1px solid transparent;
+  position: relative; text-align: right; white-space: nowrap;
+  transition: background var(--aq-motion-base), color var(--aq-motion-base);
+}
+.aq-sidebar #appNav .app-nav-btn svg { width: 17px; height: 17px; flex: 0 0 auto; }
+.aq-sidebar #appNav .app-nav-btn:hover { background: rgba(255,255,255,0.05); }
+/* الحالة النشطة: خلفية ذهبية خافتة + مؤشر ذهبي على الحافة اليمنى (RTL) */
+.aq-sidebar #appNav .app-nav-btn.is-active {
+  background: rgba(201,154,46,0.13); color: var(--aq-gold-soft);
+  border-color: rgba(201,154,46,0.22);
+}
+.aq-sidebar #appNav .app-nav-btn.is-active::before {
+  content: ""; position: absolute; inset-inline-start: -12px; inset-inline-end: auto;
+  top: 8px; bottom: 8px; width: 3px; border-radius: 3px; background: var(--aq-gold);
+}
+
+.aq-side-spacer { flex: 1 1 auto; min-height: var(--aq-space-4); }
+
+/* زر الخروج أسفل السايدبار — يستدعي window.__aqarLogout() القائم */
+.aq-side-logout {
+  display: flex; align-items: center; justify-content: flex-start; gap: var(--aq-space-3);
+  width: 100%; padding: 10px 12px; border-radius: var(--aq-radius-sm);
+  background: transparent; border: 1px solid var(--aq-line-dark);
+  color: var(--aq-text-muted-d); font-family: var(--aq-font);
+  font-size: 13px; font-weight: var(--aq-fw-bold); cursor: pointer;
+  transition: border-color var(--aq-motion-base), color var(--aq-motion-base), background var(--aq-motion-base);
+}
+.aq-side-logout:hover { border-color: rgba(230,120,120,0.45); color: #F0938C; background: rgba(176,39,31,0.08); }
+.aq-side-logout svg { width: 16px; height: 16px; }
+
+/* ------------------------------------------------- CONTENT AREA (existing) */
+/* #mainContainer هو مساحة المحتوى: يُزاح عن الهيدر والسايدبار.
+ * ملاحظة: display نفسه تديره بوابة الدخول القائمة (showApp) — لا نلمسه. */
+body.aq-app-on #mainContainer {
+  max-width: none;
+  margin: 0;
+  padding: var(--aq-content-pad);
+  padding-top: calc(var(--aq-header-h) + var(--aq-content-pad));
+  padding-inline-start: calc(var(--aq-sidebar-w) + var(--aq-content-pad));
+}
+/* محتوى الصفحات يبقى بعرضه الأقصى المعهود داخل المساحة الجديدة */
+body.aq-app-on #mainContainer > * { max-width: var(--aq-container-max); margin-inline: auto; }
+
+/* -------------------------------------------------------- DRAWER (≤1024px) */
+.aq-shell-overlay {
+  display: none; position: fixed; inset: 0; z-index: var(--aq-z-shell-overlay);
+  background: rgba(4,12,22,0.55);
+}
+@media (max-width: 1024px) {
+  .aq-menu-toggle { display: flex; }
+  .aq-sidebar {
+    transform: translateX(100%);
+    transition: transform var(--aq-motion-slow) ease;
+    box-shadow: none; width: min(300px, 84vw);
+  }
+  body.aq-app-on.aq-drawer-open .aq-sidebar { transform: translateX(0); box-shadow: var(--aq-shadow-3); }
+  body.aq-app-on.aq-drawer-open .aq-shell-overlay { display: block; }
+  body.aq-app-on.aq-drawer-open { overflow: hidden; }
+  body.aq-app-on #mainContainer { padding-inline-start: var(--aq-content-pad); }
+  .aq-header-identity .aq-id-text { display: none; } /* يبقى الأفاتار فقط على الشاشات الضيقة */
+}
+@media (max-width: 640px) {
+  .aq-header { padding: 0 var(--aq-space-3); }
+  .aq-header-brand .aq-brand-name { font-size: 15px; }
+  body.aq-app-on #mainContainer { padding: calc(var(--aq-header-h) + var(--aq-space-3)) var(--aq-space-2) var(--aq-space-3); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aq-sidebar { transition: none; }
+}
