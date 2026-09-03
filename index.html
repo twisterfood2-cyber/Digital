@@ -43,6 +43,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Phase 2A — Design System layers (tokens → foundation → shell) -->
+  <link rel="stylesheet" href="aqar-tokens.css">
+  <link rel="stylesheet" href="aqar-foundation.css">
+  <link rel="stylesheet" href="aqar-shell.css">
+  <script defer src="aqar-shell.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0A1C2F">
@@ -2245,16 +2250,31 @@
   </div>
 </div>
 
-<div class="container" id="mainContainer" style="display:none;">
-  <div class="cover-wrap" id="coverWrap">
-    <img id="coverImg" src="" alt="صورة الغلاف">
-  </div>
-  <header class="site-header">
-    <h1>ابحث عن وحدتك العقارية</h1>
-    <p class="site-tagline">اعثر على الوحدة المناسبة، قارن الأسعار، واحسب خطة السداد — كل ذلك في مكان واحد.</p>
-  </header>
 
-  <!-- ===== الشريط الموحّد: 7 أزرار في صف واحد (RTL: يمين ← يسار) ===== -->
+<!-- ============================================================
+     Phase 2A — App Shell: هيدر علوي + سايدبار يمين (Persistent Shell)
+     يظهران فقط بعد الدخول (body.aq-app-on تُضاف في showApp) —
+     المحتوى القائم كله يبقى داخل #mainContainer بلا أي تغيير داخلي.
+     ============================================================ -->
+<header class="aq-header" id="aqHeader">
+  <button type="button" class="aq-menu-toggle" id="aqMenuToggle" aria-label="فتح قائمة التنقل" aria-controls="aqSidebar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  <div class="aq-header-brand">
+    <span class="aq-brand-mark" aria-hidden="true">A</span>
+    <span class="aq-brand-name aq-ltr" dir="ltr">AqaR Digital</span>
+  </div>
+  <div class="aq-header-spacer"></div>
+  <div class="aq-header-identity" id="aqHeaderIdentity">
+    <div class="aq-id-text"><span class="aq-id-name"></span><span class="aq-id-role"></span></div>
+    <div class="aq-avatar" aria-hidden="true"></div>
+  </div>
+</header>
+<div class="aq-shell-overlay" id="aqShellOverlay" aria-hidden="true"></div>
+<aside class="aq-sidebar" id="aqSidebar" aria-label="التنقل الرئيسي">
+  <div class="aq-side-identity" id="aqSideIdentity">
+    <div class="aq-avatar" aria-hidden="true"></div>
+    <div class="aq-id-text"><span class="aq-id-name"></span><span class="aq-id-role"></span></div>
+  </div>
+  <div class="aq-side-caption">التنقل</div>
   <nav id="appNav" aria-label="أقسام التطبيق">
     <button type="button" class="top-action-btn app-nav-btn is-active" id="navSearchBtn" data-app-view="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span>البحث</span></button>
     <button type="button" class="top-action-btn app-nav-btn top-action-calc" id="calcFabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/><line x1="16" y1="18" x2="16" y2="18"/></svg><span>عرض السعر</span></button>
@@ -2264,6 +2284,20 @@
     <!-- "الإحصائيات والمخزون" أُزيل من الشريط الرئيسي — الوصول إليه من لوحة التحكم / الشريط الجانبي فقط، وحسب صلاحية VIEW_STATISTICS. -->
     <button type="button" class="top-action-btn app-nav-btn top-action-admin" id="adminFab" data-app-view="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>لوحة التحكم</span></button>
   </nav>
+  <div class="aq-side-spacer"></div>
+  <button type="button" class="aq-side-logout" id="aqSideLogoutBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg><span>تسجيل الخروج</span></button>
+</aside>
+
+<div class="container" id="mainContainer" style="display:none;">
+  <div class="cover-wrap" id="coverWrap">
+    <img id="coverImg" src="" alt="صورة الغلاف">
+  </div>
+  <header class="site-header">
+    <h1>ابحث عن وحدتك العقارية</h1>
+    <p class="site-tagline">اعثر على الوحدة المناسبة، قارن الأسعار، واحسب خطة السداد — كل ذلك في مكان واحد.</p>
+  </header>
+
+  <!-- Phase 2A: شريط التنقّل الموحّد (#appNav) انتقل إلى السايدبار الدائم — نفس الأزرار والـ ids والمعالجات -->
   <!-- زر بوابة كلمة سر إدخال الوحدة — مخفي، بيتفعّل من زر "إدخال وحدة" في الشريط أعلاه -->
   <button type="button" class="top-action-btn top-action-add" id="addUnitFabBtn" hidden style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>إضافة وحدة</span></button>
 
@@ -4065,6 +4099,8 @@
     if (roleActive() && typeof lastResults !== 'undefined' && lastResults && lastResults.length) {
       try { renderResults(sortUnits(lastResults, document.getElementById('f_sort').value)); } catch (e) {}
     }
+    // Phase 2A: تحديث هوية الشِل (اسم/دور/صورة) — طبقة عرض فقط
+    try { if (window.__aqarShellIdentity) window.__aqarShellIdentity(); } catch (e) {}
   }
   window.hasPermission = hasPermission; // مفيدة للتشخيص فقط
 
@@ -6231,6 +6267,7 @@
   /* ---------- بوابة دخول المستخدمين ---------- */
   function showApp() {
     document.documentElement.classList.remove('session-restoring'); // انتهت الاستعادة بنجاح — أزل السبلاش
+    document.body.classList.add('aq-app-on'); // Phase 2A: إظهار هيكل الشِل (هيدر+سايدبار) — عرض فقط
     document.getElementById('loginGate').style.display = 'none';
     document.getElementById('mainContainer').style.display = 'block';
     unlockApp();
@@ -6313,6 +6350,7 @@
     document.documentElement.classList.remove('session-restoring');
     var _app  = document.getElementById('mainContainer');
     var _gate = document.getElementById('loginGate');
+    document.body.classList.remove('aq-app-on', 'aq-drawer-open'); // Phase 2A: إخفاء الشِل فورًا
     if (_app)  _app.style.display = 'none';
     if (_gate) _gate.style.display = '';
     var _pw = document.getElementById('loginPassword');
@@ -6458,6 +6496,7 @@
     if (loggedOut && !hasSaved) {
       var app = document.getElementById('mainContainer');
       var gate = document.getElementById('loginGate');
+      document.body.classList.remove('aq-app-on', 'aq-drawer-open'); // Phase 2A
       if (app) app.style.display = 'none';
       if (gate) gate.style.display = '';
       if (e.persisted) location.reload();   // صفحة مُستعادة من الكاش — أقلعها نظيفة
