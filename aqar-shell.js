@@ -50,25 +50,29 @@
   /* تُستدعى من applyRoleUiVisibility (hook سطر واحد) وبعد تحميل الصفحة */
   window.__aqarShellIdentity = function () {
     var u = window.__currentUser || null;
-    paintOne('aqHeaderIdentity', u);
-    paintOne('aqSideIdentity', u);
+    paintOne('aqHeaderIdentity', u);   /* الهيدر العام هو موضع الهوية الوحيد الآن */
   };
 
-  function closeDrawer() { document.body.classList.remove('aq-drawer-open'); }
-  function toggleDrawer() { document.body.classList.toggle('aq-drawer-open'); }
+  /* لوحة التنقّل على الموبايل = نفس #appNav داخل الهيدر العام (لا سايدبار) */
+  function syncToggleAria() {
+    var t = document.getElementById('aqMenuToggle');
+    if (t) t.setAttribute('aria-expanded', document.body.classList.contains('aq-drawer-open') ? 'true' : 'false');
+  }
+  function closeDrawer() { document.body.classList.remove('aq-drawer-open'); syncToggleAria(); }
+  function toggleDrawer() { document.body.classList.toggle('aq-drawer-open'); syncToggleAria(); }
 
   function wire() {
     var toggle = document.getElementById('aqMenuToggle');
     var overlay = document.getElementById('aqShellOverlay');
-    var sidebar = document.getElementById('aqSidebar');
+    var nav = document.getElementById('appNav');
     var logoutBtn = document.getElementById('aqSideLogoutBtn');
 
     if (toggle) toggle.addEventListener('click', toggleDrawer);
     if (overlay) overlay.addEventListener('click', closeDrawer);
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDrawer(); });
 
-    /* اختيار أي عنصر تنقّل داخل السايدبار يغلق الـ drawer على الموبايل */
-    if (sidebar) sidebar.addEventListener('click', function (e) {
+    /* اختيار أي عنصر تنقّل يغلق اللوحة على الموبايل */
+    if (nav) nav.addEventListener('click', function (e) {
       var t = e.target && e.target.closest ? e.target.closest('.app-nav-btn, a') : null;
       if (t) closeDrawer();
     });

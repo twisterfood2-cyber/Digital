@@ -49,30 +49,31 @@
   --aq-bg-surface-nav:       var(--glass,       rgba(10,28,47,0.55));  /* أسطح التنقل الشفافة */
   --aq-bg-surface-light:     var(--off-white,   #F7F6F2);              /* سطح فاتح (لوحات فاتحة/طباعة) */
   --aq-bg-input:             var(--input-dark,  rgba(27,52,74,0.6));   /* خلفية الحقول على الداكن */
-  --aq-bg-input-focus:       rgba(27,52,74,0.78);
-  --aq-bg-muted-1:           rgba(255,255,255,0.04);                   /* أخف تظليل (صفوف/شرائط) */
-  --aq-bg-muted-2:           rgba(255,255,255,0.06);                   /* hover خفيف */
-  --aq-bg-muted-3:           rgba(255,255,255,0.08);                   /* شارات محايدة */
+  --aq-bg-input-focus:       var(--aq-prop-surface, #FFFFFF);
+  /* هوية فاتحة: التظليلات صارت داكنة-على-فاتح بدل بيضاء-على-داكن */
+  --aq-bg-muted-1:           rgba(16,33,30,0.035);                     /* أخف تظليل (صفوف/شرائط) */
+  --aq-bg-muted-2:           rgba(16,33,30,0.055);                     /* hover خفيف */
+  --aq-bg-muted-3:           rgba(16,33,30,0.075);                     /* شارات محايدة */
   --aq-bg-muted-4:           rgba(255,255,255,0.15);                   /* أزرار عائمة فوق الصور */
   --aq-overlay:              rgba(4,12,22,0.55);                       /* خلفية drawer / مودال */
   --aq-overlay-strong:       rgba(4,12,22,0.75);
 
   /* ------------------------------------------------ Borders */
   --aq-border-dark:          var(--aq-line-dark);                      /* hairline على الداكن */
-  --aq-border-strong:        rgba(255,255,255,0.14);                   /* حد أوضح (حقول/كروت) */
+  --aq-border-strong:        rgba(16,33,30,0.16);                      /* حد أوضح (حقول/كروت) */
   --aq-border-light:         var(--aq-border);                         /* hairline على الفاتح */
   --aq-border-accent:        var(--aq-border-gold);                    /* حد ذهبي هادئ */
-  --aq-border-accent-strong: rgba(201,154,46,0.5);                     /* حد ذهبي واضح */
+  --aq-border-accent-strong: rgba(14,84,70,0.45);                      /* حد أخضر واضح */
 
   /* ------------------------------------------------ Text */
   --aq-text-primary:         var(--aq-text-light);                     /* نص أساسي على الداكن */
-  --aq-text-secondary:       rgba(234,240,246,0.82);                   /* نص ثانوي على الداكن */
-  --aq-text-tertiary:        rgba(234,240,246,0.68);                   /* نص خافت على الداكن */
-  --aq-text-disabled:        rgba(234,240,246,0.5);
+  --aq-text-secondary:       rgba(22,33,30,0.78);                      /* نص ثانوي على الفاتح */
+  --aq-text-tertiary:        rgba(22,33,30,0.62);                      /* نص خافت على الفاتح */
+  --aq-text-disabled:        rgba(22,33,30,0.42);
   --aq-text-inverse:         var(--aq-text);                           /* نص داكن على الفاتح */
   --aq-text-inverse-muted:   var(--aq-text-muted);
-  --aq-text-on-accent:       var(--aq-navy-deep);                      /* نص فوق الذهبي */
-  --aq-text-placeholder:     #A9B2BD;
+  --aq-text-on-accent:       #FFFFFF;                                  /* نص فوق الأخضر */
+  --aq-text-placeholder:     #8A908E;
 
   /* ------------------------------------------------ Brand / accent */
   --aq-brand-navy:           var(--aq-navy);
@@ -80,26 +81,26 @@
   --aq-accent:               var(--aq-gold);
   --aq-accent-soft:          var(--aq-gold-soft);
   --aq-accent-strong:        var(--aq-gold-dark);
-  --aq-accent-tint-1:        rgba(201,154,46,0.07);                    /* خلفية ذهبية شبه معدومة */
-  --aq-accent-tint-2:        rgba(201,154,46,0.14);                    /* خلفية ذهبية خفيفة (active) */
-  --aq-accent-tint-3:        rgba(201,154,46,0.22);                    /* حد/خلفية ذهبية أوضح */
-  --aq-accent-tint-4:        rgba(201,154,46,0.35);                    /* hover على active */
-  --aq-focus-ring:           0 0 0 3px rgba(201,154,46,0.16);          /* حلقة التركيز الموحدة */
+  --aq-accent-tint-1:        rgba(14,84,70,0.06);                      /* تظليل أخضر شبه معدوم */
+  --aq-accent-tint-2:        rgba(14,84,70,0.10);                      /* تظليل أخضر خفيف (active) */
+  --aq-accent-tint-3:        rgba(14,84,70,0.20);                      /* حد/تظليل أخضر أوضح */
+  --aq-accent-tint-4:        rgba(14,84,70,0.30);                      /* hover على active */
+  --aq-focus-ring:           0 0 0 3px rgba(14,84,70,0.16);            /* حلقة التركيز الموحدة */
   --aq-focus-outline:        2px solid var(--aq-gold);
 
   /* ------------------------------------------------ Status (على الداكن: *-soft / على الفاتح: *-fg + *-bg) */
   --aq-success:              #4FA579;
   --aq-success-strong:       #46946C;
-  --aq-success-soft:         #7FD3A3;
-  --aq-success-tint:         rgba(30,110,69,0.16);
+  --aq-success-soft:         #1E7145;
+  --aq-success-tint:         rgba(30,110,69,0.10);
   --aq-success-border:       rgba(30,110,69,0.32);
   --aq-success-solid-bg:     rgba(30,110,69,0.92);
   --aq-success-solid-fg:     #EAF7EF;
   --aq-success-dot:          #1E7145;
 
   --aq-danger:               var(--aq-error-fg);
-  --aq-danger-soft:          #E9908A;
-  --aq-danger-tint:          rgba(176,39,31,0.16);
+  --aq-danger-soft:          #B0271F;
+  --aq-danger-tint:          rgba(176,39,31,0.08);
   --aq-danger-border:        rgba(176,39,31,0.35);
   --aq-danger-border-strong: rgba(176,39,31,0.6);
   --aq-danger-solid-bg:      rgba(176,39,31,0.92);
@@ -107,21 +108,21 @@
   --aq-danger-bg-light:      #FFF8F7;
 
   --aq-warning:              var(--aq-warn-fg);
-  --aq-warning-soft:         var(--aq-gold-soft);
-  --aq-warning-tint:         rgba(122,86,0,0.2);
+  --aq-warning-soft:         #8A6412;
+  --aq-warning-tint:         rgba(201,154,46,0.14);
   --aq-warning-border:       rgba(201,154,46,0.4);
 
   --aq-info:                 #1C4A75;
-  --aq-info-soft:            #8FC1EA;
-  --aq-info-tint:            rgba(28,74,117,0.22);
+  --aq-info-soft:            #1C4A75;
+  --aq-info-tint:            rgba(28,74,117,0.10);
   --aq-info-border:          rgba(143,193,234,0.35);
   --aq-info-bg-light:        #DBE7F3;
 
   --aq-neutral-disabled:     #9AA4AE;
 
   /* أدوار المستخدمين (شارات على الأسطح الفاتحة) */
-  --aq-role-owner-bg:        var(--aq-gold);
-  --aq-role-owner-fg:        #3A2A05;
+  --aq-role-owner-bg:        var(--aq-prop-green-soft, #E4EDEA);
+  --aq-role-owner-fg:        var(--aq-prop-green-ink, #023A3A);
   --aq-role-manager-bg:      var(--aq-info-bg-light);
   --aq-role-manager-fg:      var(--aq-info);
   --aq-role-sales-bg:        #E6EFE9;
@@ -231,4 +232,46 @@
    *   sm ≤ 640px  (هاتف)
    *   md ≤ 1024px (تابلت / drawer mode للشل ولوحة التحكم)
    * ================================================================== */
+
+  /* ==================================================================
+   * PROPERTY-PLATFORM PALETTE (مرحلة إعادة تصميم البحث والنتائج)
+   * ------------------------------------------------------------------
+   * مستخرجة فعليًا بالعيّنات من الصورتين المرجعيتين المعتمدتين في المشروع
+   * (SEARCH_RESULTS_REFERENCE.png / SEARCH_RESULTS_REFERENCE2.png) — لا تخمين:
+   *   #004C43 الشريط الأخضر العميق · #023A3A زر البحث · #0E5446 زر بحث النتائج
+   *   #E4EDEA رقاقة نشطة · #E7EDED قسم فاتح · #F7F7F7 خلفية الصفحة
+   *   #FFFFFF سطح البطاقة · #898989 نص ثانوي · #B4FF6C أكسنت شارة
+   * تُستهلك حصريًا داخل تجربة البحث/النتائج/overlay الوحدة — لا تمسّ هوية
+   * الشل (navy/gold) ولا بقية الشاشات.
+   * ================================================================== */
+  --aq-prop-green:          #0E5446;   /* الأساسي — أزرار، أسعار، حالات نشطة */
+  --aq-prop-green-deep:     #004C43;   /* أعمق — شرائط، تدرّج الهيرو */
+  --aq-prop-green-ink:      #023A3A;   /* أغمق — زر البحث الأساسي/hover */
+  --aq-prop-green-soft:     #E4EDEA;   /* تظليل فاتح — رقاقة نشطة، خلفيات لطيفة */
+  --aq-prop-green-line:     #BFD8CF;   /* حدّ أخضر باهت */
+  --aq-prop-accent:         #B4FF6C;   /* أكسنت ليموني — شارات محدودة الاستخدام */
+  --aq-prop-canvas:         #F7F7F7;   /* خلفية صفحة النتائج */
+  --aq-prop-canvas-2:       #E7EDED;   /* قسم فاتح ثانوي */
+  --aq-prop-surface:        #FFFFFF;   /* سطح البطاقة/الكونسول */
+  --aq-prop-surface-2:      #FAFAFA;   /* سطح ثانوي داخل البطاقة */
+  --aq-prop-border:         #E3E6E5;   /* حدّ فاتح محايد */
+  --aq-prop-border-strong:  #D3D8D7;
+  --aq-prop-text:           #16211E;   /* نص أساسي على الأسطح الفاتحة */
+  --aq-prop-text-muted:     #6E7573;   /* نص ثانوي (مشتق من #898989 لتباين أعلى) */
+  --aq-prop-text-faint:     #8A908E;
+  --aq-prop-shadow:         0 10px 30px rgba(11,40,33,0.10);
+  --aq-prop-shadow-lg:      0 24px 60px rgba(6,28,23,0.24);
+  --aq-prop-radius:         16px;      /* بطاقات العقار */
+  --aq-prop-radius-lg:      24px;      /* كونسول البحث/الهيرو */
+  --aq-prop-radius-sm:      10px;      /* حقول ورقائق */
+
+  /* --- الأسماء الدلالية للهوية العامة (تُستهلك في كل التطبيق) --- */
+  --aq-prop-primary:        var(--aq-prop-green);        /* #0E5446 */
+  --aq-prop-primary-deep:   var(--aq-prop-green-deep);   /* #004C43 */
+  --aq-prop-cta:            var(--aq-prop-green-ink);    /* #023A3A */
+  --aq-prop-active:         var(--aq-prop-green-soft);   /* #E4EDEA */
+  --aq-prop-background:     var(--aq-prop-canvas);       /* #F7F7F7 */
+  --aq-prop-background-2:   var(--aq-prop-canvas-2);     /* #E7EDED */
+  --aq-prop-white:          var(--aq-prop-surface);      /* #FFFFFF */
+  --aq-prop-accent-lime:    var(--aq-prop-accent);       /* #B4FF6C */
 }
