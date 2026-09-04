@@ -1702,11 +1702,14 @@
     }
     #sessionRestoreSplash .srs-text { font-size:  var(--aq-fs-body); font-weight: 600; letter-spacing: 0; }
     @keyframes srsSpin { to { transform: rotate(360deg); } }
-    /* خلفية المدينة أطلسية/ناعمة خلف اللوحة، بنفس أسلوب باقي الصفحات */
+    /* خلفية المدينة أطلسية/ناعمة خلف اللوحة — نفس الصورة الأصلية بلا أي تعديل عليها؛ طبقة
+       التظليل فوقها فقط تحوّلت من الكحلي القديم إلى أخضر AqaR Digital الأساسي (نفس قيمة
+       التوكن --aq-prop-green: #0E5446 → rgb(14,84,70))، بشفافية ~58-62% حتى تبقى الصورة
+       واضحة تحته. بنفس البنية والـ z-index والـ blur تمامًا — لا تغيير في التركيب. */
     .access-gate::before {
       content: ""; position: absolute; inset: -24px; z-index: 0;
       background:
-        linear-gradient(180deg, rgba(10,28,46,0.50) 0%, rgba(15,41,66,0.42) 55%, rgba(18,55,84,0.40) 100%),
+        linear-gradient(180deg, rgba(14,84,70,0.68) 0%, rgba(14,84,70,0.64) 55%, rgba(14,84,70,0.6) 100%),
         url('city-bg.png') center / cover no-repeat;
       filter: blur(4px);
       pointer-events: none;
