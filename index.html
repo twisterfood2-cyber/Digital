@@ -3068,7 +3068,7 @@
     </span>
   </div>
   <nav id="appNav" aria-label="أقسام التطبيق">
-    <button type="button" class="top-action-btn app-nav-btn is-active" id="navSearchBtn" data-app-view="search" data-route="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span>الرئيسية</span></button>
+    <button type="button" class="top-action-btn app-nav-btn is-active" id="navSearchBtn" data-app-view="search" data-route="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10"/></svg><span>الرئيسية</span></button>
     <button type="button" class="top-action-btn app-nav-btn" id="navExploreBtn" data-app-view="explore" data-route="explore"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m14.9 9.1-2 5.8-5.8 2 2-5.8Z"/></svg><span>استكشف</span></button>
     <button type="button" class="top-action-btn app-nav-btn top-action-calc" id="calcFabBtn" data-route="quote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/><line x1="16" y1="18" x2="16" y2="18"/></svg><span>عرض السعر</span></button>
     <button type="button" class="top-action-btn app-nav-btn top-action-price" id="priceInfoFabBtn" data-route="meter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>سعر المتر</span></button>
@@ -4613,8 +4613,15 @@
     return {
       get textContent() { return lbl ? lbl.textContent : realBtn.textContent; },
       set textContent(v) { if (lbl) lbl.textContent = v; else realBtn.textContent = v; },
+      // واجهة موحّدة مع أزرار DOM الحقيقية (نفس اسم الخاصية) — تلمس محتوى التسمية (.qlbl) فقط
+      // فتبقى الأيقونة المجاورة لها في مكانها، أو محتوى الزر كله لو لا توجد تسمية منفصلة.
+      get innerHTML() { return lbl ? lbl.innerHTML : realBtn.innerHTML; },
+      set innerHTML(v) { if (lbl) lbl.innerHTML = v; else realBtn.innerHTML = v; },
       get disabled() { return realBtn.disabled; },
-      set disabled(v) { realBtn.disabled = v; }
+      set disabled(v) { realBtn.disabled = v; },
+      classList: realBtn.classList,
+      setAttribute: function (n, v) { realBtn.setAttribute(n, v); },
+      removeAttribute: function (n) { realBtn.removeAttribute(n); }
     };
   }
   document.getElementById('quoteExportBtn').addEventListener('click', function () {
@@ -6032,30 +6039,59 @@
   });
 
   async function generateUnitPDF(u, btnEl, agentName, agentPhone) {
-    const originalLabel = btnEl.textContent;
-    btnEl.disabled = true;
-    btnEl.textContent = 'جاري التجهيز...';
+    // نحفظ محتوى الزر الأصلي (أيقونة + نص) عبر innerHTML لا textContent، حتى لا تُفقد أي
+    // أيقونة مجاورة للتسمية. لزر #quoteExportBtn (عبر quoteBtnShim) هذا يلمس <span class="qlbl">
+    // فقط فتبقى الأيقونة المجاورة سليمة تمامًا؛ ولزر "PDF" في كارت الوحدة (بلا أيقونة) يلمس
+    // الزر كله بلا أي فرق ملموس.
+    const originalHTML = btnEl.innerHTML;
+    const HOURGLASS_ICON = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h12"/><path d="M6 22h12"/><path d="M6 2c0 5 3.5 7 6 8-2.5 1-6 3-6 8"/><path d="M18 2c0 5-3.5 7-6 8 2.5 1 6 3 6 8"/></svg>';
+
+    function setExportBtnLoading_() {
+      btnEl.disabled = true;
+      if (btnEl.classList) btnEl.classList.add('is-loading');
+      if (btnEl.setAttribute) { btnEl.setAttribute('aria-busy', 'true'); btnEl.setAttribute('aria-label', 'جاري تجهيز الملف'); }
+      btnEl.innerHTML = HOURGLASS_ICON;
+    }
+    function restoreExportBtn_() {
+      if (btnEl.classList) btnEl.classList.remove('is-loading');
+      if (btnEl.removeAttribute) { btnEl.removeAttribute('aria-busy'); btnEl.removeAttribute('aria-label'); }
+      btnEl.disabled = false;
+      btnEl.innerHTML = originalHTML;
+    }
+    setExportBtnLoading_();
 
     // فحص مبكر: المكتبتان (html2canvas / jsPDF) لازم يكونا محمَّلتين قبل أي محاولة رسم -
     // بدل خطأ داخلي غامض لو فشل تحميل الـ CDN لأي سبب (شبكة/حظر).
     if (typeof html2canvas !== 'function' || !window.jspdf || !window.jspdf.jsPDF) {
       showToast('تعذّر تحميل مكوّنات إنشاء الملف - تحقق من الاتصال بالإنترنت وأعد المحاولة', 'error');
-      btnEl.disabled = false;
-      btnEl.textContent = originalLabel;
+      restoreExportBtn_();
       return;
     }
 
-    // حارس زمني: لو التجهيز (تحميل الصور/الرسم على Canvas/بناء PDF) تعلّق لأي سبب (شبكة،
-    // متصفح، تبويب غير نشط...)، لا يبقى الزر "جاري التجهيز..." معلّقًا إلى ما لا نهاية —
-    // بعد 30 ثانية نعرض خطأ واضح ونُعيد الزر لحالته الطبيعية. لا يغيّر المسار السليم إطلاقًا
-    // (يُلغى في finally بمجرد انتهاء العملية بنجاح أو بفشل عادي).
+    // حارس زمني واعٍ بظهور التبويب: التبويب في الخلفية يجعل المتصفح يُبطئ (Throttle) مؤقتات
+    // JS فعليًا (مؤكَّد بالاختبار الفعلي)، فتتأخر عملية إنشاء الملف رغم نجاحها في النهاية.
+    // لذلك لا نُفشل العملية أبدًا أثناء إخفاء التبويب - فقط نعيد ضبط مهلة كاملة جديدة عند
+    // الإخفاء والعودة للظهور، ولا نُظهر خطأ "استغرقت وقتًا طويلًا" إلا لو انقضت 30 ثانية
+    // فعلية والتبويب ظاهر وما زالت العملية غير منتهية. لا يغيّر مسار الإنشاء السليم إطلاقًا.
     let timedOut = false;
-    const timeoutId = setTimeout(function () {
-      timedOut = true;
-      showToast('تعذّر إنشاء الملف (استغرقت العملية وقتًا طويلًا) - جرّب مرة أخرى', 'error');
-      btnEl.disabled = false;
-      btnEl.textContent = originalLabel;
-    }, 30000);
+    let settled = false;
+    let timeoutId = null;
+    function armExportTimeout_() {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(function () {
+        if (settled) return;
+        if (document.hidden) { armExportTimeout_(); return; }
+        timedOut = true;
+        showToast('تعذّر إنشاء الملف (استغرقت العملية وقتًا طويلًا) - جرّب مرة أخرى', 'error');
+        restoreExportBtn_();
+      }, 30000);
+    }
+    function onExportVisibilityChange_() {
+      if (settled) return;
+      if (!document.hidden) armExportTimeout_();
+    }
+    document.addEventListener('visibilitychange', onExportVisibilityChange_);
+    armExportTimeout_();
 
     try {
       const images = (u['Images'] || '').split(',').map(s => s.trim()).filter(Boolean);
@@ -6288,12 +6324,11 @@
     } catch (err) {
       if (!timedOut) showToast('حدث خطأ أثناء تجهيز الملف: ' + err.message, 'error');
     } finally {
+      settled = true;
       clearTimeout(timeoutId);
+      document.removeEventListener('visibilitychange', onExportVisibilityChange_);
       // لو الحارس الزمني بالفعل أعاد الزر لحالته وعرض رسالة الخطأ، لا نكتب فوقه هنا.
-      if (!timedOut) {
-        btnEl.disabled = false;
-        btnEl.textContent = originalLabel;
-      }
+      if (!timedOut) restoreExportBtn_();
     }
   }
 
@@ -7105,7 +7140,7 @@
   function renderEditImagesPreview() {
     editImagesPreview.innerHTML = editUnitImages.map((url, idx) => `
       <div class="image-thumb" draggable="true" data-idx="${idx}">
-        <img src="${url}" alt="صورة الوحدة">
+        <img src="${url}" alt="صورة الوحدة" onclick="if (typeof openLightbox === 'function') openLightbox(editUnitImages, ${idx})">
         <button type="button" class="remove-img" onclick="removeEditUnitImage(${idx})">${ICON.x}</button>
       </div>
     `).join('');
