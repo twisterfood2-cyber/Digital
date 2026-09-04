@@ -481,7 +481,29 @@
   font-size: var(--aq-fs-title-lg); font-weight: var(--aq-fw-black); color: var(--aq-prop-green);
   letter-spacing: .5px;
 }
-.aq-dev-logo img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; display: block; }
+/* حالة الانتظار: shimmer هادئ أخضر/أبيض بنفس مساحة اللوجو تمامًا (بلا حروف أولى) — لا
+   Layout Shift لأن .aq-dev-logo نفسه لا يتغيّر حجمه أبدًا، فقط محتواه الداخلي. */
+.aq-dev-logo-skel {
+  width: 100%; height: 100%; border-radius: var(--aq-prop-radius-sm);
+  background: linear-gradient(100deg, var(--aq-prop-canvas-2) 30%, var(--aq-prop-green-soft) 50%, var(--aq-prop-canvas-2) 70%);
+  background-size: 200% 100%;
+  animation: aqDevLogoShimmer 1.6s ease-in-out infinite;
+}
+@keyframes aqDevLogoShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+/* الصورة الحقيقية تظهر بانتقال ناعم جدًا (opacity + scale خفيف) بعد onload فقط — is-visible
+   تُضاف من الـ JS بعد إلحاق الصورة بالشجرة، فلا حركة قبل أن تكون الصورة جاهزة فعليًا. */
+.aq-dev-logo img {
+  max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; display: block;
+  opacity: 0; transform: scale(0.96); transition: opacity 300ms ease, transform 300ms ease;
+}
+.aq-dev-logo img.is-visible { opacity: 1; transform: scale(1); }
+@media (prefers-reduced-motion: reduce) {
+  .aq-dev-logo-skel { animation: none; }
+  .aq-dev-logo img { transition: opacity 150ms ease; transform: none; }
+}
 /* اسم المطوّر أسفل البطاقة دائمًا، بخط واضح ومنتصف، بحدّ فاصل خفيف علوي (نفس نمط
    .unit-price-box في بطاقة الوحدة) بدل فاصل بصري ثقيل — سطر واحد بارتفاع ثابت لضمان
    تساوي ارتفاع كل بطاقات الصف. */

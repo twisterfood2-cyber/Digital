@@ -5393,6 +5393,26 @@
     devsRowBuilt = true;
     row.textContent = '';
     var logoEntries = {};   // اسم مطوّر (Upper) → { logo: <span class="aq-dev-logo">, name: الاسم الأصلي } لملء اللوجو بعد الرد المجمّع
+    // بعد انتهاء محاولة التحميل فقط (لا لوجو لهذا المطوّر، أو الصورة فشلت) — نفس الحروف
+    // الأولى الأنيقة السابقة (devInitials_)، لكن الآن بعد المحاولة وليس أثناء الانتظار.
+    function showDevInitials_(entry) {
+      entry.logo.classList.remove('is-loading');
+      entry.logo.textContent = devInitials_(entry.name);
+    }
+    // نجاح فعلي: صورة حقيقية بانتقال ناعم (opacity + scale) بعد اكتمال تحميلها فقط —
+    // لا loading="lazy" هنا (يمنع التحميل تمامًا لصورة منفصلة عن الشجرة وقت ضبط src).
+    function showDevLogoImage_(entry, url) {
+      var img = document.createElement('img');
+      img.alt = ''; img.decoding = 'async';
+      img.onload = function () {
+        entry.logo.classList.remove('is-loading');
+        entry.logo.textContent = '';
+        entry.logo.appendChild(img);
+        requestAnimationFrame(function () { img.classList.add('is-visible'); });
+      };
+      img.onerror = function () { showDevInitials_(entry); };
+      img.src = url;
+    }
     names.forEach(function (name) {
       var tile = document.createElement('button');
       tile.type = 'button';
@@ -5404,8 +5424,11 @@
       });
 
       var logo = document.createElement('span');
-      logo.className = 'aq-dev-logo';
-      logo.textContent = devInitials_(name);   // بلاطة حروف أولى أنيقة إلى حين وصول اللوجو (إن وُجد) — نفس منطق قائمة المطوّرين الإدارية
+      logo.className = 'aq-dev-logo is-loading';   // Skeleton/shimmer إلى حين وصول رد اللوجوهات — بلا حروف أولى أثناء الانتظار
+      var skel = document.createElement('span');
+      skel.className = 'aq-dev-logo-skel';
+      skel.setAttribute('aria-hidden', 'true');
+      logo.appendChild(skel);
       logoEntries[String(name).trim().toUpperCase()] = { logo: logo, name: name };
 
       var meta = document.createElement('span');
@@ -5426,21 +5449,22 @@
     section.hidden = false;
 
     /* نداء واحد مجمّع لكل اللوجوهات (getDeveloperLogos) — نفس مصدر البيانات (شيت بروفايلات
-     * المطورين)، نفس التفويض (جلسة فقط). عند وصول رابط لوجو: نعيد استخدام devLogoTileHtml_
-     * (نفس الدالة التي تبني بلاطات اللوجو في قائمة المطوّرين الإدارية) — صورة حقيقية (contain)
-     * أو رجوع تلقائي للحروف الأولى عند فشل التحميل (onerror)، بلا تكرار للمنطق. فشل النداء أو
-     * غياب الدالة (قبل نشر الباك-إند) لا يكسر الصفحة — الأسماء والحروف الأولى تبقى ظاهرة. */
+     * المطورين)، نفس التفويض (جلسة فقط)، بلا أي تغيير في هذا النداء أو في الباك-إند. لكل
+     * مطوّر: رابط لوجو → showDevLogoImage_ (صورة حقيقية + انتقال ناعم)؛ بلا رابط، أو فشل
+     * النداء كله (قبل نشر الباك-إند مثلًا) → showDevInitials_ لكل البطاقات فورًا — لا تبقى
+     * أي بطاقة عالقة على الـ skeleton إلى الأبد. */
     google.script.run
       .withSuccessHandler(function (res) {
-        if (!res || !res.success || !res.logos) return;
-        Object.keys(res.logos).forEach(function (key) {
-          var url = res.logos[key];
+        var logos = (res && res.success && res.logos) || {};
+        Object.keys(logoEntries).forEach(function (key) {
           var entry = logoEntries[key];
-          if (!url || !entry) return;
-          entry.logo.innerHTML = devLogoTileHtml_(url, entry.name);
+          var url = logos[key];
+          if (url) showDevLogoImage_(entry, url); else showDevInitials_(entry);
         });
       })
-      .withFailureHandler(function () {})
+      .withFailureHandler(function () {
+        Object.keys(logoEntries).forEach(function (key) { showDevInitials_(logoEntries[key]); });
+      })
       .getDeveloperLogos(names, getAuthCreds());
   }
 
