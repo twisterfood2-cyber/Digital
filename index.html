@@ -5330,7 +5330,9 @@
     </div>`;
   }
 
+  var resultsCardsBuilt = false;   // Perf fix: الرئيسية لا تبني كروت الوحدات المخفية إلا عند دخول "استكشف" فعليًا
   function renderResults(units) {
+    resultsCardsBuilt = true;
     if (showFavoritesOnly) {
       const favIds = getFavoriteIds();
       units = units.filter(u => favIds.indexOf(u['Unit ID']) !== -1);
@@ -5378,6 +5380,7 @@
 
     devsRowBuilt = true;
     row.textContent = '';
+    var logoSpans = {};   // اسم مطوّر (Upper) → عنصر <span class="aq-dev-logo"> الخاص به، لملء اللوجو بعد الرد المجمّع
     names.forEach(function (name) {
       var tile = document.createElement('button');
       tile.type = 'button';
@@ -5393,6 +5396,7 @@
       fallback.className = 'aq-dev-fallback';
       fallback.textContent = name;
       logo.appendChild(fallback);
+      logoSpans[String(name).trim().toUpperCase()] = logo;
 
       var meta = document.createElement('span');
       meta.className = 'aq-dev-meta';
@@ -5404,23 +5408,31 @@
       tile.appendChild(logo);
       tile.appendChild(meta);
       row.appendChild(tile);
+    });
+    section.hidden = false;
 
-      /* اللوجو من نفس مصدر بيانات المطوّرين القائم — لا أصول مخترعة */
-      google.script.run
-        .withSuccessHandler(function (res) {
-          if (!res || !res.success || !res.found || !res.logoUrl) return;
+    /* Perf fix: نداء واحد مجمّع لكل اللوجوهات (بدل نداء منفصل لكل مطوّر) — نفس مصدر البيانات
+     * (شيت بروفايلات المطورين)، نفس التفويض (جلسة فقط، getDeveloperLogos). الصورة تُنشأ منفصلة
+     * عن الشجرة وتُلحَق بـ logo فقط عند onload (بلا loading="lazy" — على عنصر منفصل عن الشجرة
+     * هذا كان يمنع التحميل نهائيًا). فشل النداء أو غياب الدالة (قبل نشر الباك-إند) لا يكسر الصفحة —
+     * الأسماء تبقى ظاهرة بلا لوجو، ونفس منطق fallback الحالي عند فشل تحميل الصورة (onerror). */
+    google.script.run
+      .withSuccessHandler(function (res) {
+        if (!res || !res.success || !res.logos) return;
+        Object.keys(res.logos).forEach(function (key) {
+          var url = res.logos[key];
+          var logo = logoSpans[key];
+          if (!url || !logo) return;
           var img = document.createElement('img');
-          img.alt = name;
-          img.loading = 'lazy';
+          img.alt = '';
           img.decoding = 'async';
           img.onload = function () { logo.textContent = ''; logo.appendChild(img); };
           img.onerror = function () { /* يبقى الاسم النصّي كما هو */ };
-          img.src = res.logoUrl;
-        })
-        .withFailureHandler(function () {})
-        .getDeveloperProfile(name, getAuthCreds());
-    });
-    section.hidden = false;
+          img.src = url;
+        });
+      })
+      .withFailureHandler(function () {})
+      .getDeveloperLogos(names, getAuthCreds());
   }
 
   function toggleUnitDetails(btnEl, unitId) {
@@ -7485,7 +7497,15 @@
         const cacheKey = JSON.stringify(filters);
         clientSearchCache[cacheKey] = { units: data.units, time: Date.now() };
         initialResultsReady = true;
-        renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
+        // Perf fix: الرئيسية لا تعرض كروت الوحدات (مخفية بـ CSS خلف .aq-results-section) — لا داعي
+        // لبناء 625 كارت في الـ DOM وقت التحميل الأول إلا لو المستخدم بالفعل داخل "استكشف" (مثال:
+        // رابط مباشر لـ #explore). غير كده نبني شريط "أكثر المطوّرين نشاطًا" فقط من نفس lastResults
+        // المحمَّل في الذاكرة، ونؤجل بناء الكروت لحد ما showExploreView() تُستدعى — بلا أي نداء شبكة إضافي.
+        if (document.body.classList.contains('app-view-explore')) {
+          renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
+        } else {
+          try { buildDevelopersRow_(); } catch (e) {}
+        }
         applyFilterOptionsToUI(data.filterOptions);
       })
       .withFailureHandler(function(err) {
@@ -8822,6 +8842,12 @@
       leaveMeterView();
       setActiveNav('explore');
       window.scrollTo(0, 0);
+      // Perf fix: لو بيانات البحث الأول وصلت فعلاً (initialResultsReady) والكروت لسه ما اتبنتش
+      // (الرئيسية أجّلتها) — ابنيها دلوقتي من نفس lastResults المحمَّل في الذاكرة، بلا أي نداء شبكة
+      // جديد. أي بحث لاحق (runSearch) أو تغيير ترتيب هيعيد البناء بشكل طبيعي زي ما هو تمامًا.
+      if (initialResultsReady && !resultsCardsBuilt) {
+        renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
+      }
     }
     function showSearchView() {
       document.body.classList.remove('app-view-stats');
