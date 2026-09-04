@@ -1684,10 +1684,13 @@
       align-items: center; justify-content: center;
       background-color: var(--page-bg);
     }
+    /* نفس تظليل بوابة الدخول بالضبط (.access-gate::before، أخضر AqaR Digital الأساسي) —
+       السبلاش هذا يظهر قبل بوابة الدخول لمستخدم لديه جلسة محفوظة عند إعادة التحميل، وكان
+       لا يزال يحمل تدرّج الكحلي القديم فيسبب وميضًا أزرق قبل ظهور الأخضر. */
     #sessionRestoreSplash::before {
       content: ""; position: absolute; inset: -24px; z-index: 0;
       background:
-        linear-gradient(180deg, rgba(10,28,46,0.50) 0%, rgba(15,41,66,0.42) 55%, rgba(18,55,84,0.40) 100%),
+        linear-gradient(180deg, rgba(14,84,70,0.68) 0%, rgba(14,84,70,0.64) 55%, rgba(14,84,70,0.6) 100%),
         url('city-bg.png') center / cover no-repeat;
       filter: blur(4px); pointer-events: none;
     }
