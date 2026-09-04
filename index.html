@@ -2531,14 +2531,20 @@
       max-width: 760px; margin-inline: auto;
       padding: var(--aq-space-6) var(--aq-space-5);
     }
-    /* حقل الكلمة المفتاحية بعرض كامل، ثم الحقول في عمودين */
+    /* Phase 2C — الحقول الستة الأساسية: صفّان × 3 أعمدة متساوية العرض (ترتيب DOM بعد
+       applyHomeFiltersLayout_ يعطي الترتيب البصري RTL المطلوب مباشرة بلا CSS إضافي). */
     body.app-view-search .aq-console .filters-card > .grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--aq-space-3) var(--aq-space-3);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--aq-space-4) var(--aq-space-3);
+      direction: rtl;
     }
-    body.app-view-search .aq-console .filters-card > .grid > div:first-child { grid-column: 1 / -1; }
     body.app-view-search .aq-console input,
     body.app-view-search .aq-console select { padding: 12px 14px; }
+    @media (max-width: 480px) {
+      body.app-view-search .aq-console .filters-card > .grid { gap: var(--aq-space-3) var(--aq-space-2); }
+      body.app-view-search .aq-console input,
+      body.app-view-search .aq-console select { padding: 11px 8px; font-size: var(--aq-fs-caption); }
+    }
     /* زر البحث عريض داخل البطاقة (كما في المرجع) ومسح الفلاتر ثانوي بجانبه */
     body.app-view-search .aq-console .btn-row { margin-top: var(--aq-space-4); gap: var(--aq-space-2); }
     body.app-view-search .aq-console #searchBtn { flex: 1 1 auto; padding: 14px 28px; font-size: var(--aq-fs-body); }
@@ -3130,8 +3136,8 @@
 </div>
 
 <div class="filters-card" id="aqConsoleFilters" role="tabpanel" aria-labelledby="aqModeFilters">
-    <div class="grid">
-      <div>
+    <div class="grid" id="aqPrimaryFilters">
+      <div id="fw_keyword">
         <label>بحث عام (كلمة مفتاحية)</label>
         <input type="text" id="f_keyword" list="f_projectDatalist" placeholder="اسم مشروع، منطقة، ملاحظات..." autocomplete="off">
         <datalist id="f_projectDatalist"></datalist>
@@ -3156,11 +3162,11 @@
     </div>
 
     <button type="button" class="toggle-details-btn" id="advancedFiltersToggle" style="margin-top:10px;">
-      <span class="label">فلاتر متقدمة (التصنيف، السعر، المساحة، الترتيب...)</span><span class="chevron">▾</span>
+      <span class="label">المزيد من الفلاتر</span><span class="chevron">▾</span>
     </button>
 
     <div class="grid" id="advancedFiltersBlock" style="display:none; margin-top:10px;">
-      <div>
+      <div id="fw_category">
         <label>التصنيف</label>
         <select id="f_category"><option value="">الكل</option></select>
       </div>
@@ -3188,7 +3194,7 @@
         <label>المساحة إلى (م²)</label>
         <input type="number" id="f_maxArea" min="0">
       </div>
-      <div>
+      <div id="fw_exactArea">
         <label>مساحة محددة بالظبط (م²)</label>
         <input type="number" id="f_exactArea" min="0" placeholder="مثال: 120">
       </div>
@@ -5380,55 +5386,45 @@
 
     devsRowBuilt = true;
     row.textContent = '';
-    var logoSpans = {};   // اسم مطوّر (Upper) → عنصر <span class="aq-dev-logo"> الخاص به، لملء اللوجو بعد الرد المجمّع
+    var logoEntries = {};   // اسم مطوّر (Upper) → { logo: <span class="aq-dev-logo">, name: الاسم الأصلي } لملء اللوجو بعد الرد المجمّع
     names.forEach(function (name) {
       var tile = document.createElement('button');
       tile.type = 'button';
       tile.className = 'aq-dev-tile';
       tile.title = name;
+      tile.setAttribute('aria-label', 'عرض بيانات ' + name);
       tile.addEventListener('click', function () {
         if (typeof showDeveloperProfile === 'function') showDeveloperProfile(name);
       });
 
       var logo = document.createElement('span');
       logo.className = 'aq-dev-logo';
-      var fallback = document.createElement('span');
-      fallback.className = 'aq-dev-fallback';
-      fallback.textContent = name;
-      logo.appendChild(fallback);
-      logoSpans[String(name).trim().toUpperCase()] = logo;
+      logo.textContent = devInitials_(name);   // بلاطة حروف أولى أنيقة إلى حين وصول اللوجو (إن وُجد) — نفس منطق قائمة المطوّرين الإدارية
+      logoEntries[String(name).trim().toUpperCase()] = { logo: logo, name: name };
 
-      var meta = document.createElement('span');
-      meta.className = 'aq-dev-meta';
-      var cnt = document.createElement('span');
-      cnt.className = 'aq-dev-count';
-      cnt.textContent = counts[name] + ' وحدة';
-      meta.appendChild(cnt);
+      var nameEl = document.createElement('span');
+      nameEl.className = 'aq-dev-name';
+      nameEl.textContent = name;
 
       tile.appendChild(logo);
-      tile.appendChild(meta);
+      tile.appendChild(nameEl);
       row.appendChild(tile);
     });
     section.hidden = false;
 
-    /* Perf fix: نداء واحد مجمّع لكل اللوجوهات (بدل نداء منفصل لكل مطوّر) — نفس مصدر البيانات
-     * (شيت بروفايلات المطورين)، نفس التفويض (جلسة فقط، getDeveloperLogos). الصورة تُنشأ منفصلة
-     * عن الشجرة وتُلحَق بـ logo فقط عند onload (بلا loading="lazy" — على عنصر منفصل عن الشجرة
-     * هذا كان يمنع التحميل نهائيًا). فشل النداء أو غياب الدالة (قبل نشر الباك-إند) لا يكسر الصفحة —
-     * الأسماء تبقى ظاهرة بلا لوجو، ونفس منطق fallback الحالي عند فشل تحميل الصورة (onerror). */
+    /* نداء واحد مجمّع لكل اللوجوهات (getDeveloperLogos) — نفس مصدر البيانات (شيت بروفايلات
+     * المطورين)، نفس التفويض (جلسة فقط). عند وصول رابط لوجو: نعيد استخدام devLogoTileHtml_
+     * (نفس الدالة التي تبني بلاطات اللوجو في قائمة المطوّرين الإدارية) — صورة حقيقية (contain)
+     * أو رجوع تلقائي للحروف الأولى عند فشل التحميل (onerror)، بلا تكرار للمنطق. فشل النداء أو
+     * غياب الدالة (قبل نشر الباك-إند) لا يكسر الصفحة — الأسماء والحروف الأولى تبقى ظاهرة. */
     google.script.run
       .withSuccessHandler(function (res) {
         if (!res || !res.success || !res.logos) return;
         Object.keys(res.logos).forEach(function (key) {
           var url = res.logos[key];
-          var logo = logoSpans[key];
-          if (!url || !logo) return;
-          var img = document.createElement('img');
-          img.alt = '';
-          img.decoding = 'async';
-          img.onload = function () { logo.textContent = ''; logo.appendChild(img); };
-          img.onerror = function () { /* يبقى الاسم النصّي كما هو */ };
-          img.src = url;
+          var entry = logoEntries[key];
+          if (!url || !entry) return;
+          entry.logo.innerHTML = devLogoTileHtml_(url, entry.name);
         });
       })
       .withFailureHandler(function () {})
@@ -6418,6 +6414,10 @@
       /* مودال تفاصيل المستخدم overlay حقيقي → Escape يغلقه (نفس مسار × والخلفية: إزالة .open). */
       var um = document.getElementById('umUserModal');
       if (um && um.classList.contains('open')) { e.preventDefault(); um.classList.remove('open'); return; }
+      /* مودال ملف المطوّر (من بطاقات "أكثر المطوّرين نشاطًا" في الرئيسية أو رابط المطوّر
+       * في بطاقة الوحدة) — نفس مسار × والخلفية (إزالة .open فقط). */
+      var devProf = document.getElementById('developerProfileModal');
+      if (devProf && devProf.classList.contains('open')) { e.preventDefault(); devProf.classList.remove('open'); return; }
       /* Escape يغلق نموذج الوحدة (#editModal) عندما يكون مودالًا حقيقيًا فقط (تعديل/استنساخ/عرض SALES)
        * عبر نفس مسار زر × (handleEditClose). في وضعَي "إدخال وحدة" و"عرض السعر" النموذج صفحة
        * داخل المحتوى — لا إغلاق ولا تنقّل. لا إرسال للنموذج ولا مسّ بأي مودال آخر. */
@@ -6792,7 +6792,7 @@
     const isOpen = block.style.display === 'none';
     block.style.display = isOpen ? 'grid' : 'none';
     this.classList.toggle('open', isOpen);
-    this.querySelector('.label').textContent = isOpen ? 'إخفاء الفلاتر المتقدمة' : 'فلاتر متقدمة (التصنيف، السعر، المساحة، الترتيب...)';
+    this.querySelector('.label').textContent = isOpen ? 'إخفاء الفلاتر المتقدمة' : 'المزيد من الفلاتر';
   });
 
   document.getElementById('clearBtn').addEventListener('click', function() {
@@ -8831,7 +8831,45 @@
     }
     /* "استكشف" = صفحة النتائج. نفس عناصر البحث والنتائج القائمة (بلا نسخة ثانية):
        كلاس العرض وحده يقرّر ما يظهر — الرئيسية: بحث + مطوّرون؛ استكشف: بحث + نتائج. */
+    /* ============================================================================
+     * Phase 2C — إعادة ترتيب الحقول الستة الأساسية في الرئيسية فقط (2 صف × 3 أعمدة،
+     * بترتيب RTL: تصنيف العقار → نوع العقار → المدينة / المنطقة → المطور → مساحة محددة).
+     * "بحث عام" ينتقل إلى "المزيد من الفلاتر". العناصر تُنقَل (لا تُستنسَخ) — نفس الـ
+     * IDs/القيم/المستمعات، ونفس الحاويتين المشتركتين مع "استكشف" (aqPrimaryFilters و
+     * advancedFiltersBlock). عند دخول "استكشف" تُعاد الحقول لتركيبتها الأصلية بالضبط
+     * (بحث عام + نوع العقار + المدينة + المنطقة + المطور) — شريط "استكشف" المضغوط لا
+     * يتأثر إطلاقًا بإعادة تصميم الرئيسية. لا نداء شبكة، لا تغيير في منطق البحث.
+     * ============================================================================ */
+    var homeFieldsMoved_ = false;
+    function applyHomeFiltersLayout_() {
+      if (homeFieldsMoved_) return;
+      var primary = document.getElementById('aqPrimaryFilters');
+      var advanced = document.getElementById('advancedFiltersBlock');
+      var fwCategory = document.getElementById('fw_category');
+      var fwExactArea = document.getElementById('fw_exactArea');
+      var fwKeyword = document.getElementById('fw_keyword');
+      if (!primary || !advanced || !fwCategory || !fwExactArea || !fwKeyword) return;
+      primary.insertBefore(fwCategory, primary.firstChild);   // يمين الصف الأول
+      primary.appendChild(fwExactArea);                       // يسار الصف الثاني
+      advanced.insertBefore(fwKeyword, advanced.firstChild);
+      homeFieldsMoved_ = true;
+    }
+    function restoreExploreFiltersLayout_() {
+      if (!homeFieldsMoved_) return;
+      var primary = document.getElementById('aqPrimaryFilters');
+      var advanced = document.getElementById('advancedFiltersBlock');
+      var fwCategory = document.getElementById('fw_category');
+      var fwExactArea = document.getElementById('fw_exactArea');
+      var fwKeyword = document.getElementById('fw_keyword');
+      var ppmWrap = document.getElementById('ppmYearsFilterWrap');
+      if (!primary || !advanced || !fwCategory || !fwExactArea || !fwKeyword) return;
+      primary.insertBefore(fwKeyword, primary.firstChild);
+      advanced.insertBefore(fwCategory, advanced.firstChild);
+      if (ppmWrap) advanced.insertBefore(fwExactArea, ppmWrap); else advanced.appendChild(fwExactArea);
+      homeFieldsMoved_ = false;
+    }
     function showExploreView() {
+      restoreExploreFiltersLayout_();
       document.body.classList.remove('app-view-stats');
       document.body.classList.remove('app-view-search');
       document.body.classList.add('app-view-explore');
@@ -8860,6 +8898,7 @@
       leaveMeterView();
       setActiveNav('search');
       window.scrollTo(0, 0);
+      applyHomeFiltersLayout_();
     }
     function showStatsView() {
       document.body.classList.remove('app-view-search');
