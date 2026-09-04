@@ -461,8 +461,9 @@
   display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--aq-space-4);
 }
-@media (min-width: 641px)  { .aq-devs-row { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-@media (min-width: 1024px) { .aq-devs-row { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--aq-space-5); } }
+/* متابعة المرحلة 2C: الرئيسية تعرض 5 مطوّرين كحد أقصى الآن — لا صف ثانٍ على الديسكتوب أبدًا. */
+@media (min-width: 641px)  { .aq-devs-row { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .aq-devs-row { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--aq-space-5); } }
 .aq-dev-tile {
   display: flex; flex-direction: column; align-items: stretch; min-width: 0; padding: 0;
   background: var(--aq-prop-surface); border: 1px solid var(--aq-prop-border); border-radius: var(--aq-prop-radius);
@@ -484,12 +485,22 @@
 /* اسم المطوّر أسفل البطاقة دائمًا، بخط واضح ومنتصف، بحدّ فاصل خفيف علوي (نفس نمط
    .unit-price-box في بطاقة الوحدة) بدل فاصل بصري ثقيل — سطر واحد بارتفاع ثابت لضمان
    تساوي ارتفاع كل بطاقات الصف. */
-.aq-dev-name {
-  display: block; padding: 10px 8px; text-align: center;
+/* متابعة المرحلة 2C: الشريط السفلي يعرض الاسم + عدد الوحدات (من نفس counts المحسوبة
+   فعليًا — بلا نداء جديد)، الاسم أولًا وأبرز، والعدد تحته أصغر وأخفّ. */
+.aq-dev-meta {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  padding: 10px 8px; text-align: center; min-width: 0;
   border-top: 1px solid var(--aq-prop-border); background: var(--aq-prop-canvas);
+}
+.aq-dev-name {
+  display: block; max-width: 100%;
   font-size: var(--aq-fs-caption); font-weight: var(--aq-fw-bold); color: var(--aq-prop-text);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   direction: ltr; unicode-bidi: isolate;   /* أسماء المطوّرين بالإنجليزية داخل واجهة عربية RTL */
+}
+.aq-dev-count {
+  display: block; font-size: var(--aq-fs-caption-sm); font-weight: var(--aq-fw-medium);
+  color: var(--aq-prop-text-muted); letter-spacing: .2px;
 }
 @media (max-width: 640px) {
   .aq-devs { margin: var(--aq-space-6) 0 var(--aq-space-4); padding: var(--aq-space-5) var(--aq-space-3); }

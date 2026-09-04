@@ -5367,7 +5367,7 @@
    * ثابتة. اللوجو من getDeveloperProfile القائم (يتطلب جلسة فقط، فيعمل لكل
    * الأدوار)، ومطوّر بلا لوجو يظهر باسمه بلا كسر التخطيط.
    * ========================================================================== */
-  var DEVS_ROW_LIMIT = 8;
+  var DEVS_ROW_LIMIT = 5;   // متابعة المرحلة 2C: حد عرض الرئيسية فقط — منطق الترتيب/العدّ بلا تغيير
   var devsRowBuilt = false;
 
   function buildDevelopersRow_() {
@@ -5402,12 +5402,19 @@
       logo.textContent = devInitials_(name);   // بلاطة حروف أولى أنيقة إلى حين وصول اللوجو (إن وُجد) — نفس منطق قائمة المطوّرين الإدارية
       logoEntries[String(name).trim().toUpperCase()] = { logo: logo, name: name };
 
+      var meta = document.createElement('span');
+      meta.className = 'aq-dev-meta';
       var nameEl = document.createElement('span');
       nameEl.className = 'aq-dev-name';
       nameEl.textContent = name;
+      var cnt = document.createElement('span');
+      cnt.className = 'aq-dev-count';
+      cnt.textContent = (counts[name] || 0) + ' وحدة';
+      meta.appendChild(nameEl);
+      meta.appendChild(cnt);
 
       tile.appendChild(logo);
-      tile.appendChild(nameEl);
+      tile.appendChild(meta);
       row.appendChild(tile);
     });
     section.hidden = false;
