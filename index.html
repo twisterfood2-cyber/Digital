@@ -59,35 +59,44 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230A1C2F'/%3E%3Ctext x='50' y='68' font-family='Arial, sans-serif' font-size='55' font-weight='900' fill='%23C99A2E' text-anchor='middle'%3ED%3C/text%3E%3C/svg%3E">
   <style>
     :root {
-      /* navy family */
-      --navy: #0A1C2F;
-      --navy-deep: #061321;
-      --navy-dark: #081727;
-      --navy-soft: #14344F;
-      /* gold accent family */
-      --gold: #C99A2E;
-      --gold-soft: #E6C978;
-      --gold-dark: #A77A18;
+      /* ============================================================
+       * الهوية البصرية العامة (أخضر/أبيض) — مشتقة من الصورتين المرجعيتين.
+       * الأسماء القديمة (navy/gold/glass…) بقيت كما هي لأن مئات القواعد
+       * تستهلكها، لكنها الآن *أسماء دلالية* تشير إلى لوحة --aq-prop-*
+       * المركزية في aqar-tokens.css. تغيير الهوية يتم من مكان واحد فقط.
+       *   navy*  = عائلة الأخضر الداكن (أزرار/أسطح داكنة)
+       *   gold*  = الأكسنت (صار أخضر أساسي مقروءًا على الأسطح الفاتحة)
+       *   glass* = الأسطح (صارت بيضاء)
+       * ============================================================ */
+      /* deep-green family (was navy) — dark surfaces & primary buttons */
+      --navy: var(--aq-prop-green, #0E5446);
+      --navy-deep: var(--aq-prop-green-ink, #023A3A);
+      --navy-dark: var(--aq-prop-green-deep, #004C43);
+      --navy-soft: #0F6152;
+      /* accent family (was gold) — primary green, readable on light surfaces */
+      --gold: var(--aq-prop-green, #0E5446);
+      --gold-soft: var(--aq-prop-green, #0E5446);
+      --gold-dark: var(--aq-prop-green-ink, #023A3A);
       /* neutrals & text */
       --white: #FFFFFF;
-      --off-white: #F7F6F2;
-      --bg: #F1EFE8;               /* light working-surface base */
-      --text: #10253A;            /* dark text on light surfaces */
-      --text-light: #EAF0F6;      /* light text on dark surfaces */
-      --text-muted: #AEB9C6;      /* muted light text on dark surfaces — رُفع تباينه قليلًا للقراءة */
-      --muted: #5E6B7A;           /* muted text on light surfaces */
+      --off-white: var(--aq-prop-surface-2, #FAFAFA);
+      --bg: #F1F4F3;               /* light working-surface base */
+      --text: var(--aq-prop-text, #16211E);            /* dark text on light surfaces */
+      --text-light: var(--aq-prop-text, #16211E);      /* الأسطح صارت فاتحة → النص الأساسي داكن */
+      --text-muted: var(--aq-prop-text-muted, #6E7573);/* نص ثانوي على الأسطح الفاتحة */
+      --muted: var(--aq-prop-text-muted, #6E7573);     /* muted text on light surfaces */
       /* lines & borders */
-      --border: rgba(16,37,58,0.14);        /* hairline on light */
-      --border-gold: rgba(201,154,46,0.28); /* subtle gold hairline */
-      --line-dark: rgba(255,255,255,0.10);  /* hairline on dark glass */
+      --border: rgba(16,33,30,0.12);        /* hairline on light */
+      --border-gold: rgba(14,84,70,0.22);   /* subtle green hairline */
+      --line-dark: rgba(16,33,30,0.10);     /* hairline on light surfaces */
       /* environment */
-      --page-bg: #0D2438;                    /* refined deep premium navy under the city image */
-      /* glass surfaces */
-      --glass: rgba(10,28,47,0.55);          /* recessive glass — nav pills that dissolve into the bg */
-      --glass-card: rgba(20,43,67,0.74);     /* elevated glass — unit cards, sit above the page bg */
-      --glass-strong: rgba(6,19,33,0.76);    /* deep glass — AI console, toasts, bars */
-      --glass-panel: rgba(19,42,63,0.72);    /* structured dark glass — filter panel */
-      --input-dark: rgba(27,52,74,0.6);      /* input surface on dark panels (~#1B344A) */
+      --page-bg: var(--aq-prop-canvas, #F7F7F7);   /* لوحة الصفحة الفاتحة */
+      /* surfaces (كانت زجاجًا داكنًا — صارت أسطحًا بيضاء) */
+      --glass: #FFFFFF;
+      --glass-card: #FFFFFF;
+      --glass-strong: #FFFFFF;
+      --glass-panel: #FFFFFF;
+      --input-dark: #FFFFFF;                 /* حقول على الأسطح الفاتحة */
       /* status */
       --success-bg: #E4F1E9; --success-fg: #1E6E45;
       --warn-bg: #F7EED9; --warn-fg: #7A5600;
@@ -96,8 +105,8 @@
       --radius-sm: 8px;
       --radius-md: 13px;
       --radius-lg: 16px;
-      --shadow-soft: 0 10px 30px rgba(0,0,0,0.18);
-      --shadow-card: 0 6px 20px rgba(4,12,22,0.26);
+      --shadow-soft: 0 10px 30px rgba(11,40,33,0.10);
+      --shadow-card: 0 6px 20px rgba(11,40,33,0.08);
       --ease: 180ms ease;
       /* عرض حاوية التطبيق الموحّد — كل الأقسام الرئيسية (الغلاف / التنقّل / البحث /
          النتائج / الإحصائيات / لوحة التحكم) بتتحاذى عليه. سقف معقول لتجنّب أسطر نص
@@ -341,7 +350,7 @@
     .fav-toggle-btn { background: transparent; color: var(--gold-soft); border: 1px solid var(--border-gold); }
     .fav-toggle-btn:hover { background: rgba(201,154,46,0.12); }
     .fav-toggle-btn.active { background: var(--navy); color: var(--gold-soft); border-color: var(--gold); }
-    #resultsCount { font-size:  var(--aq-fs-caption); color: var(--aq-text-tertiary); margin: 10px 2px; font-weight: 600; letter-spacing: 0.3px; }
+    #resultsCount { font-size:  var(--aq-fs-body); color: var(--aq-text-light); margin: 10px 2px; font-weight: 700; letter-spacing: 0.3px; }
     .results-grid {
       display: grid;
       /* auto-fill + minmax: عدد الكروت في الصف بيزيد تلقائيًا مع عرض الحاوية.
@@ -1572,7 +1581,8 @@
       font-size:  var(--aq-fs-micro); font-weight: 800; padding: 2px 8px; border-radius:  var(--aq-radius-pill); letter-spacing: .3px;
       border: 1px solid transparent;
     }
-    .um-badge.role-OWNER { background: var(--gold); color: var(--aq-role-owner-fg); }
+    /* شارة المالك: خلفية خضراء صلبة ونص أبيض (بعد تحويل اللوحة، الذهبي صار أخضر) */
+    .um-badge.role-OWNER { background: var(--aq-prop-green); color: #FFFFFF; }
     .um-badge.role-MANAGER { background: var(--aq-role-manager-bg); color: var(--aq-role-manager-fg); }
     .um-badge.role-SALES { background: var(--aq-role-sales-bg); color: var(--aq-role-sales-fg); }
     .um-badge.role-DATA_ENTRY { background: var(--aq-role-entry-bg); color: var(--aq-role-entry-fg); }
@@ -2173,6 +2183,753 @@
       margin: 0 auto;
       max-width: 460px;
     }
+
+    /* =========================================================================
+     * PROPERTY SEARCH EXPERIENCE — الرئيسية + النتائج + overlay الوحدة
+     * -------------------------------------------------------------------------
+     * لغة بصرية مستخرجة بالعيّنة من الصورتين المرجعيتين المعتمدتين:
+     *   هيرو مصوّر بتدرّج أخضر عميق + كونسول بحث أبيض مرتفع فوقه (المرجع الأول)
+     *   شريط بحث مضغوط + رقائق + شبكة بطاقات بيضاء على خلفية فاتحة (المرجع الثاني)
+     * كل الألوان من tokens --aq-prop-* في aqar-tokens.css.
+     * كل القواعد محصورة بـ body.aq-search-ui — بقية الشاشات (لوحة التحكم،
+     * المستخدمون، الإعدادات، إدخال وحدة، عرض السعر، سعر المتر) لا تتأثر إطلاقًا.
+     * ========================================================================= */
+
+    /* ---- 1) لوحة الصفحة الفاتحة (الصورة الفوتوغرافية انتقلت إلى الهيرو) ---- */
+    body.aq-search-ui {
+      background-image: none;
+      background-color: var(--aq-prop-canvas);
+    }
+    body.app-view-search::before { content: none; }
+    /* الهوية الجديدة بلا صورة غلاف كبيرة في أي شاشة (رفع الغلاف من الإعدادات
+       يبقى شغّالًا كما هو — العنصر موجود في الـ DOM، مخفي بصريًا فقط). */
+    .cover-wrap { display: none !important; }
+    body.app-view-search .aq-page-header { display: none !important; }
+    /* ---- معمارية المعلومات: الرئيسية = بحث + مطوّرون · استكشف = بحث + نتائج ----
+       كونسول البحث عنصر واحد يخدم الصفحتين (بلا تكرار حقول أو منطق). */
+    /* الكونسول يظهر في الرئيسية و"استكشف" فقط */
+    body:not(.app-view-search):not(.app-view-explore) .aq-hero { display: none !important; }
+    /* شبكة النتائج حصريًا في "استكشف" — لا نتائج على الرئيسية إطلاقًا */
+    body:not(.app-view-explore) .aq-results-section { display: none !important; }
+    /* قسم المطوّرين حصريًا في الرئيسية */
+    body:not(.app-view-search) .aq-devs { display: none !important; }
+    /* زر الرجوع للرئيسية يظهر داخل "استكشف" فقط */
+    .aq-console-back { display: none; }
+    body.app-view-explore .aq-console-back { display: inline-flex; }
+
+    /* ---- 2) الهيرو: صورة الغلاف نفسها (نفس مسار loadCoverImage) ---- */
+    .aq-hero-media { background-image: url('city-bg.png'); }
+
+    /* ---- 3) الكونسول: الفلاتر ولوحة البحث الذكي داخل بطاقة بيضاء مرتفعة ---- */
+    body.aq-search-ui .aq-console .filters-card,
+    body.aq-search-ui .aq-console .ai-search-panel {
+      background: transparent; border: none; box-shadow: none;
+      -webkit-backdrop-filter: none; backdrop-filter: none;
+      padding: 0; margin: 0;
+    }
+    body.aq-search-ui .aq-console label {
+      color: var(--aq-prop-text-muted); text-transform: none; letter-spacing: 0;
+      font-size: var(--aq-fs-caption); font-weight: 700;
+    }
+    body.aq-search-ui .aq-console input,
+    body.aq-search-ui .aq-console select {
+      background: var(--aq-prop-surface); color: var(--aq-prop-text);
+      border: 1px solid var(--aq-prop-border); border-radius: var(--aq-prop-radius-sm);
+      padding: 11px 13px; font-size: var(--aq-fs-small);
+    }
+    body.aq-search-ui .aq-console select { color-scheme: light; }
+    body.aq-search-ui .aq-console input::placeholder { color: var(--aq-prop-text-faint); }
+    body.aq-search-ui .aq-console input:focus,
+    body.aq-search-ui .aq-console select:focus {
+      border-color: var(--aq-prop-green); box-shadow: 0 0 0 3px rgba(14,84,70,0.14);
+      background: var(--aq-prop-surface);
+    }
+    body.aq-search-ui .aq-console .ai-search-head span { color: var(--aq-prop-text); }
+    body.aq-search-ui .aq-console .ai-search-head .ico { color: var(--aq-prop-green); }
+    body.aq-search-ui .aq-console .ai-search-desc { color: var(--aq-prop-text-muted); }
+    body.aq-search-ui .aq-console #nlSearchInput {
+      background: var(--aq-prop-surface); border-color: var(--aq-prop-border); color: var(--aq-prop-text);
+    }
+    body.aq-search-ui .aq-console #nlSearchBtn,
+    body.aq-search-ui .aq-console #searchBtn {
+      background: var(--aq-prop-green-ink); color: #fff; border: 1px solid var(--aq-prop-green-ink);
+      border-radius: var(--aq-prop-radius-sm); font-weight: 800;
+    }
+    body.aq-search-ui .aq-console #nlSearchBtn:hover,
+    body.aq-search-ui .aq-console #searchBtn:hover { background: var(--aq-prop-green); border-color: var(--aq-prop-green); }
+    body.aq-search-ui .aq-console #searchBtn { flex: 1 1 auto; padding: 12px 26px; }
+    body.aq-search-ui .aq-console #clearBtn {
+      background: var(--aq-prop-surface); color: var(--aq-prop-text-muted);
+      border: 1px solid var(--aq-prop-border); border-radius: var(--aq-prop-radius-sm);
+    }
+    body.aq-search-ui .aq-console #clearBtn:hover { border-color: var(--aq-prop-border-strong); color: var(--aq-prop-text); }
+    body.aq-search-ui .aq-console .toggle-details-btn {
+      background: var(--aq-prop-canvas); border: 1px solid var(--aq-prop-border);
+      color: var(--aq-prop-text-muted); border-radius: var(--aq-prop-radius-sm);
+    }
+    body.aq-search-ui .aq-console .toggle-details-btn:hover { border-color: var(--aq-prop-green-line); color: var(--aq-prop-green); }
+    .aq-console-back {
+      align-items: center; gap: 6px;
+      background: transparent; border: 1px solid var(--aq-prop-border);
+      color: var(--aq-prop-text-muted); border-radius: var(--aq-prop-radius-sm);
+      padding: 10px 14px; font-weight: 700; font-size: var(--aq-fs-small);
+    }
+    .aq-console-back svg { width: 15px; height: 15px; }
+    .aq-console-back:hover { border-color: var(--aq-prop-green-line); color: var(--aq-prop-green); }
+
+    /* ---- 4) وضع النتائج: الهيرو ينكمش إلى شريط بحث مضغوط لاصق ---- */
+    body.app-view-explore .aq-hero {
+      grid-template-columns: 1fr; min-height: 0; padding: 12px;
+      background: var(--aq-prop-surface); border: 1px solid var(--aq-prop-border);
+      border-radius: var(--aq-prop-radius); box-shadow: var(--aq-prop-shadow);
+      margin-bottom: var(--aq-space-4);
+      position: sticky; top: calc(var(--aq-header-h) + 8px); z-index: 20;
+    }
+    body.app-view-explore .aq-hero::after,
+    body.app-view-explore .aq-hero-media,
+    body.app-view-explore .aq-hero-copy { display: none; }
+    body.app-view-explore .aq-console {
+      box-shadow: none; border: none; padding: 0; background: transparent;
+    }
+    body.app-view-explore .aq-console-modes { margin-bottom: 10px; }
+    /* شبكة الفلاتر تتحوّل إلى صف أفقي مضغوط (تسميات صغيرة فوق كل حقل) */
+    body.app-view-explore .aq-console .filters-card > .grid {
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px 10px;
+    }
+    body.app-view-explore .aq-console label {
+      font-size: var(--aq-fs-micro); margin-bottom: 3px;
+    }
+    body.app-view-explore .aq-console input,
+    body.app-view-explore .aq-console select { padding: 9px 11px; }
+    body.app-view-explore .aq-console .btn-row { margin-top: 10px; }
+    body.app-view-explore .aq-console #searchBtn { flex: 0 0 auto; padding: 10px 30px; }
+
+    /* ---- 5) شريط النتائج (رقائق + ترتيب) ---- */
+    body.aq-search-ui .aq-sort-field label {
+      margin: 0; font-size: var(--aq-fs-caption); font-weight: 700;
+      color: var(--aq-prop-text-muted); text-transform: none; letter-spacing: 0; white-space: nowrap;
+    }
+    body.aq-search-ui .aq-sort-field select {
+      width: auto; min-width: 160px; background: var(--aq-prop-surface); color: var(--aq-prop-text);
+      border: 1px solid var(--aq-prop-border); border-radius: var(--aq-radius-pill);
+      padding: 8px 14px; font-size: var(--aq-fs-small); font-weight: 700; color-scheme: light;
+    }
+    body.aq-search-ui .aq-sort-field select:focus {
+      border-color: var(--aq-prop-green); box-shadow: 0 0 0 3px rgba(14,84,70,0.14);
+    }
+    body.aq-search-ui #resultsCount { font-size: var(--aq-fs-small); color: inherit; margin: 0; font-weight: 800; }
+    body.aq-search-ui .fav-toggle-btn.aq-chip.active {
+      background: var(--aq-prop-green-soft); border-color: var(--aq-prop-green-line); color: var(--aq-prop-green);
+    }
+    body.aq-search-ui .fav-toggle-btn .ico { width: 14px; height: 14px; margin: 0; }
+
+    /* ---- 6) بطاقة العقار (نفس buildUnitCardHtml — إعادة تنسيق فقط) ---- */
+    /* حدّ أدنى أضيق للمسار (264px بدل 300px) → 3 أعمدة عند 1280 و4 عند الشاشات
+       الأعرض، بكثافة أقرب لشبكة المرجع بلا أي تغيير في بناء البطاقة. */
+    body.aq-search-ui .results-grid {
+      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 264px), 1fr));
+    }
+    body.aq-search-ui .unit-card {
+      background: var(--aq-prop-surface); color: var(--aq-prop-text);
+      border: 1px solid var(--aq-prop-border); border-right: 1px solid var(--aq-prop-border);
+      border-radius: var(--aq-prop-radius); box-shadow: var(--aq-prop-shadow);
+      -webkit-backdrop-filter: none; backdrop-filter: none;
+      padding: 14px; overflow: hidden;
+      transition: transform var(--ease), box-shadow var(--ease), border-color var(--ease);
+      cursor: pointer;
+    }
+    body.aq-search-ui .unit-card:hover {
+      background: var(--aq-prop-surface); transform: translateY(-3px);
+      border-color: var(--aq-prop-green-line); box-shadow: 0 16px 40px rgba(11,40,33,0.16);
+    }
+    /* الصورة: ملء عرض البطاقة أعلىها بنسبة ثابتة (نفس إيقاع المرجع) */
+    body.aq-search-ui .unit-cover {
+      margin: -14px -14px 12px; border-radius: 0; width: auto; height: auto;
+      aspect-ratio: 4 / 3; overflow: hidden; background: var(--aq-prop-canvas-2);
+    }
+    body.aq-search-ui .unit-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    body.aq-search-ui .img-count-badge {
+      background: rgba(2,32,26,0.72); color: #fff; border: none; border-radius: var(--aq-radius-pill);
+    }
+    body.aq-search-ui .fav-btn {
+      background: rgba(255,255,255,0.92); border: 1px solid rgba(255,255,255,0.9);
+      color: var(--aq-prop-text-muted); box-shadow: 0 2px 8px rgba(6,28,23,0.18);
+    }
+    body.aq-search-ui .fav-btn.active { color: #E03131; border-color: #F1C9C9; }
+    body.aq-search-ui .compare-checkbox { background: rgba(255,255,255,0.92); border-radius: 8px; }
+    body.aq-search-ui .unit-top { padding: 0; margin: 0 0 8px; }
+    body.aq-search-ui .unit-id { color: var(--aq-prop-text-faint); }
+    body.aq-search-ui .unit-title { color: var(--aq-prop-text); font-size: var(--aq-fs-body-lg); }
+    body.aq-search-ui .unit-loc { color: var(--aq-prop-text-muted); font-weight: 600; }
+    body.aq-search-ui .unit-added { color: var(--aq-prop-text-faint); }
+    body.aq-search-ui .spec-chip {
+      background: var(--aq-prop-surface); color: var(--aq-prop-text-muted);
+      border: 1px solid var(--aq-prop-border); border-radius: var(--aq-prop-radius-sm);
+      padding: 5px 10px; font-weight: 700;
+    }
+    body.aq-search-ui .spec-chip .ico { color: var(--aq-prop-text-faint); }
+    body.aq-search-ui .unit-price-box {
+      background: transparent; border: none; border-top: 1px solid var(--aq-prop-border);
+      border-radius: 0; padding: 12px 0 4px; margin-top: 4px;
+    }
+    body.aq-search-ui .unit-price-box .final-price { color: var(--aq-prop-green); font-weight: 900; }
+    body.aq-search-ui .unit-price-box .per-meter { color: var(--aq-prop-text-muted); }
+    body.aq-search-ui .unit-price-box .old-price { color: #C4443B; }
+    body.aq-search-ui .unit-price-box .discount-tag {
+      background: var(--aq-prop-green-soft); color: var(--aq-prop-green); border: 1px solid var(--aq-prop-green-line);
+    }
+    body.aq-search-ui .resale-current-box {
+      background: var(--aq-prop-canvas); border: 1px solid var(--aq-prop-border); color: var(--aq-prop-text);
+    }
+    body.aq-search-ui .resale-box-title { color: var(--aq-prop-green); }
+    body.aq-search-ui .resale-label { color: var(--aq-prop-text-muted); }
+    body.aq-search-ui .resale-value { color: var(--aq-prop-text); }
+    body.aq-search-ui .unit-card .toggle-details-btn {
+      background: var(--aq-prop-canvas); border: 1px solid var(--aq-prop-border); color: var(--aq-prop-text-muted);
+      border-radius: var(--aq-prop-radius-sm);
+    }
+    body.aq-search-ui .unit-card .toggle-details-btn:hover { border-color: var(--aq-prop-green-line); color: var(--aq-prop-green); }
+    body.aq-search-ui .unit-extra { color: var(--aq-prop-text-muted); border-top-color: var(--aq-prop-border); }
+    body.aq-search-ui .unit-extra b { color: var(--aq-prop-text); }
+    body.aq-search-ui .card-actions-bottom { border-top: 1px solid var(--aq-prop-border); }
+    body.aq-search-ui .icon-action-btn {
+      background: var(--aq-prop-surface); color: var(--aq-prop-text-muted);
+      border: 1px solid var(--aq-prop-border); border-radius: var(--aq-prop-radius-sm); font-weight: 700;
+    }
+    body.aq-search-ui .icon-action-btn:hover {
+      border-color: var(--aq-prop-green-line); color: var(--aq-prop-green); background: var(--aq-prop-green-soft);
+    }
+    body.aq-search-ui .status-select {
+      background: var(--aq-prop-surface); color: var(--aq-prop-text);
+      border: 1px solid var(--aq-prop-border); border-radius: var(--aq-prop-radius-sm); color-scheme: light;
+    }
+    body.aq-search-ui .card-provenance { color: var(--aq-prop-text-faint); border-top-color: var(--aq-prop-border); }
+    body.aq-search-ui .card-provenance a { color: var(--aq-prop-green); }
+    body.aq-search-ui .status-badge { background: var(--aq-prop-green-soft); color: var(--aq-prop-green); border-color: var(--aq-prop-green-line); }
+    body.aq-search-ui .status-badge.محجوز { background: #FDF3DC; color: #8A6412; border-color: #EBDCB4; }
+    body.aq-search-ui .status-badge.مباع { background: #FBE9E7; color: #B0392F; border-color: #F0CFCB; }
+
+    /* ---- 7) حالات فارغة/تحميل على اللوحة الفاتحة ---- */
+    body.aq-search-ui .pre-search-state,
+    body.aq-search-ui .empty-state {
+      background: var(--aq-prop-surface); border: 1px solid var(--aq-prop-border);
+      border-radius: var(--aq-prop-radius); box-shadow: var(--aq-prop-shadow);
+      -webkit-backdrop-filter: none; backdrop-filter: none;
+    }
+    body.aq-search-ui .pre-search-state h3,
+    body.aq-search-ui .empty-state h3 { color: var(--aq-prop-text); }
+    body.aq-search-ui .pre-search-state p,
+    body.aq-search-ui .empty-state p { color: var(--aq-prop-text-muted); }
+    body.aq-search-ui .pre-search-mark {
+      background: var(--aq-prop-green-soft); border-color: var(--aq-prop-green-line); color: var(--aq-prop-green);
+    }
+    body.aq-search-ui .empty-state .icon { color: var(--aq-prop-green); }
+    body.aq-search-ui .empty-state button {
+      background: var(--aq-prop-green-ink); color: #fff; border-color: var(--aq-prop-green-ink);
+    }
+    body.aq-search-ui .skel-card {
+      background: var(--aq-prop-surface); border: 1px solid var(--aq-prop-border);
+      border-radius: var(--aq-prop-radius);
+    }
+    body.aq-search-ui .skel { background: linear-gradient(90deg, #ECEFEE 25%, #F5F7F6 37%, #ECEFEE 63%); }
+
+    /* ---- 8) overlay تفاصيل الوحدة (يعيد استخدام #unitCardOverlay القائم) ---- */
+    /* توسيط رأسي مع بقاء زر الإغلاق ظاهرًا دائمًا: flex-start + هوامش auto —
+       يتوسّط عند قِصَر الكارت، ويتمرّر بلا قصّ عند طوله (لا يُقصّ زر الإغلاق). */
+    .unit-card-overlay { align-items: flex-start; padding: 72px 16px 48px; }
+    .unit-card-overlay-box { max-width: 460px; margin-block: auto; }
+    body.aq-search-ui .unit-card-overlay .unit-card { cursor: default; }
+    .unit-card-overlay-close {
+      top: -48px; left: 0; background: var(--aq-prop-surface); color: var(--aq-prop-text);
+      box-shadow: 0 6px 20px rgba(4,20,16,0.35);
+    }
+    .unit-card-overlay-close:hover { background: #fff; color: var(--aq-prop-green); }
+
+    /* ---- 9) استجابة ---- */
+    @media (max-width: 1024px) {
+      body.app-view-explore .aq-hero { position: static; }
+    }
+    @media (max-width: 640px) {
+      body.aq-search-ui .unit-card { padding: 12px; }
+      body.aq-search-ui .unit-cover { margin: -12px -12px 10px; }
+      body.aq-search-ui .aq-sort-field { width: 100%; }
+      body.aq-search-ui .aq-sort-field select { flex: 1 1 auto; min-width: 0; }
+      body.app-view-explore .aq-hero { padding: 10px; }
+    }
+
+    /* =========================================================================
+     * الهوية العامة — تصحيحات تباين مقصودة بعد تحويل اللوحة إلى أخضر/أبيض
+     * -------------------------------------------------------------------------
+     * الأسطح صارت فاتحة والنص الأساسي داكنًا (من الـ tokens مباشرة). القواعد
+     * أدناه تعالج الحالة المعاكسة الوحيدة: عناصر خلفيتها خضراء داكنة كان نصّها
+     * ذهبيًا فاتحًا — نصّها الآن أبيض. القائمة مستخرجة بالفحص لا بالتخمين.
+     * ========================================================================= */
+    #nlSearchBtn, #searchBtn, .fav-toggle-btn.active, .edit-btn, .empty-state button,
+    #scrollTopBtn, .compare-table th, #statsView .refresh-btn, .dash-drawer-toggle,
+    #dashboardView .dash-cta, #dashPanel-users .um-chips button.active, .um-add-toggle,
+    .um-primary, .um-chips button.active, .um-avatar, #umUserBody .um-actions button.primary,
+    #umUserBody .um-inline button, .admin-panel .small-btn, .access-gate-box button,
+    #editSaveBtn, .images-choose-btn, #quoteExportBtn, .ai-extract-btn,
+    #pdfContactConfirmBtn, #devProfileExportPdfBtn {
+      color: #FFFFFF;
+    }
+    /* أسطح خضراء داكنة نصّها موروث (كان فاتحًا على داكن) → نص أبيض صريح */
+    #dashboardView .dash-live-card,
+    #dashboardView .dash-live-card *,
+    #dashboardView .dash-live-card .live-count b,
+    #dashboardView .dash-live-card .live-names { color: #FFFFFF; }
+    #dashboardView .dash-live-card { border-color: var(--aq-prop-green-line); }
+    /* قائمة اختيار المشروع في الإحصاءات: صارت حقلًا فاتحًا على لوحة بيضاء */
+    #statsView .chart-select {
+      background: var(--aq-prop-surface); color: var(--aq-prop-text);
+      border: 1px solid var(--aq-prop-border); color-scheme: light;
+    }
+    /* زر التنقّل داخل الهيدر: لا يقلب لخلفية داكنة عند الضغط */
+    .aq-header #appNav .app-nav-btn:active { background: var(--aq-prop-green-soft); color: var(--aq-prop-green); }
+
+    /* بوابة الدخول: كانت لوحة داكنة فوق صورة — صارت بطاقة بيضاء على لوحة فاتحة */
+    .access-gate { background: var(--aq-prop-canvas); }
+    .access-gate-box {
+      background: var(--aq-prop-surface); border: 1px solid var(--aq-prop-border);
+      box-shadow: var(--aq-prop-shadow);
+    }
+    .access-gate-box h2 { color: var(--aq-prop-text); }
+    .access-gate-box p, .access-gate-box label { color: var(--aq-prop-text-muted); }
+    .access-gate-box input {
+      background: var(--aq-prop-surface); color: var(--aq-prop-text);
+      border: 1px solid var(--aq-prop-border);
+    }
+    .access-gate-box .icon { color: var(--aq-prop-green); }
+    /* شاشة استعادة الجلسة */
+    #sessionRestoreSplash { background: var(--aq-prop-canvas); }
+    .srs-text { color: var(--aq-prop-text-muted); }
+
+    /* خلفية الصفحة: الهوية الجديدة فاتحة في كل الشاشات (لا صورة مدينة) */
+    body {
+      background: var(--aq-prop-canvas) !important;
+    }
+    body::before { content: none !important; }
+
+    /* =========================================================================
+     * الرئيسية + استكشف — ضبط التناسبات النهائي وفق الصورتين المرجعيتين
+     * -------------------------------------------------------------------------
+     * لا تغيير في الحقول ولا الـ ids ولا منطق البحث — تناسبات وتنسيق فقط:
+     *   الرئيسية: بطاقة بحث مركّزة بعرض محدود (حقل رئيسي كامل + حقول مزدوجة +
+     *             زر بحث عريض) بدل نموذج ممتد على كل الشاشة (المرجع الأول).
+     *   استكشف : شريط بحث مضغوط في صفّين (حقول · ثم فلاتر متقدمة + أزرار)
+     *             ليبدأ عرض البطاقات مبكرًا (المرجع الثاني).
+     * ========================================================================= */
+
+    /* ---------------- الرئيسية: هيرو أكثر سعة ---------------- */
+    body.app-view-search .aq-hero { padding-top: var(--aq-space-8); }
+    body.app-view-search .aq-hero-title { font-size: clamp(30px, 3.6vw, 46px); }
+    body.app-view-search .aq-hero-sub { max-width: 72ch; }
+
+    /* بطاقة البحث: عرض محدود ومركّزة (نِسَب المرجع) */
+    body.app-view-search .aq-console {
+      max-width: 760px; margin-inline: auto;
+      padding: var(--aq-space-6) var(--aq-space-5);
+    }
+    /* حقل الكلمة المفتاحية بعرض كامل، ثم الحقول في عمودين */
+    body.app-view-search .aq-console .filters-card > .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--aq-space-3) var(--aq-space-3);
+    }
+    body.app-view-search .aq-console .filters-card > .grid > div:first-child { grid-column: 1 / -1; }
+    body.app-view-search .aq-console input,
+    body.app-view-search .aq-console select { padding: 12px 14px; }
+    /* زر البحث عريض داخل البطاقة (كما في المرجع) ومسح الفلاتر ثانوي بجانبه */
+    body.app-view-search .aq-console .btn-row { margin-top: var(--aq-space-4); gap: var(--aq-space-2); }
+    body.app-view-search .aq-console #searchBtn { flex: 1 1 auto; padding: 14px 28px; font-size: var(--aq-fs-body); }
+    body.app-view-search .aq-console #clearBtn { flex: 0 0 auto; }
+
+    /* ---------------- استكشف: شريط بحث مضغوط في صفّين ---------------- */
+    body.app-view-explore .aq-console .filters-card {
+      display: grid; grid-template-columns: 1fr auto;
+      grid-template-areas: "fields fields" "adv actions" "advblk advblk";
+      gap: var(--aq-space-2) var(--aq-space-3); align-items: center;
+    }
+    body.app-view-explore .aq-console .filters-card > .grid { grid-area: fields; }
+    body.app-view-explore .aq-console .filters-card > .toggle-details-btn {
+      grid-area: adv; justify-self: start; width: auto; margin: 0;
+      padding: 8px 14px; border-radius: var(--aq-radius-pill); font-size: var(--aq-fs-caption);
+    }
+    body.app-view-explore .aq-console .filters-card > #advancedFiltersBlock { grid-area: advblk; margin: 0; }
+    body.app-view-explore .aq-console .filters-card > .btn-row { grid-area: actions; margin: 0; justify-content: flex-end; }
+    body.app-view-explore .aq-console { padding: var(--aq-space-3) var(--aq-space-4); }
+    body.app-view-explore .aq-console-modes { margin-bottom: var(--aq-space-2); }
+    /* على الشاشات الضيقة: الشريط المضغوط يتحوّل إلى عمود واحد (لا تزاحم بين
+       رقاقة الفلاتر المتقدمة وأزرار البحث). */
+    @media (max-width: 640px) {
+      body.app-view-explore .aq-console .filters-card {
+        grid-template-columns: 1fr;
+        grid-template-areas: "fields" "adv" "actions" "advblk";
+      }
+      body.app-view-explore .aq-console .filters-card > .toggle-details-btn { justify-self: stretch; text-align: center; }
+      body.app-view-explore .aq-console .filters-card > .btn-row { justify-content: stretch; }
+      body.app-view-explore .aq-console .filters-card > .btn-row #searchBtn { flex: 1 1 auto; }
+    }
+
+    /* =========================================================================
+     * UNIT FORM (#editModal) — نظام نماذج AqaR الأول
+     * -------------------------------------------------------------------------
+     * نفس الـ DOM والـ ids والمعالجات والأوضاع (إضافة/تعديل/استنساخ/عرض السعر/عرض SALES).
+     * التغيير عرض فقط: عرض محدود ومركّز، أقسام مفصولة بالمسافة، حقول بارتفاع مريح،
+     * لوحة مساعدة للذكاء الاصطناعي، منطقة صور واضحة، شريط إجراءات لاصق،
+     * وحالة قراءة-فقط لعرض SALES (تُستنتج من غياب زر الحفظ الذي يزيله
+     * applyRoleUiVisibility من الـ DOM — لا صلاحيات جديدة ولا JS إضافي).
+     * ========================================================================= */
+    /* الصدفة والعرض — في الوضعين: مودال فوق الاستكشاف، أو صفحة داخل المحتوى */
+    #editModal .modal-box {
+      background: var(--aq-prop-surface); color: var(--aq-prop-text);
+      border: 1px solid var(--aq-prop-border); border-top: 1px solid var(--aq-prop-border);
+      border-radius: var(--aq-prop-radius-lg); box-shadow: var(--aq-prop-shadow);
+      padding: var(--aq-space-6) var(--aq-space-6) 0;
+      max-width: 1000px; width: 100%; margin: 0 auto;
+    }
+    body.app-view-add #editModal .modal-box,
+    body.app-view-quote #editModal .modal-box { max-width: 1000px; width: 100%; margin: 0 auto; }
+    #editModal .modal-header {
+      margin-bottom: var(--aq-space-5); padding-bottom: var(--aq-space-4);
+      border-bottom: 1px solid var(--aq-prop-border);
+    }
+    #editModal .modal-title {
+      font-size: var(--aq-fs-title-lg); font-weight: var(--aq-fw-black); color: var(--aq-prop-text); letter-spacing: 0;
+    }
+    #editModal .modal-title #editUnitIdLabel {
+      font-size: var(--aq-fs-caption); font-weight: var(--aq-fw-bold); color: var(--aq-prop-text-muted);
+      direction: ltr; unicode-bidi: isolate; margin-inline-start: 6px;
+    }
+    #editModal .modal-close {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--aq-prop-surface); color: var(--aq-prop-text-muted); border: 1px solid var(--aq-prop-border);
+    }
+    #editModal .modal-close:hover { background: var(--aq-prop-green-soft); color: var(--aq-prop-green); border-color: var(--aq-prop-green-line); }
+
+    /* عناوين الأقسام: علامة خضراء + عنوان — بلا خط تحت ولا أحرف كبيرة */
+    #editForm .section-title {
+      display: flex; align-items: center; gap: 10px;
+      margin: var(--aq-space-7) 0 var(--aq-space-4); padding: 0; border: none;
+      font-size: var(--aq-fs-body-lg); font-weight: var(--aq-fw-bold); color: var(--aq-prop-text);
+      letter-spacing: 0; text-transform: none;
+    }
+    #editForm .section-title::before {
+      content: ""; width: 4px; height: 18px; border-radius: 3px; flex: 0 0 auto; background: var(--aq-prop-green);
+    }
+    #editForm .section-title:first-of-type { margin-top: 0; }
+
+    /* الحقول */
+    #editModal label {
+      font-size: var(--aq-fs-caption); font-weight: var(--aq-fw-bold); color: var(--aq-prop-text-muted);
+      letter-spacing: 0; text-transform: none; margin-bottom: 6px;
+    }
+    #editModal input:not([type="file"]):not([type="checkbox"]):not([type="radio"]),
+    #editModal select, #editModal textarea {
+      background: var(--aq-prop-surface); color: var(--aq-prop-text);
+      border: 1px solid var(--aq-prop-border); border-radius: var(--aq-prop-radius-sm);
+      padding: 12px 14px; min-height: 46px; font-size: var(--aq-fs-small); line-height: 1.4;
+      transition: border-color var(--aq-motion-base), box-shadow var(--aq-motion-base);
+    }
+    #editModal input::placeholder, #editModal textarea::placeholder { color: var(--aq-prop-text-faint); }
+    #editModal input:hover, #editModal select:hover, #editModal textarea:hover { border-color: var(--aq-prop-border-strong); }
+    #editModal input:focus, #editModal select:focus, #editModal textarea:focus {
+      outline: none; border-color: var(--aq-prop-green); box-shadow: 0 0 0 3px rgba(14,84,70,0.14); background: var(--aq-prop-surface);
+    }
+    #editModal select { color-scheme: light; }
+    #editModal textarea { min-height: 110px; resize: vertical; }
+    /* الأرقام والهواتف والروابط: ltr داخل RTL */
+    #editModal input[type="number"], #editModal input[name="ownerPhone"], #editModal #editImageLinkInput {
+      direction: ltr; text-align: end; font-variant-numeric: tabular-nums;
+    }
+
+    /* شبكات الأقسام: التسلسل يتبع المعلومات لا عمودين قسريين */
+    #editForm .grid { gap: var(--aq-space-4) var(--aq-space-4); }
+    #editForm .grid.aq-fg-basic,
+    #editForm .grid.aq-fg-location,
+    #editForm .grid.aq-fg-owner { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    #editForm .grid.aq-fg-details { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    #editForm .grid.aq-fg-price { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    #editForm .grid.aq-fg-price > div:nth-child(1) { grid-column: span 2; }   /* السعر الأصلي أبرز حقل مالي */
+    #editForm .grid.aq-fg-details > div:nth-child(10) { grid-column: span 2; } /* الفيو */
+    #editForm .aq-fg-location #editFetchLastSimilarBtn { margin-top: 8px; width: 100%; }
+
+    /* معاينة القسط: بطاقة مالية هادئة */
+    #editModal .installment-preview {
+      background: var(--aq-prop-green-soft); border: 1px solid var(--aq-prop-green-line); color: var(--aq-prop-green-ink);
+      border-radius: var(--aq-prop-radius); padding: var(--aq-space-3) var(--aq-space-4); margin-top: var(--aq-space-4);
+      display: grid; gap: 6px; font-weight: var(--aq-fw-medium);
+    }
+    #editModal .installment-preview b { color: var(--aq-prop-green-ink); font-variant-numeric: tabular-nums; }
+    #editModal .installment-preview .ico { color: var(--aq-prop-green); }
+
+    /* لوحة الذكاء الاصطناعي */
+    #editModal .ai-fill-panel .section-title { margin: 0 0 6px; }
+    #editModal .ai-fill-panel .section-title .ico { color: var(--aq-prop-green); }
+    #editModal .ai-fill-panel .section-title::before { display: none; }
+    #editModal #unitAddAiPasteText { min-height: 88px; margin-bottom: var(--aq-space-3); }
+    #editModal .ai-paste-zone { padding: var(--aq-space-4); color: var(--aq-prop-text-muted); font-weight: var(--aq-fw-bold); font-size: var(--aq-fs-caption); margin: 0 0 var(--aq-space-3); }
+    #editModal .ai-paste-zone.is-armed { color: var(--aq-prop-green); }
+    #editModal #unitAddAiPastedImagePreview { position: relative; max-width: 200px; margin: 0 0 var(--aq-space-3); }
+    #editModal #unitAddAiPastedImageTag { width: 100%; display: block; border-radius: var(--aq-prop-radius-sm); border: 1px solid var(--aq-prop-border); }
+    #editModal #unitAddAiPastedImageRemove {
+      position: absolute; top: -8px; inset-inline-end: -8px; width: 24px; height: 24px; border-radius: 50%;
+      background: var(--aq-danger); color: #fff; border: 2px solid #fff; cursor: pointer; padding: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    #editModal #unitAddAiPastedImageRemove .ico { width: 12px; height: 12px; }
+    #editModal #unitAddAiFileInput { margin-bottom: var(--aq-space-3); }
+    #editModal .ai-extract-btn { width: 100%; margin: 0; padding: 12px; font-size: var(--aq-fs-small); }
+
+    /* الصور */
+    #editModal .images-zone { padding: var(--aq-space-5) var(--aq-space-4); background: var(--aq-prop-surface); }
+    #editModal .images-zone p { color: var(--aq-prop-text-muted); }
+    #editModal .images-choose-btn {
+      background: var(--aq-prop-green); color: #fff; border: 1px solid var(--aq-prop-green-ink);
+      border-radius: var(--aq-prop-radius-sm); padding: 10px 18px; font-size: var(--aq-fs-caption);
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    #editModal .images-choose-btn:hover { background: var(--aq-prop-green-ink); }
+    #editModal .image-link-row { margin-top: var(--aq-space-3); gap: var(--aq-space-2); }
+    #editModal .image-link-row button {
+      background: var(--aq-prop-surface); color: var(--aq-prop-green); border: 1px solid var(--aq-prop-green-line);
+      border-radius: var(--aq-prop-radius-sm); padding: 0 18px; font-weight: var(--aq-fw-bold);
+    }
+    #editModal .image-link-row button:hover { background: var(--aq-prop-green-soft); }
+    #editModal .image-thumb { width: 92px; height: 92px; border-radius: var(--aq-prop-radius-sm); border: 1px solid var(--aq-prop-border); }
+    #editModal .image-thumb.drag-over { border: 2px dashed var(--aq-prop-green); }
+    #editModal .image-thumb .remove-img { background: rgba(176,39,31,0.92); }
+    #editModal .image-thumb .uploading-overlay { color: var(--aq-prop-green-ink); }
+
+    /* رسالة النموذج */
+    #editModal #editMsg { margin: 0; border-radius: var(--aq-prop-radius-sm); }
+
+    /* شريط الإجراءات اللاصق: يمتد لحواف الصدفة ويبقى ظاهرًا أثناء التمرير */
+    #editModal .aq-form-actions {
+      margin: var(--aq-space-6) calc(-1 * var(--aq-space-6)) 0;
+      padding-inline: var(--aq-space-6);
+      border-radius: 0 0 var(--aq-prop-radius-lg) var(--aq-prop-radius-lg);
+    }
+    #editModal #editSaveBtn { width: auto; flex: 1 1 240px; margin: 0; padding: 12px 22px; font-size: var(--aq-fs-small); }
+    #editModal #editSaveBtn:disabled { background: var(--aq-neutral-disabled); border-color: transparent; color: #fff; }
+    #editModal #editResetBtn { width: auto; flex: 0 1 auto; margin: 0; padding: 12px 18px; }
+    #editModal #editDeleteBtn { width: auto; flex: 0 1 auto; margin: 0; margin-inline-start: auto; padding: 12px 18px; }
+    #editModal #quoteActionRow { margin: 0; flex: 1 1 100%; }
+    #editModal #quoteActionRow.show { display: flex; gap: var(--aq-space-2); }
+    #editModal #quoteExportBtn {
+      background: var(--aq-prop-green); color: #fff; border: 1px solid var(--aq-prop-green-ink); border-radius: var(--aq-prop-radius-sm);
+    }
+    #editModal #quoteExportBtn:hover { background: var(--aq-prop-green-ink); }
+    /* واتساب: الأخضر الفاتح القائم (#4FA579) يعطي 3:1 فقط مع النص الأبيض — نستخدم درجة أعمق من نفس عائلة النجاح (AA) */
+    #editModal #quoteWhatsAppBtn { border-radius: var(--aq-prop-radius-sm); background: var(--aq-success-dot); border-color: var(--aq-success-dot); }
+    #editModal #quoteWhatsAppBtn:hover { background: var(--aq-success-fg); border-color: var(--aq-success-fg); }
+
+    /* عرض SALES (قراءة فقط): زر الحفظ يُزال من الـ DOM بواسطة applyRoleUiVisibility →
+       النموذج يُعرض كبطاقة معلومات لا كنموذج تحرير. لا صلاحيات ولا JS جديد. */
+    #editModal:not(:has(#editSaveBtn)) #editForm input:not([type="file"]),
+    #editModal:not(:has(#editSaveBtn)) #editForm select,
+    #editModal:not(:has(#editSaveBtn)) #editForm textarea {
+      background: var(--aq-prop-canvas); pointer-events: none; box-shadow: none;
+    }
+    #editModal:not(:has(#editSaveBtn)) #editForm select { background-image: none; }
+    #editModal:not(:has(#editSaveBtn)) .images-zone,
+    #editModal:not(:has(#editSaveBtn)) .image-link-row,
+    #editModal:not(:has(#editSaveBtn)) .image-thumb .remove-img,
+    #editModal:not(:has(#editSaveBtn)) #editImagesUploadMsg { display: none !important; }
+    #editModal:not(:has(#editSaveBtn)) .image-thumb { cursor: default; }
+    /* عرض SALES بلا صور: عنوان قسم الصور يختفي بدل قسم فارغ */
+    #editModal:not(:has(#editSaveBtn)) #editForm:has(#editImagesPreview:empty) .section-title:has(+ .images-zone) { display: none; }
+
+    /* استجابة */
+    @media (max-width: 1024px) {
+      #editForm .grid.aq-fg-details, #editForm .grid.aq-fg-price { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      #editForm .grid.aq-fg-price > div:nth-child(1) { grid-column: span 2; }
+    }
+    @media (max-width: 640px) {
+      #editModal .modal-box { padding: var(--aq-space-4) var(--aq-space-3) 0; border-radius: var(--aq-prop-radius); }
+      #editForm .grid.aq-fg-basic, #editForm .grid.aq-fg-location, #editForm .grid.aq-fg-owner,
+      #editForm .grid.aq-fg-details, #editForm .grid.aq-fg-price { grid-template-columns: 1fr; }
+      #editForm .grid.aq-fg-price > div:nth-child(1), #editForm .grid.aq-fg-details > div:nth-child(10) { grid-column: auto; }
+      #editModal .aq-form-actions { margin-inline: calc(-1 * var(--aq-space-3)); padding-inline: var(--aq-space-3); }
+      #editModal #editSaveBtn, #editModal #editResetBtn, #editModal #editDeleteBtn { flex: 1 1 100%; margin-inline-start: 0; }
+      #editModal #quoteActionRow.show { flex-direction: column; }
+      #editModal #quoteActionRow button { flex: 0 0 auto; width: 100%; }   /* flex-basis القديم (200px) كان يتحوّل إلى ارتفاع في العمود */
+      #editModal .modal-title { font-size: var(--aq-fs-section-title); }
+    }
+
+    /* ===== PHASE 2B — لوحة التحكم / المطوّرون / المستخدمون / الإعدادات على هوية AqaR Digital الجديدة =====
+       CSS + كلاسات إضافية فقط: نفس الـ IDs ونفس المنطق ونفس الصلاحيات. الشريط الجانبي القديم يتحوّل إلى
+       تنقّل فرعي أفقي (aq-subnav) — لا drawer ولا sidebar ثابت؛ عناصر drawer تبقى في الـ DOM (مراجع JS) مخفية. */
+    #dashboardView .dash-shell { display: block; }
+    #dashboardView .dash-sidebar {
+      position: static !important; inset: auto !important; transform: none !important; width: auto !important; top: auto;
+      background: transparent; border: 0; box-shadow: none; padding: 0; margin: 0 0 var(--aq-space-6);
+      -webkit-backdrop-filter: none; backdrop-filter: none; border-radius: 0; overflow: visible; z-index: auto;
+    }
+    #dashboardView .dash-brand, #dashboardView .dash-drawer-toggle, #dashboardView .dash-drawer-backdrop { display: none !important; }
+    #dashboardView .dash-nav { flex-direction: row; }
+    #dashboardView .dash-nav-item {
+      width: auto; text-align: start; padding: 9px 16px; margin: 0;
+      border-radius: var(--aq-radius-pill); border: 1px solid transparent; background: transparent; color: var(--aq-prop-text-muted);
+    }
+    #dashboardView .dash-nav-item:hover { background: var(--aq-prop-green-soft); border-color: transparent; color: var(--aq-prop-green); }
+    #dashboardView .dash-nav-item.is-active { background: var(--aq-prop-green); border-color: var(--aq-prop-green); color: #fff; }
+    #dashboardView .dash-nav-item.dash-logout { margin-inline-start: auto; color: var(--aq-error-fg); background: transparent; border-color: transparent; }
+    #dashboardView .dash-nav-item.dash-logout:hover { background: var(--aq-danger-tint); }
+    #dashboardView .dash-nav-item svg { opacity: 1; }
+    #dashboardView .dash-page-title {
+      font-size: var(--aq-fs-caption); font-weight: 700; color: var(--aq-prop-text-muted);
+      border: 0; padding: 0; margin: 0 0 var(--aq-space-3); letter-spacing: .2px;
+    }
+    /* بطاقات اللوحة (الرئيسية / الملف الشخصي / السجل) — سطح أبيض هادئ بدل الزجاج الداكن */
+    #dashboardView .section {
+      background: var(--aq-prop-surface); border: 1px solid var(--aq-prop-border); border-top: 1px solid var(--aq-prop-border);
+      border-radius: var(--aq-radius-lg); padding: var(--aq-space-6); margin-bottom: var(--aq-space-5);
+      box-shadow: var(--aq-shadow-subtle); -webkit-backdrop-filter: none; backdrop-filter: none;
+    }
+    #dashboardView .section h3 { color: var(--aq-prop-text); font-size: var(--aq-fs-card-title); letter-spacing: 0; text-transform: none; }
+    #dashboardView .dash-live-card { background: var(--aq-prop-green-deep); border: 0; border-radius: var(--aq-radius-lg); padding: 14px 18px; margin: 0 0 var(--aq-space-5); }
+    #dashboardView .um-empty { color: var(--aq-prop-text-muted); }
+
+    /* ---- المطوّرون ---- */
+    #dashPanel-developers .ai-fill-panel { background: var(--aq-prop-green-soft); border: 1px solid var(--aq-prop-green-line); box-shadow: none; }
+    #dashPanel-developers .aq-dev-ai-action .ai-extract-btn { width: 100%; margin: 0; }
+    #dashPanel-developers .aq-form-control, #dashPanel-developers .aq-file-input { width: 100%; }
+    #dashPanel-developers .aq-form-actions {
+      position: static; box-shadow: none; background: transparent;
+      margin: var(--aq-space-6) 0 0; padding: var(--aq-space-5) 0 0; border-top: 1px solid var(--aq-prop-border);
+    }
+    #dashPanel-developers #saveDevProfileBtn { flex: 1 1 240px; }
+    /* حقل الملف المخفي داخل مكوّن اللوجو يبقى 1px (لا يمتد ولا يسبب تمريرًا أفقيًا) */
+    #dashPanel-developers .aq-logo-upload .aq-file-input { width: 1px; height: 1px; }
+    #dashPanel-developers .aq-dev-card-name { text-align: end; }
+    #dashPanel-developers .aq-list-actions .aq-btn--ghost { border-color: var(--aq-prop-border); color: var(--aq-prop-green); }
+    #dashPanel-developers .aq-list-actions .aq-btn--ghost:hover { background: var(--aq-prop-green-soft); border-color: var(--aq-prop-green-line); }
+    #dashPanel-users #addUserBtn { flex: 0 1 auto; min-width: 240px; }
+    #dashPanel-developers .aq-dev-grid .aq-skeleton--card { min-height: 116px; }
+    #dashPanel-developers .aq-empty { padding: var(--aq-space-8) var(--aq-space-4); }
+
+    /* ---- المستخدمون ---- */
+    #dashPanel-users .um-toolbar { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--aq-space-4); flex-wrap: wrap; margin: 0 0 var(--aq-space-5); }
+    #dashPanel-users .um-count { color: var(--aq-prop-text-muted); font-size: var(--aq-fs-caption); }
+    #dashPanel-users .um-count b { color: var(--aq-prop-text); }
+    #dashPanel-users .um-add-toggle { margin: 0; }
+    #dashPanel-users .um-addform {
+      background: var(--aq-prop-canvas); border: 1px solid var(--aq-prop-border); border-radius: var(--aq-radius-lg);
+      padding: var(--aq-space-5); margin: 0 0 var(--aq-space-5);
+    }
+    #dashPanel-users .um-addform .aq-form-actions {
+      position: static; box-shadow: none; background: transparent;
+      margin: var(--aq-space-5) 0 0; padding: var(--aq-space-4) 0 0; border-top: 1px solid var(--aq-prop-border);
+    }
+    #dashPanel-users .um-addform .aq-form-control, #dashPanel-users .um-addform .aq-file-input { width: 100%; }
+    #dashPanel-users .um-hint { margin-top: var(--aq-space-3); }
+    #dashPanel-users .um-filters { display: grid; gap: 10px; margin: 0 0 var(--aq-space-4); }
+    #dashPanel-users .um-filters #umSearch { width: 100%; }
+    #dashPanel-users .um-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    #dashPanel-users .um-chips button {
+      display: inline-flex; align-items: center; padding: 7px 14px; border-radius: var(--aq-radius-pill);
+      border: 1px solid var(--aq-prop-border); background: var(--aq-prop-surface); color: var(--aq-prop-text-muted);
+      font-family: inherit; font-size: var(--aq-fs-caption); font-weight: 700; cursor: pointer; unicode-bidi: isolate;
+    }
+    #dashPanel-users .um-chips button:hover { border-color: var(--aq-prop-green-line); color: var(--aq-prop-green); }
+    #dashPanel-users .um-chips button.active { background: var(--aq-prop-green); color: #fff; border-color: var(--aq-prop-green); }
+    #dashPanel-users .um-list { display: flex; flex-direction: column; gap: 10px; max-height: none; overflow: visible; padding: 0; }
+    #dashPanel-users .um-card {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 12px 14px;
+      background: var(--aq-prop-surface); border: 1px solid var(--aq-prop-border); border-radius: var(--aq-radius-md);
+    }
+    #dashPanel-users .um-card:hover { border-color: var(--aq-prop-green-line); box-shadow: var(--aq-shadow-subtle); }
+    #dashPanel-users .um-card.is-owner { background: var(--aq-prop-green-soft); border-color: var(--aq-prop-green-line); }
+    #dashPanel-users .um-card .um-avatar {
+      width: 48px; height: 48px; border-radius: 12px; background: var(--aq-prop-green-soft); color: var(--aq-prop-green);
+      border: 1px solid var(--aq-prop-green-line); font-size: var(--aq-fs-body-lg);
+    }
+    #dashPanel-users .um-card.is-owner .um-avatar { border: 2px solid var(--aq-prop-green); }
+    #dashPanel-users .um-name { font-size: var(--aq-fs-body); font-weight: 800; color: var(--aq-prop-text); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    #dashPanel-users .um-sub { font-size: var(--aq-fs-caption); color: var(--aq-prop-text-muted); margin-top: 2px; overflow-wrap: anywhere; }
+    #dashPanel-users .um-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+    .um-badge.aq-badge, .um-status.aq-badge { padding: 2px 10px; }
+
+    /* ---- مودال تفاصيل المستخدم — نفس معالجة نموذج الوحدة ---- */
+    #umUserModal .modal-box.um-user-box {
+      max-width: 520px; background: var(--aq-prop-surface); color: var(--aq-prop-text);
+      border: 1px solid var(--aq-prop-border); border-top: 1px solid var(--aq-prop-border); border-radius: var(--aq-radius-lg);
+      box-shadow: var(--aq-prop-shadow-lg); padding: var(--aq-space-6) var(--aq-space-6) 0;
+    }
+    #umUserModal .modal-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: var(--aq-space-4); }
+    #umUserModal .modal-title { font-size: var(--aq-fs-card-title); font-weight: 800; color: var(--aq-prop-text); }
+    #umUserModal .modal-close {
+      width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--aq-prop-border); background: var(--aq-prop-surface);
+      color: var(--aq-prop-text-muted); display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    #umUserModal .modal-close:hover { background: var(--aq-prop-green-soft); color: var(--aq-prop-green); border-color: var(--aq-prop-green-line); }
+    #umUserBody .um-uhead { display: flex; align-items: center; gap: 14px; padding-bottom: var(--aq-space-4); border-bottom: 1px solid var(--aq-prop-border); margin-bottom: var(--aq-space-4); }
+    #umUserBody .um-avatar {
+      width: 64px; height: 64px; border-radius: 16px; background: var(--aq-prop-green-soft); color: var(--aq-prop-green);
+      border: 1px solid var(--aq-prop-green-line); font-size: var(--aq-fs-section-title);
+    }
+    #umUserBody .um-uname { font-weight: 800; color: var(--aq-prop-text); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    #umUserBody .um-uid { color: var(--aq-prop-text-muted); font-size: var(--aq-fs-caption); }
+    #umUserBody .um-field { margin-bottom: var(--aq-space-4); }
+    #umUserBody .um-field > label { font-size: var(--aq-fs-label); font-weight: 700; color: var(--aq-prop-text); }
+    #umUserBody .um-field .aq-form-control, #umUserBody .um-readonly { width: 100%; }
+    #umUserBody .um-readonly {
+      min-height: 46px; display: flex; align-items: center; padding: 10px 14px; border: 1px solid var(--aq-prop-border);
+      border-radius: var(--aq-radius-md); background: var(--aq-prop-canvas); color: var(--aq-prop-text-muted);
+      direction: ltr; unicode-bidi: isolate; overflow-wrap: anywhere;
+    }
+    #umUserBody .um-note { font-size: var(--aq-fs-caption); color: var(--aq-prop-text-muted); }
+    #umUserBody .um-inline { display: flex; gap: 8px; align-items: stretch; }
+    #umUserBody .um-inline input { flex: 1 1 auto; min-width: 0; }
+    #umUserBody .um-inline button { flex: 0 0 auto; }
+    #umUserBody .um-actions {
+      display: flex; flex-wrap: wrap; gap: 8px; grid-template-columns: none;
+      position: sticky; bottom: 0; z-index: 5;
+      margin: var(--aq-space-5) calc(-1 * var(--aq-space-6)) 0; padding: var(--aq-space-4) var(--aq-space-6);
+      background: var(--aq-prop-surface); border-top: 1px solid var(--aq-prop-border); box-shadow: 0 -8px 18px -14px rgba(2,58,58,0.35);
+    }
+    #umUserBody .um-actions button { flex: 1 1 45%; min-height: 44px; margin: 0; }
+    #umUserBody .um-actions button.primary { background: var(--aq-prop-green); color: #fff; border-color: var(--aq-prop-green); }
+    #umUserBody .um-actions button.danger { background: transparent; color: var(--aq-error-fg); border-color: rgba(176,39,31,0.35); }
+    #umUserBody .um-actions button.danger:hover { background: var(--aq-danger-tint); }
+    #umUserBody .um-actions button:disabled { opacity: .5; cursor: not-allowed; }
+    #umUserBody .um-msg { flex-basis: 100%; margin: 0; }
+
+    /* ---- الإعدادات ---- */
+    .aq-settings-cover { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: var(--aq-space-5); align-items: start; }
+    .aq-settings-cover-preview {
+      position: relative; min-height: 220px; border: 1px solid var(--aq-prop-border); border-radius: var(--aq-radius-lg);
+      background: var(--aq-prop-canvas-2); overflow: hidden; display: flex; align-items: center; justify-content: center;
+    }
+    .aq-settings-cover-preview img { width: 100%; height: 100%; max-height: 340px; object-fit: cover; display: block; }
+    .aq-settings-cover-empty { color: var(--aq-prop-text-muted); font-size: var(--aq-fs-small); font-weight: 700; padding: var(--aq-space-6); text-align: center; }
+    #dashSettingsCoverSlot { display: flex; flex-direction: column; align-items: stretch; gap: 10px; text-align: start; background: var(--aq-prop-surface); }
+    #dashSettingsCoverSlot p { margin: 0; }
+    #dashSettingsCoverSlot .aq-file-input { width: 100%; }
+    #dashSettingsCoverSlot #coverUploadBtn { align-self: flex-start; margin: 0; }
+    #dashSettingsCoverSlot #coverMsg { min-height: 1.2em; margin: 0; }
+    #dashSettingsCoverSlot #coverMsg.success { color: var(--aq-success-fg); }
+    #dashSettingsCoverSlot #coverMsg.error { color: var(--aq-error-fg); }
+    #aqConfirmModal { z-index: 2200; }
+    #devFormModeBadge[hidden], .aq-badge[hidden] { display: none !important; }
+
+    @media (max-width: 1024px) {
+      #dashPanel-developers .aq-form-grid--3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 768px) {
+      .aq-settings-cover { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      #dashboardView .section, #dashboardView .aq-admin-card { padding: var(--aq-space-5) var(--aq-space-4); }
+      #dashPanel-users .um-card { grid-template-columns: auto minmax(0, 1fr); }
+      #dashPanel-users .um-right { grid-column: 2; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: flex-start; }
+      #dashPanel-users .um-toolbar .aq-admin-card-actions, #dashPanel-users .um-toolbar .aq-admin-card-actions > * { width: 100%; }
+      #dashPanel-developers .aq-form-grid--3, #dashPanel-developers .aq-form-grid--2, #dashPanel-users .aq-form-grid--3 { grid-template-columns: 1fr; }
+      #umUserModal .modal-box.um-user-box { padding: var(--aq-space-5) var(--aq-space-4) 0; }
+      #umUserBody .um-actions { margin: var(--aq-space-5) calc(-1 * var(--aq-space-4)) 0; padding: var(--aq-space-4); }
+      #umUserBody .um-actions button { flex: 1 1 100%; }
+    }
   </style>
 </head>
 <body>
@@ -2284,27 +3041,23 @@
      يظهران فقط بعد الدخول (body.aq-app-on تُضاف في showApp) —
      المحتوى القائم كله يبقى داخل #mainContainer بلا أي تغيير داخلي.
      ============================================================ -->
+<!-- ===== الهيدر العام: التنقّل الأساسي الوحيد للتطبيق =====
+     الشعار (DIGITAL / Real Estate) يسارًا · #appNav وسطًا (نفس الأزرار والـ ids
+     والمعالجات وقواعد الصلاحيات كما هي — نُقل من السايدبار بلا إعادة كتابة) ·
+     الهوية والخروج وزر الهاتف يمينًا. لا سايدبار جانبي بعد الآن؛ على الموبايل
+     يتحوّل نفس #appNav إلى لوحة منسدلة عبر آلية aq-drawer-open القائمة. -->
 <header class="aq-header" id="aqHeader">
-  <button type="button" class="aq-menu-toggle" id="aqMenuToggle" aria-label="فتح قائمة التنقل" aria-controls="aqSidebar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
-  <div class="aq-header-brand">
-    <span class="aq-brand-mark" aria-hidden="true">A</span>
-    <span class="aq-brand-name aq-ltr" dir="ltr">AqaR Digital</span>
+  <button type="button" class="aq-menu-toggle" id="aqMenuToggle" aria-label="فتح قائمة التنقل" aria-controls="appNav" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  <div class="aq-brand" role="img" aria-label="AqaR Digital" title="AqaR Digital">
+    <span class="aq-brand-mark" aria-hidden="true">D</span>
+    <span class="aq-brand-lockup" aria-hidden="true">
+      <span class="aq-brand-word">Digital</span>
+      <span class="aq-brand-sub">Real Estate</span>
+    </span>
   </div>
-  <div class="aq-header-spacer"></div>
-  <div class="aq-header-identity" id="aqHeaderIdentity">
-    <div class="aq-id-text"><span class="aq-id-name"></span><span class="aq-id-role"></span></div>
-    <div class="aq-avatar" aria-hidden="true"></div>
-  </div>
-</header>
-<div class="aq-shell-overlay" id="aqShellOverlay" aria-hidden="true"></div>
-<aside class="aq-sidebar" id="aqSidebar" aria-label="التنقل الرئيسي">
-  <div class="aq-side-identity" id="aqSideIdentity">
-    <div class="aq-avatar" aria-hidden="true"></div>
-    <div class="aq-id-text"><span class="aq-id-name"></span><span class="aq-id-role"></span></div>
-  </div>
-  <div class="aq-side-caption">التنقل</div>
   <nav id="appNav" aria-label="أقسام التطبيق">
-    <button type="button" class="top-action-btn app-nav-btn is-active" id="navSearchBtn" data-app-view="search" data-route="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span>البحث</span></button>
+    <button type="button" class="top-action-btn app-nav-btn is-active" id="navSearchBtn" data-app-view="search" data-route="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span>الرئيسية</span></button>
+    <button type="button" class="top-action-btn app-nav-btn" id="navExploreBtn" data-app-view="explore" data-route="explore"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m14.9 9.1-2 5.8-5.8 2 2-5.8Z"/></svg><span>استكشف</span></button>
     <button type="button" class="top-action-btn app-nav-btn top-action-calc" id="calcFabBtn" data-route="quote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/><line x1="16" y1="18" x2="16" y2="18"/></svg><span>عرض السعر</span></button>
     <button type="button" class="top-action-btn app-nav-btn top-action-price" id="priceInfoFabBtn" data-route="meter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>سعر المتر</span></button>
     <button type="button" class="top-action-btn app-nav-btn" id="navAddUnitBtn" data-app-view="add" data-route="add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>إدخال وحدة</span></button>
@@ -2312,9 +3065,16 @@
     <!-- "الإحصائيات والمخزون" أُزيل من الشريط الرئيسي — الوصول إليه من لوحة التحكم / الشريط الجانبي فقط، وحسب صلاحية VIEW_STATISTICS. -->
     <button type="button" class="top-action-btn app-nav-btn top-action-admin" id="adminFab" data-app-view="dashboard" data-route="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>لوحة التحكم</span></button>
   </nav>
-  <div class="aq-side-spacer"></div>
-  <button type="button" class="aq-side-logout" id="aqSideLogoutBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg><span>تسجيل الخروج</span></button>
-</aside>
+  <div class="aq-header-end">
+    <div class="aq-header-identity" id="aqHeaderIdentity">
+      <div class="aq-id-text"><span class="aq-id-name"></span><span class="aq-id-role"></span></div>
+      <div class="aq-avatar" aria-hidden="true"></div>
+    </div>
+    <button type="button" class="aq-side-logout" id="aqSideLogoutBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg><span>تسجيل الخروج</span></button>
+    <a class="aq-phone-cta" href="tel:+201016908888" aria-label="اتصل بنا (+2) 010 1690 8888"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/></svg><span class="aq-phone-text">(+2) 010 1690 8888</span></a>
+  </div>
+</header>
+<div class="aq-shell-overlay" id="aqShellOverlay" aria-hidden="true"></div>
 
 <div class="container" id="mainContainer" style="display:none;">
   <div class="cover-wrap" id="coverWrap">
@@ -2339,7 +3099,24 @@
   <!-- زر بوابة كلمة سر إدخال الوحدة — مخفي، بيتفعّل من زر "إدخال وحدة" في الشريط أعلاه -->
   <button type="button" class="top-action-btn top-action-add" id="addUnitFabBtn" hidden style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>إضافة وحدة</span></button>
 
-<div class="ai-search-panel">
+<!-- ===== الهيرو: تجربة بحث عقارية متكاملة (هيكل مستمدّ من الصورتين المرجعيتين) =====
+     .aq-hero يخدم حالتين بنفس الـ DOM بلا تكرار: الهبوط (صورة + نصّ + كونسول بحث مرتفع)
+     ووضع النتائج (شريط بحث مضغوط لاصق أعلى الشبكة). التبديل بكلاس على #mainContainer
+     فقط — لا مسار جديد، لا iframe، لا نافذة منفصلة، ولا نسخة ثانية من حقول البحث. -->
+<section class="aq-hero" id="aqHero">
+  <div class="aq-hero-copy" id="aqHeroCopy">
+    <p class="aq-hero-eyebrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/><path d="M2 22h20"/></svg><span class="aq-ltr" dir="ltr">AqaR Digital</span> · مخزون عقاري احترافي</p>
+    <h1 class="aq-hero-title">ابحث عن الوحدة المناسبة لعميلك</h1>
+    <p class="aq-hero-sub">اعثر على الوحدة المناسبة، قارن الأسعار، واحسب خطة السداد — كل ذلك في مكان واحد.</p>
+  </div>
+
+  <div class="aq-console" id="aqConsole">
+    <div class="aq-console-modes" role="tablist" aria-label="وضع البحث">
+      <button type="button" class="aq-console-mode is-active" id="aqModeFilters" role="tab" aria-selected="true" aria-controls="aqConsoleFilters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3Z"/></svg>بحث بالفلاتر</button>
+      <button type="button" class="aq-console-mode" id="aqModeSmart" role="tab" aria-selected="false" aria-controls="aqConsoleSmart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"/><path d="m18.5 14 .8 2.4 2.4.8-2.4.8-.8 2.4-.8-2.4-2.4-.8 2.4-.8Z"/></svg>بحث ذكي</button>
+    </div>
+
+<div class="ai-search-panel" id="aqConsoleSmart" role="tabpanel" aria-labelledby="aqModeSmart" hidden>
   <div class="ai-search-head">
     <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"/><path d="m18.5 14 .8 2.4 2.4.8-2.4.8-.8 2.4-.8-2.4-2.4-.8 2.4-.8Z"/></svg>
     <span>بحث ذكي بلغة طبيعية</span>
@@ -2352,7 +3129,7 @@
   <div id="nlSearchMsg"></div>
 </div>
 
-<div class="filters-card">
+<div class="filters-card" id="aqConsoleFilters" role="tabpanel" aria-labelledby="aqModeFilters">
     <div class="grid">
       <div>
         <label>بحث عام (كلمة مفتاحية)</label>
@@ -2415,8 +3192,43 @@
         <label>مساحة محددة بالظبط (م²)</label>
         <input type="number" id="f_exactArea" min="0" placeholder="مثال: 120">
       </div>
-      <div>
-        <label>ترتيب النتائج حسب</label>
+      <div id="ppmYearsFilterWrap" style="display:none;">
+        <label>مقارنة سعر المتر حسب عدد سنوات تقسيط (اختياري)</label>
+        <input type="number" id="f_ppmYears" min="0" placeholder="مثال: 5">
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button id="searchBtn">بحث</button>
+      <button id="clearBtn">مسح الفلاتر</button>
+      <button type="button" class="aq-console-back" id="aqBackToHomeBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg><span>الرئيسية</span></button>
+    </div>
+  </div>
+  </div>
+</section>
+
+<!-- ===== أكثر المطوّرين نشاطًا =====
+     يُبنى من الوحدات المحمَّلة فعليًا (lastResults) بعدّ وحدات كل مطوّر، ثم يجلب
+     اللوجو من getDeveloperProfile القائم (نفس الـ API المستخدم في بطاقة الوحدة).
+     لا قائمة ثابتة، لا لوجوهات مخترعة: مطوّر بلا لوجو يظهر باسمه في نفس البلاطة. -->
+<section class="aq-devs" id="aqDevsSection" hidden>
+  <div class="aq-devs-head">
+    <h2 class="aq-devs-title">أكثر المطوّرين نشاطًا</h2>
+    <p class="aq-devs-sub">المطوّرون الأكثر تمثيلًا في مخزون AqaR Digital حاليًا</p>
+  </div>
+  <div class="aq-devs-row" id="aqDevsRow"></div>
+</section>
+
+<!-- ===== قسم النتائج: شريط رقائق (عدد النتائج · المفضلة · الترتيب) ثم شبكة البطاقات =====
+     نفس #results و#resultsCount و#favToggleBtn و#f_sort القائمة — نُقلت مواضعها البصرية فقط
+     إلى شريط النتائج (كما في الصورة المرجعية الثانية)، بلا أي عنصر تحكّم مكرَّر. -->
+<section class="aq-results-section" id="aqResultsSection">
+  <div class="aq-results-bar">
+    <span class="aq-chip aq-chip--static is-active" id="aqResultsCountChip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></svg><span id="resultsCount"></span></span>
+    <button type="button" id="favToggleBtn" class="aq-chip fav-toggle-btn" aria-pressed="false"><svg class="ico ico-fill" viewBox="0 0 24 24"><path d="m12 3 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.8 6.2 21l1.1-6.5L2.6 9.8l6.5-.9Z"/></svg><span id="favToggleLabel">المفضلة (0)</span></button>
+    <span class="aq-results-bar-spacer"></span>
+    <div class="aq-sort-field" id="aqSortHost">
+        <label for="f_sort">ترتيب النتائج حسب</label>
         <select id="f_sort">
           <option value="newest">الأحدث أولًا</option>
           <option value="price_asc">أقل إجمالي سعر</option>
@@ -2432,26 +3244,14 @@
           <option value="downpayment_asc">أقل مقدم</option>
           <option value="downpayment_desc">أعلى مقدم</option>
         </select>
-      </div>
-      <div id="ppmYearsFilterWrap" style="display:none;">
-        <label>مقارنة سعر المتر حسب عدد سنوات تقسيط (اختياري)</label>
-        <input type="number" id="f_ppmYears" min="0" placeholder="مثال: 5">
-      </div>
-    </div>
-
-    <div class="btn-row">
-      <button id="searchBtn">بحث</button>
-      <button id="clearBtn">مسح الفلاتر</button>
-      <button type="button" id="favToggleBtn" class="fav-toggle-btn"><svg class="ico ico-fill" viewBox="0 0 24 24"><path d="m12 3 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.8 6.2 21l1.1-6.5L2.6 9.8l6.5-.9Z"/></svg><span id="favToggleLabel">المفضلة (0)</span></button>
     </div>
   </div>
-
-  <div id="resultsCount"></div>
   <div id="results" class="results-grid"><div class="pre-search-state">
     <span class="pre-search-mark" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/><path d="M2 22h20"/></svg></span>
     <h3>ابدأ البحث عن وحدتك المثالية</h3>
-    <p>استخدم البحث الذكي أو الفلاتر بالأعلى للوصول إلى الوحدات والمشروعات التي تناسب احتياجك وميزانيتك.</p>
+    <p>استخدم البحث الذكي أو الفلاتر للوصول إلى الوحدات والمشروعات التي تناسب احتياجك وميزانيتك.</p>
   </div></div>
+</section>
 
   <!-- ===== عرض "الإحصائيات والمخزون" — مدمج داخل نفس الصفحة (مش iframe) ===== -->
   <section id="statsView" aria-label="لوحة الإحصائيات والمخزون">
@@ -2531,17 +3331,17 @@
     <div class="dash-shell">
       <aside class="dash-sidebar" id="dashSidebar">
         <div class="dash-brand">AqaR Digital<span>لوحة التحكم</span></div>
-        <nav class="dash-nav" id="dashNav" aria-label="أقسام لوحة التحكم">
+        <nav class="dash-nav aq-subnav" id="dashNav" aria-label="أقسام لوحة التحكم">
           <!-- قاعدة القائمة (مصدر واحد، صريحة): OWNER → كل العناصر. أي مستخدم غير OWNER → فقط
                home · stats (الإحصاءات والمخزون تبويب واحد) · profile (+ "تسجيل الخروج" الثابت).
                يقرّرها dashNavAllowed_() عبر dashIsOwner_() + DASH_NONOWNER_MENU. data-roles/data-perm للتوثيق فقط. -->
-          <button type="button" class="dash-nav-item is-active" data-dash="home" data-roles="OWNER,MANAGER,DATA_ENTRY,SALES"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg><span>الرئيسية</span></button>
-          <button type="button" class="dash-nav-item" data-dash="developers" data-roles="OWNER" data-perm="MANAGE_DEVELOPERS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18ZM10 6h4M10 10h4M10 14h4M10 18h4"/></svg><span>المطوّرون</span></button>
-          <button type="button" class="dash-nav-item" data-dash="users" data-roles="OWNER" data-perm="MANAGE_USERS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 5.2a3.5 3.5 0 0 1 0 6.8M18 20a6.5 6.5 0 0 0-3.2-5.6"/></svg><span>المستخدمون</span></button>
-          <button type="button" class="dash-nav-item" data-dash="stats" data-roles="OWNER,MANAGER,DATA_ENTRY,SALES" data-perm="VIEW_STATISTICS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span>الإحصاءات والمخزون</span></button>
-          <button type="button" class="dash-nav-item" data-dash="profile" data-roles="OWNER,MANAGER,DATA_ENTRY,SALES"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>الملف الشخصي</span></button>
-          <button type="button" class="dash-nav-item" data-dash="settings" data-roles="OWNER" data-perm="MANAGE_SETTINGS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>الإعدادات</span></button>
-          <button type="button" class="dash-nav-item dash-logout" id="dashLogoutBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg><span>تسجيل الخروج</span></button>
+          <button type="button" class="dash-nav-item aq-subnav-item is-active" data-dash="home" data-roles="OWNER,MANAGER,DATA_ENTRY,SALES"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg><span>الرئيسية</span></button>
+          <button type="button" class="dash-nav-item aq-subnav-item" data-dash="developers" data-roles="OWNER" data-perm="MANAGE_DEVELOPERS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18ZM10 6h4M10 10h4M10 14h4M10 18h4"/></svg><span>المطوّرون</span></button>
+          <button type="button" class="dash-nav-item aq-subnav-item" data-dash="users" data-roles="OWNER" data-perm="MANAGE_USERS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 5.2a3.5 3.5 0 0 1 0 6.8M18 20a6.5 6.5 0 0 0-3.2-5.6"/></svg><span>المستخدمون</span></button>
+          <button type="button" class="dash-nav-item aq-subnav-item" data-dash="stats" data-roles="OWNER,MANAGER,DATA_ENTRY,SALES" data-perm="VIEW_STATISTICS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span>الإحصاءات والمخزون</span></button>
+          <button type="button" class="dash-nav-item aq-subnav-item" data-dash="profile" data-roles="OWNER,MANAGER,DATA_ENTRY,SALES"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>الملف الشخصي</span></button>
+          <button type="button" class="dash-nav-item aq-subnav-item" data-dash="settings" data-roles="OWNER" data-perm="MANAGE_SETTINGS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>الإعدادات</span></button>
+          <button type="button" class="dash-nav-item aq-subnav-item aq-subnav-item--danger dash-logout" id="dashLogoutBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg><span>تسجيل الخروج</span></button>
         </nav>
       </aside>
 
@@ -2608,118 +3408,184 @@
 
         <div class="dash-panel" id="dashPanel-developers" hidden>
           <div class="dash-page-title">إدارة بيانات المطوّرين</div>
+          <p class="aq-page-intro">ملفات المطوّرين العقاريين المسجّلين في النظام: اللوجو، نبذة الشركة، صاحبها وسنة التأسيس. ما تحفظه هنا يظهر في بطاقات المطوّرين وصفحاتهم داخل المنصّة.</p>
 
-          <div class="section">
-            <div class="ai-fill-panel" style="margin-bottom:0;">
-              <div class="section-title" style="margin-bottom:6px;"><svg class="ico" viewBox="0 0 24 24"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"/><path d="m18.5 14 .8 2.4 2.4.8-2.4.8-.8 2.4-.8-2.4-2.4-.8 2.4-.8Z"/></svg>تعبئة تلقائية بالذكاء الاصطناعي</div>
-              <p style="font-size:12px; color:var(--text-muted); margin:0 0 10px; line-height:1.7;">
-                الصق نص عن الشركة، أو ارفع ملف بروشور/PDF، والذكاء الاصطناعي هيملى البيانات تلقائيًا تحت.
-              </p>
-              <textarea id="devAiPasteText" placeholder="الصق نص عن الشركة هنا (اختياري)..." style="min-height:70px; width:100%; padding:10px 12px; border-radius:8px; font-family:inherit; font-size:13px;"></textarea>
-              <input type="file" id="devAiFileInput" accept="image/*,application/pdf" style="margin-top:8px; width:100%; font-size:12px;">
-              <button type="button" id="devAiExtractBtn" class="ai-extract-btn">استخرج البيانات وابدأ التعبئة</button>
-              <div id="devAiExtractMsg" style="font-size:12px; margin-top:8px; display:none;"></div>
-            </div>
-          </div>
-
-          <div class="section">
-            <div class="section-title" style="margin-top:0;">إضافة / تعديل بيانات مطوّر</div>
-            <div class="dev-grid">
+          <section class="aq-admin-card aq-form-assist ai-fill-panel" id="devAiPanel" aria-labelledby="devAiTitle">
+            <div class="aq-admin-card-head">
               <div>
-                <label>اسم المطور</label>
-                <input type="text" id="devProfileNameInput" list="devProfileNameDatalist" placeholder="اسم المطور بالظبط زي ما هو مسجل">
-                <datalist id="devProfileNameDatalist"></datalist>
-              </div>
-              <div>
-                <label>صاحب الشركة</label>
-                <input type="text" id="devProfileOwnerInput" placeholder="اسم صاحب الشركة">
-              </div>
-              <div>
-                <label>سنة التأسيس</label>
-                <input type="text" id="devProfileYearInput" placeholder="مثال: 2005">
-              </div>
-              <div>
-                <label>رابط لوجو (اختياري)</label>
-                <input type="text" id="devProfileLogoInput" placeholder="https://...">
+                <h3 class="aq-admin-card-title" id="devAiTitle">تعبئة تلقائية بالذكاء الاصطناعي</h3>
+                <p class="aq-admin-card-sub">الصق نصًا عن الشركة أو ارفع بروشور/PDF، وسيُملأ النموذج تلقائيًا — راجع البيانات قبل الحفظ.</p>
               </div>
             </div>
-            <label style="margin-top:10px; display:block;">نبذة عن الشركة</label>
-            <textarea id="devProfileDescInput" placeholder="نبذة مختصرة عن تاريخ الشركة..." style="min-height:70px; width:100%; padding:10px 12px; border-radius:8px; font-family:inherit; font-size:13px;"></textarea>
-            <label style="margin-top:10px; display:block;">أعمال سابقة</label>
-            <textarea id="devProfileWorksInput" placeholder="أهم المشاريع السابقة للشركة..." style="min-height:70px; width:100%; padding:10px 12px; border-radius:8px; font-family:inherit; font-size:13px;"></textarea>
-
-            <div class="dev-actions">
-              <button type="button" id="saveDevProfileBtn" style="flex:2 1 200px; padding:11px; border:1px solid var(--border-gold); border-radius:9px; background:var(--navy); color:var(--gold-soft); font-weight:700; font-size:14px; cursor:pointer;">حفظ بيانات المطور</button>
-              <button type="button" id="clearDevProfileFormBtn" style="padding:11px; border:1px solid rgba(255,255,255,0.14); border-radius:9px; background:rgba(255,255,255,0.05); color:var(--text-light); font-weight:700; font-size:13px; cursor:pointer;"><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13M9 7V4h6v3"/></svg> تفريغ</button>
+            <div class="aq-form-grid aq-form-grid--2">
+              <div class="aq-form-field aq-form-span-2">
+                <label class="aq-form-label" for="devAiPasteText">نص عن الشركة (اختياري)</label>
+                <textarea id="devAiPasteText" class="aq-form-control" rows="4" placeholder="الصق نص عن الشركة هنا (اختياري)..."></textarea>
+              </div>
+              <div class="aq-form-field">
+                <label class="aq-form-label" for="devAiFileInput">ملف بروشور / PDF / صورة (اختياري)</label>
+                <input type="file" id="devAiFileInput" class="aq-file-input" accept="image/*,application/pdf">
+              </div>
+              <div class="aq-form-field aq-form-field--end aq-dev-ai-action">
+                <button type="button" id="devAiExtractBtn" class="ai-extract-btn aq-btn--form-primary">استخرج البيانات وابدأ التعبئة</button>
+              </div>
             </div>
-            <div id="saveDevProfileMsg" style="font-size:12px; margin-top:8px;"></div>
-          </div>
+            <div id="devAiExtractMsg" class="aq-form-hint" style="display:none;"></div>
+          </section>
 
-          <div class="section">
-            <div class="section-title" style="margin-top:0;">المطورين المسجّلين حاليًا</div>
-            <div id="devProfilesListContent"></div>
-          </div>
+          <section class="aq-admin-card" id="devFormCard" aria-labelledby="devFormTitle">
+            <div class="aq-admin-card-head">
+              <div>
+                <h3 class="aq-admin-card-title" id="devFormTitle">إضافة / تعديل بيانات مطوّر</h3>
+                <p class="aq-admin-card-sub">اختر اسم المطوّر كما هو مسجّل في الوحدات، ثم أكمل البيانات وارفع اللوجو من جهازك.</p>
+              </div>
+              <span class="aq-badge aq-badge--info aq-form-mode" id="devFormModeBadge" hidden></span>
+            </div>
+
+            <div class="aq-form-section">
+              <div class="aq-form-section-head"><h4 class="aq-form-section-title">لوجو المطوّر</h4></div>
+              <div class="aq-logo-upload" id="devLogoDropzone" tabindex="0" role="group" aria-label="رفع لوجو المطوّر">
+                <div class="aq-logo-upload-preview">
+                  <div class="aq-logo-tile aq-logo-tile--xl" id="devLogoPreviewTile" title="اختر صورة">—</div>
+                </div>
+                <div class="aq-logo-upload-body">
+                  <p class="aq-logo-upload-title" id="devLogoTitle">اسحب اللوجو هنا أو اختر صورة من جهازك</p>
+                  <p class="aq-logo-upload-hint">الصيغ المقبولة: PNG أو JPG أو WebP · الحد الأقصى 2 ميجابايت · يُعرض اللوجو داخل إطار ثابت في المنتصف دون قصّ أو تشويه.</p>
+                  <div class="aq-logo-upload-actions">
+                    <button type="button" class="aq-btn--form-primary" id="devLogoChooseBtn">رفع اللوجو</button>
+                    <button type="button" class="aq-btn--form-secondary" id="devLogoReplaceBtn" hidden>تغيير اللوجو</button>
+                    <button type="button" class="aq-btn--form-danger" id="devLogoRemoveBtn" hidden>إزالة</button>
+                  </div>
+                  <div class="aq-logo-upload-status" id="devLogoStatus" aria-live="polite"></div>
+                  <input type="file" id="devLogoFileInput" class="aq-file-input" accept="image/png,image/jpeg,image/webp" aria-label="اختيار ملف اللوجو">
+                  <input type="hidden" id="devProfileLogoInput" value="">
+                </div>
+              </div>
+            </div>
+
+            <div class="aq-form-section">
+              <div class="aq-form-section-head"><h4 class="aq-form-section-title">بيانات الشركة</h4></div>
+              <div class="aq-form-grid aq-form-grid--3">
+                <div class="aq-form-field">
+                  <label class="aq-form-label" for="devProfileNameInput">اسم المطوّر</label>
+                  <input type="text" id="devProfileNameInput" class="aq-form-control" list="devProfileNameDatalist" placeholder="اسم المطور بالظبط زي ما هو مسجل" autocomplete="off">
+                  <datalist id="devProfileNameDatalist"></datalist>
+                </div>
+                <div class="aq-form-field">
+                  <label class="aq-form-label" for="devProfileOwnerInput">صاحب الشركة</label>
+                  <input type="text" id="devProfileOwnerInput" class="aq-form-control" placeholder="اسم صاحب الشركة">
+                </div>
+                <div class="aq-form-field">
+                  <label class="aq-form-label" for="devProfileYearInput">سنة التأسيس</label>
+                  <input type="text" id="devProfileYearInput" class="aq-form-control" inputmode="numeric" placeholder="مثال: 2005">
+                </div>
+              </div>
+            </div>
+
+            <div class="aq-form-section">
+              <div class="aq-form-section-head"><h4 class="aq-form-section-title">النبذة والأعمال</h4></div>
+              <div class="aq-form-grid aq-form-grid--2">
+                <div class="aq-form-field">
+                  <label class="aq-form-label" for="devProfileDescInput">نبذة عن الشركة</label>
+                  <textarea id="devProfileDescInput" class="aq-form-control" rows="5" placeholder="نبذة مختصرة عن تاريخ الشركة..."></textarea>
+                </div>
+                <div class="aq-form-field">
+                  <label class="aq-form-label" for="devProfileWorksInput">أعمال سابقة</label>
+                  <textarea id="devProfileWorksInput" class="aq-form-control" rows="5" placeholder="أهم المشاريع السابقة للشركة..."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="aq-form-actions dev-actions">
+              <button type="button" id="saveDevProfileBtn" class="aq-btn--form-primary">حفظ بيانات المطور</button>
+              <button type="button" id="clearDevProfileFormBtn" class="aq-btn--form-secondary">تفريغ النموذج</button>
+              <div id="saveDevProfileMsg" class="aq-form-msg aq-form-hint"></div>
+            </div>
+          </section>
+
+          <section class="aq-admin-card" id="devListCard" aria-labelledby="devListTitle">
+            <div class="aq-admin-card-head">
+              <div>
+                <h3 class="aq-admin-card-title" id="devListTitle">المطوّرون المسجّلون</h3>
+                <p class="aq-admin-card-sub" id="devListCount"></p>
+              </div>
+            </div>
+            <div id="devProfilesListContent" class="aq-dev-grid"></div>
+          </section>
         </div>
 
         <div class="dash-panel" id="dashPanel-users" hidden>
           <div class="dash-page-title">إدارة المستخدمين</div>
-          <div class="section">
+          <p class="aq-page-intro">حسابات فريق العمل وصلاحياتهم داخل المنصّة. كل عملية هنا تُسجَّل في سجل العمليات، والتحقق النهائي من الصلاحية يتم في الخادم.</p>
+          <section class="aq-admin-card" id="umListCard" aria-labelledby="umListTitle">
             <div class="um-toolbar">
-              <div class="um-count">عدد المستخدمين: <b id="umCount">-</b><span class="um-online-sum">🟢 متصل الآن: <b id="umOnlineCount">-</b></span></div>
-              <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <button type="button" class="um-add-toggle" id="umAuditToggle" hidden>سجل العمليات</button>
-                <button type="button" class="um-add-toggle" id="umAddToggle">+ إضافة مستخدم</button>
+              <div>
+                <h3 class="aq-admin-card-title" id="umListTitle">فريق العمل</h3>
+                <p class="aq-admin-card-sub um-count">عدد المستخدمين: <b id="umCount">-</b><span class="um-online-sum"> · متصل الآن: <b id="umOnlineCount">-</b></span></p>
+              </div>
+              <div class="aq-admin-card-actions">
+                <button type="button" class="um-add-toggle aq-btn--form-secondary" id="umAuditToggle" hidden>سجل العمليات</button>
+                <button type="button" class="um-add-toggle aq-btn--form-primary" id="umAddToggle">+ إضافة مستخدم</button>
               </div>
             </div>
 
             <div class="um-addform" id="umAddForm" hidden>
-              <div class="section-title">إضافة مستخدم جديد</div>
-              <div class="grid">
-                <div>
-                  <label>الاسم</label>
-                  <input type="text" id="newUserName" placeholder="مثال: أحمد محمد">
-                </div>
-                <div>
-                  <label>الإيميل</label>
-                  <input type="email" id="newUserEmail" placeholder="example@gmail.com">
-                </div>
-                <div>
-                  <label>كلمة السر</label>
-                  <input type="text" id="newUserPassword" placeholder="كلمة سر خاصة بيه">
-                </div>
-                <div>
-                  <label>الصلاحية</label>
-                  <select id="newUserRole">
-                    <option value="SALES">مبيعات — SALES</option>
-                    <option value="DATA_ENTRY">إدخال بيانات — DATA_ENTRY</option>
-                    <option value="MANAGER">مدير — MANAGER</option>
-                    <option value="OWNER">مالك — OWNER</option>
-                  </select>
-                </div>
-                <div>
-                  <label>رقم الهاتف (اختياري)</label>
-                  <input type="text" id="newUserPhone" placeholder="01000000000">
-                </div>
-                <div>
-                  <label>صورة المستخدم (اختياري)</label>
-                  <input type="file" id="newUserPhoto" accept="image/*">
+              <div class="aq-form-section">
+                <div class="aq-form-section-head"><h4 class="aq-form-section-title">البيانات الأساسية</h4></div>
+                <div class="aq-form-grid aq-form-grid--3">
+                  <div class="aq-form-field">
+                    <label class="aq-form-label" for="newUserName">الاسم</label>
+                    <input type="text" id="newUserName" class="aq-form-control" placeholder="مثال: أحمد محمد" autocomplete="off">
+                  </div>
+                  <div class="aq-form-field">
+                    <label class="aq-form-label" for="newUserEmail">الإيميل</label>
+                    <input type="email" id="newUserEmail" class="aq-form-control" placeholder="example@gmail.com" autocomplete="off">
+                  </div>
+                  <div class="aq-form-field">
+                    <label class="aq-form-label" for="newUserPhone">رقم الهاتف (اختياري)</label>
+                    <input type="text" id="newUserPhone" class="aq-form-control" inputmode="tel" placeholder="01000000000">
+                  </div>
                 </div>
               </div>
-              <div class="um-hint" id="umOwnerHint" hidden>إنشاء حساب "مالك" يتطلب تسجيل دخولك أنت بحساب مالك (لا يكفي كلمة سر لوحة التحكم).</div>
-              <button type="button" id="addUserBtn" class="um-primary">إضافة المستخدم</button>
-              <div id="addUserMsg" class="um-msg"></div>
+              <div class="aq-form-section">
+                <div class="aq-form-section-head"><h4 class="aq-form-section-title">الحساب والصلاحية</h4></div>
+                <div class="aq-form-grid aq-form-grid--3">
+                  <div class="aq-form-field">
+                    <label class="aq-form-label" for="newUserPassword">كلمة السر</label>
+                    <input type="text" id="newUserPassword" class="aq-form-control" placeholder="كلمة سر خاصة بيه" autocomplete="off">
+                  </div>
+                  <div class="aq-form-field">
+                    <label class="aq-form-label" for="newUserRole">الصلاحية</label>
+                    <select id="newUserRole" class="aq-form-control">
+                      <option value="SALES">مبيعات — SALES</option>
+                      <option value="DATA_ENTRY">إدخال بيانات — DATA_ENTRY</option>
+                      <option value="MANAGER">مدير — MANAGER</option>
+                      <option value="OWNER">مالك — OWNER</option>
+                    </select>
+                  </div>
+                  <div class="aq-form-field">
+                    <label class="aq-form-label" for="newUserPhoto">صورة المستخدم (اختياري)</label>
+                    <input type="file" id="newUserPhoto" class="aq-file-input" accept="image/*">
+                  </div>
+                </div>
+                <div class="um-hint aq-form-hint" id="umOwnerHint" hidden>إنشاء حساب "مالك" يتطلب تسجيل دخولك أنت بحساب مالك.</div>
+              </div>
+              <div class="aq-form-actions">
+                <button type="button" id="addUserBtn" class="um-primary aq-btn--form-primary">إضافة المستخدم</button>
+                <div id="addUserMsg" class="um-msg aq-form-msg"></div>
+              </div>
             </div>
 
             <div class="um-filters">
-              <input type="search" id="umSearch" placeholder="بحث بالاسم أو الإيميل أو الهاتف أو معرّف المستخدم">
-              <div class="um-chips" id="umRoleChips">
+              <input type="search" id="umSearch" class="aq-form-control" placeholder="بحث بالاسم أو الإيميل أو الهاتف أو معرّف المستخدم">
+              <div class="um-chips" id="umRoleChips" aria-label="تصفية حسب الصلاحية">
                 <button type="button" data-role="ALL" class="active">الكل</button>
                 <button type="button" data-role="OWNER">OWNER</button>
                 <button type="button" data-role="MANAGER">MANAGER</button>
                 <button type="button" data-role="SALES">SALES</button>
                 <button type="button" data-role="DATA_ENTRY">DATA_ENTRY</button>
               </div>
-              <div class="um-chips" id="umStatusChips">
+              <div class="um-chips" id="umStatusChips" aria-label="تصفية حسب الحالة">
                 <button type="button" data-st="ALL" class="active">كل الحالات</button>
                 <button type="button" data-st="ACTIVE">نشط</button>
                 <button type="button" data-st="INACTIVE">موقوف</button>
@@ -2727,7 +3593,7 @@
             </div>
 
             <div id="usersListContent" class="um-list"></div>
-          </div>
+          </section>
         </div>
 
         <!-- "الإحصاءات والمخزون" — تبويب واحد فقط يفتح داخل شِل لوحة التحكم (الشريط الجانبي
@@ -2748,11 +3614,25 @@
 
         <div class="dash-panel" id="dashPanel-settings" hidden>
           <div class="dash-page-title">الإعدادات</div>
-          <div class="section">
-            <h3>صورة غلاف الصفحة</h3>
-            <div id="dashSettingsCoverSlot"></div>
-            <p class="dash-note">رفع صورة الغلاف عملية إدارية محمية بكلمة سر لوحة التحكم (زيّ ما هي حاليًا). لو دخلت لوحة التحكم بدورك كمالك من غير كلمة السر، هتحتاج تدخلها عشان تغيّر الصورة.</p>
-          </div>
+          <p class="aq-page-intro">إعدادات المنصّة المتاحة لمالك النظام. الوصول إلى هذه الصفحة مرتبط بجلسة الدخول ودور المالك فقط.</p>
+          <section class="aq-admin-card" id="settingsBrandCard" aria-labelledby="settingsBrandTitle">
+            <div class="aq-admin-card-head">
+              <div>
+                <h3 class="aq-admin-card-title" id="settingsBrandTitle">الهوية البصرية — صورة الغلاف</h3>
+                <p class="aq-admin-card-sub">الصورة المستخدمة كغلاف للمنصّة عند مشاركة الرابط (معاينة الروابط / og:image). يُفضَّل صورة أفقية بعرض 1200 بكسل أو أكثر.</p>
+              </div>
+              <span class="aq-badge aq-badge--neutral" id="settingsCoverState">لا توجد صورة</span>
+            </div>
+            <div class="aq-settings-cover">
+              <div class="aq-settings-cover-preview" id="settingsCoverPreviewWrap">
+                <img id="settingsCoverPreview" alt="صورة الغلاف الحالية" hidden>
+                <div class="aq-settings-cover-empty" id="settingsCoverEmpty">لم تُرفع صورة غلاف بعد</div>
+              </div>
+              <div class="aq-upload-zone aq-settings-cover-zone" id="dashSettingsCoverSlot">
+                <p>اختر صورة من جهازك (PNG أو JPG) ثم اضغط «رفع الصورة». الصورة الجديدة تحلّ محلّ الحالية فورًا.</p>
+              </div>
+            </div>
+          </section>
         </div>
 
         <!-- المرحلة 3.6+: "سجل عمليات إدارة المستخدمين" — قسم كامل داخل لوحة التحكم (مش مودال).
@@ -2792,7 +3672,7 @@
       <div class="modal-title">مقارنة الوحدات</div>
       <button class="modal-close" id="compareModalCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
-    <button type="button" id="compareExportPdfBtn" style="margin-bottom:14px; padding:10px 18px; border:none; border-radius:9px; background:var(--navy); color:var(--gold-soft); font-weight:700; font-size:13px; cursor:pointer;">
+    <button type="button" id="compareExportPdfBtn" style="margin-bottom:14px; padding:10px 18px; border:none; border-radius:9px; background:var(--navy); color:#fff; font-weight:700; font-size:13px; cursor:pointer;">
       تصدير مقارنة PDF
     </button>
     <div id="compareModalContent"></div>
@@ -2809,7 +3689,7 @@
       <button class="modal-close" id="shareImagesCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
     <div id="shareImagesContent" style="max-height:55vh; overflow-y:auto;"></div>
-    <button type="button" id="shareImagesConfirmBtn" style="width:100%; margin-top:14px; padding:12px; border:none; border-radius:9px; background:var(--navy); color:var(--gold-soft); font-weight:700; font-size:14px; cursor:pointer;">
+    <button type="button" id="shareImagesConfirmBtn" style="width:100%; margin-top:14px; padding:12px; border:none; border-radius:9px; background:var(--navy); color:#fff; font-weight:700; font-size:14px; cursor:pointer;">
       مشاركة
     </button>
   </div>
@@ -2883,7 +3763,7 @@
     <input type="text" id="pdfAgentName" placeholder="مثال: أحمد محمد" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:14px; margin-bottom:12px;">
     <label style="display:block; font-size:13px; font-weight:600; margin-bottom:5px;">رقم تليفونك</label>
     <input type="text" id="pdfAgentPhone" placeholder="مثال: 01000000000" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:14px; margin-bottom:16px;">
-    <button type="button" id="pdfContactConfirmBtn" style="width:100%; padding:12px; border:none; border-radius:9px; background:var(--navy); color:var(--gold-soft); font-weight:700; font-size:14px; cursor:pointer;">تصدير الملف</button>
+    <button type="button" id="pdfContactConfirmBtn" style="width:100%; padding:12px; border:none; border-radius:9px; background:var(--navy); color:#fff; font-weight:700; font-size:14px; cursor:pointer;">تصدير الملف</button>
   </div>
 </div>
 
@@ -2897,9 +3777,9 @@
   </div>
   <div id="liveEmailsList" style="font-size:11px; color:var(--muted); margin:-6px 0 14px; line-height:1.9;"></div>
   <label>تغيير صورة غلاف الصفحة</label>
-  <input type="file" id="coverFileInput" accept="image/*">
-  <button class="small-btn" id="coverUploadBtn">رفع الصورة</button>
-  <div id="coverMsg"></div>
+  <input type="file" id="coverFileInput" class="aq-file-input" accept="image/*">
+  <button class="small-btn aq-btn--form-primary" id="coverUploadBtn">رفع الصورة</button>
+  <div id="coverMsg" class="aq-form-hint"></div>
 
   <button type="button" class="small-btn" id="openUsersModalBtn" style="margin-top:12px;"><svg class="ico" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 5.2a3.5 3.5 0 0 1 0 6.8M18 20a6.5 6.5 0 0 0-3.2-5.6"/></svg> إدارة المستخدمين</button>
   <button type="button" class="small-btn" id="openDevProfilesModalBtn" style="margin-top:8px;"><svg class="ico" viewBox="0 0 24 24"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></svg> إدارة بيانات المطورين</button>
@@ -2910,6 +3790,19 @@
 <!-- المرحلة 3.6: "إدارة المستخدمين" → قسم كامل (#dashPanel-users). المرحلة 3.6+: "سجل العمليات"
      → قسم كامل (#dashPanel-audit). الباقي كمودال فرعي مركّز واحد فقط: "تفاصيل/تعديل مستخدم"
      (#umUserModal) — نافذة تعديل لكل مستخدم، مناسبة كمودال. -->
+<!-- Phase 2B: مودال تأكيد موحّد (بديل confirm() في إدارة المستخدمين/المطوّرين) — يُدار عبر aqConfirm() -->
+<div class="aq-modal-overlay" id="aqConfirmModal" role="dialog" aria-modal="true" aria-labelledby="aqConfirmTitle" aria-describedby="aqConfirmText">
+  <div class="aq-modal aq-confirm">
+    <div class="aq-confirm-body">
+      <h3 class="aq-confirm-title" id="aqConfirmTitle"></h3>
+      <p class="aq-confirm-text" id="aqConfirmText"></p>
+    </div>
+    <div class="aq-confirm-actions">
+      <button type="button" class="aq-btn--form-primary" id="aqConfirmOk">تأكيد</button>
+      <button type="button" class="aq-btn--form-secondary" id="aqConfirmCancel">إلغاء</button>
+    </div>
+  </div>
+</div>
 <!-- مودال تفاصيل/تعديل مستخدم (المرحلة 2.3) -->
 <div class="modal-overlay" id="umUserModal">
   <div class="modal-box um-user-box">
@@ -2934,29 +3827,29 @@
       <div class="modal-title">تعديل بيانات الوحدة <span id="editUnitIdLabel"></span></div>
       <button class="modal-close" id="editCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
-    <div id="unitAddAiSection" class="ai-fill-panel" style="display:none; padding:10px;">
-      <div class="section-title" style="margin-bottom:4px; margin-top:0;"><svg class="ico" viewBox="0 0 24 24"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"/><path d="m18.5 14 .8 2.4 2.4.8-2.4.8-.8 2.4-.8-2.4-2.4-.8 2.4-.8Z"/></svg>تعبئة تلقائية بالذكاء الاصطناعي</div>
-      <p style="font-size:11px; color:var(--text-muted); margin:0 0 6px; line-height:1.5;">
+    <div id="unitAddAiSection" class="ai-fill-panel aq-form-assist" style="display:none;">
+      <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"/><path d="m18.5 14 .8 2.4 2.4.8-2.4.8-.8 2.4-.8-2.4-2.4-.8 2.4-.8Z"/></svg>تعبئة تلقائية بالذكاء الاصطناعي</div>
+      <p class="aq-form-help">
         الصق رسالة المطور، أو ارفع صورة/PDF، والذكاء الاصطناعي هيملى الفورم تلقائيًا تحت.
       </p>
-      <textarea id="unitAddAiPasteText" placeholder="الصق نص الرسالة هنا (اختياري)..." style="min-height:50px; width:100%; padding:7px 10px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:13px;"></textarea>
-      <div id="unitAddAiImagePasteZone" class="ai-paste-zone" tabindex="0" style="margin-top:6px; padding:8px;">
+      <textarea id="unitAddAiPasteText" class="aq-form-control" placeholder="الصق نص الرسالة هنا (اختياري)..."></textarea>
+      <div id="unitAddAiImagePasteZone" class="ai-paste-zone aq-upload-zone" tabindex="0">
         دوس هنا وبعدين الصق صورة (Ctrl+V)
       </div>
-      <div id="unitAddAiPastedImagePreview" style="display:none; margin-top:6px; position:relative; max-width:180px;">
-        <img id="unitAddAiPastedImageTag" style="width:100%; border-radius:8px; border:1px solid var(--border);">
-        <button type="button" id="unitAddAiPastedImageRemove" style="position:absolute; top:-8px; left:-8px; width:22px; height:22px; border-radius:50%; background:var(--error-fg); color:#fff; border:none; cursor:pointer; font-size:12px;"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <div id="unitAddAiPastedImagePreview" style="display:none;">
+        <img id="unitAddAiPastedImageTag" alt="">
+        <button type="button" id="unitAddAiPastedImageRemove" aria-label="إزالة الصورة"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
       </div>
-      <input type="file" id="unitAddAiFileInput" accept="image/*,application/pdf" style="margin-top:6px; width:100%; font-size:12px;">
-      <button type="button" id="unitAddAiExtractBtn" class="ai-extract-btn" style="margin-top:6px; padding:9px; font-size:13px;">
+      <input type="file" id="unitAddAiFileInput" class="aq-file-input" accept="image/*,application/pdf">
+      <button type="button" id="unitAddAiExtractBtn" class="ai-extract-btn aq-btn--form-primary">
         استخرج البيانات وابدأ التعبئة
       </button>
-      <div id="unitAddAiExtractMsg" style="font-size:12px; margin-top:6px; display:none;"></div>
+      <div id="unitAddAiExtractMsg" class="aq-form-hint" style="display:none;"></div>
     </div>
 
     <form id="editForm">
       <div class="section-title">بيانات أساسية</div>
-      <div class="grid">
+      <div class="grid aq-fg-basic">
         <div>
           <label>تصنيف الوحدة</label>
           <select name="category" required>
@@ -3012,7 +3905,7 @@
       </div>
 
       <div class="section-title">الموقع</div>
-      <div class="grid">
+      <div class="grid aq-fg-location">
         <div>
           <label>المدينة</label>
           <select name="city" id="editCitySelect" required><option value="">اختر المدينة</option></select>
@@ -3027,14 +3920,14 @@
           <datalist id="editProjectDatalist"></datalist>
           <!-- المرحلة 3.2: زر يدوي فقط — نفس سلوك add.html. تغيير اسم المشروع **لا** يجيب بيانات آخر وحدة تلقائيًا
                (عشان متتعارضش مع بيانات الذكاء الاصطناعي). التعبئة من آخر وحدة تحصل فقط عند الضغط على الزر ده. -->
-          <button type="button" id="editFetchLastSimilarBtn" style="margin-top:6px; width:100%; padding:9px; border:1px solid rgba(255,255,255,0.14); border-radius:var(--radius-sm); background:rgba(255,255,255,0.06); color:var(--text-light); font-weight:700; font-size:12px; cursor:pointer;">
+          <button type="button" id="editFetchLastSimilarBtn" class="aq-btn--form-secondary">
             🔄 جيب بيانات آخر وحدة مشابهة
           </button>
         </div>
       </div>
 
       <div class="section-title">تفاصيل الوحدة</div>
-      <div class="grid">
+      <div class="grid aq-fg-details">
         <div>
           <label>المساحة (م²)</label>
           <input type="number" name="unitArea" required min="0" step="any">
@@ -3088,7 +3981,7 @@
       </div>
 
       <div class="section-title">السعر وطريقة الدفع</div>
-      <div class="grid">
+      <div class="grid aq-fg-price">
         <div>
           <label>السعر الأصلي (قبل الخصم) (جنيه)</label>
           <input type="number" name="price" required min="0">
@@ -3109,7 +4002,7 @@
         <div>
           <label>المقدم (نسبة %)</label>
           <input type="number" name="downPayment" min="0" max="100" step="any">
-          <div id="editDownPaymentValueHint" style="font-size:12px; color:var(--text-muted); margin-top:5px; display:none;"></div>
+          <div id="editDownPaymentValueHint" class="aq-form-hint" style="display:none;"></div>
         </div>
         <div>
           <label>المقدم محسوب على</label>
@@ -3121,7 +4014,7 @@
         <div>
           <label>قيمة الدفعة (نسبة % أو قيمة)</label>
           <input type="text" name="paymentAmount">
-          <div id="editPaymentAmountValueHint" style="font-size:12px; color:var(--text-muted); margin-top:5px; display:none;"></div>
+          <div id="editPaymentAmountValueHint" class="aq-form-hint" style="display:none;"></div>
         </div>
         <div>
           <label>عدد الدفعات</label>
@@ -3158,12 +4051,12 @@
 
       <div class="installment-preview" id="editInstallmentPreview" style="display:none;">
         <div><svg class="ico" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h13v4"/><path d="M3 7v10a2 2 0 0 0 2 2h15V7H5"/><path d="M16 13h.01"/></svg> السعر بعد الخصم: <b id="editPriceAfterDiscountValue">-</b> جنيه</div>
-        <div style="margin-top:4px;"><svg class="ico" viewBox="0 0 24 24"><path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2v.3h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2Z"/></svg> القسط الشهري التقريبي: <b id="editMonthlyInstallmentValue">-</b> جنيه/شهريًا</div>
-        <div style="margin-top:4px;"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg> القسط الربع سنوي التقريبي: <b id="editQuarterlyInstallmentValue">-</b> جنيه/كل 3 شهور</div>
+        <div><svg class="ico" viewBox="0 0 24 24"><path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2v.3h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2Z"/></svg> القسط الشهري التقريبي: <b id="editMonthlyInstallmentValue">-</b> جنيه/شهريًا</div>
+        <div><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg> القسط الربع سنوي التقريبي: <b id="editQuarterlyInstallmentValue">-</b> جنيه/كل 3 شهور</div>
       </div>
 
       <div class="section-title">بيانات المالك والمسؤول</div>
-      <div class="grid">
+      <div class="grid aq-fg-owner">
         <div>
           <label>اسم المالك</label>
           <input type="text" name="ownerName">
@@ -3179,7 +4072,7 @@
       </div>
 
       <div class="section-title">صور الوحدة</div>
-      <div class="images-zone" id="editImagesZone" tabindex="0">
+      <div class="images-zone aq-upload-zone" id="editImagesZone" tabindex="0">
         <p>الصق صورة (Ctrl+V) هنا، أو اسحب صورة، أو اختار من جهازك</p>
         <input type="file" id="editImagesFileInput" accept="image/*" multiple style="display:none;">
         <button type="button" class="images-choose-btn" id="editImagesChooseBtn"><svg class="ico" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg> اختيار صور من الجهاز</button>
@@ -3188,20 +4081,23 @@
         <input type="text" id="editImageLinkInput" placeholder="أو الصق رابط صورة هنا (URL)">
         <button type="button" id="editAddImageLinkBtn">إضافة رابط</button>
       </div>
-      <div id="editImagesPreview" class="images-preview"></div>
-      <div id="editImagesUploadMsg" style="font-size:12px; margin-top:6px;"></div>
+      <div id="editImagesPreview" class="images-preview aq-thumb-grid"></div>
+      <div id="editImagesUploadMsg" class="aq-form-hint"></div>
 
       <div class="section-title">ملاحظات</div>
-      <textarea name="notes" style="width:100%; min-height:45px; padding:7px 10px; border:1px solid var(--border); border-radius:8px; font-family:inherit;"></textarea>
+      <textarea name="notes" class="aq-form-control" rows="4"></textarea>
 
-      <div id="editMsg"></div>
-      <button type="submit" id="editSaveBtn">حفظ التعديلات</button>
-      <button type="button" id="editResetBtn" style="display:none;">تفريغ النموذج</button>
-      <button type="button" id="editDeleteBtn">مسح الوحدة نهائيًا</button>
+      <!-- شريط الإجراءات اللاصق: نفس الأزرار والـ ids والمعالجات — تغليف بصري فقط -->
+      <div class="aq-form-actions" id="editActionBar">
+      <div id="editMsg" class="aq-form-msg"></div>
+      <button type="submit" id="editSaveBtn" class="aq-btn--form-primary">حفظ التعديلات</button>
+      <button type="button" id="editResetBtn" class="aq-btn--form-secondary" style="display:none;">تفريغ النموذج</button>
+      <button type="button" id="editDeleteBtn" class="aq-btn--form-danger">مسح الوحدة نهائيًا</button>
       <!-- البند 1+2: أزرار "عرض السعر" — نفس النموذج، تظهر فقط في وضع quote (يضبطها openQuoteMode) -->
       <div id="quoteActionRow">
         <button type="button" id="quoteExportBtn"><svg class="ico" viewBox="0 0 24 24"><path d="M14 3v5h5"/><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M9 13h6M9 17h6"/></svg><span class="qlbl">تصدير عرض السعر (PDF)</span></button>
         <button type="button" id="quoteWhatsAppBtn"><svg class="ico" viewBox="0 0 24 24"><path d="M3 21l1.9-5.6A9 9 0 1 1 12 21a9 9 0 0 1-4.6-1.2L3 21Z"/><path d="M9 10c0 3 2 5 5 5"/></svg><span class="qlbl">مشاركة عبر WhatsApp</span></button>
+      </div>
       </div>
     </form>
   </div>
@@ -3492,7 +4388,7 @@
       const header = document.createElement('div');
       header.style.cssText = 'background:var(--navy); padding:12px 16px; border-right:3px solid var(--gold);';
       header.textContent = district;
-      header.style.color = 'var(--gold-soft)';
+      header.style.color = '#fff';   /* عنوان المنطقة على شريط أخضر داكن — كان أخضر على أخضر (غير مقروء) */
       header.style.fontWeight = '800';
       header.style.fontSize = '14px';
       card.appendChild(header);
@@ -3861,6 +4757,7 @@
     document.getElementById('editUnitIdLabel').textContent = '(استنساخ من ' + unitId + ')';
     document.querySelector('#editModal .modal-title').firstChild.textContent = 'إضافة وحدة جديدة (استنساخ) ';
     editSaveBtn.textContent = 'إضافة كوحدة جديدة';
+    editSaveBtn.style.display = '';   // (يُخفى في وضع "عرض السعر" — نعيده هنا كما في openAddUnitModal)
     editDeleteBtn.style.display = 'none';
     editResetBtn.style.display = 'none'; // "تفريغ النموذج" لوضع الإضافة العادية فقط (مش الاستنساخ)
     document.getElementById('editFetchLastSimilarBtn').style.display = 'none'; // "جيب آخر وحدة مشابهة" — إضافة عادية فقط
@@ -4222,8 +5119,13 @@
    * الحماية الحقيقية تبقى في الباك-إند (requirePermission_) — هذه الطبقة تنظيم للتنقّل فقط.
    * ============================================================ */
   var ROUTE_REGISTRY = {
-    search:    { hash: '',           view: 'search',    navId: 'navSearchBtn',    navPerm: null,       perm: null,              label: 'البحث',
+    search:    { hash: '',           view: 'search',    navId: 'navSearchBtn',    navPerm: null,       perm: null,              label: 'الرئيسية',
                   title: 'ابحث عن وحدتك العقارية', subtitle: 'اعثر على الوحدة المناسبة، قارن الأسعار، واحسب خطة السداد — كل ذلك في مكان واحد.' },
+    /* استكشف: صفحة تصفّح الوحدات (النتائج). نفس نموذج الصلاحيات المستخدم للبحث
+       (perm/navPerm = null) — لم تُوسَّع أي صلاحية ولم تُضيَّق؛ النتائج كانت أصلًا
+       متاحة لكل دور مسجَّل داخل شاشة البحث. */
+    explore:   { hash: '#explore',   view: 'explore',   navId: 'navExploreBtn',   navPerm: null,       perm: null,              label: 'استكشف',
+                  title: 'استكشف الوحدات', subtitle: 'تصفّح مخزون الوحدات المتاح وفق بحثك الحالي.' },
     quote:     { hash: '#quote',     view: 'quote',     navId: 'calcFabBtn',      navPerm: null,       perm: null,              label: 'عرض السعر',
                   title: 'عرض السعر', subtitle: 'احسب عرض السعر وخطة السداد لوحدة' },
     meter:     { hash: '#meter',     view: 'meter',     navId: 'priceInfoFabBtn', navPerm: null,       perm: null,              label: 'سعر المتر',
@@ -4447,6 +5349,78 @@
       return;
     }
     container.innerHTML = units.map(buildUnitCardHtml).join('');
+    try { buildDevelopersRow_(); } catch (e) {}   /* عرض فقط — لا يؤثر على النتائج */
+  }
+
+  /* ============================================================================
+   * أكثر المطوّرين نشاطًا (الرئيسية) — عرض فقط
+   * ----------------------------------------------------------------------------
+   * العدّ من الوحدات المحمَّلة فعليًا (lastResults) — لا نداء بحث جديد ولا قائمة
+   * ثابتة. اللوجو من getDeveloperProfile القائم (يتطلب جلسة فقط، فيعمل لكل
+   * الأدوار)، ومطوّر بلا لوجو يظهر باسمه بلا كسر التخطيط.
+   * ========================================================================== */
+  var DEVS_ROW_LIMIT = 8;
+  var devsRowBuilt = false;
+
+  function buildDevelopersRow_() {
+    if (devsRowBuilt) return;
+    var section = document.getElementById('aqDevsSection');
+    var row = document.getElementById('aqDevsRow');
+    if (!section || !row || !Array.isArray(lastResults) || !lastResults.length) return;
+
+    var counts = {};
+    lastResults.forEach(function (u) {
+      var d = String((u && u['Developer Name']) || '').trim();
+      if (d) counts[d] = (counts[d] || 0) + 1;
+    });
+    var names = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; }).slice(0, DEVS_ROW_LIMIT);
+    if (!names.length) return;
+
+    devsRowBuilt = true;
+    row.textContent = '';
+    names.forEach(function (name) {
+      var tile = document.createElement('button');
+      tile.type = 'button';
+      tile.className = 'aq-dev-tile';
+      tile.title = name;
+      tile.addEventListener('click', function () {
+        if (typeof showDeveloperProfile === 'function') showDeveloperProfile(name);
+      });
+
+      var logo = document.createElement('span');
+      logo.className = 'aq-dev-logo';
+      var fallback = document.createElement('span');
+      fallback.className = 'aq-dev-fallback';
+      fallback.textContent = name;
+      logo.appendChild(fallback);
+
+      var meta = document.createElement('span');
+      meta.className = 'aq-dev-meta';
+      var cnt = document.createElement('span');
+      cnt.className = 'aq-dev-count';
+      cnt.textContent = counts[name] + ' وحدة';
+      meta.appendChild(cnt);
+
+      tile.appendChild(logo);
+      tile.appendChild(meta);
+      row.appendChild(tile);
+
+      /* اللوجو من نفس مصدر بيانات المطوّرين القائم — لا أصول مخترعة */
+      google.script.run
+        .withSuccessHandler(function (res) {
+          if (!res || !res.success || !res.found || !res.logoUrl) return;
+          var img = document.createElement('img');
+          img.alt = name;
+          img.loading = 'lazy';
+          img.decoding = 'async';
+          img.onload = function () { logo.textContent = ''; logo.appendChild(img); };
+          img.onerror = function () { /* يبقى الاسم النصّي كما هو */ };
+          img.src = res.logoUrl;
+        })
+        .withFailureHandler(function () {})
+        .getDeveloperProfile(name, getAuthCreds());
+    });
+    section.hidden = false;
   }
 
   function toggleUnitDetails(btnEl, unitId) {
@@ -4794,7 +5768,7 @@
           <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px; height:16px;"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2Zm5.8 14.03c-.24.68-1.4 1.32-1.93 1.36-.5.05-1.02.24-3.4-.71-2.88-1.15-4.73-4.06-4.87-4.25-.14-.19-1.17-1.56-1.17-2.97s.73-2.11 1-2.4c.24-.27.53-.34.7-.34h.5c.16 0 .38-.03.58.45.24.57.79 1.98.86 2.12.07.14.11.3.02.48-.09.19-.14.3-.28.46-.14.17-.29.37-.42.5-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.16-.19.68-.79.86-1.06.19-.28.37-.23.62-.14.26.09 1.63.77 1.91.91.28.14.47.21.53.33.07.12.07.68-.17 1.36Z"/></svg>
           واتساب
         </button>
-        <button type="button" id="devProfileExportPdfBtn" style="flex:1; padding:11px; border:none; border-radius:9px; background:var(--navy); color:var(--gold-soft); font-weight:700; font-size:13px; cursor:pointer;">
+        <button type="button" id="devProfileExportPdfBtn" style="flex:1; padding:11px; border:none; border-radius:9px; background:var(--navy); color:#fff; font-weight:700; font-size:13px; cursor:pointer;">
           تصدير PDF
         </button>
       </div>` : '';
@@ -4810,7 +5784,7 @@
 
       ${res.ownerName ? `
       <div style="display:flex; align-items:center; gap:12px; background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-bottom:12px;">
-        <div style="width:38px; height:38px; border-radius:50%; background:var(--navy); color:var(--gold-soft); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">${ICON.user}</div>
+        <div style="width:38px; height:38px; border-radius:50%; background:var(--navy); color:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">${ICON.user}</div>
         <div>
           <div style="color:var(--muted); font-size:11px; font-weight:700;">صاحب الشركة</div>
           <div style="color:var(--navy); font-size:14px; font-weight:800;">${res.ownerName}</div>
@@ -5367,7 +6341,86 @@
     renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
   });
 
+  /* ============================================================================
+   * تجربة البحث العقاري — سلوك العرض فقط (إعادة تصميم الرئيسية + النتائج)
+   * ----------------------------------------------------------------------------
+   * لا منطق بحث جديد، لا نداء سيرفر، لا صلاحيات هنا. ثلاث مهام فقط:
+   *   1) مرحلة العرض: هبوط (هيرو + كونسول) ⇄ نتائج (شريط بحث مضغوط + شبكة).
+   *   2) مبدّل وضع الكونسول: فلاتر / بحث ذكي — يُظهر أحد اللوحين القائمين.
+   *   3) نقر بطاقة الوحدة → نفس overlay الكارت القائم (showUnitCardOverlay)
+   *      بنفس كائن الوحدة من lastResults — بلا نداء سيرفر ولا كارت ثانٍ.
+   * ========================================================================== */
+  /* تنفيذ بحث من أي مكان ينقل المستخدم إلى صفحة "استكشف" (النتائج).
+     لا حالة بحث ثانية ولا شبكة نتائج ثانية: نفس runSearch ونفس #results —
+     يتغيّر المسار فقط، فيتكفّل الراوتر القائم بالعرض والتاريخ (Back/Forward). */
+  function goToResultsRoute_() {
+    if (typeof window.__aqarGoExplore === 'function') window.__aqarGoExplore();
+    else location.hash = 'explore';
+  }
+
+  (function wireSearchExperience_() {
+    var modeFilters = document.getElementById('aqModeFilters');
+    var modeSmart   = document.getElementById('aqModeSmart');
+    var panelFilters = document.getElementById('aqConsoleFilters');
+    var panelSmart   = document.getElementById('aqConsoleSmart');
+    function setMode(smart) {
+      if (!modeFilters || !modeSmart || !panelFilters || !panelSmart) return;
+      modeSmart.classList.toggle('is-active', smart);
+      modeFilters.classList.toggle('is-active', !smart);
+      modeSmart.setAttribute('aria-selected', smart ? 'true' : 'false');
+      modeFilters.setAttribute('aria-selected', smart ? 'false' : 'true');
+      panelSmart.hidden = !smart;
+      panelFilters.hidden = smart;
+    }
+    if (modeFilters) modeFilters.addEventListener('click', function () { setMode(false); });
+    if (modeSmart)   modeSmart.addEventListener('click', function () { setMode(true); });
+
+    /* زر "الرئيسية" داخل الكونسول: رجوع لمرحلة الهبوط بلا مسّ النتائج المحمّلة */
+    var back = document.getElementById('aqBackToHomeBtn');
+    if (back) back.addEventListener('click', function () {
+      if (typeof window.__aqarGoSearch === 'function') window.__aqarGoSearch();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    /* نقر البطاقة → overlay تفاصيل الوحدة (نفس الآلية القائمة من "الوحدات المشابهة").
+       نتجاهل النقر على أي عنصر تفاعلي داخل البطاقة حتى تبقى كل الأزرار كما هي. */
+    var results = document.getElementById('results');
+    if (results) results.addEventListener('click', function (e) {
+      var card = e.target && e.target.closest ? e.target.closest('.unit-card') : null;
+      if (!card) return;
+      if (e.target.closest('button, a, select, input, label, .unit-cover, .card-actions-bottom, .toggle-details-btn')) return;
+      var idEl = card.querySelector('.unit-id');
+      var unitId = idEl ? idEl.textContent.trim() : '';
+      if (!unitId || !Array.isArray(lastResults)) return;
+      var u = lastResults.filter(function (x) { return String(x['Unit ID']) === unitId; })[0];
+      if (u && typeof showUnitCardOverlay === 'function') showUnitCardOverlay(u);
+    });
+
+    /* Escape يغلق overlay الوحدة (المطلوب في هذه المرحلة) — بلا مسّ بقية المودالات */
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      var ov = document.getElementById('unitCardOverlay');
+      if (ov && ov.classList.contains('open')) { ov.classList.remove('open'); return; }
+      /* Phase 2B: مودال التأكيد (aqConfirm) يعالج Escape بنفسه؛ معرض الصور له × فقط (كما هو). */
+      if (document.querySelector('.aq-modal-overlay.aq-open, .lightbox-overlay.open')) return;
+      /* مودال تفاصيل المستخدم overlay حقيقي → Escape يغلقه (نفس مسار × والخلفية: إزالة .open). */
+      var um = document.getElementById('umUserModal');
+      if (um && um.classList.contains('open')) { e.preventDefault(); um.classList.remove('open'); return; }
+      /* Escape يغلق نموذج الوحدة (#editModal) عندما يكون مودالًا حقيقيًا فقط (تعديل/استنساخ/عرض SALES)
+       * عبر نفس مسار زر × (handleEditClose). في وضعَي "إدخال وحدة" و"عرض السعر" النموذج صفحة
+       * داخل المحتوى — لا إغلاق ولا تنقّل. لا إرسال للنموذج ولا مسّ بأي مودال آخر. */
+      /* طبقة أعلى مفتوحة فوق النموذج (معرض الصور / أي مودال آخر)؟ اتركها لمعالجها ولا تغلق النموذج تحتها. */
+      if (document.querySelector('.modal-overlay.open:not(#editModal)')) return;
+      if (editModal.classList.contains('open') && editModalMode !== 'quote' &&
+          !document.body.classList.contains('app-view-add') && !document.body.classList.contains('app-view-quote')) {
+        e.preventDefault();
+        handleEditClose();
+      }
+    });
+  })();
+
   document.getElementById('searchBtn').addEventListener('click', runSearch);
+  document.getElementById('searchBtn').addEventListener('click', goToResultsRoute_);
 
   /* ---------- بحث ذكي بلغة طبيعية ---------- */
   function applyNaturalLanguageFilters(filters) {
@@ -5388,6 +6441,7 @@
 
   document.getElementById('nlSearchBtn').addEventListener('click', function() {
     const btn = this;
+    goToResultsRoute_();   // البحث الذكي ينقل أيضًا إلى "استكشف"
     const msg = document.getElementById('nlSearchMsg');
     const query = document.getElementById('nlSearchInput').value.trim();
     if (!query) {
@@ -5434,6 +6488,7 @@
   document.getElementById('favToggleBtn').addEventListener('click', function() {
     showFavoritesOnly = !showFavoritesOnly;
     this.classList.toggle('active', showFavoritesOnly);
+    this.setAttribute('aria-pressed', showFavoritesOnly ? 'true' : 'false');
     renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
 
     if (showFavoritesOnly) {
@@ -5939,6 +6994,7 @@
     document.getElementById('editUnitIdLabel').textContent = '(' + unitId + ')';
     document.querySelector('#editModal .modal-title').firstChild.textContent = 'تعديل بيانات الوحدة ';
     editSaveBtn.textContent = 'حفظ التعديلات';
+    editSaveBtn.style.display = '';   // (يُخفى في وضع "عرض السعر" — نعيده هنا كما في openAddUnitModal؛ لدور بلا صلاحية كتابة الزر أصلًا مُزال من الـ DOM)
     editDeleteBtn.style.display = uiAllows('DELETE_UNIT') ? '' : 'none'; // المرحلة 1: الحذف لـ OWNER (أو ADMIN_PIN) فقط
     editResetBtn.style.display = 'none'; // "تفريغ النموذج" لوضع الإضافة فقط
     document.getElementById('editFetchLastSimilarBtn').style.display = 'none'; // "جيب آخر وحدة مشابهة" — وضع الإضافة فقط
@@ -6209,9 +7265,9 @@
             var _canTermsUpdate = !_canFullUpdate && uiAllows('UPDATE_UNIT_TERMS');
             var _sameBtnHtml = '';
             if (_canFullUpdate) {
-              _sameBtnHtml = `<button type="button" id="editSameUnitBtn" style="flex:1; padding:9px; border:none; border-radius:8px; background:var(--navy); color:var(--gold-soft); font-weight:700; font-size:12px; cursor:pointer;">نفس الوحدة - حدّث</button>`;
+              _sameBtnHtml = `<button type="button" id="editSameUnitBtn" style="flex:1; padding:9px; border:none; border-radius:8px; background:var(--navy); color:#fff; font-weight:700; font-size:12px; cursor:pointer;">نفس الوحدة - حدّث</button>`;
             } else if (_canTermsUpdate) {
-              _sameBtnHtml = `<button type="button" id="editSameTermsBtn" style="flex:1; padding:9px; border:none; border-radius:8px; background:var(--navy); color:var(--gold-soft); font-weight:700; font-size:12px; cursor:pointer;">نفس الوحدة — تحديث السعر ونظام السداد</button>`;
+              _sameBtnHtml = `<button type="button" id="editSameTermsBtn" style="flex:1; padding:9px; border:none; border-radius:8px; background:var(--navy); color:#fff; font-weight:700; font-size:12px; cursor:pointer;">نفس الوحدة — تحديث السعر ونظام السداد</button>`;
             }
             editMsg.innerHTML = `
               <div style="margin-bottom:8px;">${res.message}</div>
@@ -6699,12 +7755,22 @@
   });
 
   /* ---------- صورة الغلاف ---------- */
+  /* Phase 2B — معاينة صورة الغلاف داخل "الإعدادات" (نفس المصدر: getCoverImageUrl / نتيجة uploadCoverImage). */
+  function syncSettingsCover_(url) {
+    var img = document.getElementById('settingsCoverPreview'), empty = document.getElementById('settingsCoverEmpty'), state = document.getElementById('settingsCoverState');
+    if (!img) return;
+    var has = !!url;
+    if (has) img.src = url;
+    img.hidden = !has; if (empty) empty.hidden = has;
+    if (state) { state.textContent = has ? 'صورة الغلاف مرفوعة' : 'لا توجد صورة'; state.className = 'aq-badge ' + (has ? 'aq-badge--success' : 'aq-badge--neutral'); }
+  }
   function loadCoverImage() {
     google.script.run.withSuccessHandler(function(url) {
       if (url) {
         document.getElementById('coverImg').src = url;
         document.getElementById('coverWrap').classList.add('has-image');
       }
+      syncSettingsCover_(url);
     }).getCoverImageUrl(getAuthCreds());
   }
 
@@ -6784,6 +7850,7 @@
           if (res.success) {
             document.getElementById('coverImg').src = res.url;
             document.getElementById('coverWrap').classList.add('has-image');
+            syncSettingsCover_(res.url);
           }
         })
         .withFailureHandler(function(err) {
@@ -6814,6 +7881,51 @@
   let umPresenceTimer = null;          // مؤقّت واحد فقط لتحديث الحضور أثناء عرض قسم المستخدمين
 
   function umAuth() { return getAuthCreds(); } // Phase 1B: جلسة فقط — لا PIN
+
+  /* Phase 2B — مودال تأكيد موحّد بدل confirm() الأصلي (نفس دلالة الإجراء: تأكيد/إلغاء) بلا نافذة متصفح حاجبة.
+   * يُرجع Promise<boolean>. Escape / الخلفية / إلغاء = false. لا يمسّ أي منطق تفويض. */
+  function aqConfirm(opts) {
+    opts = opts || {};
+    var ov = document.getElementById('aqConfirmModal');
+    if (!ov) return Promise.resolve(window.confirm(opts.text || ''));
+    var okBtn = document.getElementById('aqConfirmOk'), cancelBtn = document.getElementById('aqConfirmCancel');
+    document.getElementById('aqConfirmTitle').textContent = opts.title || 'تأكيد الإجراء';
+    document.getElementById('aqConfirmText').textContent = opts.text || '';
+    okBtn.textContent = opts.okText || 'تأكيد';
+    okBtn.classList.toggle('is-danger', !!opts.danger);
+    var prevFocus = document.activeElement;
+    return new Promise(function (resolve) {
+      function done(v) {
+        ov.classList.remove('aq-open');
+        okBtn.removeEventListener('click', onOk); cancelBtn.removeEventListener('click', onCancel);
+        ov.removeEventListener('click', onBackdrop); document.removeEventListener('keydown', onKey, true);
+        if (prevFocus && prevFocus.focus) { try { prevFocus.focus(); } catch (e) {} }
+        resolve(v);
+      }
+      function onOk() { done(true); }
+      function onCancel() { done(false); }
+      function onBackdrop(e) { if (e.target === ov) done(false); }
+      function onKey(e) { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); done(false); } }
+      okBtn.addEventListener('click', onOk); cancelBtn.addEventListener('click', onCancel);
+      ov.addEventListener('click', onBackdrop);
+      document.addEventListener('keydown', onKey, true);   // مرحلة الالتقاط: يسبق مستمع Escape العام ولا يترك المودال الذي تحته يُغلق
+      ov.classList.add('aq-open');
+      setTimeout(function () { (opts.danger ? cancelBtn : okBtn).focus(); }, 0);
+    });
+  }
+  window.aqConfirm = aqConfirm;
+
+  /* Phase 2B — التنقّل الفرعي للوحة التحكم يتمرّر أفقيًا على الشاشات الضيقة: أبقِ العنصر النشط ظاهرًا.
+   * قراءة فقط لحالة .is-active التي يضبطها dashSelect — لا تغيير في التوجيه ولا في الصلاحيات. */
+  (function keepActiveDashNavVisible() {
+    function reveal() {
+      var nav = document.getElementById('dashNav'); if (!nav || nav.scrollWidth <= nav.clientWidth + 1) return;
+      var act = nav.querySelector('.dash-nav-item.is-active');
+      if (act && act.scrollIntoView) { try { act.scrollIntoView({ inline: 'center', block: 'nearest' }); } catch (e) {} }
+    }
+    window.addEventListener('hashchange', function () { setTimeout(reveal, 60); });
+    window.addEventListener('load', function () { setTimeout(reveal, 300); });
+  })();
 
   /* المرحلة 3.6+ — صياغة "آخر ظهور" (توقيت مصر — نفس اصطلاح التطبيق: dd/MM/yyyy + 12h ص/م). */
   function umFormatLastSeen(lastSeen, serverNow, online) {
@@ -6980,7 +8092,7 @@
 
   function loadUsersList() {
     const content = document.getElementById('usersListContent');
-    content.innerHTML = '<div class="um-empty">جاري التحميل...</div>';
+    content.innerHTML = '<div class="aq-skeleton aq-skeleton--card" style="min-height:76px"></div><div class="aq-skeleton aq-skeleton--card" style="min-height:76px"></div><div class="aq-skeleton aq-skeleton--card" style="min-height:76px"></div>';
     google.script.run
       .withSuccessHandler(function (res) {
         if (!res || !res.success) { content.innerHTML = '<div class="um-empty">' + umEsc((res && res.message) || 'تعذّر تحميل المستخدمين') + '</div>'; return; }
@@ -7021,19 +8133,19 @@
       const isOwner = u.role === 'OWNER';
       const active = u.status === 'نشط';
       return `
-      <div class="um-card ${isOwner ? 'is-owner' : ''}" data-email="${umEsc(u.email)}">
+      <div class="um-card aq-list-row aq-list-row--interactive ${isOwner ? 'is-owner' : ''}" data-email="${umEsc(u.email)}">
         ${umAvatarHtml(u)}
-        <div class="um-main">
-          <div class="um-name">${umEsc(u.name || '(بدون اسم)')}
-            <span class="um-badge role-${u.role}">${umEsc(ROLE_LABELS[u.role] || u.role)}</span>
+        <div class="um-main aq-list-body">
+          <div class="um-name aq-list-title">${umEsc(u.name || '(بدون اسم)')}
+            <span class="um-badge aq-badge role-${u.role}">${umEsc(ROLE_LABELS[u.role] || u.role)}</span>
             ${isOwner ? '<span title="حساب المالك — محمي">★</span>' : ''}
           </div>
-          <div class="um-sub">${umEsc(u.email)}</div>
-          <div class="um-sub">${u.phone ? umEsc(u.phone) + ' · ' : ''}أُضيف ${umEsc(u.addedDate || '-')}</div>
+          <div class="um-sub aq-list-meta"><span class="ltr" dir="ltr">${umEsc(u.email)}</span></div>
+          <div class="um-sub aq-list-meta">${u.phone ? '<span class="ltr" dir="ltr">' + umEsc(u.phone) + '</span> · ' : ''}أُضيف ${umEsc(u.addedDate || '-')}</div>
         </div>
-        <div class="um-right">
+        <div class="um-right aq-list-trailing">
           ${umPresenceHtml(u)}
-          <span class="um-status ${active ? 'active' : 'inactive'}">${active ? 'نشط' : 'موقوف'}</span>
+          <span class="um-status aq-badge ${active ? 'active aq-badge--success' : 'inactive aq-badge--error'}">${active ? 'نشط' : 'موقوف'}</span>
         </div>
       </div>`;
     }).join('');
@@ -7097,46 +8209,46 @@
       <div class="um-uhead">
         ${umAvatarHtml(u)}
         <div>
-          <div style="font-weight:800;color:var(--navy);">${umEsc(u.name || '(بدون اسم)')}
-            <span class="um-badge role-${u.role}">${umEsc(ROLE_LABELS[u.role] || u.role)}</span></div>
-          <div class="um-uid">معرّف المستخدم: ${umEsc(u.userId || '-')}</div>
+          <div class="um-uname">${umEsc(u.name || '(بدون اسم)')}
+            <span class="um-badge aq-badge role-${u.role}">${umEsc(ROLE_LABELS[u.role] || u.role)}</span></div>
+          <div class="um-uid">معرّف المستخدم: <span class="ltr" dir="ltr">${umEsc(u.userId || '-')}</span></div>
           <div style="margin-top:4px;">${umPresenceHtml(u)}</div>
         </div>
       </div>
 
-      <div class="um-field"><label>الاسم</label>
-        <input type="text" id="umfName" value="${umEsc(u.name || '')}"></div>
+      <div class="um-field aq-form-field"><label class="aq-form-label">الاسم</label>
+        <input type="text" id="umfName" class="aq-form-control" value="${umEsc(u.name || '')}"></div>
 
-      <div class="um-field"><label>الإيميل</label>
+      <div class="um-field aq-form-field"><label class="aq-form-label">الإيميل</label>
         <div class="um-readonly">${umEsc(u.email)}</div>
         <div class="um-note">الإيميل مُعرِّف الدخول ولا يمكن تغييره من هنا.</div></div>
 
-      <div class="um-field"><label>رقم الهاتف</label>
-        <input type="text" id="umfPhone" value="${umEsc(u.phone || '')}" placeholder="اختياري"></div>
+      <div class="um-field aq-form-field"><label class="aq-form-label">رقم الهاتف</label>
+        <input type="text" id="umfPhone" class="aq-form-control" value="${umEsc(u.phone || '')}" placeholder="اختياري"></div>
 
-      <div class="um-field"><label>الصلاحية</label>
-        <select id="umfRole">${roleOpts}</select>
+      <div class="um-field aq-form-field"><label class="aq-form-label">الصلاحية</label>
+        <select id="umfRole" class="aq-form-control">${roleOpts}</select>
         ${isOwner ? '<div class="um-note">حساب المالك محمي: لا يمكن تنزيل رتبته أو ترك النظام بلا مالك نشط.</div>'
                   : (canGrantOwner ? '' : '<div class="um-note">ترقية مستخدم إلى "مالك" تتطلب تسجيل دخولك أنت بحساب مالك.</div>')}</div>
 
-      <div class="um-field"><label>الحالة</label>
-        <span class="um-status ${active ? 'active' : 'inactive'}">${active ? 'نشط' : 'موقوف'}</span>
+      <div class="um-field aq-form-field"><label class="aq-form-label">الحالة</label>
+        <span class="um-status aq-badge ${active ? 'active aq-badge--success' : 'inactive aq-badge--error'}">${active ? 'نشط' : 'موقوف'}</span>
         <span class="um-note"> · أُضيف في ${umEsc(u.addedDate || '-')}</span></div>
 
-      <div class="um-field"><label>تغيير صورة المستخدم</label>
-        <input type="file" id="umfPhoto" accept="image/*"></div>
+      <div class="um-field aq-form-field"><label class="aq-form-label">تغيير صورة المستخدم</label>
+        <input type="file" id="umfPhoto" class="aq-file-input" accept="image/*"></div>
 
-      <div class="um-field"><label>إعادة تعيين كلمة السر</label>
+      <div class="um-field aq-form-field"><label class="aq-form-label">إعادة تعيين كلمة السر</label>
         <div class="um-inline">
-          <input type="text" id="umfNewPw" placeholder="كلمة سر جديدة">
-          <button type="button" id="umBtnResetPw">إعادة تعيين</button>
+          <input type="text" id="umfNewPw" class="aq-form-control" placeholder="كلمة سر جديدة">
+          <button type="button" id="umBtnResetPw" class="aq-btn--form-secondary">إعادة تعيين</button>
         </div></div>
 
-      <div class="um-actions">
-        <button type="button" class="primary" id="umBtnSaveProfile">حفظ البيانات</button>
-        <button type="button" id="umBtnSaveRole">تغيير الصلاحية</button>
-        <button type="button" id="umBtnToggleStatus"${isOwner ? ' disabled title="لا يمكن تعطيل حساب المالك"' : ''}>${active ? 'إيقاف الحساب' : 'تفعيل الحساب'}</button>
-        <button type="button" class="danger" id="umBtnDelete"${isOwner ? ' disabled title="لا يمكن حذف حساب المالك"' : ''}>حذف المستخدم</button>
+      <div class="um-actions aq-form-actions">
+        <button type="button" class="primary aq-btn--form-primary" id="umBtnSaveProfile">حفظ البيانات</button>
+        <button type="button" id="umBtnSaveRole" class="aq-btn--form-secondary">تغيير الصلاحية</button>
+        <button type="button" id="umBtnToggleStatus" class="aq-btn--form-secondary"${isOwner ? ' disabled title="لا يمكن تعطيل حساب المالك"' : ''}>${active ? 'إيقاف الحساب' : 'تفعيل الحساب'}</button>
+        <button type="button" class="danger aq-btn--form-danger" id="umBtnDelete"${isOwner ? ' disabled title="لا يمكن حذف حساب المالك"' : ''}>حذف المستخدم</button>
       </div>
       <div id="umUserMsg" class="um-msg"></div>
     `;
@@ -7169,33 +8281,36 @@
     document.getElementById('umBtnSaveRole').addEventListener('click', function () {
       const newRole = document.getElementById('umfRole').value;
       if (newRole === u.role) { setMsg('لا يوجد تغيير في الصلاحية', false); return; }
-      if (!confirm('تغيير صلاحية "' + (u.name || u.email) + '" إلى ' + (ROLE_LABELS[newRole] || newRole) + '؟')) return;
+      aqConfirm({ title: 'تغيير الصلاحية', text: 'تغيير صلاحية "' + (u.name || u.email) + '" إلى ' + (ROLE_LABELS[newRole] || newRole) + '؟', okText: 'تغيير الصلاحية' }).then(function (ok) { if (!ok) return;
       run('تغيير الصلاحية');
       google.script.run
         .withSuccessHandler(r => { if (onDone(r, 'تم تغيير الصلاحية بنجاح')) umUserModal.classList.remove('open'); })
         .withFailureHandler(e => setMsg('حدث خطأ: ' + (e && e.message), false))
         .setUserRole(umAuth(), u.email, newRole);
+      });
     });
 
     document.getElementById('umBtnToggleStatus').addEventListener('click', function () {
       const newStatus = active ? 'معطل' : 'نشط';
-      if (!confirm((active ? 'إيقاف' : 'تفعيل') + ' حساب "' + (u.name || u.email) + '"؟')) return;
+      aqConfirm({ title: active ? 'إيقاف الحساب' : 'تفعيل الحساب', text: (active ? 'إيقاف' : 'تفعيل') + ' حساب "' + (u.name || u.email) + '"؟', okText: active ? 'إيقاف الحساب' : 'تفعيل الحساب', danger: active }).then(function (ok) { if (!ok) return;
       run('تحديث الحالة');
       google.script.run
         .withSuccessHandler(r => { if (onDone(r, active ? 'تم إيقاف المستخدم' : 'تم تفعيل المستخدم')) umUserModal.classList.remove('open'); })
         .withFailureHandler(e => setMsg('حدث خطأ: ' + (e && e.message), false))
         .setUserStatus(u.email, newStatus, umAuth());
+      });
     });
 
     document.getElementById('umBtnResetPw').addEventListener('click', function () {
       const pw = document.getElementById('umfNewPw').value;
       if (!pw || pw.length < 4) { setMsg('كلمة السر الجديدة قصيرة جدًا', false); return; }
-      if (!confirm('إعادة تعيين كلمة سر "' + (u.name || u.email) + '"؟')) return;
+      aqConfirm({ title: 'إعادة تعيين كلمة السر', text: 'إعادة تعيين كلمة سر "' + (u.name || u.email) + '"؟', okText: 'إعادة التعيين' }).then(function (ok) { if (!ok) return;
       run('إعادة التعيين');
       google.script.run
         .withSuccessHandler(r => { onDone(r, 'تم إعادة تعيين كلمة السر بنجاح'); document.getElementById('umfNewPw').value = ''; })
         .withFailureHandler(e => setMsg('حدث خطأ: ' + (e && e.message), false))
         .resetUserPassword(umAuth(), u.email, pw);
+      });
     });
 
     document.getElementById('umfPhoto').addEventListener('change', function () {
@@ -7215,12 +8330,13 @@
     });
 
     document.getElementById('umBtnDelete').addEventListener('click', function () {
-      if (!confirm('هل أنت متأكد من حذف هذا المستخدم؟ لا يمكن التراجع.')) return;
+      aqConfirm({ title: 'حذف المستخدم', text: 'هل أنت متأكد من حذف "' + (u.name || u.email) + '"؟ لا يمكن التراجع.', okText: 'حذف المستخدم', danger: true }).then(function (ok) { if (!ok) return;
       run('الحذف');
       google.script.run
         .withSuccessHandler(r => { if (onDone(r, 'تم حذف المستخدم')) umUserModal.classList.remove('open'); })
         .withFailureHandler(e => setMsg('حدث خطأ: ' + (e && e.message), false))
         .deleteUserAccount(u.email, umAuth());
+      });
     });
 
     umUserModal.classList.add('open');
@@ -7290,6 +8406,120 @@
     return getAuthCreds(); // Phase 1B: جلسة فقط — لا PIN
   }
 
+  /* ============================================================
+   * Phase 2B — لوجو المطوّر من الجهاز: اختيار/سحب → معاينة → تغيير/إزالة → رفع عند الحفظ.
+   * - لا رابط يدوي: #devProfileLogoInput حقل مخفي يحمل رابط اللوجو (الحالي أو الناتج عن الرفع).
+   * - الرفع الفعلي عبر uploadDeveloperLogo (OWNER فقط في السيرفر + التحقق من النوع/الحجم) ويتم عند
+   *   الضغط "حفظ" حصرًا، ثم يُحفظ الرابط مع باقي البيانات عبر saveDeveloperProfile كما كان.
+   * - بلاطة الحروف الأولى عند غياب اللوجو أو فشل تحميله — لا صور مخترعة.
+   * ============================================================ */
+  var DEV_LOGO_TYPES = { 'image/png': 1, 'image/jpeg': 1, 'image/webp': 1 };
+  var DEV_LOGO_MAX = 2 * 1024 * 1024;
+  var devLogoPending = null;   // { base64, mime, dataUrl, name } — لوجو مختار لم يُرفع بعد
+  function devEsc_(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
+  function devInitials_(name) {
+    var parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return '—';
+    return (parts[0].charAt(0) + (parts.length > 1 ? parts[1].charAt(0) : '')).toUpperCase();
+  }
+  // مشترك بين بطاقة القائمة والمعاينة: صورة حقيقية (contain) أو حروف أولى، وعند فشل التحميل نعود للحروف.
+  function devLogoTileHtml_(url, name) {
+    var ini = devEsc_(devInitials_(name)).replace(/'/g, '');
+    if (!url) return ini;
+    return '<img src="' + devEsc_(url) + '" alt="" loading="lazy" decoding="async" onerror="this.parentNode.textContent=\'' + ini + '\'">';
+  }
+  function devLogoStatus_(text, tone) {
+    var el = document.getElementById('devLogoStatus'); if (!el) return;
+    el.textContent = text || ''; el.className = 'aq-logo-upload-status' + (tone ? ' is-' + tone : '');
+  }
+  function devLogoRender_() {
+    var tile = document.getElementById('devLogoPreviewTile'); if (!tile) return;
+    var current = document.getElementById('devProfileLogoInput').value.trim();
+    var name = document.getElementById('devProfileNameInput').value;
+    var has = !!(devLogoPending || current);
+    tile.innerHTML = devLogoPending ? '<img src="' + devLogoPending.dataUrl + '" alt="">' : devLogoTileHtml_(current, name);
+    document.getElementById('devLogoChooseBtn').hidden = has;
+    document.getElementById('devLogoReplaceBtn').hidden = !has;
+    document.getElementById('devLogoRemoveBtn').hidden = !has;
+    document.getElementById('devLogoTitle').textContent = has
+      ? (devLogoPending ? 'لوجو جديد جاهز — سيُرفع عند الحفظ' : 'اللوجو الحالي للمطوّر')
+      : 'اسحب اللوجو هنا أو اختر صورة من جهازك';
+  }
+  function devLogoSetCurrent(url) { devLogoPending = null; document.getElementById('devProfileLogoInput').value = url || ''; devLogoRender_(); }
+  function devLogoReset() {
+    devLogoPending = null;
+    document.getElementById('devProfileLogoInput').value = '';
+    var f = document.getElementById('devLogoFileInput'); if (f) f.value = '';
+    devLogoStatus_(''); devLogoRender_();
+  }
+  function devLogoHandleFile(file) {
+    if (!file) return;
+    if (!DEV_LOGO_TYPES[String(file.type).toLowerCase()]) { devLogoStatus_('صيغة غير مدعومة — المسموح PNG أو JPG أو WebP', 'err'); return; }
+    if (file.size > DEV_LOGO_MAX) { devLogoStatus_('الملف كبير جدًا — الحد 2 ميجابايت', 'err'); return; }
+    var reader = new FileReader();
+    reader.onload = function () {
+      var dataUrl = String(reader.result);
+      devLogoPending = { base64: dataUrl.split(',')[1], mime: file.type, dataUrl: dataUrl, name: file.name };
+      devLogoStatus_('تم اختيار «' + file.name + '» — سيُرفع عند الضغط على «حفظ بيانات المطور»', 'ok');
+      devLogoRender_();
+    };
+    reader.onerror = function () { devLogoStatus_('تعذّر قراءة الملف', 'err'); };
+    reader.readAsDataURL(file);
+  }
+  function devSetFormMode_(name) {
+    var b = document.getElementById('devFormModeBadge'); if (!b) return;
+    if (name) { b.textContent = 'وضع التعديل: ' + name; b.hidden = false; } else { b.textContent = ''; b.hidden = true; }
+  }
+  // الرفع يسبق الحفظ. بلا لوجو مختار → الحفظ يكمل فورًا (السلوك الأصلي كما هو).
+  function devLogoUploadThen_(btn, msg, developerName, proceed) {
+    if (!devLogoPending) { proceed(); return; }
+    btn.disabled = true; btn.textContent = 'جاري رفع اللوجو...';
+    devLogoStatus_('جاري رفع اللوجو…');
+    google.script.run
+      .withSuccessHandler(function (res) {
+        if (!res || !res.success) {
+          btn.disabled = false; btn.textContent = 'حفظ بيانات المطور';
+          msg.style.color = 'var(--error-fg)'; msg.textContent = (res && res.message) || 'تعذّر رفع اللوجو';
+          devLogoStatus_((res && res.message) || 'تعذّر رفع اللوجو', 'err');
+          return;
+        }
+        document.getElementById('devProfileLogoInput').value = res.url;
+        devLogoPending = null;
+        devLogoStatus_('تم رفع اللوجو', 'ok');
+        devLogoRender_();
+        proceed();
+      })
+      .withFailureHandler(function (err) {
+        btn.disabled = false; btn.textContent = 'حفظ بيانات المطور';
+        msg.style.color = 'var(--error-fg)'; msg.textContent = 'تعذّر رفع اللوجو: ' + (err && err.message);
+        devLogoStatus_('تعذّر رفع اللوجو: ' + (err && err.message), 'err');
+      })
+      .uploadDeveloperLogo(devMgmtAuth(), developerName, devLogoPending.base64, devLogoPending.mime);
+  }
+  (function wireDevLogoUpload() {
+    var zone = document.getElementById('devLogoDropzone'), fileIn = document.getElementById('devLogoFileInput');
+    if (!zone || !fileIn) return;
+    var pick = function () { fileIn.click(); };
+    document.getElementById('devLogoChooseBtn').addEventListener('click', pick);
+    document.getElementById('devLogoReplaceBtn').addEventListener('click', pick);
+    document.getElementById('devLogoPreviewTile').addEventListener('click', pick);
+    document.getElementById('devLogoRemoveBtn').addEventListener('click', function () {
+      var hadCurrent = !!document.getElementById('devProfileLogoInput').value.trim();
+      devLogoPending = null; document.getElementById('devProfileLogoInput').value = ''; fileIn.value = '';
+      devLogoStatus_(hadCurrent ? 'سيُزال اللوجو الحالي عند الحفظ' : '', hadCurrent ? 'ok' : '');
+      devLogoRender_();
+    });
+    fileIn.addEventListener('change', function () { devLogoHandleFile(this.files && this.files[0]); });
+    ['dragenter', 'dragover'].forEach(function (ev) { zone.addEventListener(ev, function (e) { e.preventDefault(); zone.classList.add('drag-over'); }); });
+    ['dragleave', 'drop'].forEach(function (ev) { zone.addEventListener(ev, function (e) { e.preventDefault(); zone.classList.remove('drag-over'); }); });
+    zone.addEventListener('drop', function (e) { devLogoHandleFile(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]); });
+    zone.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target === zone) { e.preventDefault(); pick(); } });
+    document.getElementById('devProfileNameInput').addEventListener('input', function () {
+      if (!devLogoPending && !document.getElementById('devProfileLogoInput').value.trim()) devLogoRender_();
+    });
+    devLogoRender_();
+  })();
+
   // الزر القديم في اللوحة المنزلقة القديمة (لسه موجود كـ fallback) — يوجّه لقسم المطوّرين في لوحة التحكم.
   var _openDevProfilesBtn = document.getElementById('openDevProfilesModalBtn');
   if (_openDevProfilesBtn) {
@@ -7317,7 +8547,7 @@
     document.getElementById('devProfileNameInput').value = '';
     document.getElementById('devProfileOwnerInput').value = '';
     document.getElementById('devProfileYearInput').value = '';
-    document.getElementById('devProfileLogoInput').value = '';
+    devLogoReset(); devSetFormMode_(null);
     document.getElementById('devProfileDescInput').value = '';
     document.getElementById('devProfileWorksInput').value = '';
     document.getElementById('saveDevProfileMsg').textContent = '';
@@ -7391,50 +8621,67 @@
 
   function loadDevProfilesList() {
     const content = document.getElementById('devProfilesListContent');
-    content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:14px; font-size:12px;">جاري التحميل...</div>';
+    content.innerHTML = '<div class="aq-skeleton aq-skeleton--card"></div><div class="aq-skeleton aq-skeleton--card"></div><div class="aq-skeleton aq-skeleton--card"></div>';
     google.script.run.withSuccessHandler(function(res) {
-      if (!res.success) { content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:14px; font-size:12px;">' + res.message + '</div>'; return; }
+      if (!res.success) { content.innerHTML = '<div class="aq-empty" style="grid-column:1/-1"><h3>تعذّر تحميل المطوّرين</h3><p>' + devEsc_(res.message) + '</p></div>'; return; }
       renderDevProfilesList(res.profiles);
     }).getAllDeveloperProfiles(devMgmtAuth());
   }
 
   function renderDevProfilesList(profiles) {
     const content = document.getElementById('devProfilesListContent');
+    const countEl = document.getElementById('devListCount');
+    if (countEl) countEl.textContent = profiles.length ? (profiles.length + ' مطوّر مسجّل — اضغط "تعديل" لتحميل البيانات في النموذج') : '';
     if (!profiles.length) {
-      content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:14px; font-size:12px;">مفيش مطورين مسجّلين لسه</div>';
+      content.innerHTML = '<div class="aq-empty" style="grid-column:1/-1"><h3>لا يوجد مطوّرون مسجّلون بعد</h3><p>أضف أول ملف مطوّر من النموذج أعلاه.</p></div>';
       return;
     }
-    content.innerHTML = profiles.map(p => `
-      <div class="access-req-item">
-        <div class="name">${p.developerName}</div>
-        <div class="meta">${p.ownerName || 'بدون اسم صاحب شركة'}${p.foundedYear ? ' - تأسست ' + p.foundedYear : ''}</div>
-        <div class="actions">
-          <button type="button" class="approve-btn" onclick='editDevProfile(${JSON.stringify(p)})'>${ICON.edit} تعديل</button>
-          <button type="button" class="reject-btn" onclick="removeDevProfile('${p.developerName.replace(/'/g, "\\'")}')">${ICON.trash} حذف</button>
+    content.innerHTML = profiles.map(p => {
+      const name = String(p.developerName || '');
+      const payload = JSON.stringify(p).replace(/&/g, '&amp;').replace(/'/g, '&#39;');
+      const nameJs = name.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      return `
+      <article class="aq-dev-card">
+        <div class="aq-logo-tile aq-logo-tile--lg">${devLogoTileHtml_(p.logoUrl, name)}</div>
+        <div class="aq-list-body">
+          <div class="aq-dev-card-name">${devEsc_(name)}</div>
+          <div class="aq-dev-card-meta">${devEsc_(p.ownerName || 'بدون اسم صاحب شركة')}</div>
         </div>
-      </div>
-    `).join('');
+        <div class="aq-dev-card-foot">
+          <span class="aq-dev-card-year">${p.foundedYear ? 'تأسست ' + devEsc_(p.foundedYear) : 'سنة التأسيس غير مسجّلة'}</span>
+          <span class="aq-list-actions">
+            <button type="button" class="aq-btn aq-btn--ghost aq-btn--icon" title="تعديل" aria-label="تعديل ${devEsc_(name)}" onclick='editDevProfile(${payload})'>${ICON.edit}</button>
+            <button type="button" class="aq-btn aq-btn--danger aq-btn--icon" title="حذف" aria-label="حذف ${devEsc_(name)}" onclick="removeDevProfile('${nameJs}')">${ICON.trash}</button>
+          </span>
+        </div>
+      </article>`;
+    }).join('');
   }
 
   function editDevProfile(p) {
     document.getElementById('devProfileNameInput').value = p.developerName || '';
     document.getElementById('devProfileOwnerInput').value = p.ownerName || '';
     document.getElementById('devProfileYearInput').value = p.foundedYear || '';
-    document.getElementById('devProfileLogoInput').value = p.logoUrl || '';
+    devLogoSetCurrent(p.logoUrl || '');
+    var _f = document.getElementById('devLogoFileInput'); if (_f) _f.value = '';
+    devLogoStatus_('');
+    devSetFormMode_(p.developerName || '');
     document.getElementById('devProfileDescInput').value = p.description || '';
     document.getElementById('devProfileWorksInput').value = p.previousWorks || '';
-    window.scrollTo(0, 0);
+    var _card = document.getElementById('devFormCard');
+    if (_card && _card.scrollIntoView) _card.scrollIntoView({ behavior: 'smooth', block: 'start' }); else window.scrollTo(0, 0);
   }
   window.editDevProfile = editDevProfile;
 
   function removeDevProfile(developerName) {
-    const confirmed = confirm('متأكد إنك عايز تمسح بيانات المطور ده؟');
-    if (!confirmed) return;
-    google.script.run.withSuccessHandler(function(res) {
-      if (!res.success) { showToast(res.message, 'error'); return; }
-      showToast('تم حذف بيانات المطور', 'success');
-      loadDevProfilesList();
-    }).deleteDeveloperProfile(devMgmtAuth(), developerName);
+    aqConfirm({ title: 'حذف بيانات المطوّر', text: 'سيتم حذف ملف "' + developerName + '" نهائيًا من قائمة المطوّرين. لا يمكن التراجع.', okText: 'حذف', danger: true }).then(function (confirmed) {
+      if (!confirmed) return;
+      google.script.run.withSuccessHandler(function(res) {
+        if (!res.success) { showToast(res.message, 'error'); return; }
+        showToast('تم حذف بيانات المطور', 'success');
+        loadDevProfilesList();
+      }).deleteDeveloperProfile(devMgmtAuth(), developerName);
+    });
   }
   window.removeDevProfile = removeDevProfile;
 
@@ -7448,6 +8695,8 @@
       return;
     }
 
+    // Phase 2B: لوجو مختار من الجهاز؟ يُرفع أولًا (uploadDeveloperLogo) ثم يُحفظ الملف بالرابط الناتج.
+    devLogoUploadThen_(btn, msg, developerName, function () {
     btn.disabled = true; btn.textContent = 'جاري الحفظ...';
     google.script.run
       .withSuccessHandler(function(res) {
@@ -7458,7 +8707,7 @@
           document.getElementById('devProfileNameInput').value = '';
           document.getElementById('devProfileOwnerInput').value = '';
           document.getElementById('devProfileYearInput').value = '';
-          document.getElementById('devProfileLogoInput').value = '';
+          devLogoReset(); devSetFormMode_(null);
           document.getElementById('devProfileDescInput').value = '';
           document.getElementById('devProfileWorksInput').value = '';
           document.getElementById('devAiPasteText').value = '';
@@ -7481,6 +8730,7 @@
         document.getElementById('devProfileWorksInput').value.trim(),
         document.getElementById('devProfileLogoInput').value.trim()
       );
+    });
   });
 
   /* ============================================================
@@ -7494,6 +8744,7 @@
    * ============================================================ */
   (function initUnifiedNav() {
     var navSearchBtn  = document.getElementById('navSearchBtn');
+    var navExploreBtn = document.getElementById('navExploreBtn');   // "استكشف" — صفحة النتائج
     var navAddUnitBtn = document.getElementById('navAddUnitBtn');
     var navStatsBtn   = document.getElementById('navStatsBtn'); // أُزيل من #appNav — يبقى null، الوصول لـ #stats من الشريط الجانبي
     var editModalEl   = document.getElementById('editModal');
@@ -7526,7 +8777,7 @@
     var navDashBtn = document.getElementById('adminFab'); // المرحلة 3.4: زر "لوحة الإدارة"
 
     function setActiveNav(view) {
-      [navSearchBtn, navAddUnitBtn, navStatsBtn, navDashBtn, calcFabBtn, priceInfoFabBtn].forEach(function (b) {
+      [navSearchBtn, navExploreBtn, navAddUnitBtn, navStatsBtn, navDashBtn, calcFabBtn, priceInfoFabBtn].forEach(function (b) {
         if (b) b.classList.toggle('is-active', b.getAttribute('data-app-view') === view);
       });
     }
@@ -7558,8 +8809,25 @@
     function leaveMeterView() {
       document.body.classList.remove('app-view-meter');
     }
+    /* "استكشف" = صفحة النتائج. نفس عناصر البحث والنتائج القائمة (بلا نسخة ثانية):
+       كلاس العرض وحده يقرّر ما يظهر — الرئيسية: بحث + مطوّرون؛ استكشف: بحث + نتائج. */
+    function showExploreView() {
+      document.body.classList.remove('app-view-stats');
+      document.body.classList.remove('app-view-search');
+      document.body.classList.add('app-view-explore');
+      document.body.classList.add('aq-search-ui');      /* أنماط مكوّنات البحث/النتائج مشتركة مع الرئيسية */
+      leaveDashboardView();
+      leaveAddView();
+      leaveQuoteView();
+      leaveMeterView();
+      setActiveNav('explore');
+      window.scrollTo(0, 0);
+    }
     function showSearchView() {
       document.body.classList.remove('app-view-stats');
+      document.body.classList.remove('app-view-explore');
+      document.body.classList.add('app-view-search');   // لوحة البحث الفاتحة (إعادة تصميم الرئيسية/النتائج)
+      document.body.classList.add('aq-search-ui');
       leaveDashboardView();
       leaveAddView();
       leaveQuoteView();
@@ -7568,6 +8836,9 @@
       window.scrollTo(0, 0);
     }
     function showStatsView() {
+      document.body.classList.remove('app-view-search');
+      document.body.classList.remove('app-view-explore');
+      document.body.classList.remove('aq-search-ui');
       leaveAddView();
       leaveDashboardView();
       leaveQuoteView();
@@ -7577,6 +8848,9 @@
       window.scrollTo(0, 0);
     }
     function showAddView() {
+      document.body.classList.remove('app-view-search');
+      document.body.classList.remove('app-view-explore');
+      document.body.classList.remove('aq-search-ui');
       document.body.classList.remove('app-view-stats');
       leaveDashboardView();
       leaveQuoteView();
@@ -7593,6 +8867,9 @@
     // الحسابات. لا نموذج منفصل. الرجوع لشاشة البحث عبر زر × (editCloseBtn) — يتصرّف
     // حسب الوضع (quote → رجوع للبحث).
     function showQuoteView() {
+      document.body.classList.remove('app-view-search');
+      document.body.classList.remove('app-view-explore');
+      document.body.classList.remove('aq-search-ui');
       document.body.classList.remove('app-view-stats');
       leaveDashboardView();
       leaveAddView();
@@ -7604,6 +8881,9 @@
     }
     // "سعر المتر" — نفس المعالجة بالظبط.
     function showMeterView() {
+      document.body.classList.remove('app-view-search');
+      document.body.classList.remove('app-view-explore');
+      document.body.classList.remove('aq-search-ui');
       document.body.classList.remove('app-view-stats');
       leaveDashboardView();
       leaveAddView();
@@ -8219,6 +9499,9 @@
     }
 
     function showDashboardView() {
+      document.body.classList.remove('app-view-search');
+      document.body.classList.remove('app-view-explore');
+      document.body.classList.remove('aq-search-ui');
       dashWireOnce();
       document.body.classList.remove('app-view-stats');
       leaveAddView();
@@ -8260,6 +9543,10 @@
       if (location.hash) history.pushState('', document.title, location.pathname + location.search);
       route();
     }
+    function goToExploreHash() {
+      if (location.hash !== '#explore') location.hash = 'explore'; else route();
+    }
+    window.__aqarGoExplore = goToExploreHash;
     function goToQuoteHash() {
       if (location.hash !== '#quote') location.hash = 'quote'; else route();
     }
@@ -8303,6 +9590,7 @@
     }
     var ROUTE_ENTER = {
       search:    function () { showSearchView(); },
+      explore:   function () { showExploreView(); },
       quote:     function () { showQuoteView(); },   // ميزة عامة بلا صلاحية — صفحة داخل مساحة المحتوى
       meter:     function () { showMeterView(); },   // ميزة عامة بلا صلاحية
       add:       function () {
@@ -8359,6 +9647,7 @@
     };
 
     navSearchBtn.addEventListener('click', goToSearchHash);
+    if (navExploreBtn) navExploreBtn.addEventListener('click', goToExploreHash);
     if (navStatsBtn) navStatsBtn.addEventListener('click', openStats); // الزر أُزيل من #appNav؛ يبقى الحارس لو رجع مستقبلًا
     navAddUnitBtn.addEventListener('click', openAdd);
 
