@@ -2369,17 +2369,16 @@
       background: rgba(2,32,26,0.72); color: #fff; border: none; border-radius: var(--aq-radius-pill);
     }
     body.aq-search-ui .fav-btn {
-      background: rgba(255,255,255,0.92); border: 1px solid var(--aq-prop-border);
-      color: var(--aq-prop-text-muted); box-shadow: 0 2px 6px rgba(6,28,23,0.14);
+      background: var(--aq-prop-green-soft); border: 1px solid var(--aq-prop-green-line);
+      color: var(--aq-prop-green-deep); box-shadow: 0 2px 6px rgba(6,28,23,0.10);
     }
-    body.aq-search-ui .fav-btn:hover { border-color: var(--aq-prop-green-line); color: var(--aq-prop-green-deep); }
-    body.aq-search-ui .fav-btn.active { color: var(--aq-prop-green-deep); border-color: var(--aq-prop-green-line); }
+    body.aq-search-ui .fav-btn:hover { background: rgba(191,216,207,0.55); border-color: var(--aq-prop-green-deep); }
     body.aq-search-ui .fav-btn.active .ico { fill: currentColor; stroke: none; }
     body.aq-search-ui .compare-checkbox {
-      background: rgba(255,255,255,0.92); border-radius: 8px; border: 1px solid var(--aq-prop-border);
-      box-shadow: 0 2px 6px rgba(6,28,23,0.14);
+      background: var(--aq-prop-green-soft); border-radius: 8px; border: 1px solid var(--aq-prop-green-line);
+      box-shadow: 0 2px 6px rgba(6,28,23,0.10);
     }
-    body.aq-search-ui .compare-checkbox:hover { border-color: var(--aq-prop-green-line); }
+    body.aq-search-ui .compare-checkbox:hover { background: rgba(191,216,207,0.55); border-color: var(--aq-prop-green-deep); }
     body.aq-search-ui .compare-checkbox input {
       appearance: none; -webkit-appearance: none; margin: 0; display: block;
       width: 16px; height: 16px; border-radius: 4px;
@@ -2393,25 +2392,35 @@
     }
     body.aq-search-ui .unit-top { padding: 0; margin: 0 0 8px; }
     body.aq-search-ui .unit-id { color: var(--aq-prop-text-faint); }
-    body.aq-search-ui .unit-title { color: var(--aq-prop-text); font-size: var(--aq-fs-body-lg); }
+    body.aq-search-ui .unit-title { color: var(--aq-prop-text); font-size: var(--aq-fs-body-lg); font-weight: 800; }
     body.aq-search-ui .unit-loc { color: var(--aq-prop-text-muted); font-weight: 600; }
     body.aq-search-ui .unit-added { color: var(--aq-prop-text-faint); }
     body.aq-search-ui .spec-chip {
-      background: var(--aq-prop-surface); color: var(--aq-prop-text-muted);
-      border: 1px solid var(--aq-prop-border); border-radius: var(--aq-prop-radius-sm);
-      padding: 5px 10px; font-weight: 700;
+      background: var(--aq-prop-surface); color: var(--aq-prop-text);
+      border: 1px solid var(--aq-prop-green-line); border-radius: var(--aq-prop-radius-sm);
+      padding: 6px 10px; font-weight: 700; box-shadow: 0 1px 4px rgba(11,40,33,0.06);
     }
-    body.aq-search-ui .spec-chip .ico { color: var(--aq-prop-text-faint); }
+    body.aq-search-ui .spec-chip .ico { color: var(--aq-prop-green-deep); }
     body.aq-search-ui .unit-price-box {
-      background: transparent; border: none; border-top: 1px solid var(--aq-prop-border);
-      border-radius: 0; padding: 12px 0 4px; margin-top: 4px;
+      background: var(--aq-prop-green-soft); border: none;
+      border-radius: var(--aq-prop-radius-sm); padding: 12px 14px; margin-top: 8px;
+      display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px;
     }
-    body.aq-search-ui .unit-price-box .final-price { color: var(--aq-prop-green); font-weight: 900; }
+    body.aq-search-ui .unit-price-box.has-discount {
+      flex-direction: row; align-items: center; justify-content: space-between; text-align: initial; gap: 10px;
+    }
+    body.aq-search-ui .price-old-group,
+    body.aq-search-ui .price-current-group {
+      display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0;
+    }
+    body.aq-search-ui .unit-price-box .final-price { color: var(--aq-prop-green-deep); font-weight: 900; }
     body.aq-search-ui .unit-price-box .per-meter { color: var(--aq-prop-text-muted); }
     body.aq-search-ui .unit-price-box .old-price { color: #C4443B; }
     body.aq-search-ui .unit-price-box .discount-tag {
-      background: var(--aq-prop-green-soft); color: var(--aq-prop-green); border: 1px solid var(--aq-prop-green-line);
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--aq-prop-surface); color: var(--aq-prop-green-deep); border: 1px solid var(--aq-prop-green-line);
     }
+    body.aq-search-ui .unit-price-box .discount-tag .ico { width: 11px; height: 11px; }
     body.aq-search-ui .resale-current-box {
       background: var(--aq-prop-canvas); border: 1px solid var(--aq-prop-border); color: var(--aq-prop-text);
     }
@@ -2439,7 +2448,7 @@
     }
     body.aq-search-ui .card-provenance { color: var(--aq-prop-text-faint); border-top-color: var(--aq-prop-border); }
     body.aq-search-ui .card-provenance a { color: var(--aq-prop-green); }
-    body.aq-search-ui .status-badge { background: var(--aq-prop-green-soft); color: var(--aq-prop-green); border-color: var(--aq-prop-green-line); }
+    body.aq-search-ui .status-badge { background: var(--aq-prop-green-soft); color: var(--aq-prop-green-deep); border-color: var(--aq-prop-green-line); }
     body.aq-search-ui .status-badge.محجوز { background: #FDF3DC; color: #8A6412; border-color: #EBDCB4; }
     body.aq-search-ui .status-badge.مباع { background: #FBE9E7; color: #B0392F; border-color: #F0CFCB; }
 
@@ -2475,10 +2484,15 @@
     body.aq-search-ui .unit-card .unit-specs { min-height: 0; margin-bottom: 0; flex-wrap: nowrap; overflow: hidden; }
     body.aq-search-ui .unit-card .unit-specs .spec-chip { white-space: nowrap; }
     body.aq-search-ui .unit-card-footer { margin-top: auto; padding-top: 2px; }
-    body.aq-search-ui .unit-card .unit-price-box { padding-top: 10px; margin-top: 6px; }
     body.aq-search-ui .unit-dev-row {
+      display: flex; align-items: center; gap: 6px; min-width: 0;
       font-size: var(--aq-fs-caption); color: var(--aq-prop-text-faint); font-weight: 600;
-      margin-top: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      margin-top: 8px; overflow: hidden;
+    }
+    body.aq-search-ui .unit-dev-row .ico { flex-shrink: 0; color: var(--aq-prop-text-faint); }
+    body.aq-search-ui .unit-dev-row .dev-name {
+      color: var(--aq-prop-text); font-weight: 800;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
     }
 
     /* =========================================================================
@@ -4274,6 +4288,7 @@
     lock:     '<svg class="ico" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>',
     star:     '<svg class="ico ico-fill" viewBox="0 0 24 24"><path d="m12 3 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.8 6.2 21l1.1-6.5L2.6 9.8l6.5-.9Z"/></svg>',
     heart:    '<svg class="ico" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg>',
+    tag:      '<svg class="ico" viewBox="0 0 24 24"><path d="M20.59 13.41 12 22l-9-9V4a1 1 0 0 1 1-1h9l9 9a2 2 0 0 1 0 2.82Z"/><path d="M7 7h.01"/></svg>',
     arrowUp:  '<svg class="ico" viewBox="0 0 24 24"><path d="M12 20V5M6 11l6-6 6 6"/></svg>',
     x:        '<svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>',
     award:    '<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="9" r="6"/><path d="M9 14.5 8 22l4-2 4 2-1-7.5"/></svg>',
@@ -5391,11 +5406,15 @@
       </div>
       <div class="unit-card-footer">
         ${Number(u['Discount Percentage']) > 0 ? `
-        <div class="unit-price-box">
-          <span class="old-price">${fmtNum(u['Price'])} جنيه</span>
-          <span class="discount-tag">خصم ${u['Discount Percentage']}%</span>
-          <div class="final-price">${fmtNum(u['Price After Discount'])} جنيه</div>
-          ${u['Price per Meter'] ? `<div class="per-meter">${fmtNum(u['Price per Meter'])} ج/م²</div>` : ''}
+        <div class="unit-price-box has-discount">
+          <div class="price-old-group">
+            <span class="old-price">${fmtNum(u['Price'])} جنيه</span>
+            <span class="discount-tag">${ICON.tag} خصم ${u['Discount Percentage']}%</span>
+          </div>
+          <div class="price-current-group">
+            <div class="final-price">${fmtNum(u['Price After Discount'])} جنيه</div>
+            ${u['Price per Meter'] ? `<div class="per-meter">${fmtNum(u['Price per Meter'])} ج/م²</div>` : ''}
+          </div>
         </div>
         ` : `
         <div class="unit-price-box">
@@ -5403,7 +5422,7 @@
           ${u['Price per Meter'] ? `<div class="per-meter">${fmtNum(u['Price per Meter'])} ج/م²</div>` : ''}
         </div>
         `}
-        ${u['Developer Name'] ? `<div class="unit-dev-row">المطور: ${u['Developer Name']}</div>` : ''}
+        ${u['Developer Name'] ? `<div class="unit-dev-row">${ICON.building}<span class="dev-label">المطور:</span> <span class="dev-name">${u['Developer Name']}</span></div>` : ''}
       </div>
     </div>`;
   }
