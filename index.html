@@ -2521,11 +2521,29 @@
     }
     .ud-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .ud-media .img-count-badge { position: absolute; top: 12px; right: 12px; }
+    /* أزرار التنقّل بين الصور - دائرية Premium بهوية الأخضر/المينت، تباين كافٍ فوق أي صورة
+     * (فاتحة أو غامقة) عبر خلفية بيضاء شبه شفافة + حدّ مينت + ظل ناعم، بدل خلفية داكنة ثقيلة. */
+    .ud-nav {
+      position: absolute; top: 50%; transform: translateY(-50%); z-index: 2;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,0.88); border: 1px solid var(--aq-prop-green-line);
+      color: var(--aq-prop-green-deep); box-shadow: 0 4px 14px rgba(6,28,23,0.18);
+      -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0;
+      transition: background var(--ease), border-color var(--ease), transform var(--ease);
+    }
+    .ud-nav:hover { background: #fff; border-color: var(--aq-prop-green-deep); transform: translateY(-50%) scale(1.06); }
+    .ud-nav .ico { width: 18px; height: 18px; }
+    .ud-nav-prev { left: 12px; }
+    .ud-nav-next { right: 12px; }
     .ud-thumbs { display: flex; gap: 6px; padding: 8px 20px; overflow-x: auto; flex-shrink: 0; }
     .ud-thumbs img {
       width: 64px; height: 48px; object-fit: cover; border-radius: 8px; cursor: pointer;
       border: 1px solid var(--aq-prop-border); flex-shrink: 0;
+      transition: border-color var(--ease), box-shadow var(--ease);
     }
+    .ud-thumbs img:hover { border-color: var(--aq-prop-green-line); }
+    .ud-thumbs img.active { border-color: var(--aq-prop-green-deep); box-shadow: 0 0 0 2px var(--aq-prop-green-line); }
     .ud-body { padding: 18px 20px 20px; }
     .ud-body .unit-price-box { margin-bottom: 16px; }
     .ud-section-title {
@@ -2550,6 +2568,10 @@
       .ud-modal-body { max-height: 100vh; height: 100vh; border-radius: 0; }
       .ud-header { padding-top: 56px; }
       .ud-info-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+      .ud-nav { width: 32px; height: 32px; }
+      .ud-nav .ico { width: 16px; height: 16px; }
+      .ud-nav-prev { left: 8px; }
+      .ud-nav-next { right: 8px; }
     }
 
     /* ---- 7) حالات فارغة/تحميل على اللوحة الفاتحة ---- */
@@ -2583,10 +2605,13 @@
     .unit-card-overlay-box { max-width: 460px; margin-block: auto; }
     body.aq-search-ui .unit-card-overlay .unit-card { cursor: default; }
     .unit-card-overlay-close {
-      top: -48px; left: 0; background: var(--aq-prop-surface); color: var(--aq-prop-text);
-      box-shadow: 0 6px 20px rgba(4,20,16,0.35);
+      top: -48px; left: 0; background: var(--aq-prop-green-soft); color: var(--aq-prop-green-deep);
+      border: 1px solid var(--aq-prop-green-line); box-shadow: 0 4px 14px rgba(6,28,23,0.16);
+      transition: background var(--ease), border-color var(--ease), transform var(--ease);
     }
-    .unit-card-overlay-close:hover { background: #fff; color: var(--aq-prop-green); }
+    .unit-card-overlay-close:hover {
+      background: rgba(191,216,207,0.6); border-color: var(--aq-prop-green-deep); transform: scale(1.06);
+    }
 
     /* ---- 9) استجابة ---- */
     @media (max-width: 1024px) {
@@ -4296,6 +4321,8 @@
     heart:    '<svg class="ico" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg>',
     tag:      '<svg class="ico" viewBox="0 0 24 24"><path d="M20.59 13.41 12 22l-9-9V4a1 1 0 0 1 1-1h9l9 9a2 2 0 0 1 0 2.82Z"/><path d="M7 7h.01"/></svg>',
     arrowUp:  '<svg class="ico" viewBox="0 0 24 24"><path d="M12 20V5M6 11l6-6 6 6"/></svg>',
+    chevronLeft:  '<svg class="ico" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>',
+    chevronRight: '<svg class="ico" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>',
     x:        '<svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>',
     award:    '<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="9" r="6"/><path d="M9 14.5 8 22l4-2 4 2-1-7.5"/></svg>',
     info:     '<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>',
@@ -5444,11 +5471,15 @@
     const resalePPMDiff = (resalePurchasePPM > 0 && resaleCurrentPPM > 0) ? (resaleCurrentPPM - resalePurchasePPM) : null;
 
     const mediaHtml = images.length > 0 ? `
-      <div class="ud-media" onclick='openLightbox(${JSON.stringify(images)}, 0)'>
+      <div class="ud-media" onclick='udGalleryOpenLightbox()'>
         <img src="${getThumbUrl(images[0])}" alt="صورة الوحدة" loading="lazy" decoding="async">
+        ${images.length > 1 ? `
+        <button type="button" class="ud-nav ud-nav-prev" onclick="event.stopPropagation(); udGalleryNav(-1)" aria-label="الصورة السابقة">${ICON.chevronLeft}</button>
+        <button type="button" class="ud-nav ud-nav-next" onclick="event.stopPropagation(); udGalleryNav(1)" aria-label="الصورة التالية">${ICON.chevronRight}</button>
+        ` : ''}
         ${images.length > 1 ? `<span class="img-count-badge">${ICON.camera} ${images.length} صور</span>` : ''}
       </div>
-      ${images.length > 1 ? `<div class="ud-thumbs">${images.map((img, idx) => `<img src="${getThumbUrl(img)}" alt="" loading="lazy" onclick='event.stopPropagation(); openLightbox(${JSON.stringify(images)}, ${idx})'>`).join('')}</div>` : ''}
+      ${images.length > 1 ? `<div class="ud-thumbs">${images.map((img, idx) => `<img src="${getThumbUrl(img)}" alt="" loading="lazy" class="${idx === 0 ? 'active' : ''}" onclick="event.stopPropagation(); udGallerySelect(${idx})">`).join('')}</div>` : ''}
     ` : '';
 
     const priceHtml = Number(u['Discount Percentage']) > 0 ? `
@@ -5781,6 +5812,63 @@
   lightboxOverlay.addEventListener('click', function(e) {
     if (e.target === lightboxOverlay) closeLightbox();
   });
+
+  /* ---------- معرض صور نافذة تفاصيل الوحدة (Unit Details Modal) ----------
+   * حالة بسيطة (مصفوفة صور الوحدة الحالية + الفهرس النشط) تُحدَّث مباشرة داخل
+   * #unitCardOverlayBody الثابت (لا حاوية DOM جديدة، لا نظام حالة موازٍ) - نفس
+   * getThumbUrl المستخدمة أصلًا للصور المصغّرة، فاختيار صورة مصغّرة كصورة رئيسية
+   * لا يُحمّل رابطًا جديدًا (نفس الرابط بالضبط - يُستخدَم من ذاكرة التخزين المؤقت). */
+  let udGalleryImages = [];
+  let udGalleryIndex = 0;
+  function udGalleryRender() {
+    const mainImg = document.querySelector('#unitCardOverlayBody .ud-media img');
+    if (!mainImg || !udGalleryImages.length) return;
+    mainImg.src = getThumbUrl(udGalleryImages[udGalleryIndex]);
+    document.querySelectorAll('#unitCardOverlayBody .ud-thumbs img').forEach((t, i) => {
+      t.classList.toggle('active', i === udGalleryIndex);
+    });
+  }
+  function udGalleryNav(delta) {
+    if (!udGalleryImages.length) return;
+    udGalleryIndex = (udGalleryIndex + delta + udGalleryImages.length) % udGalleryImages.length;
+    udGalleryRender();
+  }
+  window.udGalleryNav = udGalleryNav;
+  function udGallerySelect(idx) {
+    if (idx < 0 || idx >= udGalleryImages.length) return;
+    udGalleryIndex = idx;
+    udGalleryRender();
+  }
+  window.udGallerySelect = udGallerySelect;
+  function udGalleryOpenLightbox() {
+    if (!udGalleryImages.length) return;
+    openLightbox(udGalleryImages, udGalleryIndex);
+  }
+  window.udGalleryOpenLightbox = udGalleryOpenLightbox;
+  /* لوحة مفاتيح: يسار/يمين للتنقّل بين الصور - فقط والمودال مفتوح ومعرض الصور
+   * الكبير (lightbox) مغلق (له مساره الخاص بلا تعديل). لا يمسّ Escape الحالية. */
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    if (!unitCardOverlay.classList.contains('open') || lightboxOverlay.classList.contains('open')) return;
+    e.preventDefault();
+    udGalleryNav(e.key === 'ArrowLeft' ? -1 : 1);
+  });
+  /* Swipe بسيط للموبايل (بلا مكتبة، بلا preventDefault على touchmove - فلا يتعارض
+   * إطلاقًا مع تمرير المودال الرأسي الحالي): مسافة أفقية معنويّة فقط (>40px). */
+  (function () {
+    let touchStartX = null;
+    const udBodyEl = document.getElementById('unitCardOverlayBody');
+    udBodyEl.addEventListener('touchstart', function (e) {
+      touchStartX = e.target.closest && e.target.closest('.ud-media') ? e.changedTouches[0].clientX : null;
+    }, { passive: true });
+    udBodyEl.addEventListener('touchend', function (e) {
+      if (touchStartX === null) return;
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      touchStartX = null;
+      if (Math.abs(dx) < 40) return;
+      udGalleryNav(dx < 0 ? 1 : -1);
+    }, { passive: true });
+  })();
 
   /* ---------- مشاركة بيانات الوحدة عبر واتساب (مع الصور لو الجهاز بيدعم) ---------- */
   function buildUnitShareText(u) {
@@ -6215,6 +6303,8 @@
   const unitCardOverlay = document.getElementById('unitCardOverlay');
   function showUnitCardOverlay(u) {
     document.getElementById('unitCardOverlayBody').innerHTML = buildUnitDetailsHtml(u);
+    udGalleryImages = (u['Images'] || '').split(',').map(s => s.trim()).filter(Boolean);
+    udGalleryIndex = 0;
     unitCardOverlay.classList.add('open');
     try { if (u && u['Unit ID']) logUnitDetailsView(u['Unit ID']); } catch (e) {}
   }
