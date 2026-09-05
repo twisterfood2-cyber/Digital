@@ -3069,6 +3069,83 @@
     #umUserBody .um-actions button:disabled { opacity: .5; cursor: not-allowed; }
     #umUserBody .um-msg { flex-basis: 100%; margin: 0; }
 
+    /* ---- مودال قصّ الصورة الشخصية (نفس معالجة #umUserModal — أخضر/مينت بالكامل) ---- */
+    #photoCropModal .modal-box.pc-box {
+      max-width: 400px; background: var(--aq-prop-surface); color: var(--aq-prop-text);
+      border: 1px solid var(--aq-prop-border); border-radius: var(--aq-radius-lg);
+      box-shadow: var(--aq-prop-shadow-lg); padding: var(--aq-space-5);
+    }
+    #photoCropModal .modal-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: var(--aq-space-4); }
+    #photoCropModal .modal-title { font-size: var(--aq-fs-card-title); font-weight: 800; color: var(--aq-prop-text); }
+    #photoCropModal .modal-close {
+      width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--aq-prop-border); background: var(--aq-prop-surface);
+      color: var(--aq-prop-text-muted); display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    #photoCropModal .modal-close:hover { background: var(--aq-prop-green-soft); color: var(--aq-prop-green); border-color: var(--aq-prop-green-line); }
+    .pc-error {
+      margin-bottom: var(--aq-space-4); padding: 8px 12px; border-radius: var(--aq-radius-sm);
+      background: var(--aq-danger-tint); color: var(--aq-error-fg); font-size: var(--aq-fs-caption); font-weight: 700;
+    }
+    /* منطقة القص: نُظهر الصورة كاملة القابلة للسحب/التكبير، مع إطار مربّع واضح في المنتصف
+     * وتعتيم كل ما هو خارجه (box-shadow بانتشار كبير جدًا — نافذة صافية داخل ستارة داكنة). */
+    .pc-stage {
+      position: relative; width: min(320px, 100%); aspect-ratio: 1 / 1; margin: 0 auto;
+      overflow: hidden; border-radius: var(--aq-radius-md); background: var(--aq-prop-canvas-2);
+      touch-action: none; cursor: grab; user-select: none;
+    }
+    .pc-stage:active { cursor: grabbing; }
+    .pc-imgwrap { position: absolute; top: 0; left: 0; transform-origin: 0 0; will-change: transform; }
+    .pc-imgwrap img { display: block; max-width: none; pointer-events: none; }
+    .pc-frame {
+      position: absolute; inset: 15%; border: 2px solid #fff; border-radius: 6px;
+      box-shadow: 0 0 0 9999px rgba(2,20,16,0.55); pointer-events: none;
+    }
+    .pc-zoom-row { display: flex; align-items: center; gap: 10px; margin-top: var(--aq-space-4); }
+    .pc-zoom-btn {
+      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; padding: 0;
+      border: 1px solid var(--aq-prop-green-line); background: var(--aq-prop-green-soft); color: var(--aq-prop-green-deep);
+      display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+      transition: background var(--ease), border-color var(--ease);
+    }
+    .pc-zoom-btn:hover { background: rgba(191,216,207,0.6); border-color: var(--aq-prop-green-deep); }
+    .pc-zoom-btn:focus-visible { outline: 2px solid var(--aq-prop-green); outline-offset: 2px; }
+    .pc-zoom-btn .ico { width: 16px; height: 16px; }
+    .pc-zoom-slider {
+      flex: 1 1 auto; appearance: none; -webkit-appearance: none; height: 4px; border-radius: 999px;
+      background: var(--aq-prop-green-line); outline: none; cursor: pointer; margin: 0;
+    }
+    .pc-zoom-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+      background: var(--aq-prop-green-deep); border: 2px solid #fff; box-shadow: 0 1px 4px rgba(6,28,23,0.3); cursor: pointer;
+    }
+    .pc-zoom-slider::-moz-range-thumb {
+      width: 16px; height: 16px; border-radius: 50%; background: var(--aq-prop-green-deep);
+      border: 2px solid #fff; box-shadow: 0 1px 4px rgba(6,28,23,0.3); cursor: pointer;
+    }
+    .pc-zoom-slider:focus-visible { outline: 2px solid var(--aq-prop-green); outline-offset: 2px; }
+    .pc-preview-row { display: flex; align-items: center; gap: 10px; margin-top: var(--aq-space-4); }
+    .pc-preview-circle {
+      width: 48px; height: 48px; border-radius: 50%; overflow: hidden; flex-shrink: 0;
+      border: 2px solid var(--aq-prop-green-line); background: var(--aq-prop-canvas-2);
+    }
+    .pc-preview-circle canvas { width: 100%; height: 100%; display: block; }
+    .pc-preview-label { font-size: var(--aq-fs-caption); color: var(--aq-prop-text-muted); font-weight: 700; }
+    .pc-actions { display: flex; gap: 8px; margin-top: var(--aq-space-5); flex-wrap: wrap; }
+    .pc-btn {
+      flex: 1 1 auto; min-height: 44px; padding: 10px 14px; border-radius: var(--aq-radius-md);
+      font-family: inherit; font-weight: 700; font-size: var(--aq-fs-small); cursor: pointer;
+      border: 1px solid var(--aq-prop-border); background: var(--aq-prop-surface); color: var(--aq-prop-text);
+      transition: background var(--ease), border-color var(--ease), color var(--ease);
+    }
+    .pc-btn:hover { border-color: var(--aq-prop-green-line); }
+    .pc-btn.primary { background: var(--aq-prop-green-deep); color: #fff; border-color: var(--aq-prop-green-deep); }
+    .pc-btn.primary:hover { background: var(--aq-prop-green); border-color: var(--aq-prop-green); }
+    .pc-btn:focus-visible { outline: 2px solid var(--aq-prop-green); outline-offset: 2px; }
+    @media (max-width: 480px) {
+      .pc-actions { flex-direction: column; }
+      .pc-btn { width: 100%; }
+    }
+
     /* ---- الإعدادات ---- */
     .aq-settings-cover { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: var(--aq-space-5); align-items: start; }
     .aq-settings-cover-preview {
@@ -3983,6 +4060,36 @@
       <button class="modal-close" id="umUserCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
     <div id="umUserBody"></div>
+  </div>
+</div>
+
+<!-- مودال قصّ الصورة الشخصية — يُفتح بين اختيار الملف (dashProfPhotoInput) وإرساله الفعلي
+     عبر uploadMyPhoto القائمة (بلا أي تعديل في Code.gs). انظر openPhotoCropModal(). -->
+<div class="modal-overlay" id="photoCropModal">
+  <div class="modal-box pc-box">
+    <div class="modal-header">
+      <div class="modal-title">قص الصورة الشخصية</div>
+      <button class="modal-close" id="pcCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="pc-error" id="pcError" hidden></div>
+    <div class="pc-stage" id="pcStage" aria-label="منطقة تحديد القص — اسحب لتحريك الصورة">
+      <div class="pc-imgwrap" id="pcImgWrap"><img id="pcImage" alt="" draggable="false"></div>
+      <div class="pc-frame" aria-hidden="true"></div>
+    </div>
+    <div class="pc-zoom-row">
+      <button type="button" class="pc-zoom-btn" id="pcZoomOutBtn" aria-label="تصغير"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
+      <input type="range" id="pcZoomSlider" class="pc-zoom-slider" min="0" max="100" value="0" aria-label="مستوى التكبير">
+      <button type="button" class="pc-zoom-btn" id="pcZoomInBtn" aria-label="تكبير"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+    </div>
+    <div class="pc-preview-row">
+      <div class="pc-preview-circle"><canvas id="pcPreviewCanvas" width="56" height="56"></canvas></div>
+      <span class="pc-preview-label">معاينة الصورة الشخصية</span>
+    </div>
+    <div class="pc-actions">
+      <button type="button" class="pc-btn secondary" id="pcCancelBtn">إلغاء</button>
+      <button type="button" class="pc-btn secondary" id="pcResetBtn">إعادة ضبط</button>
+      <button type="button" class="pc-btn primary" id="pcConfirmBtn">تأكيد القص</button>
+    </div>
   </div>
 </div>
 
@@ -6807,6 +6914,10 @@
     /* Escape يغلق overlay الوحدة (المطلوب في هذه المرحلة) — بلا مسّ بقية المودالات */
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'Escape') return;
+      /* مودال قصّ الصورة الشخصية - إلغاء بلا حفظ (نفس مسار زر "إلغاء"/×). أولوية قبل أي
+       * مودال آخر لأنه غالبًا الأعلى ظهورًا لو فُتح. */
+      var pcm = document.getElementById('photoCropModal');
+      if (pcm && pcm.classList.contains('open')) { e.preventDefault(); pcm.classList.remove('open'); return; }
       var ov = document.getElementById('unitCardOverlay');
       if (ov && ov.classList.contains('open')) { ov.classList.remove('open'); return; }
       /* Phase 2B: مودال التأكيد (aqConfirm) يعالج Escape بنفسه؛ معرض الصور له × فقط (كما هو). */
@@ -9828,6 +9939,222 @@
         : (typeof getAuthCreds === 'function' ? getAuthCreds() : { authEmail: '', authPassword: '' });
     }
 
+    /* ============================================================
+     * مودال قصّ الصورة الشخصية (Profile Photo Crop) — بلا أي مكتبة خارجية.
+     * يُفتح بين اختيار الملف وإرساله الفعلي عبر uploadMyPhoto القائمة بلا أي تعديل
+     * فيها: نفس المدخلات بالضبط (base64 + mimeType) لكن مصدرها الآن Canvas مقصوص
+     * بدل الملف الخام مباشرة. Code.gs لا يعرف ولا يحتاج يعرف أن الصورة قُصّت.
+     * ============================================================ */
+    var pcImageEl = document.getElementById('pcImage');
+    var pcImgWrapEl = document.getElementById('pcImgWrap');
+    var pcStageEl = document.getElementById('pcStage');
+    var pcFrameEl = document.querySelector('#photoCropModal .pc-frame');
+    var pcErrorEl = document.getElementById('pcError');
+    var pcPreviewCanvas = document.getElementById('pcPreviewCanvas');
+    var pcZoomSlider = document.getElementById('pcZoomSlider');
+    var photoCropModalEl = document.getElementById('photoCropModal');
+
+    var pcNaturalW = 0, pcNaturalH = 0;
+    var pcScale = 1, pcMinScale = 1, pcTx = 0, pcTy = 0;
+    var pcFrameRect = { left: 0, top: 0, width: 0, height: 0 };
+    var pcOnConfirm = null;
+    var PC_ZOOM_MAX_FACTOR = 3; // أقصى تكبير إضافي فوق أصغر مقاس يغطي الإطار بالكامل
+    var PC_OUTPUT_SIZE = 480;   // دقة تصدير مربّعة معقولة لأفاتار حاد بلا تضخيم غير ضروري
+
+    function pcShowError(msg) {
+      pcErrorEl.textContent = msg;
+      pcErrorEl.hidden = false;
+    }
+    function pcHideError() { pcErrorEl.hidden = true; }
+
+    /* قياس الإطار (Frame) فعليًا بالبكسل بالنسبة لمنطقة القص (Stage) - نسبي بالكامل
+     * (inset: 15% في CSS) فيعمل صح على أي مقاس استجابة (390/768/1024/1280px). */
+    function pcMeasureFrame() {
+      var stageRect = pcStageEl.getBoundingClientRect();
+      var frameRect = pcFrameEl.getBoundingClientRect();
+      pcFrameRect = {
+        left: frameRect.left - stageRect.left, top: frameRect.top - stageRect.top,
+        width: frameRect.width, height: frameRect.height
+      };
+      pcMinScale = Math.max(pcFrameRect.width / pcNaturalW, pcFrameRect.height / pcNaturalH);
+    }
+
+    function pcClamp(tx, ty, scale) {
+      var imgW = pcNaturalW * scale, imgH = pcNaturalH * scale;
+      var minTx = pcFrameRect.left + pcFrameRect.width - imgW;
+      var maxTx = pcFrameRect.left;
+      var minTy = pcFrameRect.top + pcFrameRect.height - imgH;
+      var maxTy = pcFrameRect.top;
+      return {
+        tx: Math.min(maxTx, Math.max(minTx, tx)),
+        ty: Math.min(maxTy, Math.max(minTy, ty))
+      };
+    }
+
+    function pcComputeSourceRect() {
+      return {
+        sx: (pcFrameRect.left - pcTx) / pcScale,
+        sy: (pcFrameRect.top - pcTy) / pcScale,
+        sw: pcFrameRect.width / pcScale,
+        sh: pcFrameRect.height / pcScale
+      };
+    }
+
+    function pcUpdatePreview() {
+      var r = pcComputeSourceRect();
+      var ctx = pcPreviewCanvas.getContext('2d');
+      var w = pcPreviewCanvas.width, h = pcPreviewCanvas.height;
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(pcImageEl, r.sx, r.sy, r.sw, r.sh, 0, 0, w, h);
+    }
+
+    function pcRender() {
+      pcImgWrapEl.style.transform = 'translate(' + pcTx + 'px,' + pcTy + 'px) scale(' + pcScale + ')';
+      pcZoomSlider.value = Math.round(((pcScale / pcMinScale - 1) / (PC_ZOOM_MAX_FACTOR - 1)) * 100);
+      pcUpdatePreview();
+    }
+
+    /* تكبير/تصغير مع تثبيت مركز الإطار بصريًا (Anchored Zoom) + منع أي مساحة فارغة داخل
+     * الإطار عبر pcClamp - الإطار مغطّى بالكامل دائمًا مهما كان مستوى التكبير. */
+    function pcSetScale(newScale) {
+      newScale = Math.min(pcMinScale * PC_ZOOM_MAX_FACTOR, Math.max(pcMinScale, newScale));
+      var cx = pcFrameRect.left + pcFrameRect.width / 2;
+      var cy = pcFrameRect.top + pcFrameRect.height / 2;
+      var imgPtX = (cx - pcTx) / pcScale;
+      var imgPtY = (cy - pcTy) / pcScale;
+      pcScale = newScale;
+      pcTx = cx - imgPtX * pcScale;
+      pcTy = cy - imgPtY * pcScale;
+      var c = pcClamp(pcTx, pcTy, pcScale);
+      pcTx = c.tx; pcTy = c.ty;
+      pcRender();
+    }
+
+    function pcResetCrop() {
+      pcMeasureFrame();
+      pcScale = pcMinScale;
+      pcTx = pcFrameRect.left + pcFrameRect.width / 2 - (pcNaturalW * pcScale) / 2;
+      pcTy = pcFrameRect.top + pcFrameRect.height / 2 - (pcNaturalH * pcScale) / 2;
+      var c = pcClamp(pcTx, pcTy, pcScale);
+      pcTx = c.tx; pcTy = c.ty;
+      pcRender();
+    }
+
+    /* سحب/قرص بالإصبع عبر Pointer Events (توحيد فأرة/لمس/قلم ببنية واحدة، بلا مكتبة). */
+    var pcActivePointers = {};
+    var pcDragging = false, pcLastX = 0, pcLastY = 0;
+    var pcPinchStartDist = null, pcPinchStartScale = null;
+    function pcPointerDistance() {
+      var ids = Object.keys(pcActivePointers);
+      if (ids.length < 2) return null;
+      var a = pcActivePointers[ids[0]], b = pcActivePointers[ids[1]];
+      return Math.hypot(a.x - b.x, a.y - b.y);
+    }
+    pcStageEl.addEventListener('pointerdown', function (e) {
+      pcStageEl.setPointerCapture(e.pointerId);
+      pcActivePointers[e.pointerId] = { x: e.clientX, y: e.clientY };
+      if (Object.keys(pcActivePointers).length >= 2) {
+        pcDragging = false;
+        pcPinchStartDist = pcPointerDistance();
+        pcPinchStartScale = pcScale;
+      } else {
+        pcDragging = true; pcLastX = e.clientX; pcLastY = e.clientY;
+      }
+    });
+    pcStageEl.addEventListener('pointermove', function (e) {
+      if (!(e.pointerId in pcActivePointers)) return;
+      pcActivePointers[e.pointerId] = { x: e.clientX, y: e.clientY };
+      if (Object.keys(pcActivePointers).length >= 2) {
+        var d = pcPointerDistance();
+        if (d && pcPinchStartDist) pcSetScale(pcPinchStartScale * (d / pcPinchStartDist));
+        return;
+      }
+      if (!pcDragging) return;
+      var dx = e.clientX - pcLastX, dy = e.clientY - pcLastY;
+      pcLastX = e.clientX; pcLastY = e.clientY;
+      var c = pcClamp(pcTx + dx, pcTy + dy, pcScale);
+      pcTx = c.tx; pcTy = c.ty;
+      pcRender();
+    });
+    function pcReleasePointer(e) {
+      delete pcActivePointers[e.pointerId];
+      var remainingIds = Object.keys(pcActivePointers);
+      pcPinchStartDist = null;
+      if (remainingIds.length === 1) {
+        var p = pcActivePointers[remainingIds[0]];
+        pcDragging = true; pcLastX = p.x; pcLastY = p.y;
+      } else if (remainingIds.length === 0) {
+        pcDragging = false;
+      }
+    }
+    pcStageEl.addEventListener('pointerup', pcReleasePointer);
+    pcStageEl.addEventListener('pointercancel', pcReleasePointer);
+
+    pcZoomSlider.addEventListener('input', function () {
+      var factor = 1 + (Number(pcZoomSlider.value) / 100) * (PC_ZOOM_MAX_FACTOR - 1);
+      pcSetScale(pcMinScale * factor);
+    });
+    document.getElementById('pcZoomInBtn').addEventListener('click', function () { pcSetScale(pcScale * 1.15); });
+    document.getElementById('pcZoomOutBtn').addEventListener('click', function () { pcSetScale(pcScale / 1.15); });
+    document.getElementById('pcResetBtn').addEventListener('click', pcResetCrop);
+
+    function pcClose() {
+      photoCropModalEl.classList.remove('open');
+      pcOnConfirm = null;
+      pcImageEl.src = '';
+    }
+    document.getElementById('pcCancelBtn').addEventListener('click', pcClose);
+    document.getElementById('pcCloseBtn').addEventListener('click', pcClose);
+    photoCropModalEl.addEventListener('click', function (e) { if (e.target === photoCropModalEl) pcClose(); });
+
+    document.getElementById('pcConfirmBtn').addEventListener('click', function () {
+      var canvas = document.createElement('canvas');
+      canvas.width = PC_OUTPUT_SIZE; canvas.height = PC_OUTPUT_SIZE;
+      var ctx = canvas.getContext('2d');
+      var r = pcComputeSourceRect();
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, PC_OUTPUT_SIZE, PC_OUTPUT_SIZE);
+      ctx.drawImage(pcImageEl, r.sx, r.sy, r.sw, r.sh, 0, 0, PC_OUTPUT_SIZE, PC_OUTPUT_SIZE);
+      var dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+      var cb = pcOnConfirm;
+      photoCropModalEl.classList.remove('open');
+      pcOnConfirm = null;
+      pcImageEl.src = '';
+      if (typeof cb === 'function') cb(dataUrl);
+    });
+
+    /**
+     * يفتح مودال القص لملف صورة مُختار حديثًا.
+     * @param {File} file - ملف الصورة (من input[type=file]) - تم التحقق من نوعه/حجمه مسبقًا.
+     * @param {Function} onConfirm - يُستدعى بـ(dataUrl) للصورة المقصوصة (JPEG مربّع) عند تأكيد المستخدم للقصّ فقط.
+     */
+    function openPhotoCropModal(file, onConfirm) {
+      pcHideError();
+      pcOnConfirm = onConfirm;
+      var reader = new FileReader();
+      reader.onload = function () {
+        pcImageEl.onload = function () {
+          pcNaturalW = pcImageEl.naturalWidth; pcNaturalH = pcImageEl.naturalHeight;
+          if (!pcNaturalW || !pcNaturalH) { pcShowError('تعذّر قراءة هذه الصورة — جرّب صورة أخرى.'); return; }
+          pcImageEl.style.width = pcNaturalW + 'px';
+          pcImageEl.style.height = pcNaturalH + 'px';
+          requestAnimationFrame(pcResetCrop);
+        };
+        pcImageEl.onerror = function () { pcShowError('تعذّر فتح هذا الملف — تأكد أنه صورة صالحة (JPG/PNG/WebP).'); };
+        pcImageEl.src = String(reader.result);
+        photoCropModalEl.classList.add('open');
+      };
+      reader.onerror = function () { pcHideError(); pcShowError('تعذّر قراءة الملف من جهازك.'); photoCropModalEl.classList.add('open'); };
+      reader.readAsDataURL(file);
+    }
+    window.openPhotoCropModal = openPhotoCropModal;
+    /* إعادة قياس الإطار عند تغيير حجم النافذة أثناء فتح مودال القص فقط (Responsive حي). */
+    window.addEventListener('resize', function () {
+      if (photoCropModalEl.classList.contains('open') && pcNaturalW) { pcMeasureFrame(); pcRender(); }
+    }, { passive: true });
+
     function dashRenderProfile() {
       var host = document.getElementById('dashProfileCard');
       if (!host) return;
@@ -9951,16 +10278,16 @@
         photoBtn.addEventListener('click', function () { photoInput.click(); });
         photoInput.addEventListener('change', function () {
           var file = this.files && this.files[0];
+          this.value = ''; // يسمح باختيار نفس الملف تاني لاحقًا (قبل/بعد الإلغاء سيّان)
           if (!file) return;
           if (!/^image\//.test(file.type)) { setMsg('اختر ملف صورة صالحًا', false); return; }
           if (file.size > 5 * 1024 * 1024) { setMsg('الصورة كبيرة جدًا (الحد 5 ميجابايت)', false); return; }
-          var reader = new FileReader();
-          reader.onload = function () {
-            var dataUrl = String(reader.result);
-            // معاينة فورية
+          // القصّ أولًا (تفاعلي بالكامل على المتصفح) - الرفع الفعلي عبر uploadMyPhoto القائمة
+          // لا يحدث إلا بعد "تأكيد القص"؛ الإلغاء لا يغيّر الصورة الحالية إطلاقًا.
+          openPhotoCropModal(file, function (croppedDataUrl) {
             var av = document.getElementById('dashProfAvatar');
-            if (av) av.innerHTML = '<img src="' + dataUrl + '" alt="">';
-            var b64 = dataUrl.split(',')[1];
+            if (av) av.innerHTML = '<img src="' + croppedDataUrl + '" alt="">';
+            var b64 = croppedDataUrl.split(',')[1];
             if (photoBtn) { photoBtn.disabled = true; photoBtn.textContent = 'جاري الرفع…'; }
             setMsg('جاري رفع الصورة…', true);
             google.script.run
@@ -9978,9 +10305,8 @@
                 if (photoBtn) { photoBtn.disabled = false; photoBtn.textContent = 'تغيير الصورة'; }
                 setMsg('حدث خطأ: ' + (err && err.message ? err.message : 'تعذّر رفع الصورة'), false);
               })
-              .uploadMyPhoto(dashProfileAuth(), b64, file.type);
-          };
-          reader.readAsDataURL(file);
+              .uploadMyPhoto(dashProfileAuth(), b64, 'image/jpeg');
+          });
         });
       }
     }
