@@ -6115,9 +6115,9 @@
       if (timedOut) return;
 
       const detailRow = (label, value) => value ? `
-        <div style="padding:8px 0; border-bottom:1px solid #eef0f2; display:flex; justify-content:space-between; font-size:12px;">
-          <span style="color:#6b7684;">${label}</span>
-          <span style="color:#1c2530; font-weight:600;">${value}</span>
+        <div style="padding:8px 0; border-bottom:1px solid #E3E6E5; display:flex; justify-content:space-between; font-size:12px;">
+          <span style="color:#6E7573;">${label}</span>
+          <span style="color:#16211E; font-weight:600;">${value}</span>
         </div>` : '';
 
       /* ---------- الصفحة الأولى: الغلاف والمواصفات والسعر ---------- */
@@ -6131,68 +6131,68 @@
       page1.style.background = '#ffffff';
 
       page1.innerHTML = `
-        <div style="background:#0f2942;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;">
+        <div style="background:#004C43;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;">
           <div>
-            <div style="color:#ecd08c;font-size:15px;font-weight:700;">Digital Real Estate</div>
-            <div style="color:#9fb0c2;font-size:11px;margin-top:2px;">بوابتك الآمنة إلى عالم الاستثمار العقاري</div>
+            <div style="color:#FFFFFF;font-size:15px;font-weight:700;">Digital Real Estate</div>
+            <div style="color:#BFD8CF;font-size:11px;margin-top:2px;">بوابتك الآمنة إلى عالم الاستثمار العقاري</div>
           </div>
           <div style="color:#fff;font-size:11px;background:rgba(255,255,255,0.15);padding:4px 10px;border-radius:6px;">${u['Unit ID']}</div>
         </div>
 
-        <div style="position:relative;height:220px;background:#e2e5ea;">
+        <div style="position:relative;height:220px;background:#E7EDED;">
           ${resolvedImages[0] ? `<img src="${resolvedImages[0]}" style="width:100%;height:100%;object-fit:cover;display:block;">` : ''}
           <span style="position:absolute;top:12px;left:12px;background:${statusColor};color:#fff;font-size:11px;padding:4px 12px;border-radius:999px;">${u['Status']}</span>
         </div>
 
         <div style="padding:18px 20px 4px;">
-          <div style="font-size:18px;font-weight:700;color:#0f2942;">${u['Property Type']}${u['Project Name'] ? ' - ' + u['Project Name'] : ''}</div>
-          <div style="font-size:12px;color:#0f2942;font-weight:700;margin-top:4px;">${u['City']} - ${u['Area/District']}</div>
+          <div style="font-size:18px;font-weight:700;color:#16211E;">${u['Property Type']}${u['Project Name'] ? ' - ' + u['Project Name'] : ''}</div>
+          <div style="font-size:12px;color:#16211E;font-weight:700;margin-top:4px;">${u['City']} - ${u['Area/District']}</div>
         </div>
 
         <div style="display:flex;flex-wrap:wrap;gap:6px;padding:12px 20px;">
-          <span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">${u['Unit Area (sqm)']} م²</span>
-          ${u['Rooms'] ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">${u['Rooms']} غرف</span>` : ''}
-          ${u['Bathrooms'] ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">${u['Bathrooms']} حمام</span>` : ''}
-          ${u['Floor'] ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">دور ${u['Floor']}</span>` : ''}
-          ${u['Finishing'] ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">${u['Finishing']}</span>` : ''}
-          ${u['Garden Area (sqm)'] ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">حديقة ${u['Garden Area (sqm)']} م²</span>` : ''}
-          ${u['Terrace Area (sqm)'] ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">تراس ${u['Terrace Area (sqm)']} م²</span>` : ''}
-          ${u['Roof Area (sqm)'] ? `<span style="background:#f3f4f7;color:#0f2942;font-size:11px;padding:5px 10px;border-radius:6px;">روف ${u['Roof Area (sqm)']} م²</span>` : ''}
+          <span style="background:#E4EDEA;color:#16211E;font-size:11px;padding:5px 10px;border-radius:6px;">${u['Unit Area (sqm)']} م²</span>
+          ${u['Rooms'] ? `<span style="background:#E4EDEA;color:#16211E;font-size:11px;padding:5px 10px;border-radius:6px;">${u['Rooms']} غرف</span>` : ''}
+          ${u['Bathrooms'] ? `<span style="background:#E4EDEA;color:#16211E;font-size:11px;padding:5px 10px;border-radius:6px;">${u['Bathrooms']} حمام</span>` : ''}
+          ${u['Floor'] ? `<span style="background:#E4EDEA;color:#16211E;font-size:11px;padding:5px 10px;border-radius:6px;">دور ${u['Floor']}</span>` : ''}
+          ${u['Finishing'] ? `<span style="background:#E4EDEA;color:#16211E;font-size:11px;padding:5px 10px;border-radius:6px;">${u['Finishing']}</span>` : ''}
+          ${u['Garden Area (sqm)'] ? `<span style="background:#E4EDEA;color:#16211E;font-size:11px;padding:5px 10px;border-radius:6px;">حديقة ${u['Garden Area (sqm)']} م²</span>` : ''}
+          ${u['Terrace Area (sqm)'] ? `<span style="background:#E4EDEA;color:#16211E;font-size:11px;padding:5px 10px;border-radius:6px;">تراس ${u['Terrace Area (sqm)']} م²</span>` : ''}
+          ${u['Roof Area (sqm)'] ? `<span style="background:#E4EDEA;color:#16211E;font-size:11px;padding:5px 10px;border-radius:6px;">روف ${u['Roof Area (sqm)']} م²</span>` : ''}
         </div>
 
-        <div style="margin:6px 20px 0;padding:14px 16px;background:#faf6ec;border-radius:10px;">
+        <div style="margin:6px 20px 0;padding:14px 16px;background:#E4EDEA;border-radius:10px;">
           ${hasDiscount ? `
             <div style="display:flex;align-items:baseline;gap:8px;">
-              <span style="font-size:12px;color:#6b7684;text-decoration:line-through;">${fmtNum(u['Price'])} جنيه</span>
-              <span style="background:#e24b4a;color:#fff;font-size:10px;padding:2px 8px;border-radius:5px;">خصم ${u['Discount Percentage']}%</span>
+              <span style="font-size:12px;color:#6E7573;text-decoration:line-through;">${fmtNum(u['Price'])} جنيه</span>
+              <span style="background:#B0271F;color:#fff;font-size:10px;padding:2px 8px;border-radius:5px;">خصم ${u['Discount Percentage']}%</span>
             </div>
-            <div style="font-size:22px;font-weight:700;color:#0f2942;margin-top:4px;">${fmtNum(u['Price After Discount'])} جنيه</div>
+            <div style="font-size:22px;font-weight:700;color:#16211E;margin-top:4px;">${fmtNum(u['Price After Discount'])} جنيه</div>
           ` : `
-            <div style="font-size:22px;font-weight:700;color:#0f2942;">${fmtNum(u['Price'])} جنيه</div>
+            <div style="font-size:22px;font-weight:700;color:#16211E;">${fmtNum(u['Price'])} جنيه</div>
           `}
-          ${u['Price per Meter'] ? `<div style="font-size:11px;color:#6b7684;">${fmtNum(u['Price per Meter'])} جنيه/م²</div>` : ''}
+          ${u['Price per Meter'] ? `<div style="font-size:11px;color:#6E7573;">${fmtNum(u['Price per Meter'])} جنيه/م²</div>` : ''}
         </div>
 
         <div style="margin:10px 20px 0;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
           ${u['Down Payment'] ? `
-          <div style="background:#f3f4f7;border-radius:8px;padding:10px 12px;">
-            <div style="font-size:10px;color:#6b7684;">المقدم</div>
-            <div style="font-size:13px;font-weight:700;color:#0f2942;">${u['Down Payment']}% = ${fmtNum(u['Down Payment Value'])} جنيه</div>
+          <div style="background:#E4EDEA;border-radius:8px;padding:10px 12px;">
+            <div style="font-size:10px;color:#6E7573;">المقدم</div>
+            <div style="font-size:13px;font-weight:700;color:#16211E;">${u['Down Payment']}% = ${fmtNum(u['Down Payment Value'])} جنيه</div>
           </div>` : '<div></div>'}
           ${u['Monthly Installment'] ? `
-          <div style="background:#f3f4f7;border-radius:8px;padding:10px 12px;">
-            <div style="font-size:10px;color:#6b7684;">القسط الشهري</div>
-            <div style="font-size:13px;font-weight:700;color:#0f2942;">${fmtNum(u['Monthly Installment'])} جنيه</div>
+          <div style="background:#E4EDEA;border-radius:8px;padding:10px 12px;">
+            <div style="font-size:10px;color:#6E7573;">القسط الشهري</div>
+            <div style="font-size:13px;font-weight:700;color:#16211E;">${fmtNum(u['Monthly Installment'])} جنيه</div>
           </div>` : '<div></div>'}
           ${u['Payment Count'] ? `
-          <div style="background:#f3f4f7;border-radius:8px;padding:10px 12px;">
-            <div style="font-size:10px;color:#6b7684;">الدفعات</div>
-            <div style="font-size:13px;font-weight:700;color:#0f2942;">${u['Payment Count']} × ${fmtNum(u['Payment Amount Value'])} جنيه</div>
+          <div style="background:#E4EDEA;border-radius:8px;padding:10px 12px;">
+            <div style="font-size:10px;color:#6E7573;">الدفعات</div>
+            <div style="font-size:13px;font-weight:700;color:#16211E;">${u['Payment Count']} × ${fmtNum(u['Payment Amount Value'])} جنيه</div>
           </div>` : '<div></div>'}
           ${u['Monthly Installment'] ? `
-          <div style="background:#f3f4f7;border-radius:8px;padding:10px 12px;">
-            <div style="font-size:10px;color:#6b7684;">القسط الربع سنوي</div>
-            <div style="font-size:13px;font-weight:700;color:#0f2942;">${fmtNum(Number(u['Monthly Installment']) * 3)} جنيه</div>
+          <div style="background:#E4EDEA;border-radius:8px;padding:10px 12px;">
+            <div style="font-size:10px;color:#6E7573;">القسط الربع سنوي</div>
+            <div style="font-size:13px;font-weight:700;color:#16211E;">${fmtNum(Number(u['Monthly Installment']) * 3)} جنيه</div>
           </div>` : '<div></div>'}
         </div>
         <div style="padding-bottom:20px;"></div>
@@ -6213,8 +6213,8 @@
       page2.style.flexDirection = 'column';
 
       page2.innerHTML = `
-        <div style="background:#0f2942;padding:14px 20px;">
-          <div style="color:#ecd08c;font-size:14px;font-weight:700;">تفاصيل الوحدة - ${u['Unit ID']}</div>
+        <div style="background:#004C43;padding:14px 20px;">
+          <div style="color:#FFFFFF;font-size:14px;font-weight:700;">تفاصيل الوحدة - ${u['Unit ID']}</div>
         </div>
         <div style="padding:16px 20px 0;">
           ${detailRow('التصنيف', u['Category'])}
@@ -6238,11 +6238,11 @@
           ${detailRow('ملاحظات', u['Notes'])}
         </div>
 
-        <div style="margin-top:auto;background:#0f2942;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
-          <span style="font-size:12px;color:#fff;font-weight:700;">${agentName || 'Digital Real Estate Team'}${agentPhone ? ' — ' : ''}<span style="color:#ecd08c;">${agentPhone || ''}</span></span>
-          <span style="font-size:9px;color:#9fb0c2;white-space:nowrap;">Contact Info</span>
+        <div style="margin-top:auto;background:#004C43;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+          <span style="font-size:12px;color:#fff;font-weight:700;">${agentName || 'Digital Real Estate Team'}${agentPhone ? ' — ' : ''}<span style="color:#B4FF6C;">${agentPhone || ''}</span></span>
+          <span style="font-size:9px;color:#BFD8CF;white-space:nowrap;">Contact Info</span>
         </div>
-        <div style="padding:10px 20px;text-align:center;font-size:10px;color:#9aa4ae;">
+        <div style="padding:10px 20px;text-align:center;font-size:10px;color:#8A908E;">
           تم إصدار هذا الملف بتاريخ ${new Date().toLocaleDateString('ar-EG')}
         </div>
       `;
@@ -6264,15 +6264,15 @@
         pageDiv.style.flexDirection = 'column';
 
         pageDiv.innerHTML = `
-          <div style="background:#0f2942;padding:14px 20px;flex-shrink:0;">
-            <div style="color:#ecd08c;font-size:14px;font-weight:700;">صورة ${idx + 1} من ${resolvedImages.length} - ${u['Unit ID']}</div>
+          <div style="background:#004C43;padding:14px 20px;flex-shrink:0;">
+            <div style="color:#FFFFFF;font-size:14px;font-weight:700;">صورة ${idx + 1} من ${resolvedImages.length} - ${u['Unit ID']}</div>
           </div>
           <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:16px 20px;overflow:hidden;">
             <img src="${img}" style="max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;display:block;border-radius:8px;">
           </div>
-          <div style="background:#0f2942;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0;">
-            <span style="font-size:12px;color:#fff;font-weight:700;">${agentName || 'Digital Real Estate Team'}${agentPhone ? ' — ' : ''}<span style="color:#ecd08c;">${agentPhone || ''}</span></span>
-            <span style="font-size:9px;color:#9fb0c2;white-space:nowrap;">Contact Info</span>
+          <div style="background:#004C43;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0;">
+            <span style="font-size:12px;color:#fff;font-weight:700;">${agentName || 'Digital Real Estate Team'}${agentPhone ? ' — ' : ''}<span style="color:#B4FF6C;">${agentPhone || ''}</span></span>
+            <span style="font-size:9px;color:#BFD8CF;white-space:nowrap;">Contact Info</span>
           </div>
         `;
         document.body.appendChild(pageDiv);
