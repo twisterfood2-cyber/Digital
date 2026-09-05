@@ -2501,7 +2501,10 @@
     body.aq-search-ui .unit-details-box { max-width: min(1000px, 96vw); }
     .ud-modal-body {
       background: var(--aq-prop-surface); border-radius: var(--aq-prop-radius);
-      overflow: hidden; max-height: calc(90vh - 24px); display: flex; flex-direction: column;
+      /* UX-fix: المودال كله هو حاوية التمرير الوحيدة (بدل ud-body الداخلية) - فتصبح الصورة
+       * محدودة الارتفاع الأقصى (ud-media أدناه) بدل ما تلتهم المساحة على حساب .ud-body
+       * المحشورة سابقًا في شريط تمرير داخلي ضيق منفصل. */
+      overflow-y: auto; max-height: calc(90vh - 24px); display: flex; flex-direction: column;
       box-shadow: 0 24px 64px rgba(2,20,16,0.28);
     }
     .ud-header {
@@ -2512,7 +2515,10 @@
     .ud-header-text .unit-title { font-size: var(--aq-fs-title-sm); margin-bottom: 4px; }
     .ud-header-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
     .ud-header-meta .unit-id { font-size: var(--aq-fs-caption-sm); }
-    .ud-media { position: relative; aspect-ratio: 16 / 9; background: var(--aq-prop-canvas-2); cursor: pointer; flex-shrink: 0; }
+    .ud-media {
+      position: relative; aspect-ratio: 16 / 9; max-height: 56vh;
+      background: var(--aq-prop-canvas-2); cursor: pointer; flex-shrink: 0;
+    }
     .ud-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .ud-media .img-count-badge { position: absolute; top: 12px; right: 12px; }
     .ud-thumbs { display: flex; gap: 6px; padding: 8px 20px; overflow-x: auto; flex-shrink: 0; }
@@ -2520,7 +2526,7 @@
       width: 64px; height: 48px; object-fit: cover; border-radius: 8px; cursor: pointer;
       border: 1px solid var(--aq-prop-border); flex-shrink: 0;
     }
-    .ud-body { padding: 18px 20px 20px; overflow-y: auto; }
+    .ud-body { padding: 18px 20px 20px; }
     .ud-body .unit-price-box { margin-bottom: 16px; }
     .ud-section-title {
       font-size: var(--aq-fs-caption); font-weight: 800; color: var(--aq-prop-green);
@@ -9182,9 +9188,24 @@
      * والطي الفعلي بـ max-height (مقاسة فعليًا) في الـ CSS - فتاخد الكروت المساحة فعلًا. */
     var __exploreHeroEl = null;
     var __exploreHeroHidden = false;
-    var __exploreHeroLastY = 0;
-    var __exploreHeroAccum = 0;   /* QA-fix: مسافة التمرير المتراكمة في نفس الاتجاه الحالي */
     var __exploreHeroTicking = false;
+    /* UX-fix: تتبّع "حركة متصلة بنفس الاتجاه" بدل تراكم يُصفَّر بأي انعكاس إطار-لإطار (سبب
+     * الاهتزاز القديم)، وبدل مرجع ثابت من آخر قرار (كان يمنع كشف الشريط بتمرير صعود بسيط
+     * بعد نزول طويل). الفكرة: نتتبّع نقطة بداية الحركة الحالية (__exploreHeroRunStartY)
+     * وتُصفَّر فقط عند انعكاس حقيقي للاتجاه (أكبر من ضجيج بكسل واحد) - فأي جيتر تحت ذلك لا
+     * يُغيّر الاتجاه المتتبَّع ولا يصفّر المسافة المقطوعة. المسافة المقطوعة بنفس الاتجاه منذ
+     * آخر انعكاس حقيقي (runDistance) يجب أن تتجاوز عتبة معنويّة (28px نزولًا / 20px صعودًا)
+     * قبل أي تغيير حالة - فتعمل صح مع كل من التمرير البطيء والسريع/momentum بلا استثناء.
+     * + فترة تهدئة (cooldown) تمنع انعكاس الحالة قبل اكتمال الـ transition الحالي (260ms
+     * في CSS) - يمنع أي قلب سريع متكرر أثناء نفس حركة التمرير. */
+    var __exploreHeroDir = null;        /* 'down' | 'up' | null */
+    var __exploreHeroRunStartY = 0;
+    var __exploreHeroLastY = 0;
+    var __exploreHeroLastChangeTs = 0;
+    var EXPLORE_HERO_NOISE_PX = 1;       /* إزاحة إطار-لإطار أصغر منها = ضجيج، تُتجاهل تمامًا */
+    var EXPLORE_HERO_HIDE_PX = 28;
+    var EXPLORE_HERO_SHOW_PX = 20;
+    var EXPLORE_HERO_COOLDOWN_MS = 280;
     function __exploreHeroMeasure() {
       if (!__exploreHeroEl || __exploreHeroHidden) return;
       var h = __exploreHeroEl.scrollHeight;
@@ -9197,6 +9218,7 @@
       if (!__exploreHeroEl || v === __exploreHeroHidden) return;
       __exploreHeroHidden = v;
       __exploreHeroEl.classList.toggle('aq-hero--hidden', v);
+      __exploreHeroLastChangeTs = performance.now();
       if (!v) __exploreHeroMeasure();
     }
     function __exploreHeroOnScroll() {
@@ -9206,26 +9228,38 @@
         __exploreHeroTicking = false;
         if (!document.body.classList.contains('app-view-explore')) return;
         var y = window.scrollY || window.pageYOffset || 0;
-        if (y <= 0) { __exploreHeroSetHidden(false); __exploreHeroLastY = y; __exploreHeroAccum = 0; return; }
-        var diff = y - __exploreHeroLastY;
+        if (y <= 0) {
+          __exploreHeroDir = null; __exploreHeroRunStartY = 0; __exploreHeroLastY = 0;
+          __exploreHeroSetHidden(false);
+          return;
+        }
+        var frameDiff = y - __exploreHeroLastY;
         __exploreHeroLastY = y;
-        /* QA-fix: تراكم إزاحة نفس الاتجاه بدل مقارنة الإطار الأخير فقط - عشان يعمل صح مع
-         * تمرير Trackpad/Momentum التدريجي (خطوات صغيرة كثيرة)، مش بس القفزات الكبيرة دفعة
-         * واحدة. يصفّر فورًا عند عكس الاتجاه. */
-        if (diff > 0) {
-          __exploreHeroAccum = (__exploreHeroAccum > 0 ? __exploreHeroAccum : 0) + diff;
-          if (__exploreHeroAccum > 8) __exploreHeroSetHidden(true);
-        } else if (diff < 0) {
-          __exploreHeroAccum = (__exploreHeroAccum < 0 ? __exploreHeroAccum : 0) + diff;
-          if (__exploreHeroAccum < -5) __exploreHeroSetHidden(false);
+        if (Math.abs(frameDiff) < EXPLORE_HERO_NOISE_PX) return; /* ضجيج بسيط - تجاهل الإطار كليًا */
+        var newDir = frameDiff > 0 ? 'down' : 'up';
+        if (__exploreHeroDir !== newDir) {
+          /* انعكاس حقيقي للاتجاه: الحركة الجديدة تبدأ من الموضع قبل هذا الإطار */
+          __exploreHeroDir = newDir;
+          __exploreHeroRunStartY = y - frameDiff;
+        }
+        var runDistance = Math.abs(y - __exploreHeroRunStartY);
+        /* أثناء التهدئة: لا قرار حالة جديد، لكن runStartY/runDistance يستمران بالتحديث
+         * بشكل طبيعي - فالإطار التالي بعد التهدئة يرى المسافة الكاملة المقطوعة فعلًا. */
+        if (performance.now() - __exploreHeroLastChangeTs < EXPLORE_HERO_COOLDOWN_MS) return;
+        if (newDir === 'down' && !__exploreHeroHidden && runDistance > EXPLORE_HERO_HIDE_PX) {
+          __exploreHeroSetHidden(true);
+        } else if (newDir === 'up' && __exploreHeroHidden && runDistance > EXPLORE_HERO_SHOW_PX) {
+          __exploreHeroSetHidden(false);
         }
       });
     }
     function resetExploreSearchHeader_() {
       __exploreHeroEl = document.getElementById('aqHero');
       __exploreHeroHidden = false;
-      __exploreHeroLastY = window.scrollY || window.pageYOffset || 0;
-      __exploreHeroAccum = 0;
+      __exploreHeroDir = null;
+      __exploreHeroRunStartY = window.scrollY || window.pageYOffset || 0;
+      __exploreHeroLastY = __exploreHeroRunStartY;
+      __exploreHeroLastChangeTs = 0;
       if (__exploreHeroEl) {
         __exploreHeroEl.classList.remove('aq-hero--hidden');
         requestAnimationFrame(__exploreHeroMeasure);
