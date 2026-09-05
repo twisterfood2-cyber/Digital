@@ -4812,12 +4812,16 @@
       editCitySelect.value = u['City'] || '';
       populateDistrictSelect(editDistrictSelect, u['City'], false, u['Area/District']);
 
-      // الصور عمدًا فاضية - الوحدة الجديدة صورها لازم تكون مختلفة ومحدثة
-      editUnitImages = [];
+      // قرار منتج صريح: الاستنساخ ينسخ صور الوحدة الأصلية أيضًا (مش بس البيانات) - OWNER
+      // يقدر يراجعها/يحذفها/يستبدلها بالأدوات القائمة نفسها قبل الحفظ. الروابط تُنسخ كما هي
+      // (نفس تمثيل التخزين الحالي: نص روابط مفصول بفواصل - لا يوجد نموذج ملكية لكل وحدة على
+      // Drive يمنع مشاركة نفس الرابط بين وحدتين، ونفس آلية "إضافة رابط صورة" القائمة أصلًا
+      // تسمح بإدخال أي رابط بلا قيود، فهذا امتداد آمن ومتّسق مع النموذج الحالي).
+      editUnitImages = (u['Images'] || '').split(',').map(s => s.trim()).filter(Boolean);
       renderEditImagesPreview();
 
       editMsg.className = '';
-      editMsg.textContent = 'تم استنساخ بيانات الوحدة ' + unitId + ' - راجع كل حاجة (خصوصًا الدور والسعر) وضيف صور جديدة قبل الحفظ';
+      editMsg.textContent = 'تم استنساخ بيانات الوحدة ' + unitId + ' وصورها - راجع كل حاجة (خصوصًا الدور والسعر والصور) قبل الحفظ';
       editMsg.style.display = 'block';
     }).getUnitById(unitId, getAuthCreds());
   }
@@ -6073,6 +6077,9 @@
     // لذلك لا نُفشل العملية أبدًا أثناء إخفاء التبويب - فقط نعيد ضبط مهلة كاملة جديدة عند
     // الإخفاء والعودة للظهور، ولا نُظهر خطأ "استغرقت وقتًا طويلًا" إلا لو انقضت 30 ثانية
     // فعلية والتبويب ظاهر وما زالت العملية غير منتهية. لا يغيّر مسار الإنشاء السليم إطلاقًا.
+    // القيمة (150 ثانية) مبنيّة على قياس فعلي حي على تبويب نشط غير مخفي: صفحة واحدة عبر
+    // html2canvas قد تستغرق ~17-20 ثانية، والوحدة قد تحتوي حتى 7 صفحات (غلاف+تفاصيل+5 صور)
+    // = حتى ~140 ثانية فعليًا في أسوأ حالة واقعية - لا علاقة لها بأي تبطيء نتيجة إخفاء التبويب.
     let timedOut = false;
     let settled = false;
     let timeoutId = null;
@@ -6084,7 +6091,7 @@
         timedOut = true;
         showToast('تعذّر إنشاء الملف (استغرقت العملية وقتًا طويلًا) - جرّب مرة أخرى', 'error');
         restoreExportBtn_();
-      }, 30000);
+      }, 150000);
     }
     function onExportVisibilityChange_() {
       if (settled) return;
@@ -6103,6 +6110,9 @@
       const resolvedImages = imagesToLoad.length > 0
         ? (await Promise.all(imagesToLoad.map(fetchImageAsDataUrl))).filter(Boolean)
         : [];
+      // لو الحارس الزمني ضرب أثناء انتظار الصور (تبويب ظاهر وتجاوزنا المهلة)، لا داعي لإكمال
+      // أي عمل تقيل بعد كده - رسالة الفشل ظهرت للمستخدم بالفعل ويجب ألا يستمر أي شيء بعدها.
+      if (timedOut) return;
 
       const detailRow = (label, value) => value ? `
         <div style="padding:8px 0; border-bottom:1px solid #eef0f2; display:flex; justify-content:space-between; font-size:12px;">
@@ -6282,7 +6292,8 @@
 
       // دالة تضيف عنصر DOM كصفحة/صفحات PDF، وبتقص بذكاء لو المحتوى أطول من صفحة واحدة
       async function addElementAsPages(el, isFirstPageOverall) {
-        const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+        if (timedOut) { if (el.parentNode) document.body.removeChild(el); return; }
+        const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
         document.body.removeChild(el);
 
         const pageHeightPx = Math.floor((usableHeight * canvas.width) / imgWidth);
@@ -6319,6 +6330,7 @@
         await addElementAsPages(pageDiv, false);
       }
 
+      if (timedOut) return; // بوابة أخيرة: لا تنزيل بعد إعلان الفشل للمستخدم مهما حدث
       const pdfFileName = (u['Property Type'] || 'Unit') + ' - ' + (u['Unit Area (sqm)'] || '') + ' sqm';
       pdf.save(pdfFileName.replace(/[\\/:*?"<>|]/g, '') + '.pdf');
     } catch (err) {
