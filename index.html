@@ -2369,11 +2369,28 @@
       background: rgba(2,32,26,0.72); color: #fff; border: none; border-radius: var(--aq-radius-pill);
     }
     body.aq-search-ui .fav-btn {
-      background: rgba(255,255,255,0.92); border: 1px solid rgba(255,255,255,0.9);
-      color: var(--aq-prop-text-muted); box-shadow: 0 2px 8px rgba(6,28,23,0.18);
+      background: rgba(255,255,255,0.92); border: 1px solid var(--aq-prop-border);
+      color: var(--aq-prop-text-muted); box-shadow: 0 2px 6px rgba(6,28,23,0.14);
     }
-    body.aq-search-ui .fav-btn.active { color: #E03131; border-color: #F1C9C9; }
-    body.aq-search-ui .compare-checkbox { background: rgba(255,255,255,0.92); border-radius: 8px; }
+    body.aq-search-ui .fav-btn:hover { border-color: var(--aq-prop-green-line); color: var(--aq-prop-green-deep); }
+    body.aq-search-ui .fav-btn.active { color: var(--aq-prop-green-deep); border-color: var(--aq-prop-green-line); }
+    body.aq-search-ui .fav-btn.active .ico { fill: currentColor; stroke: none; }
+    body.aq-search-ui .compare-checkbox {
+      background: rgba(255,255,255,0.92); border-radius: 8px; border: 1px solid var(--aq-prop-border);
+      box-shadow: 0 2px 6px rgba(6,28,23,0.14);
+    }
+    body.aq-search-ui .compare-checkbox:hover { border-color: var(--aq-prop-green-line); }
+    body.aq-search-ui .compare-checkbox input {
+      appearance: none; -webkit-appearance: none; margin: 0; display: block;
+      width: 16px; height: 16px; border-radius: 4px;
+      border: 1.5px solid var(--aq-prop-green-line); background: #fff;
+      transition: background var(--ease), border-color var(--ease);
+    }
+    body.aq-search-ui .compare-checkbox input:checked {
+      background-color: var(--aq-prop-green-deep); border-color: var(--aq-prop-green-deep);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: center; background-size: 11px 11px;
+    }
     body.aq-search-ui .unit-top { padding: 0; margin: 0 0 8px; }
     body.aq-search-ui .unit-id { color: var(--aq-prop-text-faint); }
     body.aq-search-ui .unit-title { color: var(--aq-prop-text); font-size: var(--aq-fs-body-lg); }
@@ -4256,6 +4273,7 @@
     ban:      '<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/></svg>',
     lock:     '<svg class="ico" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>',
     star:     '<svg class="ico ico-fill" viewBox="0 0 24 24"><path d="m12 3 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.8 6.2 21l1.1-6.5L2.6 9.8l6.5-.9Z"/></svg>',
+    heart:    '<svg class="ico" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg>',
     arrowUp:  '<svg class="ico" viewBox="0 0 24 24"><path d="M12 20V5M6 11l6-6 6 6"/></svg>',
     x:        '<svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>',
     award:    '<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="9" r="6"/><path d="M9 14.5 8 22l4-2 4 2-1-7.5"/></svg>',
@@ -4971,11 +4989,11 @@
     const idx = favs.findIndex(f => f.id === unitId);
     if (idx === -1) {
       favs.push({ id: unitId, price: Number(currentPrice) || null });
-      if (btnEl) btnEl.classList.add('active');
+      if (btnEl) { btnEl.classList.add('active'); btnEl.setAttribute('aria-pressed', 'true'); }
       showToast('تمت إضافة الوحدة للمفضلة', 'success');
     } else {
       favs.splice(idx, 1);
-      if (btnEl) btnEl.classList.remove('active');
+      if (btnEl) { btnEl.classList.remove('active'); btnEl.setAttribute('aria-pressed', 'false'); }
       showToast('تم الحذف من المفضلة', 'info');
     }
     try { localStorage.setItem('favoriteUnits', JSON.stringify(favs)); } catch (e) {}
@@ -5354,9 +5372,9 @@
          aria-label="عرض تفاصيل الوحدة ${u['Unit ID']} - ${u['Property Type']}${u['Project Name'] ? ' - ' + u['Project Name'] : ''}">
       ${coverHtml}
       ${priceDropBadge}
-      <button type="button" class="fav-btn ${isFavorite(u['Unit ID']) ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite('${u['Unit ID']}', this, ${currentPrice})" title="إضافة للمفضلة">${ICON.star}</button>
+      <button type="button" class="fav-btn ${isFavorite(u['Unit ID']) ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite('${u['Unit ID']}', this, ${currentPrice})" title="إضافة للمفضلة" aria-label="إضافة للمفضلة" aria-pressed="${isFavorite(u['Unit ID']) ? 'true' : 'false'}">${ICON.heart}</button>
       <label class="compare-checkbox" title="إضافة للمقارنة" onclick="event.stopPropagation()">
-        <input type="checkbox" ${compareList.indexOf(u['Unit ID']) !== -1 ? 'checked' : ''} onchange="toggleCompare('${u['Unit ID']}', this)">
+        <input type="checkbox" ${compareList.indexOf(u['Unit ID']) !== -1 ? 'checked' : ''} onchange="toggleCompare('${u['Unit ID']}', this)" aria-label="إضافة للمقارنة">
       </label>
       <div class="unit-top">
         <span class="status-badge ${u['Status']}">${u['Status']}</span>
@@ -7060,6 +7078,9 @@
     block.style.display = isOpen ? 'grid' : 'none';
     this.classList.toggle('open', isOpen);
     this.querySelector('.label').textContent = isOpen ? 'إخفاء الفلاتر المتقدمة' : 'المزيد من الفلاتر';
+    /* Micro-fix: نعيد قياس الارتفاع الطبيعي لـ #aqHero بعد فتح/طي الفلاتر المتقدمة -
+     * وإلا فـ max-height المحسوبة مسبقًا (--aqh-natural) تفضل قديمة فتقصّ المحتوى الجديد. */
+    if (typeof window.__exploreHeroMeasure === 'function') window.__exploreHeroMeasure();
   });
 
   document.getElementById('clearBtn').addEventListener('click', function() {
@@ -9150,6 +9171,9 @@
       var h = __exploreHeroEl.scrollHeight;
       if (h > 0) __exploreHeroEl.style.setProperty('--aqh-natural', h + 'px');
     }
+    /* Micro-fix: نعرّضها على window عشان معالج زر "المزيد من الفلاتر" (خارج هذا الـ IIFE)
+     * يقدر يعيد القياس بعد فتح/طي الفلاتر المتقدمة. */
+    window.__exploreHeroMeasure = __exploreHeroMeasure;
     function __exploreHeroSetHidden(v) {
       if (!__exploreHeroEl || v === __exploreHeroHidden) return;
       __exploreHeroHidden = v;
