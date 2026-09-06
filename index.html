@@ -2501,6 +2501,7 @@
     body.aq-search-ui .unit-details-box { max-width: min(1000px, 96vw); }
     .ud-modal-body {
       background: var(--aq-prop-surface); border-radius: var(--aq-prop-radius);
+      border: 1px solid var(--aq-prop-green-line);
       /* UX-fix: المودال كله هو حاوية التمرير الوحيدة (بدل ud-body الداخلية) - فتصبح الصورة
        * محدودة الارتفاع الأقصى (ud-media أدناه) بدل ما تلتهم المساحة على حساب .ud-body
        * المحشورة سابقًا في شريط تمرير داخلي ضيق منفصل. */
@@ -2510,16 +2511,20 @@
     .ud-header {
       display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
       padding: 18px 20px; border-bottom: 1px solid var(--aq-prop-border); flex-shrink: 0;
+      background: var(--aq-prop-green-soft);
     }
     .ud-header-text { min-width: 0; }
     .ud-header-text .unit-title { font-size: var(--aq-fs-title-sm); margin-bottom: 4px; }
     .ud-header-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
     .ud-header-meta .unit-id { font-size: var(--aq-fs-caption-sm); }
+    /* الصورة: object-fit:contain (بدل cover) لضمان ظهور الصورة كاملة بلا أي قصّ غير مقصود
+     * لأي جزء منها - أي فراغ ناتج عن اختلاف نسبة الصورة الأصلية عن صندوق العرض يمتلئ بخلفية
+     * محايدة فاتحة (letterbox) بدل تمديد الصورة أو قصّها. */
     .ud-media {
       position: relative; aspect-ratio: 16 / 9; max-height: 56vh;
       background: var(--aq-prop-canvas-2); cursor: pointer; flex-shrink: 0;
     }
-    .ud-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .ud-media img { width: 100%; height: 100%; object-fit: contain; display: block; }
     .ud-media .img-count-badge { position: absolute; top: 12px; right: 12px; }
     /* أزرار التنقّل بين الصور - دائرية Premium بهوية الأخضر/المينت، تباين كافٍ فوق أي صورة
      * (فاتحة أو غامقة) عبر خلفية بيضاء شبه شفافة + حدّ مينت + ظل ناعم، بدل خلفية داكنة ثقيلة. */
@@ -2545,18 +2550,28 @@
     .ud-thumbs img:hover { border-color: var(--aq-prop-green-line); }
     .ud-thumbs img.active { border-color: var(--aq-prop-green-deep); box-shadow: 0 0 0 2px var(--aq-prop-green-line); }
     .ud-body { padding: 18px 20px 20px; }
-    .ud-body .unit-price-box { margin-bottom: 16px; }
+    /* صندوق السعر داخل المودال فقط - إطار وظل خفيفان إضافيان فوق التنسيق العام المشترك
+     * مع كارت الوحدة (.unit-price-box الأساسي) بلا أي تعديل على منطق/قيم السعر نفسه. */
+    .ud-body .unit-price-box {
+      margin-bottom: 18px; border: 1px solid var(--aq-prop-green-line);
+      box-shadow: 0 2px 10px rgba(11,40,33,0.06);
+    }
     .ud-section-title {
       font-size: var(--aq-fs-caption); font-weight: 800; color: var(--aq-prop-green);
       margin: 18px 0 8px; text-transform: uppercase; letter-spacing: 0.3px;
     }
     .ud-section-title:first-of-type { margin-top: 0; }
+    /* بيانات الوحدة/التفاصيل الإضافية: بطاقات فردية خفيفة لكل حقل بدل لوحة واحدة مكتظة -
+     * مسافات أوسع ومقروئية أعلى دون ازدحام بصري. */
     .ud-info-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px 16px;
-      background: var(--aq-prop-green-soft); border: 1px solid var(--aq-prop-green-line);
-      border-radius: var(--aq-prop-radius-sm); padding: 12px 14px;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;
+      background: transparent; border: none; padding: 0;
     }
-    .ud-info-row { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .ud-info-row {
+      display: flex; flex-direction: column; gap: 3px; min-width: 0;
+      background: var(--aq-prop-surface); border: 1px solid var(--aq-prop-border);
+      border-radius: var(--aq-prop-radius-sm); padding: 9px 12px;
+    }
     .ud-info-label { font-size: var(--aq-fs-micro); color: var(--aq-prop-text-muted); font-weight: 600; }
     .ud-info-value { font-size: var(--aq-fs-small); color: var(--aq-prop-text); font-weight: 700; overflow-wrap: break-word; }
     .ud-body .card-actions-bottom { margin-top: 18px; padding-top: 16px; }
@@ -2565,7 +2580,7 @@
       body.aq-search-ui .unit-card-overlay { padding: 0; align-items: stretch; }
       body.aq-search-ui .unit-details-box { max-width: 100%; margin: 0; }
       body.aq-search-ui .unit-details-box .unit-card-overlay-close { top: 10px; left: 10px; }
-      .ud-modal-body { max-height: 100vh; height: 100vh; border-radius: 0; }
+      .ud-modal-body { max-height: 100vh; height: 100vh; border-radius: 0; border: none; }
       .ud-header { padding-top: 56px; }
       .ud-info-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
       .ud-nav { width: 32px; height: 32px; }
@@ -2604,13 +2619,19 @@
     .unit-card-overlay { align-items: flex-start; padding: 72px 16px 48px; }
     .unit-card-overlay-box { max-width: 460px; margin-block: auto; }
     body.aq-search-ui .unit-card-overlay .unit-card { cursor: default; }
-    .unit-card-overlay-close {
-      top: -48px; left: 0; background: var(--aq-prop-green-soft); color: var(--aq-prop-green-deep);
-      border: 1px solid var(--aq-prop-green-line); box-shadow: 0 4px 14px rgba(6,28,23,0.16);
+    /* زر إغلاق مطوّر ومتصل بصريًا بزاوية النافذة (شارة صغيرة على الحرف العلوي)
+     * بدل دائرة كبيرة عائمة منفصلة بعيدًا فوق النافذة - حجم أصغر (32px)، هوية
+     * أخضر/مينت متسقة مع الهوية البصرية، وضوح كافٍ للنقر. */
+    .unit-details-box .unit-card-overlay-close {
+      top: -14px; left: -14px; width: 32px; height: 32px; padding: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--aq-prop-surface); color: var(--aq-prop-green-deep);
+      border: 1px solid var(--aq-prop-green-line); box-shadow: 0 4px 14px rgba(6,28,23,0.18);
       transition: background var(--ease), border-color var(--ease), transform var(--ease);
     }
-    .unit-card-overlay-close:hover {
-      background: rgba(191,216,207,0.6); border-color: var(--aq-prop-green-deep); transform: scale(1.06);
+    .unit-details-box .unit-card-overlay-close .ico { width: 15px; height: 15px; }
+    .unit-details-box .unit-card-overlay-close:hover {
+      background: var(--aq-prop-green-soft); border-color: var(--aq-prop-green-deep); transform: scale(1.08);
     }
 
     /* ---- 9) استجابة ---- */
