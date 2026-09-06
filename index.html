@@ -6155,6 +6155,30 @@
   }
 
   /* ---------- توليد بروشور PDF لوحدة واحدة ---------- */
+  /* Direct PDF Engine (pdf-lib + fontkit + Cairo) — المحرك الأساسي لتصدير الوحدة بعد اعتماد POC وبوابة التوافق.
+   * علم التشغيل: DIRECT_PDF_ENABLED (true = المحرك المباشر أساسي والمحرك القديم html2canvas احتياطي تلقائي؛
+   * false = المحرك القديم فقط كما كان). مفتاح طوارئ بلا نشر: localStorage.setItem('aqarDirectPdf','off').
+   * المحرك وملفاته (pdf-engine/) تُحمَّل كسولًا عند أول تصدير فقط — لا أثر على تحميل الصفحة. */
+  const DIRECT_PDF_ENABLED = true;
+  const DIRECT_PDF_ENGINE_URL = 'pdf-engine/pdf-direct-engine.js';
+  let directPdfEnginePromise_ = null;
+  function directPdfEnabled_() {
+    try { if (localStorage.getItem('aqarDirectPdf') === 'off') return false; } catch (e) {}
+    return DIRECT_PDF_ENABLED;
+  }
+  function loadDirectPdfEngine_() {
+    if (window.AqarDirectPdf) return Promise.resolve(window.AqarDirectPdf);
+    if (!directPdfEnginePromise_) {
+      directPdfEnginePromise_ = new Promise(function (resolve, reject) {
+        var s = document.createElement('script');
+        s.src = DIRECT_PDF_ENGINE_URL; s.async = true;
+        s.onload = function () { window.AqarDirectPdf ? resolve(window.AqarDirectPdf) : reject(new Error('Direct PDF engine did not initialize')); };
+        s.onerror = function () { reject(new Error('Direct PDF engine failed to load')); };
+        document.head.appendChild(s);
+      }).catch(function (err) { directPdfEnginePromise_ = null; throw err; });
+    }
+    return directPdfEnginePromise_;
+  }
   let pendingPdfUnit = null;
   let pendingPdfBtn = null;
   let pendingDevProfileExport = false;
@@ -6494,6 +6518,21 @@
       btnEl.innerHTML = originalHTML;
     }
     setExportBtnLoading_();
+
+    /* المحرك الأساسي: Direct PDF (pdf-lib + fontkit + Cairo) — نفس الوحدة ونفس بيانات المسؤول ونفس
+     * صور السيرفر (getUnitImageBase64) ونفس اسم الملف. نجاح = تنزيل الملف وانتهاء الدالة هنا (لا يُستدعى
+     * المحرك القديم إطلاقًا). أي فشل (تحميل/مهلة/ملف غير صالح) = تشخيص مختصر في الـ console ثم المتابعة
+     * تلقائيًا بالمحرك القديم أدناه كما هو، بلا رسالة تقنية للمستخدم. الزر يُعاد دائمًا في كل مسار. */
+    if (directPdfEnabled_()) {
+      try {
+        var directEngine = await loadDirectPdfEngine_();
+        await directEngine.exportUnit(u, agentName, agentPhone);
+        restoreExportBtn_();
+        return;
+      } catch (directErr) {
+        console.warn('[DirectPDF] فشل المحرك المباشر - الرجوع للمحرك القديم:', (directErr && directErr.message) ? directErr.message : directErr);
+      }
+    }
 
     // فحص مبكر: المكتبتان (html2canvas / jsPDF) لازم يكونا محمَّلتين قبل أي محاولة رسم -
     // بدل خطأ داخلي غامض لو فشل تحميل الـ CDN لأي سبب (شبكة/حظر).
