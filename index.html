@@ -2920,9 +2920,12 @@
      * applyRoleUiVisibility من الـ DOM — لا صلاحيات جديدة ولا JS إضافي).
      * ========================================================================= */
     /* الصدفة والعرض — في الوضعين: مودال فوق الاستكشاف، أو صفحة داخل المحتوى */
+    /* خلفية خضراء فاتحة جدًا من نفس عائلة الهوية (green-soft ممزوجة بالأبيض) — الحقول والأزرار الثانوية تبقى بيضاء فتبرز فوقها */
     #editModal .modal-box {
-      background: var(--aq-prop-surface); color: var(--aq-prop-text);
-      border: 1px solid var(--aq-prop-border); border-top: 1px solid var(--aq-prop-border);
+      --aq-form-bg: #EBF2EF;
+      --aq-form-bg: color-mix(in srgb, var(--aq-prop-green-soft) 72%, #fff);
+      background: var(--aq-form-bg); color: var(--aq-prop-text);
+      border: 1px solid var(--aq-prop-green-line); border-top: 1px solid var(--aq-prop-green-line);
       border-radius: var(--aq-prop-radius-lg); box-shadow: var(--aq-prop-shadow);
       padding: var(--aq-space-5) var(--aq-space-6) 0;
       max-width: 1280px; width: 100%; margin: 0 auto;   /* أعرض من 1000px: صفوف أقل على الشاشات العريضة */
@@ -2931,7 +2934,7 @@
     body.app-view-quote #editModal .modal-box { max-width: 1280px; width: 100%; margin: 0 auto; }
     #editModal .modal-header {
       margin-bottom: var(--aq-space-4); padding-bottom: var(--aq-space-3);
-      border-bottom: 1px solid var(--aq-prop-border);
+      border-bottom: 1px solid var(--aq-prop-green-line);
     }
     #editModal .modal-title {
       font-size: var(--aq-fs-title-lg); font-weight: var(--aq-fw-black); color: var(--aq-prop-text); letter-spacing: 0;
@@ -2999,7 +3002,7 @@
 
     /* معاينة القسط: بطاقة مالية هادئة */
     #editModal .installment-preview {
-      background: var(--aq-prop-green-soft); border: 1px solid var(--aq-prop-green-line); color: var(--aq-prop-green-ink);
+      background: var(--aq-prop-surface); border: 1px solid var(--aq-prop-green-line); color: var(--aq-prop-green-ink);
       border-radius: var(--aq-prop-radius); padding: var(--aq-space-2) var(--aq-space-4); margin: 0;
       font-weight: var(--aq-fw-medium); font-size: var(--aq-fs-caption); align-self: stretch;
     }
@@ -3009,7 +3012,8 @@
     #editModal .installment-preview .ico { color: var(--aq-prop-green); }
 
     /* لوحة الذكاء الاصطناعي */
-    #editModal .ai-fill-panel { padding: var(--aq-space-4); margin-bottom: var(--aq-space-5); }
+    #editModal .ai-fill-panel,
+    #editModal #unitAddAiSection.ai-fill-panel { padding: var(--aq-space-4); margin-bottom: var(--aq-space-5); background: var(--aq-prop-surface); border-color: var(--aq-prop-green-line); }
     #editModal .ai-fill-panel .aq-ai-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; margin-bottom: var(--aq-space-3); }
     #editModal .ai-fill-panel .section-title { margin: 0; }
     #editModal .ai-fill-panel .aq-form-help { margin: 0; }
@@ -3087,10 +3091,11 @@
       margin: var(--aq-space-6) calc(-1 * var(--aq-space-6)) 0;
       padding-inline: var(--aq-space-6);
       border-radius: 0 0 var(--aq-prop-radius-lg) var(--aq-prop-radius-lg);
+      background: var(--aq-form-bg); border-top-color: var(--aq-prop-green-line);
     }
     #editModal #editSaveBtn { width: auto; flex: 1 1 240px; margin: 0; padding: 12px 22px; font-size: var(--aq-fs-small); }
     #editModal #editSaveBtn:disabled { background: var(--aq-neutral-disabled); border-color: transparent; color: #fff; }
-    #editModal #editResetBtn { width: auto; flex: 0 1 auto; margin: 0; padding: 12px 18px; }
+    #editModal #editResetBtn { width: auto; flex: 0 1 auto; margin: 0; padding: 12px 18px; background: var(--aq-prop-surface); }
     #editModal #editDeleteBtn { width: auto; flex: 0 1 auto; margin: 0; margin-inline-start: auto; padding: 12px 18px; }
     #editModal #quoteActionRow { margin: 0; flex: 1 1 100%; }
     #editModal #quoteActionRow.show { display: flex; gap: var(--aq-space-2); }
