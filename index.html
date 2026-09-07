@@ -3628,6 +3628,11 @@
         <input type="text" id="f_developer" list="f_developerDatalist" placeholder="اكتب اسم المطور (ولو جزء منه)..." autocomplete="off">
         <datalist id="f_developerDatalist"></datalist>
       </div>
+      <!-- "مساحة محددة" في الصف الأساسي بجوار المطور — في الرئيسية و"استكشف" معًا (نفس الـ id/المنطق) -->
+      <div id="fw_exactArea">
+        <label>مساحة محددة بالظبط (م²)</label>
+        <input type="number" id="f_exactArea" min="0" placeholder="مثال: 120">
+      </div>
     </div>
 
     <button type="button" class="toggle-details-btn" id="advancedFiltersToggle" style="margin-top:10px;">
@@ -3662,10 +3667,6 @@
       <div>
         <label>المساحة إلى (م²)</label>
         <input type="number" id="f_maxArea" min="0">
-      </div>
-      <div id="fw_exactArea">
-        <label>مساحة محددة بالظبط (م²)</label>
-        <input type="number" id="f_exactArea" min="0" placeholder="مثال: 120">
       </div>
       <div id="ppmYearsFilterWrap" style="display:none;">
         <label>مقارنة سعر المتر حسب عدد سنوات تقسيط (اختياري)</label>
@@ -9779,7 +9780,7 @@
       if (!primary || !advanced || !fwCategory || !fwExactArea || !fwKeyword) return;
       primary.insertBefore(fwKeyword, primary.firstChild);
       advanced.insertBefore(fwCategory, advanced.firstChild);
-      if (ppmWrap) advanced.insertBefore(fwExactArea, ppmWrap); else advanced.appendChild(fwExactArea);
+      primary.appendChild(fwExactArea);   // "مساحة محددة" تبقى في الصف الأساسي بجوار المطور في "استكشف" أيضًا (طلب المستخدم)
       homeFieldsMoved_ = false;
     }
     /* Part 1 — إخفاء/إظهار ذكي لشريط البحث في "استكشف" فقط (Scroll Direction Detection).
