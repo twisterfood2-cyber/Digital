@@ -2398,6 +2398,10 @@
       color: #fff; font-size: var(--aq-fs-body); font-weight: 800; letter-spacing: 0.6px;
       text-shadow: 0 1px 6px rgba(2,20,16,0.55); margin-inline-start: 2px; direction: ltr; unicode-bidi: isolate;
     }
+    /* فاصل رأسي رفيع بين الحالة ورقم الوحدة - كما في الصورة المرجعية */
+    body.aq-search-ui .unit-cover-strip .cover-strip-divider {
+      width: 1px; height: 15px; background: rgba(255,255,255,0.4); flex: none; font-style: normal;
+    }
     body.aq-search-ui .unit-cover-strip .img-count-badge {
       position: static; margin-inline-start: auto; display: inline-flex; align-items: center; gap: 4px;
       background: rgba(2,32,26,0.62); color: #fff; border: 1px solid rgba(255,255,255,0.16);
@@ -2432,6 +2436,9 @@
     body.aq-search-ui .unit-title { color: var(--aq-prop-text); font-size: var(--aq-fs-body-lg); font-weight: 800; }
     body.aq-search-ui .unit-loc { color: var(--aq-prop-text-muted); font-weight: 600; }
     body.aq-search-ui .unit-card .unit-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 2px; line-height: 1.45; }
+    /* اسم الوحدة (بارز) + نوع العقار كلاحقة أهدأ - نفس الـhierarchy في الصورة المرجعية */
+    body.aq-search-ui .unit-card .unit-title-name { color: var(--aq-prop-text); font-weight: 800; }
+    body.aq-search-ui .unit-card .unit-title-type { color: var(--aq-prop-text-muted); font-weight: 600; font-size: var(--aq-fs-caption); }
     body.aq-search-ui .unit-card .unit-loc { margin-bottom: 8px; font-size: var(--aq-fs-caption); }
     body.aq-search-ui .unit-card .unit-loc .ico { color: var(--aq-prop-green-deep); }
     /* المواصفات: صفّان بثلاث شرائح (سطر واحد لكل شريحة) */
@@ -2459,15 +2466,27 @@
     }
     /* لوحة السعر Premium: عمق + حدّ + ظل ناعم، بلا زيادة مبالغ فيها في الارتفاع */
     body.aq-search-ui .unit-card-footer { margin-top: auto; padding-top: 2px; }
+    /* لوحة السعر: عمود رأسي (flex-column, align-items:center) - السعر النهائي وسعر المتر
+     * (.price-center) يتمركزان تلقائيًا بالنسبة لعرض المستطيل بالكامل لأن align-items:center
+     * يُوسّط كل عنصر بحسب عرض محتواه هو، بصرف النظر عمّا يعلوه من عناصر (.price-top). فوقه،
+     * صفّ السعر قبل الخصم + Badge الخصم (عند وجود خصم) يُثبَّت على جانب البداية (يمين RTL)
+     * عبر align-self:flex-start - نفس توزيع الصورة المرجعية (كليهما مجموعة واحدة أعلى يمين
+     * اللوحة، والسعر النهائي بارز ومتمركز تمامًا أسفلهما). */
     body.aq-search-ui .unit-card .unit-price-box {
-      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 10px;
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
       background: linear-gradient(180deg, #FFFFFF 0%, var(--aq-prop-green-soft) 100%);
       border: 1px solid var(--aq-prop-green-line); border-radius: 12px; padding: 9px 12px; margin-top: 6px;
       box-shadow: 0 4px 14px rgba(11,40,33,0.08), inset 0 1px 0 #fff;
     }
-    body.aq-search-ui .unit-card .price-main { display: flex; flex-direction: column; gap: 1px; min-width: 0; text-align: start; }
-    body.aq-search-ui .unit-card .price-old-label { font-size: var(--aq-fs-micro); color: var(--aq-prop-text-faint); font-weight: 600; }
-    body.aq-search-ui .unit-card .old-price { font-size: var(--aq-fs-caption); color: var(--aq-prop-text-faint); font-weight: 700; text-decoration: line-through; }
+    body.aq-search-ui .unit-card .price-top {
+      align-self: flex-start; display: flex; align-items: center; gap: 8px; max-width: 100%; min-width: 0;
+    }
+    body.aq-search-ui .unit-card .price-old-group { display: flex; flex-direction: column; gap: 1px; align-items: flex-end; text-align: end; min-width: 0; }
+    body.aq-search-ui .unit-card .price-center {
+      display: flex; flex-direction: column; align-items: center; gap: 1px; min-width: 0; text-align: center;
+    }
+    body.aq-search-ui .unit-card .price-old-label { font-size: var(--aq-fs-micro); color: var(--aq-prop-text-faint); font-weight: 600; white-space: nowrap; }
+    body.aq-search-ui .unit-card .old-price { font-size: var(--aq-fs-caption); color: var(--aq-prop-text-faint); font-weight: 700; text-decoration: line-through; white-space: nowrap; }
     body.aq-search-ui .unit-card .final-price { font-size: var(--aq-fs-title-sm); line-height: 1.25; color: var(--aq-prop-green-deep); font-weight: 900; margin: 0; white-space: nowrap; }
     body.aq-search-ui .unit-card .final-price .cur { font-size: var(--aq-fs-caption); font-weight: 800; }
     body.aq-search-ui .unit-card .per-meter { display: inline-flex; align-items: center; gap: 4px; font-size: var(--aq-fs-micro); color: var(--aq-prop-text-muted); font-weight: 600; margin: 0; }
@@ -5654,6 +5673,7 @@
     const coverStrip = `
         <div class="unit-cover-strip">
           <span class="status-badge ${u['Status']}"><i class="status-dot"></i>${u['Status']}</span>
+          <i class="cover-strip-divider"></i>
           <span class="unit-id">${u['Unit ID']}</span>
           ${images.length > 1 ? `<span class="img-count-badge">${ICON.camera} ${images.length}</span>` : ''}
         </div>`;
@@ -5682,35 +5702,43 @@
 
     // شريحة مواصفة: أيقونة + قيمة (بارزة) + تسمية صغيرة - سطر واحد للحفاظ على ارتفاع الكارت
     const chip = (icon, value, label) => `<span class="spec-chip">${icon}<span class="spec-txt"><b>${value}</b><small>${label}</small></span></span>`;
+    // ترتيب DOM معكوس عمدًا: شبكة RTL تعرض أول عنصر في DOM أقصى اليمين، وآخر عنصر أقصى
+    // اليسار - فترتيب [حمامات، غرف، مساحة] في DOM ينتج بصريًا "مساحة يسار، غرف وسط،
+    // حمامات يمين" مطابقًا تمامًا لتوزيع الصورة المرجعية (unit card.png).
     const row1 = [
-      u['Unit Area (sqm)'] ? chip(ICON.area, u['Unit Area (sqm)'] + ' م²', 'المساحة') : '',
+      u['Bathrooms'] ? chip(ICON.bath, u['Bathrooms'], 'حمامات') : '',
       u['Rooms'] ? chip(ICON.bed, u['Rooms'], 'غرف') : '',
-      u['Bathrooms'] ? chip(ICON.bath, u['Bathrooms'], 'حمامات') : ''
+      u['Unit Area (sqm)'] ? chip(ICON.area, u['Unit Area (sqm)'] + ' م²', 'المساحة') : ''
     ].filter(Boolean);
     // الصف الثاني: الدور / التشطيب / الجاردن أو الروف أو التراس - فقط ما هو موجود فعلًا في بيانات الوحدة
+    // (نفس منطق العكس: الدور يظهر بصريًا يسارًا والجاردن/الروف/التراس يمينًا كما في المرجع)
     const outdoor = u['Garden Area (sqm)'] ? chip(ICON.tree, u['Garden Area (sqm)'] + ' م²', 'الجاردن')
       : (u['Roof Area (sqm)'] ? chip(ICON.roof, u['Roof Area (sqm)'] + ' م²', 'الروف')
       : (u['Terrace Area (sqm)'] ? chip(ICON.terrace, u['Terrace Area (sqm)'] + ' م²', 'التراس') : ''));
     const row2 = [
-      u['Floor'] ? chip(ICON.floor, u['Floor'], 'الدور') : '',
+      outdoor,
       u['Finishing'] ? chip(ICON.brush, u['Finishing'], 'التشطيب') : '',
-      outdoor
+      u['Floor'] ? chip(ICON.floor, u['Floor'], 'الدور') : ''
     ].filter(Boolean);
 
     const hasDiscount = Number(u['Discount Percentage']) > 0;
     const perMeter = u['Price per Meter'] ? `<div class="per-meter">${ICON.chart} ${fmtNum(u['Price per Meter'])} جنيه / م²</div>` : '';
     const priceHtml = hasDiscount ? `
         <div class="unit-price-box has-discount">
-          <div class="price-main">
-            <span class="price-old-label">السعر قبل الخصم</span>
-            <span class="old-price">${fmtNum(u['Price'])} جنيه</span>
+          <div class="price-top">
+            <div class="price-old-group">
+              <span class="price-old-label">السعر قبل الخصم</span>
+              <span class="old-price">${fmtNum(u['Price'])} جنيه</span>
+            </div>
+            <span class="discount-tag">${ICON.tag} خصم ${u['Discount Percentage']}%</span>
+          </div>
+          <div class="price-center">
             <div class="final-price">${fmtNum(u['Price After Discount'])} <span class="cur">جنيه</span></div>
             ${perMeter}
           </div>
-          <span class="discount-tag">${ICON.tag} خصم ${u['Discount Percentage']}%</span>
         </div>` : `
         <div class="unit-price-box">
-          <div class="price-main">
+          <div class="price-center">
             <div class="final-price">${fmtNum(u['Price'])} <span class="cur">جنيه</span></div>
             ${perMeter}
           </div>
@@ -5730,7 +5758,7 @@
         <input type="checkbox" ${compareList.indexOf(u['Unit ID']) !== -1 ? 'checked' : ''} onchange="toggleCompare('${u['Unit ID']}', this)" aria-label="إضافة للمقارنة">
       </label>
       <div class="unit-info-block">
-        <div class="unit-title">${u['Property Type']} - ${u['Project Name'] || u['City']}</div>
+        <div class="unit-title"><span class="unit-title-name">${u['Project Name'] || u['City']}</span> <span class="unit-title-type">- ${u['Property Type']}</span></div>
         <div class="unit-loc">${ICON.pin} ${u['City']} - ${u['Area/District']}</div>
         ${row1.length ? `<div class="unit-specs">${row1.join('')}</div>` : ''}
         ${row2.length ? `<div class="unit-specs unit-specs-2">${row2.join('')}</div>` : ''}
