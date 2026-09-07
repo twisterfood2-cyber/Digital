@@ -2445,17 +2445,25 @@
     body.aq-search-ui .unit-card .unit-specs {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 6px;
       margin: 0 0 6px; min-height: 0; overflow: visible;
+      direction: rtl;   /* ترتيب بصري حتمي: أول شريحة في DOM = أقصى اليمين، لا يتأثر بأي وراثة/استجابة */
     }
     body.aq-search-ui .spec-chip {
-      display: flex; align-items: center; gap: 7px; min-width: 0;
+      /* توسيط حقيقي لمجموعة (أيقونة + قيمة/تسمية) داخل الكارت: justify-content:center يوسّط
+       * المجموعة على المحور الرئيسي بصرف النظر عن اتجاه RTL (بخلاف flex-start الافتراضي
+       * الذي كان يُلصق المجموعة بحافة الكارت اليمنى تحت RTL). لا تغيير في الحجم/الحدود/الحشو. */
+      display: flex; align-items: center; justify-content: center; gap: 7px; min-width: 0;
       background: var(--aq-prop-canvas); color: var(--aq-prop-text);
       border: 1px solid var(--aq-prop-border); border-radius: 10px;
       padding: 5px 8px; box-shadow: none; white-space: nowrap;
     }
     body.aq-search-ui .spec-chip .ico { width: 16px; height: 16px; flex: none; color: var(--aq-prop-green-deep); }
-    body.aq-search-ui .spec-chip .spec-txt { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
-    body.aq-search-ui .spec-chip .spec-txt b { font-size: var(--aq-fs-caption); font-weight: 800; overflow: hidden; text-overflow: ellipsis; }
-    body.aq-search-ui .spec-chip .spec-txt small { font-size: var(--aq-fs-micro); color: var(--aq-prop-text-muted); font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+    /* align-items:center يوسّط كل سطر (القيمة والتسمية) بالنسبة للآخر عند اختلاف طولهما،
+     * بدل ترك الافتراضي (stretch) يمدّد السطرين لعرض واحد فيظهر السطر الأقصر ملتصقًا
+     * بحافة تبعًا لاتجاه RTL رغم توسيط المجموعة الخارجية. */
+    body.aq-search-ui .spec-chip .spec-txt { display: flex; flex-direction: column; align-items: center; min-width: 0; line-height: 1.2; }
+    /* max-width:100% يُبقي القيمة/التسمية داخل عرض الشريحة (فيعمل الـ ellipsis) مع بقائهما متمركزتين */
+    body.aq-search-ui .spec-chip .spec-txt b { font-size: var(--aq-fs-caption); font-weight: 800; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+    body.aq-search-ui .spec-chip .spec-txt small { font-size: var(--aq-fs-micro); color: var(--aq-prop-text-muted); font-weight: 600; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
     /* كروت ضيقة (شبكة 5-6 أعمدة): إخفاء أيقونة الشريحة وتقليص الحشو حتى تبقى القيمة والتسمية مقروءتين */
     body.aq-search-ui .unit-card { container-type: inline-size; }
     @container (max-width: 250px) {
@@ -5702,24 +5710,28 @@
 
     // شريحة مواصفة: أيقونة + قيمة (بارزة) + تسمية صغيرة - سطر واحد للحفاظ على ارتفاع الكارت
     const chip = (icon, value, label) => `<span class="spec-chip">${icon}<span class="spec-txt"><b>${value}</b><small>${label}</small></span></span>`;
-    // ترتيب DOM معكوس عمدًا: شبكة RTL تعرض أول عنصر في DOM أقصى اليمين، وآخر عنصر أقصى
-    // اليسار - فترتيب [حمامات، غرف، مساحة] في DOM ينتج بصريًا "مساحة يسار، غرف وسط،
-    // حمامات يمين" مطابقًا تمامًا لتوزيع الصورة المرجعية (unit card.png).
+    /* ترتيب العرض الثابت (أولوية منطقية، لا ترتيب الحقول الخام) - بصريًا من اليمين لليسار
+     * لأن شبكة .unit-specs مضبوطة صراحةً على direction:rtl (أول عنصر في DOM = أقصى اليمين):
+     *   الصف 1: المساحة ← الغرف ← الحمامات
+     *   الصف 2: الدور ← (الجاردن أو الروف أو التراس) ← التشطيب
+     *   ثم أي معلومة مكانية إضافية (لو وُجد أكثر من جاردن/روف/تراس) في صف تالٍ بنفس الشريحة.
+     * الحقول الغائبة تُحذف كليًا (لا Placeholder فارغ) فتتوزع الشرائح المتبقية طبيعيًا. */
     const row1 = [
-      u['Bathrooms'] ? chip(ICON.bath, u['Bathrooms'], 'حمامات') : '',
+      u['Unit Area (sqm)'] ? chip(ICON.area, u['Unit Area (sqm)'] + ' م²', 'المساحة') : '',
       u['Rooms'] ? chip(ICON.bed, u['Rooms'], 'غرف') : '',
-      u['Unit Area (sqm)'] ? chip(ICON.area, u['Unit Area (sqm)'] + ' م²', 'المساحة') : ''
+      u['Bathrooms'] ? chip(ICON.bath, u['Bathrooms'], 'حمامات') : ''
     ].filter(Boolean);
-    // الصف الثاني: الدور / التشطيب / الجاردن أو الروف أو التراس - فقط ما هو موجود فعلًا في بيانات الوحدة
-    // (نفس منطق العكس: الدور يظهر بصريًا يسارًا والجاردن/الروف/التراس يمينًا كما في المرجع)
-    const outdoor = u['Garden Area (sqm)'] ? chip(ICON.tree, u['Garden Area (sqm)'] + ' م²', 'الجاردن')
-      : (u['Roof Area (sqm)'] ? chip(ICON.roof, u['Roof Area (sqm)'] + ' م²', 'الروف')
-      : (u['Terrace Area (sqm)'] ? chip(ICON.terrace, u['Terrace Area (sqm)'] + ' م²', 'التراس') : ''));
+    const outdoors = [
+      u['Garden Area (sqm)'] ? chip(ICON.tree, u['Garden Area (sqm)'] + ' م²', 'الجاردن') : '',
+      u['Roof Area (sqm)'] ? chip(ICON.roof, u['Roof Area (sqm)'] + ' م²', 'الروف') : '',
+      u['Terrace Area (sqm)'] ? chip(ICON.terrace, u['Terrace Area (sqm)'] + ' م²', 'التراس') : ''
+    ].filter(Boolean);
     const row2 = [
-      outdoor,
-      u['Finishing'] ? chip(ICON.brush, u['Finishing'], 'التشطيب') : '',
-      u['Floor'] ? chip(ICON.floor, u['Floor'], 'الدور') : ''
+      u['Floor'] ? chip(ICON.floor, u['Floor'], 'الدور') : '',
+      outdoors[0] || '',
+      u['Finishing'] ? chip(ICON.brush, u['Finishing'], 'التشطيب') : ''
     ].filter(Boolean);
+    const row3 = outdoors.slice(1);   // معلومات مكانية إضافية فقط عند وجودها فعلًا
 
     const hasDiscount = Number(u['Discount Percentage']) > 0;
     const perMeter = u['Price per Meter'] ? `<div class="per-meter">${ICON.chart} ${fmtNum(u['Price per Meter'])} جنيه / م²</div>` : '';
@@ -5762,6 +5774,7 @@
         <div class="unit-loc">${ICON.pin} ${u['City']} - ${u['Area/District']}</div>
         ${row1.length ? `<div class="unit-specs">${row1.join('')}</div>` : ''}
         ${row2.length ? `<div class="unit-specs unit-specs-2">${row2.join('')}</div>` : ''}
+        ${row3.length ? `<div class="unit-specs unit-specs-3">${row3.join('')}</div>` : ''}
       </div>
       <div class="unit-card-footer">
         ${priceHtml}
