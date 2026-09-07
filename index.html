@@ -3063,21 +3063,25 @@
     #editModal #quoteWhatsAppBtn { border-radius: var(--aq-prop-radius-sm); background: var(--aq-success-dot); border-color: var(--aq-success-dot); }
     #editModal #quoteWhatsAppBtn:hover { background: var(--aq-success-fg); border-color: var(--aq-success-fg); }
 
-    /* عرض SALES (قراءة فقط): زر الحفظ يُزال من الـ DOM بواسطة applyRoleUiVisibility →
-       النموذج يُعرض كبطاقة معلومات لا كنموذج تحرير. لا صلاحيات ولا JS جديد. */
-    #editModal:not(:has(#editSaveBtn)) #editForm input:not([type="file"]),
-    #editModal:not(:has(#editSaveBtn)) #editForm select,
-    #editModal:not(:has(#editSaveBtn)) #editForm textarea {
+    /* عرض SALES (قراءة فقط) عبر salesOpenUnitView/loadUnitIntoEditForm: زر الحفظ يُزال من
+       الـ DOM بواسطة applyRoleUiVisibility → النموذج يُعرض كبطاقة معلومات لا كنموذج تحرير.
+       لا صلاحيات ولا JS جديد. استبعاد .aq-quote-mode (يضبطها openQuoteMode فقط) ضروري: بلا
+       زر حفظ للـ SALES أصلًا (لا EDIT_UNIT/ADD_UNIT)، فكان هذا الشرط يقفل حاسبة "عرض السعر"
+       (حقول الإدخال تصبح pointer-events:none) رغم أنها لا تحفظ في الباك-إند لأي دور - وهذا
+       الإصلاح الوحيد المطلوب: تمييز "عرض قراءة فقط لوحدة حقيقية" عن "حاسبة عرض سعر تفاعلية". */
+    #editModal:not(:has(#editSaveBtn)):not(.aq-quote-mode) #editForm input:not([type="file"]),
+    #editModal:not(:has(#editSaveBtn)):not(.aq-quote-mode) #editForm select,
+    #editModal:not(:has(#editSaveBtn)):not(.aq-quote-mode) #editForm textarea {
       background: var(--aq-prop-canvas); pointer-events: none; box-shadow: none;
     }
-    #editModal:not(:has(#editSaveBtn)) #editForm select { background-image: none; }
-    #editModal:not(:has(#editSaveBtn)) .images-zone,
-    #editModal:not(:has(#editSaveBtn)) .image-link-row,
-    #editModal:not(:has(#editSaveBtn)) .image-thumb .remove-img,
-    #editModal:not(:has(#editSaveBtn)) #editImagesUploadMsg { display: none !important; }
-    #editModal:not(:has(#editSaveBtn)) .image-thumb { cursor: default; }
+    #editModal:not(:has(#editSaveBtn)):not(.aq-quote-mode) #editForm select { background-image: none; }
+    #editModal:not(:has(#editSaveBtn)):not(.aq-quote-mode) .images-zone,
+    #editModal:not(:has(#editSaveBtn)):not(.aq-quote-mode) .image-link-row,
+    #editModal:not(:has(#editSaveBtn)):not(.aq-quote-mode) .image-thumb .remove-img,
+    #editModal:not(:has(#editSaveBtn)):not(.aq-quote-mode) #editImagesUploadMsg { display: none !important; }
+    #editModal:not(:has(#editSaveBtn)):not(.aq-quote-mode) .image-thumb { cursor: default; }
     /* عرض SALES بلا صور: عنوان قسم الصور يختفي بدل قسم فارغ */
-    #editModal:not(:has(#editSaveBtn)) #editForm:has(#editImagesPreview:empty) .section-title:has(+ .images-zone) { display: none; }
+    #editModal:not(:has(#editSaveBtn)):not(.aq-quote-mode) #editForm:has(#editImagesPreview:empty) .section-title:has(+ .images-zone) { display: none; }
 
     /* استجابة */
     @media (max-width: 1024px) {
@@ -4908,6 +4912,7 @@
   function openAddUnitModal() {
     editModalMode = 'add';
     currentEditUnitId = null;
+    editModal.classList.remove('aq-quote-mode');   // ضبط افتراضي: وضع "إضافة" ليس حاسبة عرض سعر (تُضبط في openQuoteMode أدناه)
     editForm.reset();
     document.getElementById('editUnitIdLabel').textContent = '';
     document.querySelector('#editModal .modal-title').firstChild.textContent = 'إضافة وحدة جديدة ';
@@ -4954,6 +4959,9 @@
     // ابدأ من reset كامل زي وضع الإضافة (نفس القوائم/الحقول/تعبئة AI/الصور)
     openAddUnitModal();
     editModalMode = 'quote';
+    // Fix: حاسبة "عرض السعر" تفاعلية دائمًا (لا حفظ لأي دور أصلًا) - استبعادها من قفل
+    // "عرض SALES للقراءة فقط" أعلاه، الذي كان يقفل حقول الإدخال خطأً لأي دور بلا زر حفظ (SALES).
+    editModal.classList.add('aq-quote-mode');
     document.querySelector('#editModal .modal-title').firstChild.textContent = 'عرض السعر ';
     // في وضع "عرض السعر": لا "حفظ"، لا "مسح"، لا "جيب آخر وحدة" — بدلها صفّ (تصدير + واتساب)
     editSaveBtn.style.display = 'none';
@@ -5208,6 +5216,7 @@
 
   function cloneUnit(unitId) {
     editModalMode = 'clone';
+    editModal.classList.remove('aq-quote-mode');   // استنساخ وحدة - ليس حاسبة عرض سعر
     unitWritePin = ''; // التفويض عبر بيانات الدخول (getAuthCreds) والدور — السيرفر بيتحقق من CLONE_UNIT
     currentEditUnitId = null; // مفيش وحدة بنعدّل عليها، إحنا بنعمل وحدة جديدة
     document.getElementById('editUnitIdLabel').textContent = '(استنساخ من ' + unitId + ')';
@@ -7820,6 +7829,7 @@
   function loadUnitIntoEditForm(unitId) {
     editModalMode = 'edit';
     currentEditUnitId = unitId;
+    editModal.classList.remove('aq-quote-mode');   // تعديل/عرض وحدة حقيقية - ليس حاسبة عرض سعر (قفل SALES للقراءة فقط يبقى كما كان)
     // افتراضيًا صفّ (تصدير/واتساب) مخفي في وضع التعديل العادي (OWNER/MANAGER)؛
     // مسار salesOpenUnitView (عرض فقط لـ SALES) يُظهره بعد هذا الاستدعاء.
     var _qrHide = document.getElementById('quoteActionRow'); if (_qrHide) _qrHide.classList.remove('show');
