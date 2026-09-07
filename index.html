@@ -2924,13 +2924,13 @@
       background: var(--aq-prop-surface); color: var(--aq-prop-text);
       border: 1px solid var(--aq-prop-border); border-top: 1px solid var(--aq-prop-border);
       border-radius: var(--aq-prop-radius-lg); box-shadow: var(--aq-prop-shadow);
-      padding: var(--aq-space-6) var(--aq-space-6) 0;
-      max-width: 1000px; width: 100%; margin: 0 auto;
+      padding: var(--aq-space-5) var(--aq-space-6) 0;
+      max-width: 1280px; width: 100%; margin: 0 auto;   /* أعرض من 1000px: صفوف أقل على الشاشات العريضة */
     }
     body.app-view-add #editModal .modal-box,
-    body.app-view-quote #editModal .modal-box { max-width: 1000px; width: 100%; margin: 0 auto; }
+    body.app-view-quote #editModal .modal-box { max-width: 1280px; width: 100%; margin: 0 auto; }
     #editModal .modal-header {
-      margin-bottom: var(--aq-space-5); padding-bottom: var(--aq-space-4);
+      margin-bottom: var(--aq-space-4); padding-bottom: var(--aq-space-3);
       border-bottom: 1px solid var(--aq-prop-border);
     }
     #editModal .modal-title {
@@ -2949,7 +2949,7 @@
     /* عناوين الأقسام: علامة خضراء + عنوان — بلا خط تحت ولا أحرف كبيرة */
     #editForm .section-title {
       display: flex; align-items: center; gap: 10px;
-      margin: var(--aq-space-7) 0 var(--aq-space-4); padding: 0; border: none;
+      margin: var(--aq-space-4) 0 10px; padding: 0; border: none;
       font-size: var(--aq-fs-body-lg); font-weight: var(--aq-fw-bold); color: var(--aq-prop-text);
       letter-spacing: 0; text-transform: none;
     }
@@ -2977,39 +2977,73 @@
     }
     #editModal select { color-scheme: light; }
     #editModal textarea { min-height: 110px; resize: vertical; }
+    #editModal textarea[name="notes"] { min-height: 72px; }   /* ملاحظات: ارتفاع مريح بلا فراغ زائد */
     /* الأرقام والهواتف والروابط: ltr داخل RTL */
     #editModal input[type="number"], #editModal input[name="ownerPhone"], #editModal #editImageLinkInput {
       direction: ltr; text-align: end; font-variant-numeric: tabular-nums;
     }
 
-    /* شبكات الأقسام: التسلسل يتبع المعلومات لا عمودين قسريين */
-    #editForm .grid { gap: var(--aq-space-4) var(--aq-space-4); }
-    #editForm .grid.aq-fg-basic,
-    #editForm .grid.aq-fg-location,
-    #editForm .grid.aq-fg-owner { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    #editForm .grid.aq-fg-details { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    #editForm .grid.aq-fg-price { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    #editForm .grid.aq-fg-price > div:nth-child(1) { grid-column: span 2; }   /* السعر الأصلي أبرز حقل مالي */
-    #editForm .grid.aq-fg-details > div:nth-child(10) { grid-column: span 2; } /* الفيو */
-    #editForm .aq-fg-location #editFetchLastSimilarBtn { margin-top: 8px; width: 100%; }
+    /* شبكة 12 عمودًا: عرض كل حقل بحسب طبيعته (aq-c2 … aq-c12) — صفوف أقل واستغلال كامل للعرض.
+       Desktop: أساسية 4|4|4 — الموقع 3|3|6 — التفاصيل 2|2|2|2|4 ×2 — السعر 3|2|3|2|2 ثم 3|2|3|2|2 ثم 3|3|معاينة 6 */
+    #editForm .grid { grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 10px var(--aq-space-3); }
+    #editForm .grid > * { grid-column: span 12; min-width: 0; align-self: end; }   /* محاذاة الحقول لأسفل الصف حين يلتفّ عنوان على سطرين */
+    #editForm .grid > .aq-c2 { grid-column: span 2; }
+    #editForm .grid > .aq-c3 { grid-column: span 3; }
+    #editForm .grid > .aq-c4 { grid-column: span 4; }
+    #editForm .grid > .aq-c6 { grid-column: span 6; }
+    #editForm .grid > .aq-c12 { grid-column: span 12; }
+    /* اسم المشروع + زر "جيب آخر وحدة" في سطر واحد؛ لو الزر مخفي (تعديل/نسخ) الحقل يملأ العرض تلقائيًا */
+    #editForm .aq-inline-action { display: flex; flex-wrap: wrap; gap: var(--aq-space-2); align-items: stretch; }
+    #editForm .aq-inline-action > input { flex: 1 1 200px; min-width: 0; }
+    #editForm .aq-inline-action #editFetchLastSimilarBtn { flex: 0 0 auto; margin: 0; min-height: 46px; white-space: nowrap; padding: 10px 14px; font-size: var(--aq-fs-caption); }
 
     /* معاينة القسط: بطاقة مالية هادئة */
     #editModal .installment-preview {
       background: var(--aq-prop-green-soft); border: 1px solid var(--aq-prop-green-line); color: var(--aq-prop-green-ink);
-      border-radius: var(--aq-prop-radius); padding: var(--aq-space-3) var(--aq-space-4); margin-top: var(--aq-space-4);
-      display: grid; gap: 6px; font-weight: var(--aq-fw-medium);
+      border-radius: var(--aq-prop-radius); padding: var(--aq-space-2) var(--aq-space-4); margin: 0;
+      font-weight: var(--aq-fw-medium); font-size: var(--aq-fs-caption); align-self: stretch;
     }
+    /* عنصر شبكة داخل قسم السعر (JS يبدّل display فقط): الأسطر الثلاثة تتوزع أفقيًا قدر الإمكان */
+    #editModal .installment-preview > div { display: inline-flex; align-items: center; gap: 6px; margin: 4px 0 4px var(--aq-space-4); white-space: nowrap; }
     #editModal .installment-preview b { color: var(--aq-prop-green-ink); font-variant-numeric: tabular-nums; }
     #editModal .installment-preview .ico { color: var(--aq-prop-green); }
 
     /* لوحة الذكاء الاصطناعي */
-    #editModal .ai-fill-panel .section-title { margin: 0 0 6px; }
+    #editModal .ai-fill-panel { padding: var(--aq-space-4); margin-bottom: var(--aq-space-5); }
+    #editModal .ai-fill-panel .aq-ai-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; margin-bottom: var(--aq-space-3); }
+    #editModal .ai-fill-panel .section-title { margin: 0; }
+    #editModal .ai-fill-panel .aq-form-help { margin: 0; }
     #editModal .ai-fill-panel .section-title .ico { color: var(--aq-prop-green); }
     #editModal .ai-fill-panel .section-title::before { display: none; }
-    #editModal #unitAddAiPasteText { min-height: 88px; margin-bottom: var(--aq-space-3); }
-    #editModal .ai-paste-zone { padding: var(--aq-space-4); color: var(--aq-prop-text-muted); font-weight: var(--aq-fw-bold); font-size: var(--aq-fs-caption); margin: 0 0 var(--aq-space-3); }
+    #editModal #unitAddAiPasteText { min-height: 76px; margin-bottom: var(--aq-space-3); }
+    /* صفّ الإجراءات الثلاثة: لصق | رفع | استخراج (الأساسي أعرض قليلًا) */
+    #editModal .aq-ai-actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.25fr); gap: var(--aq-space-2); align-items: stretch; }
+    #editModal .ai-paste-zone {
+      margin: 0; min-height: 48px; padding: 10px 14px; display: flex; align-items: center; justify-content: center;
+      color: var(--aq-prop-text-muted); font-weight: var(--aq-fw-bold); font-size: var(--aq-fs-caption);
+    }
     #editModal .ai-paste-zone.is-armed { color: var(--aq-prop-green); }
-    #editModal #unitAddAiPastedImagePreview { position: relative; max-width: 200px; margin: 0 0 var(--aq-space-3); }
+    #editModal .aq-ai-upload { position: relative; min-height: 48px; }
+    #editModal .aq-ai-upload-btn {
+      width: 100%; height: 100%; min-height: 48px; box-sizing: border-box; padding: 10px 14px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      border: 1.5px dashed var(--aq-prop-green-line); border-radius: var(--aq-prop-radius); background: var(--aq-prop-surface);
+      color: var(--aq-prop-text-muted); font-weight: var(--aq-fw-bold); font-size: var(--aq-fs-caption);
+      transition: border-color var(--aq-motion-base), background var(--aq-motion-base);
+    }
+    #editModal .aq-ai-upload-btn .ico { width: 15px; height: 15px; color: var(--aq-prop-green); flex: 0 0 auto; }
+    #editModal .aq-ai-upload-btn #unitAddAiFileLabel {
+      min-width: 0; text-align: center; line-height: 1.3; overflow-wrap: anywhere;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;   /* سطران كحدّ أقصى (أسماء ملفات طويلة) */
+    }
+    #editModal .aq-ai-upload:hover .aq-ai-upload-btn, #editModal .aq-ai-upload:focus-within .aq-ai-upload-btn { border-color: var(--aq-prop-green); background: var(--aq-prop-green-soft); }
+    #editModal .aq-ai-upload.has-file .aq-ai-upload-btn { border-style: solid; border-color: var(--aq-prop-green); color: var(--aq-prop-green-ink); background: var(--aq-prop-green-soft); }
+    /* حقل الملف الأصلي شفاف فوق الزر — نفس النقرة الأصلية لفتح منتقي الملفات، بلا JS إضافي */
+    #editModal #unitAddAiSection #unitAddAiFileInput {
+      position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; border: 0;
+      opacity: 0; cursor: pointer; z-index: 1; font-size: 0; background: transparent;
+    }
+    #editModal #unitAddAiPastedImagePreview { position: relative; max-width: 160px; margin: var(--aq-space-3) 0 0; }
     #editModal #unitAddAiPastedImageTag { width: 100%; display: block; border-radius: var(--aq-prop-radius-sm); border: 1px solid var(--aq-prop-border); }
     #editModal #unitAddAiPastedImageRemove {
       position: absolute; top: -8px; inset-inline-end: -8px; width: 24px; height: 24px; border-radius: 50%;
@@ -3017,19 +3051,24 @@
       display: inline-flex; align-items: center; justify-content: center;
     }
     #editModal #unitAddAiPastedImageRemove .ico { width: 12px; height: 12px; }
-    #editModal #unitAddAiFileInput { margin-bottom: var(--aq-space-3); }
-    #editModal .ai-extract-btn { width: 100%; margin: 0; padding: 12px; font-size: var(--aq-fs-small); }
+    #editModal .ai-extract-btn { width: 100%; margin: 0; min-height: 48px; padding: 10px 16px; font-size: var(--aq-fs-small); }
+    #editModal #unitAddAiExtractMsg { margin-top: var(--aq-space-2); }
 
-    /* الصور */
-    #editModal .images-zone { padding: var(--aq-space-5) var(--aq-space-4); background: var(--aq-prop-surface); }
-    #editModal .images-zone p { color: var(--aq-prop-text-muted); }
+    /* الصور: منطقة اللصق/السحب + صفّ الرابط جنبًا إلى جنب (7|5) بدل صفّين متراصّين */
+    #editModal .aq-fg-images { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--aq-space-3); align-items: stretch; }
+    #editModal .images-zone {
+      padding: var(--aq-space-3) var(--aq-space-4); background: var(--aq-prop-surface); margin: 0;
+      display: flex; align-items: center; justify-content: space-between; gap: var(--aq-space-3); flex-wrap: wrap; text-align: start;
+    }
+    #editModal .images-zone p { color: var(--aq-prop-text-muted); margin: 0; flex: 1 1 200px; font-size: var(--aq-fs-caption); }
+    #editModal .images-zone .images-choose-btn { flex: 0 0 auto; }
     #editModal .images-choose-btn {
       background: var(--aq-prop-green); color: #fff; border: 1px solid var(--aq-prop-green-ink);
       border-radius: var(--aq-prop-radius-sm); padding: 10px 18px; font-size: var(--aq-fs-caption);
       display: inline-flex; align-items: center; gap: 8px;
     }
     #editModal .images-choose-btn:hover { background: var(--aq-prop-green-ink); }
-    #editModal .image-link-row { margin-top: var(--aq-space-3); gap: var(--aq-space-2); }
+    #editModal .image-link-row { margin: 0; gap: var(--aq-space-2); align-items: stretch; }
     #editModal .image-link-row button {
       background: var(--aq-prop-surface); color: var(--aq-prop-green); border: 1px solid var(--aq-prop-green-line);
       border-radius: var(--aq-prop-radius-sm); padding: 0 18px; font-weight: var(--aq-fw-bold);
@@ -3075,24 +3114,35 @@
       background: var(--aq-prop-canvas); pointer-events: none; box-shadow: none;
     }
     #editModal:not(:has(#editSaveBtn)):not(.aq-quote-mode) #editForm select { background-image: none; }
+    #editModal:not(:has(#editSaveBtn)):not(.aq-quote-mode) .aq-fg-images,
     #editModal:not(:has(#editSaveBtn)):not(.aq-quote-mode) .images-zone,
     #editModal:not(:has(#editSaveBtn)):not(.aq-quote-mode) .image-link-row,
     #editModal:not(:has(#editSaveBtn)):not(.aq-quote-mode) .image-thumb .remove-img,
     #editModal:not(:has(#editSaveBtn)):not(.aq-quote-mode) #editImagesUploadMsg { display: none !important; }
     #editModal:not(:has(#editSaveBtn)):not(.aq-quote-mode) .image-thumb { cursor: default; }
     /* عرض SALES بلا صور: عنوان قسم الصور يختفي بدل قسم فارغ */
-    #editModal:not(:has(#editSaveBtn)):not(.aq-quote-mode) #editForm:has(#editImagesPreview:empty) .section-title:has(+ .images-zone) { display: none; }
+    #editModal:not(:has(#editSaveBtn)):not(.aq-quote-mode) #editForm:has(#editImagesPreview:empty) .section-title:has(+ .aq-fg-images) { display: none; }
 
-    /* استجابة */
+    /* استجابة: تابلت/لابتوب ضيق → الحقول الصغيرة 3 في الصف؛ موبايل → عمودان للحقول الصغيرة وعمود واحد للباقي */
     @media (max-width: 1024px) {
-      #editForm .grid.aq-fg-details, #editForm .grid.aq-fg-price { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      #editForm .grid.aq-fg-price > div:nth-child(1) { grid-column: span 2; }
+      #editForm .grid > .aq-c2, #editForm .grid > .aq-c3 { grid-column: span 4; }
+      #editForm .grid > .aq-c4, #editForm .grid > .aq-c6 { grid-column: span 6; }
+      #editForm .grid > #editInstallmentPreview { grid-column: span 12; }
+      #editModal .aq-fg-images { grid-template-columns: 1fr; }
     }
     @media (max-width: 640px) {
       #editModal .modal-box { padding: var(--aq-space-4) var(--aq-space-3) 0; border-radius: var(--aq-prop-radius); }
-      #editForm .grid.aq-fg-basic, #editForm .grid.aq-fg-location, #editForm .grid.aq-fg-owner,
-      #editForm .grid.aq-fg-details, #editForm .grid.aq-fg-price { grid-template-columns: 1fr; }
-      #editForm .grid.aq-fg-price > div:nth-child(1), #editForm .grid.aq-fg-details > div:nth-child(10) { grid-column: auto; }
+      #editForm .grid { gap: var(--aq-space-3) var(--aq-space-2); }
+      #editForm .grid > .aq-c2, #editForm .grid > .aq-c3 { grid-column: span 6; }
+      #editForm .grid > .aq-c4, #editForm .grid > .aq-c6, #editForm .grid > .aq-c12, #editForm .grid > #editInstallmentPreview { grid-column: span 12; }
+      #editForm .aq-inline-action #editFetchLastSimilarBtn { flex: 1 1 100%; white-space: normal; }
+      #editModal .installment-preview > div { display: flex; margin: 4px 0; white-space: normal; }
+      #editModal .ai-fill-panel { padding: var(--aq-space-3); }
+      #editModal .ai-fill-panel .aq-ai-head { margin-bottom: var(--aq-space-2); }
+      #editModal .aq-ai-actions { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+      #editModal .aq-ai-actions .ai-extract-btn { grid-column: 1 / -1; }
+      #editModal .images-zone { justify-content: center; text-align: center; }
+      #editModal .images-zone p { flex: 1 1 100%; }
       #editModal .aq-form-actions { margin-inline: calc(-1 * var(--aq-space-3)); padding-inline: var(--aq-space-3); }
       #editModal #editSaveBtn, #editModal #editResetBtn, #editModal #editDeleteBtn { flex: 1 1 100%; margin-inline-start: 0; }
       #editModal #quoteActionRow.show { flex-direction: column; }
@@ -4277,29 +4327,34 @@
       <button class="modal-close" id="editCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
     <div id="unitAddAiSection" class="ai-fill-panel aq-form-assist" style="display:none;">
-      <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"/><path d="m18.5 14 .8 2.4 2.4.8-2.4.8-.8 2.4-.8-2.4-2.4-.8 2.4-.8Z"/></svg>تعبئة تلقائية بالذكاء الاصطناعي</div>
-      <p class="aq-form-help">
-        الصق رسالة المطور، أو ارفع صورة/PDF، والذكاء الاصطناعي هيملى الفورم تلقائيًا تحت.
-      </p>
+      <div class="aq-ai-head">
+        <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"/><path d="m18.5 14 .8 2.4 2.4.8-2.4.8-.8 2.4-.8-2.4-2.4-.8 2.4-.8Z"/></svg>تعبئة تلقائية بالذكاء الاصطناعي</div>
+        <p class="aq-form-help">الصق رسالة المطور، أو ارفع صورة/PDF، والذكاء الاصطناعي هيملى الفورم تلقائيًا تحت.</p>
+      </div>
       <textarea id="unitAddAiPasteText" class="aq-form-control" placeholder="الصق نص الرسالة هنا (اختياري)..."></textarea>
-      <div id="unitAddAiImagePasteZone" class="ai-paste-zone aq-upload-zone" tabindex="0">
-        دوس هنا وبعدين الصق صورة (Ctrl+V)
+      <!-- صفّ الإجراءات: [لصق صورة] [رفع من الجهاز] [استخراج] — نفس الـ ids ونفس المعالجات؛ التغليف بصري فقط -->
+      <div class="aq-ai-actions">
+        <div id="unitAddAiImagePasteZone" class="ai-paste-zone aq-upload-zone" tabindex="0">دوس هنا وبعدين الصق صورة (Ctrl+V)</div>
+        <div class="aq-ai-upload" id="unitAddAiUploadWrap">
+          <!-- حقل الملف الأصلي كما هو (المنطق يقرأ .files منه) — شفاف فوق زر مضغوط بدل الشريط العريض -->
+          <input type="file" id="unitAddAiFileInput" class="aq-file-input" accept="image/*,application/pdf" aria-label="رفع الصورة من جهازك">
+          <span class="aq-ai-upload-btn" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg><span id="unitAddAiFileLabel">رفع الصورة من جهازك</span></span>
+        </div>
+        <button type="button" id="unitAddAiExtractBtn" class="ai-extract-btn aq-btn--form-primary">
+          استخرج البيانات وابدأ التعبئة
+        </button>
       </div>
       <div id="unitAddAiPastedImagePreview" style="display:none;">
         <img id="unitAddAiPastedImageTag" alt="">
         <button type="button" id="unitAddAiPastedImageRemove" aria-label="إزالة الصورة"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
       </div>
-      <input type="file" id="unitAddAiFileInput" class="aq-file-input" accept="image/*,application/pdf">
-      <button type="button" id="unitAddAiExtractBtn" class="ai-extract-btn aq-btn--form-primary">
-        استخرج البيانات وابدأ التعبئة
-      </button>
       <div id="unitAddAiExtractMsg" class="aq-form-hint" style="display:none;"></div>
     </div>
 
     <form id="editForm">
       <div class="section-title">بيانات أساسية</div>
       <div class="grid aq-fg-basic">
-        <div>
+        <div class="aq-c4">
           <label>تصنيف الوحدة</label>
           <select name="category" required>
             <option value="">اختر</option>
@@ -4309,7 +4364,7 @@
             <option value="فندقي">فندقي</option>
           </select>
         </div>
-        <div>
+        <div class="aq-c4">
           <label>نوع العقار</label>
           <select name="propertyType" required>
             <option value="">اختر</option>
@@ -4346,7 +4401,7 @@
             </optgroup>
           </select>
         </div>
-        <div>
+        <div class="aq-c4">
           <label>اسم المطور العقاري</label>
           <input type="text" name="developer" list="editDeveloperDatalist" autocomplete="off">
           <datalist id="editDeveloperDatalist"></datalist>
@@ -4355,61 +4410,48 @@
 
       <div class="section-title">الموقع</div>
       <div class="grid aq-fg-location">
-        <div>
+        <div class="aq-c3">
           <label>المدينة</label>
           <select name="city" id="editCitySelect" required><option value="">اختر المدينة</option></select>
         </div>
-        <div>
+        <div class="aq-c3">
           <label>المنطقة</label>
           <select name="district" id="editDistrictSelect" required></select>
         </div>
-        <div>
+        <div class="aq-c6">
           <label>اسم المشروع</label>
-          <input type="text" name="projectName" list="editProjectDatalist" autocomplete="off">
-          <datalist id="editProjectDatalist"></datalist>
-          <!-- المرحلة 3.2: زر يدوي فقط — نفس سلوك add.html. تغيير اسم المشروع **لا** يجيب بيانات آخر وحدة تلقائيًا
-               (عشان متتعارضش مع بيانات الذكاء الاصطناعي). التعبئة من آخر وحدة تحصل فقط عند الضغط على الزر ده. -->
-          <button type="button" id="editFetchLastSimilarBtn" class="aq-btn--form-secondary">
-            🔄 جيب بيانات آخر وحدة مشابهة
-          </button>
+          <div class="aq-inline-action">
+            <input type="text" name="projectName" list="editProjectDatalist" autocomplete="off">
+            <datalist id="editProjectDatalist"></datalist>
+            <!-- المرحلة 3.2: زر يدوي فقط — نفس سلوك add.html. تغيير اسم المشروع **لا** يجيب بيانات آخر وحدة تلقائيًا
+                 (عشان متتعارضش مع بيانات الذكاء الاصطناعي). التعبئة من آخر وحدة تحصل فقط عند الضغط على الزر ده. -->
+            <button type="button" id="editFetchLastSimilarBtn" class="aq-btn--form-secondary">
+              🔄 جيب بيانات آخر وحدة مشابهة
+            </button>
+          </div>
         </div>
       </div>
 
       <div class="section-title">تفاصيل الوحدة</div>
+      <!-- صفّان: [المساحة|الغرف|الحمامات|الدور|التشطيب] ثم [الأرض|الحديقة|التراس|السطح|الفيو] -->
       <div class="grid aq-fg-details">
-        <div>
+        <div class="aq-c2">
           <label>المساحة (م²)</label>
           <input type="number" name="unitArea" required min="0" step="any">
         </div>
-        <div>
-          <label>مساحة الأرض (م²)</label>
-          <input type="number" name="landArea" min="0" step="0.5">
-        </div>
-        <div>
-          <label>مساحة الحديقة (م²)</label>
-          <input type="number" name="gardenArea" min="0" step="any">
-        </div>
-        <div>
-          <label>مساحة التراس (م²)</label>
-          <input type="number" name="terraceArea" min="0" step="any">
-        </div>
-        <div>
-          <label>مساحة السطح (م²)</label>
-          <input type="number" name="roofArea" min="0" step="any">
-        </div>
-        <div>
+        <div class="aq-c2">
           <label>عدد الغرف</label>
           <input type="number" name="rooms" min="0">
         </div>
-        <div>
+        <div class="aq-c2">
           <label>عدد الحمامات</label>
           <input type="number" name="bathrooms" min="0">
         </div>
-        <div>
+        <div class="aq-c2">
           <label>الدور</label>
           <input type="text" name="floor">
         </div>
-        <div>
+        <div class="aq-c4">
           <label>التشطيب</label>
           <select name="finishing">
             <option value="">اختر</option>
@@ -4423,7 +4465,23 @@
             <option value="بدون تشطيب">بدون تشطيب</option>
           </select>
         </div>
-        <div>
+        <div class="aq-c2">
+          <label>مساحة الأرض (م²)</label>
+          <input type="number" name="landArea" min="0" step="0.5">
+        </div>
+        <div class="aq-c2">
+          <label>مساحة الحديقة (م²)</label>
+          <input type="number" name="gardenArea" min="0" step="any">
+        </div>
+        <div class="aq-c2">
+          <label>مساحة التراس (م²)</label>
+          <input type="number" name="terraceArea" min="0" step="any">
+        </div>
+        <div class="aq-c2">
+          <label>مساحة السطح (م²)</label>
+          <input type="number" name="roofArea" min="0" step="any">
+        </div>
+        <div class="aq-c4">
           <label>الفيو</label>
           <input type="text" name="view">
         </div>
@@ -4431,15 +4489,15 @@
 
       <div class="section-title">السعر وطريقة الدفع</div>
       <div class="grid aq-fg-price">
-        <div>
+        <div class="aq-c3">
           <label>السعر الأصلي (قبل الخصم) (جنيه)</label>
           <input type="number" name="price" required min="0">
         </div>
-        <div>
+        <div class="aq-c2">
           <label>نسبة الخصم %</label>
           <input type="number" name="discountPercent" min="0" max="100" step="any">
         </div>
-        <div>
+        <div class="aq-c3">
           <label>طريقة الدفع</label>
           <select name="paymentMethod">
             <option value="">اختر</option>
@@ -4448,47 +4506,47 @@
             <option value="كاش أو تقسيط">كاش أو تقسيط</option>
           </select>
         </div>
-        <div>
+        <div class="aq-c2">
           <label>المقدم (نسبة %)</label>
           <input type="number" name="downPayment" min="0" max="100" step="any">
           <div id="editDownPaymentValueHint" class="aq-form-hint" style="display:none;"></div>
         </div>
-        <div>
+        <div class="aq-c2">
           <label>المقدم محسوب على</label>
           <select name="downPaymentBase">
             <option value="بعد الخصم" selected>السعر بعد الخصم</option>
             <option value="قبل الخصم">السعر قبل الخصم</option>
           </select>
         </div>
-        <div>
+        <div class="aq-c3">
           <label>قيمة الدفعة (نسبة % أو قيمة)</label>
           <input type="text" name="paymentAmount">
           <div id="editPaymentAmountValueHint" class="aq-form-hint" style="display:none;"></div>
         </div>
-        <div>
+        <div class="aq-c2">
           <label>عدد الدفعات</label>
           <input type="number" name="paymentCount" min="0">
         </div>
-        <div>
+        <div class="aq-c3">
           <label>موعد الدفعات</label>
           <input type="text" name="paymentSchedule" placeholder="مثال: كل 6 شهور">
         </div>
-        <div>
+        <div class="aq-c2">
           <label>عدد سنوات التقسيط</label>
           <input type="number" name="installmentYears" min="0" step="any">
         </div>
-        <div>
+        <div class="aq-c2">
           <label>تاريخ التسليم</label>
           <input type="text" name="deliveryDate">
         </div>
-        <div>
+        <div class="aq-c3">
           <label>أنظمة سداد أخرى</label>
           <select name="otherPaymentPlans">
             <option value="لا" selected>لا</option>
             <option value="نعم">نعم</option>
           </select>
         </div>
-        <div>
+        <div class="aq-c3">
           <label>حالة الوحدة</label>
           <select name="status">
             <option value="متاح" selected>متاح</option>
@@ -4496,45 +4554,48 @@
             <option value="مباع">مباع</option>
           </select>
         </div>
-      </div>
-
-      <div class="installment-preview" id="editInstallmentPreview" style="display:none;">
-        <div><svg class="ico" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h13v4"/><path d="M3 7v10a2 2 0 0 0 2 2h15V7H5"/><path d="M16 13h.01"/></svg> السعر بعد الخصم: <b id="editPriceAfterDiscountValue">-</b> جنيه</div>
-        <div><svg class="ico" viewBox="0 0 24 24"><path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2v.3h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2Z"/></svg> القسط الشهري التقريبي: <b id="editMonthlyInstallmentValue">-</b> جنيه/شهريًا</div>
-        <div><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg> القسط الربع سنوي التقريبي: <b id="editQuarterlyInstallmentValue">-</b> جنيه/كل 3 شهور</div>
+        <!-- معاينة القسط: نفس الـ id/العناصر (calcEditMonthlyInstallment يبدّل display) — تشغل بقية الصف بجوار الحالة -->
+        <div class="installment-preview aq-c6" id="editInstallmentPreview" style="display:none;">
+          <div><svg class="ico" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h13v4"/><path d="M3 7v10a2 2 0 0 0 2 2h15V7H5"/><path d="M16 13h.01"/></svg> السعر بعد الخصم: <b id="editPriceAfterDiscountValue">-</b> جنيه</div>
+          <div><svg class="ico" viewBox="0 0 24 24"><path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2v.3h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2Z"/></svg> القسط الشهري التقريبي: <b id="editMonthlyInstallmentValue">-</b> جنيه/شهريًا</div>
+          <div><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg> القسط الربع سنوي التقريبي: <b id="editQuarterlyInstallmentValue">-</b> جنيه/كل 3 شهور</div>
+        </div>
       </div>
 
       <div class="section-title">بيانات المالك والمسؤول</div>
       <div class="grid aq-fg-owner">
-        <div>
+        <div class="aq-c4">
           <label>اسم المالك</label>
           <input type="text" name="ownerName">
         </div>
-        <div>
+        <div class="aq-c4">
           <label>رقم هاتف المالك</label>
           <input type="text" name="ownerPhone">
         </div>
-        <div>
+        <div class="aq-c4">
           <label>الموظف المسؤول</label>
           <input type="text" name="agent">
         </div>
       </div>
 
       <div class="section-title">صور الوحدة</div>
-      <div class="images-zone aq-upload-zone" id="editImagesZone" tabindex="0">
-        <p>الصق صورة (Ctrl+V) هنا، أو اسحب صورة، أو اختار من جهازك</p>
-        <input type="file" id="editImagesFileInput" accept="image/*" multiple style="display:none;">
-        <button type="button" class="images-choose-btn" id="editImagesChooseBtn"><svg class="ico" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg> اختيار صور من الجهاز</button>
-      </div>
-      <div class="image-link-row">
-        <input type="text" id="editImageLinkInput" placeholder="أو الصق رابط صورة هنا (URL)">
-        <button type="button" id="editAddImageLinkBtn">إضافة رابط</button>
+      <!-- منطقة الصور + صفّ الرابط جنبًا إلى جنب على الشاشات العريضة — نفس الـ ids والمعالجات -->
+      <div class="aq-fg-images">
+        <div class="images-zone aq-upload-zone" id="editImagesZone" tabindex="0">
+          <p>الصق صورة (Ctrl+V) هنا، أو اسحب صورة، أو اختار من جهازك</p>
+          <input type="file" id="editImagesFileInput" accept="image/*" multiple style="display:none;">
+          <button type="button" class="images-choose-btn" id="editImagesChooseBtn"><svg class="ico" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg> اختيار صور من الجهاز</button>
+        </div>
+        <div class="image-link-row">
+          <input type="text" id="editImageLinkInput" placeholder="أو الصق رابط صورة هنا (URL)">
+          <button type="button" id="editAddImageLinkBtn">إضافة رابط</button>
+        </div>
       </div>
       <div id="editImagesPreview" class="images-preview aq-thumb-grid"></div>
       <div id="editImagesUploadMsg" class="aq-form-hint"></div>
 
       <div class="section-title">ملاحظات</div>
-      <textarea name="notes" class="aq-form-control" rows="4"></textarea>
+      <textarea name="notes" class="aq-form-control" rows="3"></textarea>
 
       <!-- شريط الإجراءات اللاصق: نفس الأزرار والـ ids والمعالجات — تغليف بصري فقط -->
       <div class="aq-form-actions" id="editActionBar">
@@ -4940,6 +5001,7 @@
     document.getElementById('unitAddAiSection').style.display = 'block';
     document.getElementById('unitAddAiPasteText').value = '';
     document.getElementById('unitAddAiFileInput').value = '';
+    syncUnitAddAiFileLabel();   // عرض فقط: إعادة نص زر الرفع بعد تفريغ حقل الملف
     unitAddAiPastedImageBase64 = null;
     unitAddAiPastedImageMime = null;
     document.getElementById('unitAddAiPastedImagePreview').style.display = 'none';
@@ -5117,6 +5179,17 @@
     unitAddAiPastedImageMime = null;
     document.getElementById('unitAddAiPastedImagePreview').style.display = 'none';
   });
+  // عرض فقط: اسم الملف المختار على زر "رفع الصورة من جهازك" (حقل الملف نفسه ومنطق الاستخراج بلا تغيير)
+  function syncUnitAddAiFileLabel() {
+    var inp = document.getElementById('unitAddAiFileInput');
+    var lbl = document.getElementById('unitAddAiFileLabel');
+    var wrap = document.getElementById('unitAddAiUploadWrap');
+    if (!inp || !lbl) return;
+    var f = inp.files && inp.files[0];
+    lbl.textContent = f ? f.name : 'رفع الصورة من جهازك';
+    if (wrap) wrap.classList.toggle('has-file', !!f);
+  }
+  document.getElementById('unitAddAiFileInput').addEventListener('change', syncUnitAddAiFileLabel);
 
   document.getElementById('unitAddAiExtractBtn').addEventListener('click', function() {
     const btn = this;
@@ -7844,6 +7917,7 @@
     document.getElementById('unitAddAiSection').style.display = 'block';
     document.getElementById('unitAddAiPasteText').value = '';
     document.getElementById('unitAddAiFileInput').value = '';
+    syncUnitAddAiFileLabel();   // عرض فقط: إعادة نص زر الرفع بعد تفريغ حقل الملف
     unitAddAiPastedImageBase64 = null;
     unitAddAiPastedImageMime = null;
     document.getElementById('unitAddAiPastedImagePreview').style.display = 'none';
