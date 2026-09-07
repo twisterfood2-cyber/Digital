@@ -4562,19 +4562,24 @@
         </div>
       </div>
 
-      <div class="section-title">بيانات المالك والمسؤول</div>
-      <div class="grid aq-fg-owner">
-        <div class="aq-c4">
-          <label>اسم المالك</label>
-          <input type="text" name="ownerName">
-        </div>
-        <div class="aq-c4">
-          <label>رقم هاتف المالك</label>
-          <input type="text" name="ownerPhone">
-        </div>
-        <div class="aq-c4">
-          <label>الموظف المسؤول</label>
-          <input type="text" name="agent">
+      <!-- قسم "بيانات المالك والمسؤول" مخفي من الواجهة (كل الشغل من مطورين — غير مستخدم).
+           الحقول باقية في الـ DOM مخفية عمدًا: أعمدة الشيت (Owner Name / Owner Phone / Sales/Agent)
+           وبيانات الوحدات القديمة تُحمَّل وتُحفظ كما هي بلا تغيير في الباك-إند أو بنية البيانات. -->
+      <div class="aq-fg-owner-hidden" style="display:none;" aria-hidden="true">
+        <div class="section-title">بيانات المالك والمسؤول</div>
+        <div class="grid aq-fg-owner">
+          <div class="aq-c4">
+            <label>اسم المالك</label>
+            <input type="text" name="ownerName" tabindex="-1">
+          </div>
+          <div class="aq-c4">
+            <label>رقم هاتف المالك</label>
+            <input type="text" name="ownerPhone" tabindex="-1">
+          </div>
+          <div class="aq-c4">
+            <label>الموظف المسؤول</label>
+            <input type="text" name="agent" tabindex="-1">
+          </div>
         </div>
       </div>
 
