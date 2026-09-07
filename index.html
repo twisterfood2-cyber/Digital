@@ -2346,12 +2346,17 @@
       gap: 20px;
       grid-template-columns: repeat(auto-fill, minmax(min(100%, 264px), 1fr));
     }
+    /* =========================================================================
+     * كارت الوحدة في "استكشف" — Compact Premium Card (مرجع: unit card.png)
+     * الحالة + رقم الوحدة فوق الجزء السفلي من الصورة (بلا صف مستقل)، صفّان من المواصفات،
+     * لوحة سعر Premium، المطور، وسطر "أضيفت • آخر تعديل" - كله بأقل ارتفاع ممكن.
+     * ========================================================================= */
     body.aq-search-ui .unit-card {
       background: var(--aq-prop-surface); color: var(--aq-prop-text);
       border: 1px solid var(--aq-prop-border); border-right: 1px solid var(--aq-prop-border);
       border-radius: var(--aq-prop-radius); box-shadow: var(--aq-prop-shadow);
       -webkit-backdrop-filter: none; backdrop-filter: none;
-      padding: 14px; overflow: hidden;
+      padding: 12px; overflow: hidden; display: flex; flex-direction: column;
       transition: transform var(--ease), box-shadow var(--ease), border-color var(--ease);
       cursor: pointer;
     }
@@ -2359,26 +2364,58 @@
       background: var(--aq-prop-surface); transform: translateY(-3px);
       border-color: var(--aq-prop-green-line); box-shadow: 0 16px 40px rgba(11,40,33,0.16);
     }
-    /* الصورة: ملء عرض البطاقة أعلىها بنسبة ثابتة (نفس إيقاع المرجع) */
+    body.aq-search-ui .unit-card:focus-visible { outline: 2px solid var(--aq-prop-green); outline-offset: 2px; }
+    /* الصورة: الحاوية تحدد المساحة (نسبة ثابتة) والصورة تملؤها بقصّ مركزي - لا تتحكم أبعاد الصورة في الكارت */
     body.aq-search-ui .unit-cover {
-      margin: -14px -14px 12px; border-radius: 0; width: auto; height: auto;
+      position: relative; margin: -12px -12px 10px; border-radius: 0; width: auto; height: auto;
       aspect-ratio: 4 / 3; overflow: hidden; background: var(--aq-prop-canvas-2);
     }
-    body.aq-search-ui .unit-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    body.aq-search-ui .img-count-badge {
-      background: rgba(2,32,26,0.72); color: #fff; border: none; border-radius: var(--aq-radius-pill);
+    body.aq-search-ui .unit-cover img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; transition: transform 320ms ease; }
+    body.aq-search-ui .unit-card:hover .unit-cover img { transform: scale(1.02); }
+    body.aq-search-ui .unit-cover::after {
+      content: ''; position: absolute; inset: auto 0 0 0; height: 52%;
+      background: linear-gradient(to top, rgba(2,32,26,0.62), rgba(2,32,26,0));
+      pointer-events: none;
     }
+    body.aq-search-ui .unit-cover-empty { background: linear-gradient(135deg, #E7EDED, #DCE7E3); }
+    /* شريط الحالة + رقم الوحدة (+ عدّاد الصور) فوق أسفل الصورة */
+    body.aq-search-ui .unit-cover-strip {
+      position: absolute; z-index: 3; bottom: 10px; right: 10px; left: 10px;
+      display: flex; align-items: center; gap: 8px; pointer-events: none;
+    }
+    body.aq-search-ui .unit-cover-strip .status-badge {
+      display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+      background: rgba(0,76,67,0.92); color: #fff; border: 1px solid rgba(255,255,255,0.18);
+      border-radius: var(--aq-radius-pill); padding: 4px 11px; font-size: var(--aq-fs-caption); font-weight: 800;
+      box-shadow: 0 2px 8px rgba(2,20,16,0.28);
+    }
+    body.aq-search-ui .unit-cover-strip .status-badge .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #B4FF6C; flex: none; }
+    body.aq-search-ui .unit-cover-strip .status-badge.محجوز { background: rgba(138,100,18,0.92); }
+    body.aq-search-ui .unit-cover-strip .status-badge.محجوز .status-dot { background: #FFD97A; }
+    body.aq-search-ui .unit-cover-strip .status-badge.مباع { background: rgba(176,57,47,0.92); }
+    body.aq-search-ui .unit-cover-strip .status-badge.مباع .status-dot { background: #FFB4AC; }
+    body.aq-search-ui .unit-cover-strip .unit-id {
+      color: #fff; font-size: var(--aq-fs-body); font-weight: 800; letter-spacing: 0.6px;
+      text-shadow: 0 1px 6px rgba(2,20,16,0.55); margin-inline-start: 2px; direction: ltr; unicode-bidi: isolate;
+    }
+    body.aq-search-ui .unit-cover-strip .img-count-badge {
+      position: static; margin-inline-start: auto; display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(2,32,26,0.62); color: #fff; border: 1px solid rgba(255,255,255,0.16);
+      border-radius: var(--aq-radius-pill); padding: 3px 8px; font-size: var(--aq-fs-caption-sm); font-weight: 700;
+    }
+    body.aq-search-ui .unit-cover-strip .img-count-badge .ico { width: 12px; height: 12px; }
+    /* المفضلة / المقارنة - نفس العناصر والوظائف، هوية خضراء فاتحة فوق الصورة */
     body.aq-search-ui .fav-btn {
-      background: var(--aq-prop-green-soft); border: 1px solid var(--aq-prop-green-line);
-      color: var(--aq-prop-green-deep); box-shadow: 0 2px 6px rgba(6,28,23,0.10);
+      background: rgba(255,255,255,0.92); border: 1px solid var(--aq-prop-green-line);
+      color: var(--aq-prop-green-deep); box-shadow: 0 2px 8px rgba(6,28,23,0.18);
     }
-    body.aq-search-ui .fav-btn:hover { background: rgba(191,216,207,0.55); border-color: var(--aq-prop-green-deep); }
+    body.aq-search-ui .fav-btn:hover { background: #fff; border-color: var(--aq-prop-green-deep); }
     body.aq-search-ui .fav-btn.active .ico { fill: currentColor; stroke: none; }
     body.aq-search-ui .compare-checkbox {
-      background: var(--aq-prop-green-soft); border-radius: 8px; border: 1px solid var(--aq-prop-green-line);
-      box-shadow: 0 2px 6px rgba(6,28,23,0.10);
+      background: rgba(255,255,255,0.92); border-radius: 8px; border: 1px solid var(--aq-prop-green-line);
+      box-shadow: 0 2px 8px rgba(6,28,23,0.18);
     }
-    body.aq-search-ui .compare-checkbox:hover { background: rgba(191,216,207,0.55); border-color: var(--aq-prop-green-deep); }
+    body.aq-search-ui .compare-checkbox:hover { background: #fff; border-color: var(--aq-prop-green-deep); }
     body.aq-search-ui .compare-checkbox input {
       appearance: none; -webkit-appearance: none; margin: 0; display: block;
       width: 16px; height: 16px; border-radius: 4px;
@@ -2390,37 +2427,79 @@
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
       background-repeat: no-repeat; background-position: center; background-size: 11px 11px;
     }
-    body.aq-search-ui .unit-top { padding: 0; margin: 0 0 8px; }
-    body.aq-search-ui .unit-id { color: var(--aq-prop-text-faint); }
+    /* الاسم / النوع / الموقع */
+    body.aq-search-ui .unit-card .unit-info-block { min-height: 0; }
     body.aq-search-ui .unit-title { color: var(--aq-prop-text); font-size: var(--aq-fs-body-lg); font-weight: 800; }
     body.aq-search-ui .unit-loc { color: var(--aq-prop-text-muted); font-weight: 600; }
-    body.aq-search-ui .unit-added { color: var(--aq-prop-text-faint); }
+    body.aq-search-ui .unit-card .unit-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 2px; line-height: 1.45; }
+    body.aq-search-ui .unit-card .unit-loc { margin-bottom: 8px; font-size: var(--aq-fs-caption); }
+    body.aq-search-ui .unit-card .unit-loc .ico { color: var(--aq-prop-green-deep); }
+    /* المواصفات: صفّان بثلاث شرائح (سطر واحد لكل شريحة) */
+    body.aq-search-ui .unit-card .unit-specs {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 6px;
+      margin: 0 0 6px; min-height: 0; overflow: visible;
+    }
     body.aq-search-ui .spec-chip {
-      background: var(--aq-prop-surface); color: var(--aq-prop-text);
-      border: 1px solid var(--aq-prop-green-line); border-radius: var(--aq-prop-radius-sm);
-      padding: 6px 10px; font-weight: 700; box-shadow: 0 1px 4px rgba(11,40,33,0.06);
+      display: flex; align-items: center; gap: 7px; min-width: 0;
+      background: var(--aq-prop-canvas); color: var(--aq-prop-text);
+      border: 1px solid var(--aq-prop-border); border-radius: 10px;
+      padding: 5px 8px; box-shadow: none; white-space: nowrap;
     }
-    body.aq-search-ui .spec-chip .ico { color: var(--aq-prop-green-deep); }
-    body.aq-search-ui .unit-price-box {
-      background: var(--aq-prop-green-soft); border: none;
-      border-radius: var(--aq-prop-radius-sm); padding: 12px 14px; margin-top: 8px;
-      display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px;
+    body.aq-search-ui .spec-chip .ico { width: 16px; height: 16px; flex: none; color: var(--aq-prop-green-deep); }
+    body.aq-search-ui .spec-chip .spec-txt { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
+    body.aq-search-ui .spec-chip .spec-txt b { font-size: var(--aq-fs-caption); font-weight: 800; overflow: hidden; text-overflow: ellipsis; }
+    body.aq-search-ui .spec-chip .spec-txt small { font-size: var(--aq-fs-micro); color: var(--aq-prop-text-muted); font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+    /* كروت ضيقة (شبكة 5-6 أعمدة): إخفاء أيقونة الشريحة وتقليص الحشو حتى تبقى القيمة والتسمية مقروءتين */
+    body.aq-search-ui .unit-card { container-type: inline-size; }
+    @container (max-width: 250px) {
+      body.aq-search-ui .spec-chip { gap: 4px; padding: 4px 6px; }
+      body.aq-search-ui .spec-chip > .ico { display: none; }
+      body.aq-search-ui .unit-card .unit-price-box { padding: 8px 10px; }
+      body.aq-search-ui .unit-card .final-price { font-size: var(--aq-fs-body-lg); }
     }
-    body.aq-search-ui .unit-price-box.has-discount {
-      flex-direction: row; align-items: center; justify-content: space-between; text-align: initial; gap: 10px;
+    /* لوحة السعر Premium: عمق + حدّ + ظل ناعم، بلا زيادة مبالغ فيها في الارتفاع */
+    body.aq-search-ui .unit-card-footer { margin-top: auto; padding-top: 2px; }
+    body.aq-search-ui .unit-card .unit-price-box {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 10px;
+      background: linear-gradient(180deg, #FFFFFF 0%, var(--aq-prop-green-soft) 100%);
+      border: 1px solid var(--aq-prop-green-line); border-radius: 12px; padding: 9px 12px; margin-top: 6px;
+      box-shadow: 0 4px 14px rgba(11,40,33,0.08), inset 0 1px 0 #fff;
     }
-    body.aq-search-ui .price-old-group,
-    body.aq-search-ui .price-current-group {
-      display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0;
+    body.aq-search-ui .unit-card .price-main { display: flex; flex-direction: column; gap: 1px; min-width: 0; text-align: start; }
+    body.aq-search-ui .unit-card .price-old-label { font-size: var(--aq-fs-micro); color: var(--aq-prop-text-faint); font-weight: 600; }
+    body.aq-search-ui .unit-card .old-price { font-size: var(--aq-fs-caption); color: var(--aq-prop-text-faint); font-weight: 700; text-decoration: line-through; }
+    body.aq-search-ui .unit-card .final-price { font-size: var(--aq-fs-title-sm); line-height: 1.25; color: var(--aq-prop-green-deep); font-weight: 900; margin: 0; white-space: nowrap; }
+    body.aq-search-ui .unit-card .final-price .cur { font-size: var(--aq-fs-caption); font-weight: 800; }
+    body.aq-search-ui .unit-card .per-meter { display: inline-flex; align-items: center; gap: 4px; font-size: var(--aq-fs-micro); color: var(--aq-prop-text-muted); font-weight: 600; margin: 0; }
+    body.aq-search-ui .unit-card .per-meter .ico { width: 12px; height: 12px; color: var(--aq-prop-green-deep); }
+    body.aq-search-ui .discount-tag {
+      display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; flex: none;
+      background: #FFF4D6; color: #8A5A00; border: 1px solid #F1DFAE; border-radius: var(--aq-radius-pill);
+      padding: 4px 10px; font-size: var(--aq-fs-caption-sm); font-weight: 800; box-shadow: 0 1px 4px rgba(138,90,0,0.12);
     }
-    body.aq-search-ui .unit-price-box .final-price { color: var(--aq-prop-green-deep); font-weight: 900; }
-    body.aq-search-ui .unit-price-box .per-meter { color: var(--aq-prop-text-muted); }
-    body.aq-search-ui .unit-price-box .old-price { color: #C4443B; }
-    body.aq-search-ui .unit-price-box .discount-tag {
-      display: inline-flex; align-items: center; gap: 4px;
-      background: var(--aq-prop-surface); color: var(--aq-prop-green-deep); border: 1px solid var(--aq-prop-green-line);
+    body.aq-search-ui .discount-tag .ico { width: 12px; height: 12px; }
+    /* المطور + سطر التواريخ (بلا صناديق - أقل مساحة رأسية) */
+    body.aq-search-ui .unit-dev-row {
+      display: flex; align-items: center; gap: 6px; min-width: 0;
+      font-size: var(--aq-fs-caption); color: var(--aq-prop-text-faint); font-weight: 600;
+      margin-top: 8px; overflow: hidden;
     }
-    body.aq-search-ui .unit-price-box .discount-tag .ico { width: 11px; height: 11px; }
+    body.aq-search-ui .unit-dev-row .ico { flex-shrink: 0; color: var(--aq-prop-green-deep); }
+    body.aq-search-ui .unit-dev-row .dev-name { color: var(--aq-prop-text); font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+    body.aq-search-ui .unit-meta-line {
+      display: flex; align-items: center; gap: 6px; min-width: 0; margin-top: 4px;
+      font-size: var(--aq-fs-micro); color: var(--aq-prop-text-faint); font-weight: 600;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    body.aq-search-ui .unit-meta-line .ico { width: 12px; height: 12px; flex: none; }
+    body.aq-search-ui .unit-meta-line span { overflow: hidden; text-overflow: ellipsis; }
+    body.aq-search-ui .unit-meta-line i { font-style: normal; margin: 0 2px; }
+    body.aq-search-ui .unit-card.status-مباع .unit-price-box,
+    body.aq-search-ui .unit-card.status-مباع .spec-chip { opacity: 0.85; }
+    /* ---- أنماط مشتركة/قديمة تخصّ مودالات أخرى وتصدير المقارنة (كما كانت) ---- */
+    body.aq-search-ui .unit-top { padding: 0; margin: 0 0 8px; }
+    body.aq-search-ui .unit-id { color: var(--aq-prop-text-faint); }
+    body.aq-search-ui .unit-added { color: var(--aq-prop-text-faint); }
     body.aq-search-ui .resale-current-box {
       background: var(--aq-prop-canvas); border: 1px solid var(--aq-prop-border); color: var(--aq-prop-text);
     }
@@ -2453,85 +2532,54 @@
     body.aq-search-ui .status-badge.مباع { background: #FBE9E7; color: #B0392F; border-color: #F0CFCB; }
 
     /* =========================================================================
-     * إعادة تصميم كارت الوحدة (Explore) — Premium Preview Card قابل للنقر بالكامل
+     * نافذة تفاصيل الوحدة (Unit Detail View) — Modal عريض أفقي (مرجع: unit details.png)
+     * يعيد استخدام #unitCardOverlay القائم. حاوية تمرير واحدة (.ud-modal-body).
      * ========================================================================= */
-    body.aq-search-ui .unit-card {
-      display: flex; flex-direction: column;
-    }
-    body.aq-search-ui .unit-card:focus-visible {
-      outline: 2px solid var(--aq-prop-green); outline-offset: 2px;
-    }
-    /* الصورة: عنصر بصري قوي - نسبة ثابتة + تكبير خفيف عند hover + تظليل سفلي خفيف */
-    body.aq-search-ui .unit-cover { position: relative; }
-    body.aq-search-ui .unit-cover::after {
-      content: ''; position: absolute; inset: auto 0 0 0; height: 46%;
-      background: linear-gradient(to top, rgba(2,32,26,0.38), rgba(2,32,26,0));
-      pointer-events: none;
-    }
-    body.aq-search-ui .unit-cover img { transition: transform 320ms ease; }
-    body.aq-search-ui .unit-card:hover .unit-cover img { transform: scale(1.02); }
-    body.aq-search-ui .unit-cover-empty {
-      margin: -14px -14px 12px; aspect-ratio: 4 / 3; background: var(--aq-prop-canvas-2);
-    }
-    /* شريط الحالة/رقم الوحدة أعلى المعلومات - الحالة أولًا (بادج بصري فقط، بلا قائمة اختيار) */
-    body.aq-search-ui .unit-card .unit-top { display: flex; justify-content: space-between; align-items: center; }
-    /* عنوان مضغوط: سطر واحد بلا تمديد ارتفاع الكارت مهما طال الاسم */
-    body.aq-search-ui .unit-card .unit-title {
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 3px;
-    }
-    body.aq-search-ui .unit-card .unit-loc { margin-bottom: 8px; }
-    body.aq-search-ui .unit-card .unit-info-block { min-height: 0; }
-    body.aq-search-ui .unit-card .unit-specs { min-height: 0; margin-bottom: 0; flex-wrap: nowrap; overflow: hidden; }
-    body.aq-search-ui .unit-card .unit-specs .spec-chip { white-space: nowrap; }
-    body.aq-search-ui .unit-card-footer { margin-top: auto; padding-top: 2px; }
-    body.aq-search-ui .unit-dev-row {
-      display: flex; align-items: center; gap: 6px; min-width: 0;
-      font-size: var(--aq-fs-caption); color: var(--aq-prop-text-faint); font-weight: 600;
-      margin-top: 8px; overflow: hidden;
-    }
-    body.aq-search-ui .unit-dev-row .ico { flex-shrink: 0; color: var(--aq-prop-text-faint); }
-    body.aq-search-ui .unit-dev-row .dev-name {
-      color: var(--aq-prop-text); font-weight: 800;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
-    }
-
-    /* =========================================================================
-     * نافذة تفاصيل الوحدة (Unit Details Modal) — تعيد استخدام #unitCardOverlay القائم
-     * ========================================================================= */
-    body.aq-search-ui .unit-details-box { max-width: min(1000px, 96vw); }
+    body.aq-search-ui .unit-card-overlay { background: rgba(6,28,23,0.42); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+    body.aq-search-ui .unit-details-box { max-width: min(1320px, 96vw); }
     .ud-modal-body {
-      background: var(--aq-prop-surface); border-radius: var(--aq-prop-radius);
+      position: relative; background: var(--aq-prop-canvas, #F5F7F6); border-radius: 18px;
       border: 1px solid var(--aq-prop-green-line);
-      /* UX-fix: المودال كله هو حاوية التمرير الوحيدة (بدل ud-body الداخلية) - فتصبح الصورة
-       * محدودة الارتفاع الأقصى (ud-media أدناه) بدل ما تلتهم المساحة على حساب .ud-body
-       * المحشورة سابقًا في شريط تمرير داخلي ضيق منفصل. */
-      overflow-y: auto; max-height: calc(90vh - 24px); display: flex; flex-direction: column;
+      overflow-y: auto; overflow-x: hidden; max-height: calc(100vh - 48px);
       box-shadow: 0 24px 64px rgba(2,20,16,0.28);
     }
-    .ud-header {
-      display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
-      padding: 18px 20px; border-bottom: 1px solid var(--aq-prop-border); flex-shrink: 0;
-      background: var(--aq-prop-green-soft);
+    .ud-top {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 14px 20px 14px 64px; background: var(--aq-prop-surface);
+      border-bottom: 1px solid var(--aq-prop-border); position: sticky; top: 0; z-index: 4;
     }
-    .ud-header-text { min-width: 0; }
-    .ud-header-text .unit-title { font-size: var(--aq-fs-title-sm); margin-bottom: 4px; }
-    .ud-header-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
-    .ud-header-meta .unit-id { font-size: var(--aq-fs-caption-sm); }
-    /* الصورة: object-fit:contain (بدل cover) لضمان ظهور الصورة كاملة بلا أي قصّ غير مقصود
-     * لأي جزء منها - أي فراغ ناتج عن اختلاف نسبة الصورة الأصلية عن صندوق العرض يمتلئ بخلفية
-     * محايدة فاتحة (letterbox) بدل تمديد الصورة أو قصّها. */
+    .ud-top-title { margin: 0; display: flex; align-items: center; gap: 10px; font-size: var(--aq-fs-title-sm); font-weight: 800; color: var(--aq-prop-green-deep); }
+    .ud-top-title .ico { width: 22px; height: 22px; }
+    .ud-body { padding: 16px 20px 20px; }
+    /* ---- الهيرو: ملخّص الوحدة (يمين) + المعرض (يسار) ---- */
+    .ud-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 18px; align-items: start; }
+    .ud-gallery { order: 2; min-width: 0; }
+    .ud-summary { order: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+    /* المعرض: الحاوية بنسبة ثابتة تحدد المساحة؛ الصورة تملؤها بقصّ مركزي (لا تمدد، لا تشويه،
+     * ولا تتحكم أبعاد الصورة الأصلية - عرضية/طولية/ضخمة - في ارتفاع الـ Modal) */
     .ud-media {
-      position: relative; aspect-ratio: 16 / 9; max-height: 56vh;
-      background: var(--aq-prop-canvas-2); cursor: pointer; flex-shrink: 0;
+      position: relative; width: 100%; aspect-ratio: 16 / 10; overflow: hidden; border-radius: 14px;
+      background: var(--aq-prop-canvas-2); cursor: pointer; box-shadow: 0 6px 20px rgba(11,40,33,0.10);
     }
-    .ud-media img { width: 100%; height: 100%; object-fit: contain; display: block; }
-    .ud-media .img-count-badge { position: absolute; top: 12px; right: 12px; }
-    /* أزرار التنقّل بين الصور - دائرية Premium بهوية الأخضر/المينت، تباين كافٍ فوق أي صورة
-     * (فاتحة أو غامقة) عبر خلفية بيضاء شبه شفافة + حدّ مينت + ظل ناعم، بدل خلفية داكنة ثقيلة. */
+    .ud-media img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+    .ud-media-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--aq-prop-text-faint); cursor: default; font-weight: 700; }
+    .ud-media-empty .ico { width: 34px; height: 34px; }
+    .ud-media-status {
+      position: absolute; top: 12px; right: 12px; z-index: 2; display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(0,76,67,0.92); color: #fff; border: 1px solid rgba(255,255,255,0.18);
+      border-radius: var(--aq-radius-pill); padding: 4px 11px; font-size: var(--aq-fs-caption); font-weight: 800;
+    }
+    .ud-media-status .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #B4FF6C; }
+    .ud-media-status.محجوز { background: rgba(138,100,18,0.92); } .ud-media-status.محجوز .status-dot { background: #FFD97A; }
+    .ud-media-status.مباع { background: rgba(176,57,47,0.92); } .ud-media-status.مباع .status-dot { background: #FFB4AC; }
+    .ud-media-strip { position: absolute; z-index: 2; bottom: 12px; left: 12px; right: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; pointer-events: none; }
+    .ud-media-id { background: rgba(2,32,26,0.72); color: #fff; border-radius: 9px; padding: 4px 10px; font-size: var(--aq-fs-caption); font-weight: 800; letter-spacing: 0.5px; direction: ltr; unicode-bidi: isolate; }
+    .ud-media .img-count-badge { position: static; display: inline-flex; align-items: center; gap: 5px; background: rgba(2,32,26,0.72); color: #fff; border: none; border-radius: 9px; padding: 4px 9px; font-size: var(--aq-fs-caption-sm); font-weight: 700; }
+    .ud-media .img-count-badge .ico { width: 13px; height: 13px; }
     .ud-nav {
-      position: absolute; top: 50%; transform: translateY(-50%); z-index: 2;
-      width: 36px; height: 36px; border-radius: 50%;
-      background: rgba(255,255,255,0.88); border: 1px solid var(--aq-prop-green-line);
+      position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
+      width: 38px; height: 38px; border-radius: 50%;
+      background: rgba(255,255,255,0.9); border: 1px solid var(--aq-prop-green-line);
       color: var(--aq-prop-green-deep); box-shadow: 0 4px 14px rgba(6,28,23,0.18);
       -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
       display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0;
@@ -2541,48 +2589,125 @@
     .ud-nav .ico { width: 18px; height: 18px; }
     .ud-nav-prev { left: 12px; }
     .ud-nav-next { right: 12px; }
-    .ud-thumbs { display: flex; gap: 6px; padding: 8px 20px; overflow-x: auto; flex-shrink: 0; }
+    /* الصور المصغّرة: نفس المبدأ (عرض ثابت + نسبة ثابتة + cover) */
+    .ud-thumbs { display: flex; gap: 8px; padding: 10px 0 0; overflow-x: auto; scrollbar-width: thin; }
     .ud-thumbs img {
-      width: 64px; height: 48px; object-fit: cover; border-radius: 8px; cursor: pointer;
-      border: 1px solid var(--aq-prop-border); flex-shrink: 0;
-      transition: border-color var(--ease), box-shadow var(--ease);
+      width: 96px; aspect-ratio: 4 / 3; height: auto; object-fit: cover; object-position: center; flex: none;
+      border-radius: 10px; cursor: pointer; border: 2px solid transparent; box-shadow: 0 1px 4px rgba(11,40,33,0.10);
+      transition: border-color var(--ease), transform var(--ease);
     }
     .ud-thumbs img:hover { border-color: var(--aq-prop-green-line); }
-    .ud-thumbs img.active { border-color: var(--aq-prop-green-deep); box-shadow: 0 0 0 2px var(--aq-prop-green-line); }
-    .ud-body { padding: 18px 20px 20px; }
-    /* صندوق السعر داخل المودال فقط - إطار وظل خفيفان إضافيان فوق التنسيق العام المشترك
-     * مع كارت الوحدة (.unit-price-box الأساسي) بلا أي تعديل على منطق/قيم السعر نفسه. */
-    .ud-body .unit-price-box {
-      margin-bottom: 18px; border: 1px solid var(--aq-prop-green-line);
-      box-shadow: 0 2px 10px rgba(11,40,33,0.06);
+    .ud-thumbs img.active { border-color: var(--aq-prop-green-deep); }
+    /* ---- الملخّص ---- */
+    .ud-summary-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    .ud-code { display: inline-block; background: var(--aq-prop-surface); border: 1px solid var(--aq-prop-border); border-radius: 9px; padding: 4px 10px; font-size: var(--aq-fs-caption); font-weight: 800; color: var(--aq-prop-text-muted); direction: ltr; unicode-bidi: isolate; }
+    .ud-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+    .ud-actions .icon-action-btn {
+      display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 10px;
+      background: var(--aq-prop-surface); color: var(--aq-prop-text); border: 1px solid var(--aq-prop-border);
+      font-size: var(--aq-fs-caption); font-weight: 800; box-shadow: 0 1px 4px rgba(11,40,33,0.06); cursor: pointer;
     }
-    .ud-section-title {
-      font-size: var(--aq-fs-caption); font-weight: 800; color: var(--aq-prop-green);
-      margin: 18px 0 8px; text-transform: uppercase; letter-spacing: 0.3px;
+    .ud-actions .icon-action-btn .ico { width: 15px; height: 15px; color: var(--aq-prop-green-deep); }
+    .ud-actions .icon-action-btn:hover { border-color: var(--aq-prop-green-line); background: var(--aq-prop-green-soft); color: var(--aq-prop-green-deep); }
+    .ud-actions .icon-action-btn.ud-act-primary { background: var(--aq-prop-green-deep); color: #fff; border-color: var(--aq-prop-green-deep); }
+    .ud-actions .icon-action-btn.ud-act-primary .ico { color: #fff; }
+    .ud-actions .icon-action-btn.ud-act-primary:hover { background: var(--aq-prop-green); border-color: var(--aq-prop-green); color: #fff; }
+    .ud-name { font-size: 26px; line-height: 1.25; font-weight: 900; color: var(--aq-prop-text); margin-top: 2px; overflow-wrap: anywhere; }
+    .ud-type { font-size: var(--aq-fs-body); font-weight: 700; color: var(--aq-prop-text-muted); }
+    .ud-locline { display: flex; align-items: center; gap: 6px; font-size: var(--aq-fs-small); color: var(--aq-prop-text-muted); font-weight: 600; }
+    .ud-locline .ico { color: var(--aq-prop-green-deep); }
+    .ud-status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .ud-status-row .status-badge { display: inline-flex; align-items: center; gap: 6px; }
+    .ud-status-row .status-badge .status-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+    .ud-status-select { flex: none; width: auto; min-width: 120px; padding: 6px 10px; font-size: var(--aq-fs-caption); font-weight: 700; }
+    /* ---- الأقسام والبلاطات (Icon + Label + Value) ---- */
+    .ud-sec {
+      background: var(--aq-prop-surface); border: 1px solid var(--aq-prop-border); border-radius: 14px;
+      padding: 12px 14px 14px; box-shadow: 0 2px 10px rgba(11,40,33,0.05); min-width: 0;
     }
-    .ud-section-title:first-of-type { margin-top: 0; }
-    /* بيانات الوحدة/التفاصيل الإضافية: بطاقات فردية خفيفة لكل حقل بدل لوحة واحدة مكتظة -
-     * مسافات أوسع ومقروئية أعلى دون ازدحام بصري. */
-    .ud-info-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;
-      background: transparent; border: none; padding: 0;
+    .ud-sec-title {
+      display: flex; align-items: center; gap: 8px; margin: -12px -14px 12px; padding: 10px 14px;
+      background: var(--aq-prop-green-soft); border-bottom: 1px solid var(--aq-prop-green-line); border-radius: 14px 14px 0 0;
+      font-size: var(--aq-fs-small); font-weight: 800; color: var(--aq-prop-green-deep);
     }
-    .ud-info-row {
-      display: flex; flex-direction: column; gap: 3px; min-width: 0;
-      background: var(--aq-prop-surface); border: 1px solid var(--aq-prop-border);
-      border-radius: var(--aq-prop-radius-sm); padding: 9px 12px;
+    .ud-sec-title .ico { width: 18px; height: 18px; }
+    .ud-summary .ud-sec-basic { margin-top: 4px; }
+    .ud-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+    .ud-tiles-basic { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .ud-tiles-1 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .ud-tile {
+      display: flex; align-items: center; gap: 10px; min-width: 0;
+      background: var(--aq-prop-canvas, #F5F7F6); border: 1px solid var(--aq-prop-border); border-radius: 12px; padding: 8px 10px;
     }
-    .ud-info-label { font-size: var(--aq-fs-micro); color: var(--aq-prop-text-muted); font-weight: 600; }
-    .ud-info-value { font-size: var(--aq-fs-small); color: var(--aq-prop-text); font-weight: 700; overflow-wrap: break-word; }
-    .ud-body .card-actions-bottom { margin-top: 18px; padding-top: 16px; }
-
+    .ud-tile > .ico { width: 20px; height: 20px; flex: none; color: var(--aq-prop-green-deep); }
+    .ud-tile-txt { display: flex; flex-direction: column; gap: 1px; min-width: 0; line-height: 1.3; }
+    .ud-tile-label { font-size: var(--aq-fs-micro); color: var(--aq-prop-text-muted); font-weight: 600; }
+    .ud-tile-value { font-size: var(--aq-fs-caption); color: var(--aq-prop-text); font-weight: 800; overflow-wrap: anywhere; }
+    .ud-link { color: var(--aq-prop-green-deep); text-decoration: none; }
+    .ud-link:hover { text-decoration: underline; }
+    /* ---- شبكة الأقسام السفلية ---- */
+    .ud-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 1fr); gap: 14px; margin-top: 14px; align-items: start; }
+    .ud-grid-2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1fr); }
+    /* ---- Pricing Hero ---- */
+    .ud-price-hero {
+      display: flex; align-items: stretch; gap: 14px; margin-bottom: 10px;
+      background: linear-gradient(180deg, #FFFFFF 0%, var(--aq-prop-green-soft) 100%);
+      border: 1px solid var(--aq-prop-green-line); border-radius: 14px; padding: 12px 14px;
+      box-shadow: 0 4px 14px rgba(11,40,33,0.08), inset 0 1px 0 #fff;
+    }
+    .ud-price-total { display: flex; align-items: flex-start; gap: 10px; flex: 1 1 auto; min-width: 0; }
+    .ud-price-total > .ico { width: 30px; height: 30px; flex: none; color: var(--aq-prop-green-deep); margin-top: 4px; }
+    .ud-price-label { display: block; font-size: var(--aq-fs-micro); color: var(--aq-prop-text-muted); font-weight: 700; }
+    .ud-price-value { font-size: 26px; line-height: 1.2; font-weight: 900; color: var(--aq-prop-green-deep); white-space: nowrap; }
+    .ud-price-value .cur { font-size: var(--aq-fs-small); font-weight: 800; }
+    .ud-price-ppm { display: inline-flex; align-items: center; gap: 5px; font-size: var(--aq-fs-caption); color: var(--aq-prop-text-muted); font-weight: 600; margin-top: 2px; }
+    .ud-price-ppm .ico { width: 13px; height: 13px; color: var(--aq-prop-green-deep); }
+    .ud-price-old { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; flex: none; padding-inline-start: 14px; border-inline-start: 1px dashed var(--aq-prop-green-line); }
+    .ud-price-old .old-price { font-size: var(--aq-fs-small); color: var(--aq-prop-text-faint); font-weight: 700; text-decoration: line-through; }
+    .ud-sec-finance .resale-current-box { margin-top: 10px; }
+    /* ---- الملاحظات / الموقع ---- */
+    .ud-notes { margin: 0; padding: 0 18px 0 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .ud-notes li { position: relative; font-size: var(--aq-fs-caption); font-weight: 700; color: var(--aq-prop-text); line-height: 1.6; }
+    .ud-notes li::before { content: ''; position: absolute; right: -14px; top: 0.6em; width: 7px; height: 7px; border-radius: 50%; background: var(--aq-prop-green-deep); }
+    .ud-notes-text { margin: 0; font-size: var(--aq-fs-caption); font-weight: 700; color: var(--aq-prop-text); line-height: 1.7; }
+    .ud-map {
+      display: flex; align-items: center; justify-content: center; gap: 12px; height: 96px; border-radius: 12px;
+      border: 1px solid var(--aq-prop-border);
+      background-color: #EEF4F1;
+      background-image: linear-gradient(rgba(0,76,67,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(0,76,67,0.08) 1px, transparent 1px);
+      background-size: 22px 22px;
+    }
+    .ud-map > .ico { width: 30px; height: 30px; color: var(--aq-prop-green-deep); }
+    .ud-map-txt { display: flex; flex-direction: column; text-align: center; }
+    .ud-map-txt b { font-size: var(--aq-fs-small); color: var(--aq-prop-text); }
+    .ud-map-txt span { font-size: var(--aq-fs-caption); color: var(--aq-prop-text-muted); font-weight: 600; }
+    .ud-map-btn {
+      display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 8px; padding: 9px 10px;
+      border: 1px solid var(--aq-prop-green-line); border-radius: 10px; background: var(--aq-prop-surface);
+      color: var(--aq-prop-green-deep); font-size: var(--aq-fs-caption); font-weight: 800; text-decoration: none;
+    }
+    .ud-map-btn:hover { background: var(--aq-prop-green-soft); }
+    .ud-map-btn .ico { width: 14px; height: 14px; }
+    /* ---- استجابة ---- */
+    @media (max-width: 1024px) {
+      .ud-hero { grid-template-columns: 1fr; }
+      .ud-gallery { order: 1; } .ud-summary { order: 2; }
+      .ud-grid, .ud-grid-2 { grid-template-columns: 1fr; }
+      .ud-name { font-size: 22px; }
+    }
     @media (max-width: 640px) {
       body.aq-search-ui .unit-card-overlay { padding: 0; align-items: stretch; }
       body.aq-search-ui .unit-details-box { max-width: 100%; margin: 0; }
-      body.aq-search-ui .unit-details-box .unit-card-overlay-close { top: 10px; left: 10px; }
       .ud-modal-body { max-height: 100vh; height: 100vh; border-radius: 0; border: none; }
-      .ud-header { padding-top: 56px; }
-      .ud-info-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+      .ud-top { padding: 12px 14px 12px 56px; }
+      .ud-body { padding: 12px 12px 16px; }
+      .ud-media { aspect-ratio: 4 / 3; }
+      .ud-thumbs img { width: 80px; }
+      .ud-tiles-basic { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .ud-name { font-size: 20px; }
+      .ud-price-hero { flex-direction: column; gap: 10px; }
+      .ud-price-old { padding-inline-start: 0; border-inline-start: none; padding-top: 8px; border-top: 1px dashed var(--aq-prop-green-line); }
+      .ud-price-value { font-size: 22px; }
       .ud-nav { width: 32px; height: 32px; }
       .ud-nav .ico { width: 16px; height: 16px; }
       .ud-nav-prev { left: 8px; }
@@ -2614,25 +2739,19 @@
     body.aq-search-ui .skel { background: linear-gradient(90deg, #ECEFEE 25%, #F5F7F6 37%, #ECEFEE 63%); }
 
     /* ---- 8) overlay تفاصيل الوحدة (يعيد استخدام #unitCardOverlay القائم) ---- */
-    /* توسيط رأسي مع بقاء زر الإغلاق ظاهرًا دائمًا: flex-start + هوامش auto —
-       يتوسّط عند قِصَر الكارت، ويتمرّر بلا قصّ عند طوله (لا يُقصّ زر الإغلاق). */
-    .unit-card-overlay { align-items: flex-start; padding: 72px 16px 48px; }
+    .unit-card-overlay { align-items: flex-start; padding: 24px 16px 40px; }
     .unit-card-overlay-box { max-width: 460px; margin-block: auto; }
     body.aq-search-ui .unit-card-overlay .unit-card { cursor: default; }
-    /* زر إغلاق مطوّر ومتصل بصريًا بزاوية النافذة (شارة صغيرة على الحرف العلوي)
-     * بدل دائرة كبيرة عائمة منفصلة بعيدًا فوق النافذة - حجم أصغر (32px)، هوية
-     * أخضر/مينت متسقة مع الهوية البصرية، وضوح كافٍ للنقر. */
+    /* زر الإغلاق داخل هيدر نافذة التفاصيل (أعلى يسار) - مربّع ناعم بهوية الأخضر/الأبيض */
     .unit-details-box .unit-card-overlay-close {
-      top: -14px; left: -14px; width: 32px; height: 32px; padding: 0;
+      top: 11px; left: 14px; width: 38px; height: 38px; padding: 0; z-index: 6; border-radius: 11px;
       display: flex; align-items: center; justify-content: center;
-      background: var(--aq-prop-surface); color: var(--aq-prop-green-deep);
-      border: 1px solid var(--aq-prop-green-line); box-shadow: 0 4px 14px rgba(6,28,23,0.18);
-      transition: background var(--ease), border-color var(--ease), transform var(--ease);
+      background: var(--aq-prop-surface); color: var(--aq-prop-text);
+      border: 1px solid var(--aq-prop-border); box-shadow: 0 2px 8px rgba(6,28,23,0.10);
+      transition: background var(--ease), border-color var(--ease), color var(--ease);
     }
-    .unit-details-box .unit-card-overlay-close .ico { width: 15px; height: 15px; }
-    .unit-details-box .unit-card-overlay-close:hover {
-      background: var(--aq-prop-green-soft); border-color: var(--aq-prop-green-deep); transform: scale(1.08);
-    }
+    .unit-details-box .unit-card-overlay-close .ico { width: 17px; height: 17px; }
+    .unit-details-box .unit-card-overlay-close:hover { background: var(--aq-prop-green-soft); border-color: var(--aq-prop-green-line); color: var(--aq-prop-green-deep); }
 
     /* ---- 9) استجابة ---- */
     @media (max-width: 1024px) {
@@ -2640,7 +2759,6 @@
     }
     @media (max-width: 640px) {
       body.aq-search-ui .unit-card { padding: 12px; }
-      body.aq-search-ui .unit-cover { margin: -12px -12px 10px; }
       body.aq-search-ui .aq-sort-field { width: 100%; }
       body.aq-search-ui .aq-sort-field select { flex: 1 1 auto; min-width: 0; }
       body.app-view-explore .aq-hero { padding: 10px; }
@@ -5518,13 +5636,32 @@
   /* بطاقة الوحدة (Explore) — نسخة "Preview" مختصرة ومضغوطة قابلة للنقر بالكامل.
    * كل التفاصيل الثانوية والأدوات نُقلت إلى buildUnitDetailsHtml() ضمن نافذة
    * التفاصيل (showUnitCardOverlay) - نفس البيانات، بدون أي نداء شبكة جديد. */
+  /* تاريخ مختصر للكارت (dd/mm/yyyy) من قيمة الشيت كما هي: "14/08/2026 19:03" → "14/08/2026"،
+   * وISO "2026-08-14T..." → "14/08/2026". لا تغيير في البيانات نفسها - عرض فقط. */
+  function cardDate_(v) {
+    var s = String(v == null ? '' : v).trim();
+    if (!s) return '';
+    var iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (iso) return iso[3] + '/' + iso[2] + '/' + iso[1];
+    return s.split(/\s+/)[0];
+  }
+
   function buildUnitCardHtml(u) {
     const images = (u['Images'] || '').split(',').map(s => s.trim()).filter(Boolean);
+    /* الحالة + رقم الوحدة (+ عدّاد الصور) فوق الجزء السفلي من الصورة نفسها (Overlay) - بلا صف
+     * مستقل أسفل الصورة، فيوفَّر ارتفاع صف كامل. .unit-id تبقى داخل الكارت لأن فتح التفاصيل
+     * (openCardDetailsFromEl_) يقرأ رقم الوحدة منها. */
+    const coverStrip = `
+        <div class="unit-cover-strip">
+          <span class="status-badge ${u['Status']}"><i class="status-dot"></i>${u['Status']}</span>
+          <span class="unit-id">${u['Unit ID']}</span>
+          ${images.length > 1 ? `<span class="img-count-badge">${ICON.camera} ${images.length}</span>` : ''}
+        </div>`;
     const coverHtml = images.length > 0 ? `
       <div class="unit-cover">
         <img src="${getThumbUrl(images[0])}" alt="صورة الوحدة" loading="lazy" decoding="async">
-        ${images.length > 1 ? `<span class="img-count-badge">${ICON.camera} ${images.length} صور</span>` : ''}
-      </div>` : '<div class="unit-cover unit-cover-empty"></div>';
+        ${coverStrip}
+      </div>` : `<div class="unit-cover unit-cover-empty">${coverStrip}</div>`;
 
     const favPrice = getFavoritePrice(u['Unit ID']);
     const currentPrice = Number(u['Price']) || 0;
@@ -5543,6 +5680,46 @@
       </div>`;
     }
 
+    // شريحة مواصفة: أيقونة + قيمة (بارزة) + تسمية صغيرة - سطر واحد للحفاظ على ارتفاع الكارت
+    const chip = (icon, value, label) => `<span class="spec-chip">${icon}<span class="spec-txt"><b>${value}</b><small>${label}</small></span></span>`;
+    const row1 = [
+      u['Unit Area (sqm)'] ? chip(ICON.area, u['Unit Area (sqm)'] + ' م²', 'المساحة') : '',
+      u['Rooms'] ? chip(ICON.bed, u['Rooms'], 'غرف') : '',
+      u['Bathrooms'] ? chip(ICON.bath, u['Bathrooms'], 'حمامات') : ''
+    ].filter(Boolean);
+    // الصف الثاني: الدور / التشطيب / الجاردن أو الروف أو التراس - فقط ما هو موجود فعلًا في بيانات الوحدة
+    const outdoor = u['Garden Area (sqm)'] ? chip(ICON.tree, u['Garden Area (sqm)'] + ' م²', 'الجاردن')
+      : (u['Roof Area (sqm)'] ? chip(ICON.roof, u['Roof Area (sqm)'] + ' م²', 'الروف')
+      : (u['Terrace Area (sqm)'] ? chip(ICON.terrace, u['Terrace Area (sqm)'] + ' م²', 'التراس') : ''));
+    const row2 = [
+      u['Floor'] ? chip(ICON.floor, u['Floor'], 'الدور') : '',
+      u['Finishing'] ? chip(ICON.brush, u['Finishing'], 'التشطيب') : '',
+      outdoor
+    ].filter(Boolean);
+
+    const hasDiscount = Number(u['Discount Percentage']) > 0;
+    const perMeter = u['Price per Meter'] ? `<div class="per-meter">${ICON.chart} ${fmtNum(u['Price per Meter'])} جنيه / م²</div>` : '';
+    const priceHtml = hasDiscount ? `
+        <div class="unit-price-box has-discount">
+          <div class="price-main">
+            <span class="price-old-label">السعر قبل الخصم</span>
+            <span class="old-price">${fmtNum(u['Price'])} جنيه</span>
+            <div class="final-price">${fmtNum(u['Price After Discount'])} <span class="cur">جنيه</span></div>
+            ${perMeter}
+          </div>
+          <span class="discount-tag">${ICON.tag} خصم ${u['Discount Percentage']}%</span>
+        </div>` : `
+        <div class="unit-price-box">
+          <div class="price-main">
+            <div class="final-price">${fmtNum(u['Price'])} <span class="cur">جنيه</span></div>
+            ${perMeter}
+          </div>
+        </div>`;
+
+    const added = cardDate_(u['Date Added']), updated = cardDate_(u['Last Updated']);
+    const metaLine = (added || updated) ? `
+        <div class="unit-meta-line">${ICON.calendar}<span>${added ? 'أضيفت ' + added : ''}${added && updated ? ' <i>•</i> ' : ''}${updated ? 'آخر تعديل ' + updated : ''}</span></div>` : '';
+
     return `
     <div class="unit-card status-${u['Status']}" role="button" tabindex="0"
          aria-label="عرض تفاصيل الوحدة ${u['Unit ID']} - ${u['Property Type']}${u['Project Name'] ? ' - ' + u['Project Name'] : ''}">
@@ -5552,38 +5729,16 @@
       <label class="compare-checkbox" title="إضافة للمقارنة" onclick="event.stopPropagation()">
         <input type="checkbox" ${compareList.indexOf(u['Unit ID']) !== -1 ? 'checked' : ''} onchange="toggleCompare('${u['Unit ID']}', this)" aria-label="إضافة للمقارنة">
       </label>
-      <div class="unit-top">
-        <span class="status-badge ${u['Status']}">${u['Status']}</span>
-        <span class="unit-id">${u['Unit ID']}</span>
-      </div>
       <div class="unit-info-block">
         <div class="unit-title">${u['Property Type']} - ${u['Project Name'] || u['City']}</div>
         <div class="unit-loc">${ICON.pin} ${u['City']} - ${u['Area/District']}</div>
-        <div class="unit-specs">
-          <span class="spec-chip">${ICON.area} ${u['Unit Area (sqm)']} م²</span>
-          ${u['Rooms'] ? `<span class="spec-chip">${ICON.bed} ${u['Rooms']} غرف</span>` : ''}
-          ${u['Bathrooms'] ? `<span class="spec-chip">${ICON.bath} ${u['Bathrooms']} حمام</span>` : ''}
-        </div>
+        ${row1.length ? `<div class="unit-specs">${row1.join('')}</div>` : ''}
+        ${row2.length ? `<div class="unit-specs unit-specs-2">${row2.join('')}</div>` : ''}
       </div>
       <div class="unit-card-footer">
-        ${Number(u['Discount Percentage']) > 0 ? `
-        <div class="unit-price-box has-discount">
-          <div class="price-old-group">
-            <span class="old-price">${fmtNum(u['Price'])} جنيه</span>
-            <span class="discount-tag">${ICON.tag} خصم ${u['Discount Percentage']}%</span>
-          </div>
-          <div class="price-current-group">
-            <div class="final-price">${fmtNum(u['Price After Discount'])} جنيه</div>
-            ${u['Price per Meter'] ? `<div class="per-meter">${fmtNum(u['Price per Meter'])} ج/م²</div>` : ''}
-          </div>
-        </div>
-        ` : `
-        <div class="unit-price-box">
-          <div class="final-price">${fmtNum(u['Price'])} جنيه</div>
-          ${u['Price per Meter'] ? `<div class="per-meter">${fmtNum(u['Price per Meter'])} ج/م²</div>` : ''}
-        </div>
-        `}
+        ${priceHtml}
         ${u['Developer Name'] ? `<div class="unit-dev-row">${ICON.building}<span class="dev-label">المطور:</span> <span class="dev-name">${u['Developer Name']}</span></div>` : ''}
+        ${metaLine}
       </div>
     </div>`;
   }
@@ -5597,69 +5752,111 @@
     const resalePurchasePPM = Number(u['Resale Price Per Meter At Purchase']) || 0;
     const resaleCurrentPPM = Number(u['Resale Current Price Per Meter']) || 0;
     const resalePPMDiff = (resalePurchasePPM > 0 && resaleCurrentPPM > 0) ? (resaleCurrentPPM - resalePurchasePPM) : null;
+    const esc = (v) => String(v == null ? '' : v);
+    const has = (v) => v !== undefined && v !== null && String(v).trim() !== '';
 
+    /* ---------- المعرض: الحاوية هي التي تحدد المساحة (نسبة ثابتة) وليس الصورة ---------- */
     const mediaHtml = images.length > 0 ? `
       <div class="ud-media" onclick='udGalleryOpenLightbox()'>
         <img src="${getThumbUrl(images[0])}" alt="صورة الوحدة" loading="lazy" decoding="async">
+        <span class="status-badge ud-media-status ${u['Status']}"><i class="status-dot"></i>${u['Status']}</span>
         ${images.length > 1 ? `
         <button type="button" class="ud-nav ud-nav-prev" onclick="event.stopPropagation(); udGalleryNav(-1)" aria-label="الصورة السابقة">${ICON.chevronLeft}</button>
         <button type="button" class="ud-nav ud-nav-next" onclick="event.stopPropagation(); udGalleryNav(1)" aria-label="الصورة التالية">${ICON.chevronRight}</button>
         ` : ''}
-        ${images.length > 1 ? `<span class="img-count-badge">${ICON.camera} ${images.length} صور</span>` : ''}
+        <div class="ud-media-strip">
+          <span class="ud-media-id">${esc(u['Unit ID'])}</span>
+          ${images.length > 1 ? `<span class="img-count-badge">${ICON.camera} <span class="ud-counter" dir="ltr">1 / ${images.length}</span></span>` : ''}
+        </div>
       </div>
       ${images.length > 1 ? `<div class="ud-thumbs">${images.map((img, idx) => `<img src="${getThumbUrl(img)}" alt="" loading="lazy" class="${idx === 0 ? 'active' : ''}" onclick="event.stopPropagation(); udGallerySelect(${idx})">`).join('')}</div>` : ''}
-    ` : '';
+    ` : `<div class="ud-media ud-media-empty">${ICON.image}<span>لا توجد صور لهذه الوحدة</span></div>`;
 
-    const priceHtml = Number(u['Discount Percentage']) > 0 ? `
-      <div class="unit-price-box">
-        <span class="old-price">${fmtNum(u['Price'])} جنيه</span>
-        <span class="discount-tag">خصم ${u['Discount Percentage']}%</span>
-        <div class="final-price">${fmtNum(u['Price After Discount'])} جنيه</div>
-        ${u['Price per Meter'] ? `<div class="per-meter">${fmtNum(u['Price per Meter'])} ج/م²</div>` : ''}
-      </div>` : `
-      <div class="unit-price-box">
-        <div class="final-price">${fmtNum(u['Price'])} جنيه</div>
-        ${u['Price per Meter'] ? `<div class="per-meter">${fmtNum(u['Price per Meter'])} ج/م²</div>` : ''}
+    /* ---------- بلاطة معلومة: أيقونة + تسمية + قيمة (تظهر فقط إن وُجدت القيمة) ---------- */
+    const tile = (icon, label, value) => has(value) ? `<div class="ud-tile">${icon}<div class="ud-tile-txt"><span class="ud-tile-label">${label}</span><span class="ud-tile-value">${esc(value)}</span></div></div>` : '';
+    const section = (icon, title, inner, extraClass) => inner ? `<section class="ud-sec ${extraClass || ''}"><h4 class="ud-sec-title">${icon}${title}</h4>${inner}</section>` : '';
+
+    /* ---------- الإجراءات: نفس الأزرار ونفس شروط الصلاحيات والدوال حرفيًا (بلا أي تغيير) ---------- */
+    const actionsHtml = `
+        <div class="ud-actions card-icon-row">
+          ${uiAllows('EDIT_UNIT') ? `<button type="button" class="icon-action-btn ud-act-primary" onclick="closeUnitCardOverlay(); openEditModal('${u['Unit ID']}')" title="تعديل الوحدة">${ICON.edit}تعديل</button>` : ''}
+          <button type="button" class="icon-action-btn" onclick='closeUnitCardOverlay(); shareOnWhatsApp(${JSON.stringify(u)})' title="مشاركة على واتساب">${ICON.share}واتساب</button>
+          <button type="button" class="icon-action-btn" onclick='closeUnitCardOverlay(); downloadUnitPDF(${JSON.stringify(u)}, this)' title="تصدير PDF">${ICON.file}PDF</button>
+          <button type="button" class="icon-action-btn" onclick='closeUnitCardOverlay(); showSimilarUnits(${JSON.stringify(u)})' title="وحدات مشابهة">${ICON.search}مشابهة</button>
+          ${ hasPermission('CLONE_UNIT')
+            ? `<button type="button" class="icon-action-btn" onclick="closeUnitCardOverlay(); cloneUnit('${u['Unit ID']}')" title="استنساخ الوحدة">${ICON.clipboard}نسخ</button>`
+            : (currentUserRole() === 'SALES')
+              ? `<button type="button" class="icon-action-btn" onclick="closeUnitCardOverlay(); salesOpenUnitView('${u['Unit ID']}')" title="فتح الوحدة">${ICON.clipboard}نسخ</button>`
+              : ''}
+        </div>`;
+    const statusSelectHtml = uiAllows('CHANGE_UNIT_STATUS') ? `<select class="status-select ud-status-select" onchange="changeStatus('${u['Unit ID']}', this.value)" title="تغيير حالة الوحدة">
+            <option value="متاح" ${u['Status']==='متاح'?'selected':''}>متاح</option>
+            <option value="محجوز" ${u['Status']==='محجوز'?'selected':''}>محجوز</option>
+            <option value="مباع" ${u['Status']==='مباع'?'selected':''}>مباع</option>
+          </select>` : '';
+
+    /* ---------- الملخّص (يمين المعرض على الشاشات العريضة) ---------- */
+    const summaryHtml = `
+      <div class="ud-summary">
+        <div class="ud-summary-head">
+          <span class="ud-code">${esc(u['Unit ID'])}</span>
+          ${actionsHtml}
+        </div>
+        <div class="ud-name">${esc(u['Project Name'] || u['City'])}</div>
+        <div class="ud-type">${esc(u['Property Type'])}</div>
+        <div class="ud-locline">${ICON.pin} ${esc(u['City'])} - ${esc(u['Area/District'])}</div>
+        <div class="ud-status-row"><span class="status-badge ${u['Status']}"><i class="status-dot"></i>${u['Status']}</span>${statusSelectHtml}</div>
+        ${section(ICON.clipboard, 'البيانات الأساسية', `<div class="ud-tiles ud-tiles-basic">
+          ${tile(ICON.area, 'المساحة', u['Unit Area (sqm)'] ? u['Unit Area (sqm)'] + ' م²' : '')}
+          ${tile(ICON.building, 'نوع العقار', u['Property Type'])}
+          ${tile(ICON.pin, 'المدينة', u['City'])}
+          ${tile(ICON.pin, 'المنطقة', u['Area/District'])}
+          ${tile(ICON.bed, 'الغرف', u['Rooms'])}
+          ${tile(ICON.bath, 'الحمامات', u['Bathrooms'])}
+        </div>`, 'ud-sec-basic')}
       </div>`;
 
-    const infoRow = (label, value) => value ? `<div class="ud-info-row"><span class="ud-info-label">${label}</span><span class="ud-info-value">${value}</span></div>` : '';
+    /* ---------- التفاصيل الإضافية ---------- */
+    const extraTiles = [
+      tile(ICON.floor, 'الدور', u['Floor']),
+      tile(ICON.brush, 'التشطيب', u['Finishing']),
+      tile(ICON.tree, 'الجاردن', u['Garden Area (sqm)'] ? u['Garden Area (sqm)'] + ' م²' : ''),
+      tile(ICON.roof, 'الروف', u['Roof Area (sqm)'] ? u['Roof Area (sqm)'] + ' م²' : ''),
+      tile(ICON.terrace, 'التراس', u['Terrace Area (sqm)'] ? u['Terrace Area (sqm)'] + ' م²' : ''),
+      tile(ICON.area, 'مساحة الأرض', u['Land Area (sqm)'] ? u['Land Area (sqm)'] + ' م²' : ''),
+      tile(ICON.eye, 'الفيو', u['View'])
+    ].filter(Boolean).join('');
+    const extraHtml = section(ICON.info, 'التفاصيل الإضافية', extraTiles ? `<div class="ud-tiles">${extraTiles}</div>` : '');
 
-    const primaryInfoHtml = `
-      <div class="ud-section-title">بيانات الوحدة</div>
-      <div class="ud-info-grid">
-        ${infoRow('المساحة', u['Unit Area (sqm)'] ? u['Unit Area (sqm)'] + ' م²' : '')}
-        ${infoRow('الغرف', u['Rooms'])}
-        ${infoRow('الحمامات', u['Bathrooms'])}
-        ${infoRow('الدور', u['Floor'])}
-        ${infoRow('التشطيب', u['Finishing'])}
-        ${infoRow('نوع العقار', u['Property Type'])}
-        ${infoRow('المدينة', u['City'])}
-        ${infoRow('المنطقة', u['Area/District'])}
-        ${infoRow('المطور', u['Developer Name'])}
-      </div>`;
-
-    const detailsHtml = `
-      <div class="ud-section-title">تفاصيل إضافية</div>
-      <div class="ud-info-grid">
-        ${infoRow('التصنيف', u['Category'])}
-        ${infoRow('اسم المشروع', u['Project Name'])}
-        ${infoRow('مساحة الأرض', u['Land Area (sqm)'] ? u['Land Area (sqm)'] + ' م²' : '')}
-        ${infoRow('حديقة', u['Garden Area (sqm)'] ? u['Garden Area (sqm)'] + ' م²' : '')}
-        ${infoRow('تراس', u['Terrace Area (sqm)'] ? u['Terrace Area (sqm)'] + ' م²' : '')}
-        ${infoRow('روف', u['Roof Area (sqm)'] ? u['Roof Area (sqm)'] + ' م²' : '')}
-        ${infoRow('الفيو', u['View'])}
-        ${infoRow('طريقة الدفع', u['Payment Method'])}
-        ${infoRow('المقدم', u['Down Payment'] ? u['Down Payment'] + '% = ' + fmtNum(u['Down Payment Value']) + ' جنيه' : '')}
-        ${infoRow('الدفعات', u['Payment Count'] ? u['Payment Count'] + ' دفعة × ' + fmtNum(u['Payment Amount Value']) + ' جنيه' + (u['Payment Schedule'] ? ' - ' + u['Payment Schedule'] : '') : '')}
-        ${infoRow('القسط الشهري التقريبي', u['Monthly Installment'] ? fmtNum(u['Monthly Installment']) + ' جنيه' : '')}
-        ${infoRow('عدد سنوات التقسيط', u['Installment Years'])}
-        ${infoRow('تاريخ التسليم', u['Delivery Date'])}
-        ${infoRow('أنظمة سداد أخرى', u['Other Payment Plans'])}
-        ${infoRow('أُضيفت في', u['Date Added'])}
-        ${infoRow('آخر تحديث', u['Last Updated'])}
-        ${infoRow('ملاحظات', u['Notes'])}
-      </div>`;
-
+    /* ---------- التفاصيل المالية (نفس القيم والحسابات الحالية بلا تغيير) ---------- */
+    const hasDisc = Number(u['Discount Percentage']) > 0;
+    const priceHero = `
+        <div class="ud-price-hero">
+          <div class="ud-price-total">
+            ${ICON.wallet}
+            <div>
+              <span class="ud-price-label">إجمالي السعر</span>
+              <div class="ud-price-value">${fmtNum(hasDisc ? u['Price After Discount'] : u['Price'])} <span class="cur">جنيه</span></div>
+              ${u['Price per Meter'] ? `<div class="ud-price-ppm">${ICON.chart} سعر المتر ${fmtNum(u['Price per Meter'])} جنيه / م²</div>` : ''}
+            </div>
+          </div>
+          ${hasDisc ? `
+          <div class="ud-price-old">
+            <span class="ud-price-label">السعر قبل الخصم</span>
+            <span class="old-price">${fmtNum(u['Price'])} جنيه</span>
+            <span class="discount-tag">${ICON.tag} خصم ${esc(u['Discount Percentage'])}%</span>
+          </div>` : ''}
+        </div>`;
+    const finTiles = [
+      tile(ICON.wallet, 'المقدم', u['Down Payment'] ? esc(u['Down Payment']) + '% = ' + fmtNum(u['Down Payment Value']) + ' جنيه' : ''),
+      tile(ICON.calendar, 'القسط الشهري', u['Monthly Installment'] ? fmtNum(u['Monthly Installment']) + ' جنيه' : ''),
+      tile(ICON.clock, 'سنوات التقسيط', u['Installment Years'] ? esc(u['Installment Years']) + ' سنة' : ''),
+      tile(ICON.calc, 'طريقة الدفع', u['Payment Method']),
+      tile(ICON.calc, 'الدفعات', u['Payment Count'] ? esc(u['Payment Count']) + ' × ' + fmtNum(u['Payment Amount Value']) + ' جنيه' : ''),
+      tile(ICON.calendar, 'موعد الدفعات', u['Payment Schedule']),
+      tile(ICON.file, 'أنظمة سداد أخرى', u['Other Payment Plans']),
+      tile(ICON.calendar, 'تاريخ التسليم', u['Delivery Date'])
+    ].filter(Boolean).join('');
     const resaleHtml = u['Listing Type'] === 'ريسيل' ? `
       <div class="resale-current-box">
         <div class="resale-box-title">${ICON.wallet} الوضع المالي الحالي</div>
@@ -5673,54 +5870,60 @@
           ${resalePPMDiff !== null ? `<div class="resale-item highlight"><span class="resale-label">فرق سعر المتر</span><span class="resale-value">${resalePPMDiff >= 0 ? '+' : ''}${fmtNum(resalePPMDiff)} ج/م²</span></div>` : ''}
         </div>
       </div>` : '';
+    const financeHtml = section(ICON.wallet, 'التفاصيل المالية', `${priceHero}${finTiles ? `<div class="ud-tiles">${finTiles}</div>` : ''}${resaleHtml}`, 'ud-sec-finance');
 
-    const actionsHtml = `
-      <div class="card-actions-bottom">
-        <div class="card-actions">
-          ${uiAllows('CHANGE_UNIT_STATUS') ? `<select class="status-select" onchange="changeStatus('${u['Unit ID']}', this.value)">
-            <option value="متاح" ${u['Status']==='متاح'?'selected':''}>متاح</option>
-            <option value="محجوز" ${u['Status']==='محجوز'?'selected':''}>محجوز</option>
-            <option value="مباع" ${u['Status']==='مباع'?'selected':''}>مباع</option>
-          </select>` : ''}
-        </div>
-        <div class="card-icon-row">
-          ${uiAllows('EDIT_UNIT') ? `<button type="button" class="icon-action-btn" onclick="closeUnitCardOverlay(); openEditModal('${u['Unit ID']}')" title="تعديل الوحدة">تعديل</button>` : ''}
-          <button type="button" class="icon-action-btn" onclick='closeUnitCardOverlay(); shareOnWhatsApp(${JSON.stringify(u)})' title="مشاركة على واتساب">واتساب</button>
-          <button type="button" class="icon-action-btn" onclick='closeUnitCardOverlay(); downloadUnitPDF(${JSON.stringify(u)}, this)' title="تصدير PDF">PDF</button>
-          <button type="button" class="icon-action-btn" onclick='closeUnitCardOverlay(); showSimilarUnits(${JSON.stringify(u)})' title="وحدات مشابهة">مشابهة</button>
-          ${ hasPermission('CLONE_UNIT')
-            ? `<button type="button" class="icon-action-btn" onclick="closeUnitCardOverlay(); cloneUnit('${u['Unit ID']}')" title="استنساخ الوحدة">نسخ</button>`
-            : (currentUserRole() === 'SALES')
-              ? `<button type="button" class="icon-action-btn" onclick="closeUnitCardOverlay(); salesOpenUnitView('${u['Unit ID']}')" title="فتح الوحدة">نسخ</button>`
-              : ''}
-        </div>
-        <div class="card-provenance">
-          <span class="prov-dev">${u['Developer Name'] ? `${ICON.building} المطور: <a href="javascript:void(0)" onclick='closeUnitCardOverlay(); showDeveloperProfile(${JSON.stringify(u['Developer Name'])})'>${u['Developer Name']}</a>` : ''}</span>
-          <span class="prov-meta">
-            <span class="prov-added" title="مُدخِل الوحدة">${u['Entered By'] ? `${ICON.user} ${u['Entered By']}` : ''}</span>
-            ${(roleActive() && hasPermission('VIEW_ADMIN_ANALYTICS') && u['Details View Count'] !== undefined) ? `<span class="prov-views" title="عدد مرات مشاهدة تفاصيل الوحدة (إداري)">${ICON.eye} <span class="views-num">${Number(u['Details View Count']) || 0}</span> مشاهدة</span>` : ''}
-          </span>
-        </div>
-      </div>`;
+    /* ---------- معلومات المشروع ---------- */
+    const devTile = u['Developer Name'] ? `<div class="ud-tile">${ICON.building}<div class="ud-tile-txt"><span class="ud-tile-label">المطور</span><a class="ud-tile-value ud-link" href="javascript:void(0)" onclick='closeUnitCardOverlay(); showDeveloperProfile(${JSON.stringify(u['Developer Name'])})'>${esc(u['Developer Name'])}</a></div></div>` : '';
+    const projTiles = [
+      tile(ICON.building, 'اسم المشروع', u['Project Name']),
+      devTile,
+      tile(ICON.folder, 'التصنيف', u['Category']),
+      tile(ICON.tag, 'نوع العرض', u['Listing Type']),
+      tile(ICON.user, 'السيلز / الوكيل', u['Sales/Agent'])
+    ].filter(Boolean).join('');
+    const projectHtml = section(ICON.building, 'معلومات المشروع', projTiles ? `<div class="ud-tiles">${projTiles}</div>` : '');
+
+    /* ---------- الملاحظات: لوحة بنقاط إن كان النص مفصولًا بـ "-" أو أسطر ---------- */
+    let notesHtml = '';
+    if (has(u['Notes'])) {
+      const parts = esc(u['Notes']).split(/\s*(?:\n|\r|(?:^|\s)[-–•]\s+)/).map(s => s.trim()).filter(Boolean);
+      notesHtml = section(ICON.clipboard, 'ملاحظات', parts.length > 1 ? `<ul class="ud-notes">${parts.map(p => `<li>${p}</li>`).join('')}</ul>` : `<p class="ud-notes-text">${parts[0] || esc(u['Notes'])}</p>`, 'ud-sec-notes');
+    }
+
+    /* ---------- موقع الوحدة (بيانات الموقع الموجودة فعلًا: المدينة/المنطقة - رابط خرائط خارجي) ---------- */
+    const locQuery = [u['Project Name'], u['Area/District'], u['City']].filter(has).join(' ');
+    const locationHtml = (has(u['City']) || has(u['Area/District'])) ? section(ICON.pin, 'موقع الوحدة', `
+        <div class="ud-map">${ICON.pin}<div class="ud-map-txt"><b>${esc(u['Area/District'])}</b><span>${esc(u['City'])}</span></div></div>
+        <a class="ud-map-btn" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locQuery)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${ICON.share} عرض الموقع على الخريطة</a>`, 'ud-sec-location') : '';
+
+    /* ---------- سجل الوحدة (معلومات ثانوية) ---------- */
+    const histTiles = [
+      tile(ICON.calendar, 'أضيفت في', u['Date Added']),
+      tile(ICON.edit, 'آخر تعديل', u['Last Updated']),
+      tile(ICON.user, 'أضيفت بواسطة', u['Entered By']),
+      (roleActive() && hasPermission('VIEW_ADMIN_ANALYTICS') && u['Details View Count'] !== undefined) ? `<div class="ud-tile prov-views" title="عدد مرات مشاهدة تفاصيل الوحدة (إداري)">${ICON.eye}<div class="ud-tile-txt"><span class="ud-tile-label">المشاهدات</span><span class="ud-tile-value"><span class="views-num">${Number(u['Details View Count']) || 0}</span> مشاهدة</span></div></div>` : ''
+    ].filter(Boolean).join('');
+    const historyHtml = section(ICON.clock, 'سجل الوحدة', histTiles ? `<div class="ud-tiles ud-tiles-1">${histTiles}</div>` : '', 'ud-sec-history');
 
     return `
-      <div class="ud-header">
-        <div class="ud-header-text">
-          <div class="unit-title">${u['Property Type']}${u['Project Name'] ? ' - ' + u['Project Name'] : ''}</div>
-          <div class="unit-loc">${ICON.pin} ${u['City']} - ${u['Area/District']}</div>
-        </div>
-        <div class="ud-header-meta">
-          <span class="status-badge ${u['Status']}">${u['Status']}</span>
-          <span class="unit-id">${u['Unit ID']}</span>
-        </div>
+      <div class="ud-top">
+        <h3 class="ud-top-title">${ICON.building} تفاصيل الوحدة</h3>
       </div>
-      ${mediaHtml}
       <div class="ud-body">
-        ${priceHtml}
-        ${resaleHtml}
-        ${primaryInfoHtml}
-        ${detailsHtml}
-        ${actionsHtml}
+        <div class="ud-hero">
+          <div class="ud-gallery">${mediaHtml}</div>
+          ${summaryHtml}
+        </div>
+        <div class="ud-grid">
+          ${extraHtml}
+          ${financeHtml}
+          ${projectHtml}
+        </div>
+        <div class="ud-grid ud-grid-2">
+          ${historyHtml}
+          ${notesHtml}
+          ${locationHtml}
+        </div>
       </div>
     `;
   }
@@ -5955,6 +6158,8 @@
     document.querySelectorAll('#unitCardOverlayBody .ud-thumbs img').forEach((t, i) => {
       t.classList.toggle('active', i === udGalleryIndex);
     });
+    const counter = document.querySelector('#unitCardOverlayBody .ud-counter');
+    if (counter) counter.textContent = (udGalleryIndex + 1) + ' / ' + udGalleryImages.length;
   }
   function udGalleryNav(delta) {
     if (!udGalleryImages.length) return;
