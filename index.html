@@ -1087,6 +1087,179 @@
     #statsView .chart-summary .stat .val { font-size:  var(--aq-fs-body-lg); font-weight: 800; color: var(--gold-soft); margin-top: 2px; }
     #statsView .chart-summary .stat.up .val { color: var(--danger); }
     #statsView .chart-summary .stat.down .val { color: var(--ok); }
+
+    /* ============================================================================
+     * Dashboard Redesign — Management Dashboard. نفس عائلة الألوان/التوكنز المستخدمة
+     * أصلًا في #statsView (gold-soft/navy/glass-panel معاد ربطها بالفعل بهوية الأخضر
+     * الحالية أعلى الملف) — لا هوية بصرية منفصلة، ولا مكوّنات جديدة حيث كان يمكن إعادة
+     * استخدام القائم (.chart-summary/.bar-track/.bar-fill/.aq-kpi/.aq-kpi-grid).
+     * ============================================================================ */
+    #statsView .stats-toolbar {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    #statsView .stats-toolbar-desc { margin: 0; color: var(--text-muted); font-size: var(--aq-fs-small); max-width: 56ch; }
+    #statsView .stats-toolbar-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    #statsView .stats-updated-at { font-size: var(--aq-fs-caption-sm); color: var(--text-muted); white-space: nowrap; }
+    #statsView .stats-toolbar .refresh-btn { margin-bottom: 0; }
+
+    #statsView .stats-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
+    #statsView .stats-grid-2 .section { margin-bottom: 0; }
+
+    /* KPI قابلة للنقر — نفس مكوّن .aq-kpi القائم بلا CSS جديد له، فقط مؤشر تفاعل */
+    #statsView .aq-kpi-grid { margin-bottom: 14px; }
+    #statsView .stats-kpi-clickable { cursor: pointer; }
+    #statsView .stats-kpi-clickable:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+    #statsView .stats-sub-kpis { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 16px; }
+
+    #statsView .stats-value-card .chart-summary { margin-top: 6px; }
+    #statsView .stats-pending-note {
+      margin-top: 10px; font-size: var(--aq-fs-caption-sm); color: var(--text-muted); font-style: italic;
+    }
+
+    /* Donut التصنيف/الحالة */
+    #statsView .stats-donut-wrap { display: flex; align-items: center; gap: 18px; }
+    #statsView .stats-donut-canvas { position: relative; width: 150px; height: 150px; flex: 0 0 auto; }
+    #statsView .stats-legend { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+    #statsView .stats-legend-item {
+      display: flex; align-items: center; gap: 8px; font-size: var(--aq-fs-small);
+      padding: 4px 6px; border-radius: var(--radius-sm); transition: background-color var(--ease);
+    }
+    #statsView .stats-legend-item.is-clickable { cursor: pointer; }
+    #statsView .stats-legend-item.is-clickable:hover { background: var(--aq-bg-muted-2, rgba(16,33,30,0.05)); }
+    #statsView .stats-legend-swatch { width: 11px; height: 11px; border-radius: 3px; flex: 0 0 auto; }
+    #statsView .stats-legend-label { flex: 1; min-width: 0; color: var(--text-light); font-weight: 600; }
+    #statsView .stats-legend-count { color: var(--text-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+    #statsView .stats-archived-note { margin-top: 10px; font-size: var(--aq-fs-caption-sm); color: var(--text-muted); }
+
+    /* صفوف ترتيب (المناطق/المطورون) — Compact: الاسم ثم العدد/النسبة ثم Bar رفيع بعرض
+     * الصف كاملًا كمؤشر مساعد مباشرة تحت المعلومة (لا عمود منفصل بعيد عن النص). نفس
+     * .bar-track/.bar-fill القائمة، فقط أُضيف .stats-rank-bar لضبط ارتفاع أرفع هنا تحديدًا. */
+    #statsView .stats-rank-row {
+      display: flex; flex-direction: column; gap: 3px; padding: 6px 6px; cursor: pointer;
+      border-radius: var(--radius-sm); transition: background-color var(--ease);
+    }
+    #statsView .stats-rank-row:hover { background: var(--aq-bg-muted-2, rgba(16,33,30,0.05)); }
+    #statsView .stats-rank-top { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    #statsView .stats-rank-name { font-weight: 700; color: var(--text-light); font-size: var(--aq-fs-small); }
+    #statsView .stats-rank-meta { font-size: var(--aq-fs-caption-sm); color: var(--text-muted); }
+    #statsView .stats-rank-bar { width: 100%; height: 5px; margin-top: 1px; }
+    #statsView #geoDistribution > .stats-rank-row + .stats-rank-row,
+    #statsView .stats-dev-row + .stats-dev-row { border-top: 1px solid var(--line-dark); }
+    #statsView .stats-dev-avatar {
+      width: 26px; height: 26px; border-radius: 50%; flex: 0 0 auto; display: inline-flex;
+      align-items: center; justify-content: center; background: var(--border-gold); color: var(--gold-soft);
+      font-weight: 800; font-size: var(--aq-fs-caption-sm); text-transform: uppercase;
+    }
+    #statsView .stats-dev-expand { padding: 8px 6px 4px; }
+    #statsView .stats-dev-explore-btn { margin-top: 10px; }
+
+    /* نشاط فريق المبيعات */
+    #statsView .stats-note { margin: 0 0 12px; font-size: var(--aq-fs-caption); color: var(--text-muted); }
+    #statsView .stats-table-block h4 { margin: 0 0 8px; font-size: var(--aq-fs-caption); color: var(--gold-soft); }
+    #statsView .stats-compact-table { font-size: var(--aq-fs-caption); }
+    #statsView .stats-compact-table th, #statsView .stats-compact-table td { padding: 7px 6px; }
+    #statsView .stats-clickable-row { cursor: pointer; transition: background-color var(--ease); }
+    #statsView .stats-clickable-row:hover { background: var(--aq-bg-muted-2, rgba(16,33,30,0.05)); }
+
+    /* ============================================================================
+     * Visual Refinement — لوحات "Mint" مستقلة (تحليل الأسعار الداخلية + القسمان
+     * السفليان). خلفية خضراء فاتحة جدًا من هوية الموقع نفسها (نفس توكن --aq-prop-green-soft
+     * المستخدَم أصلًا في خلفية نموذج الوحدة)، حدّ وظل ناعمان، بلا تدرّجات أو ألوان جديدة.
+     * ============================================================================ */
+    #statsView .stats-mint-panel {
+      background: var(--aq-prop-green-soft, #E4EDEA);
+      border: 1px solid var(--aq-prop-green-line, #BFD8CF);
+      border-radius: var(--aq-prop-radius, 10px);
+      box-shadow: 0 2px 10px rgba(14,84,70,0.07);
+      padding: 14px 16px;
+    }
+    #statsView .stats-mint-panel h3,
+    #statsView .stats-mint-panel h4 {
+      margin: 0 0 10px; font-size: var(--aq-fs-caption); font-weight: 800;
+      color: var(--aq-prop-green-ink, #023A3A); border: none; padding: 0;
+    }
+    /* اختلاف بسيط جدًا بين اللوحتين (أعلى/أقل) — نفس العائلة، لا تباين مبالغ فيه */
+    #statsView .stats-mint-panel--accentHigh { border-inline-start: 3px solid var(--aq-prop-green, #0E5446); }
+    #statsView .stats-mint-panel--accentLow { border-inline-start: 3px solid var(--aq-prop-green-deep, #004C43); }
+    /* صفوف تحليل الأسعار: التسلسل الاسم ← نوع العقار ← السعر (الأبرز) */
+    #statsView .stats-price-item { padding: 7px 2px; border-bottom: 1px solid rgba(14,84,70,0.10); }
+    #statsView .stats-price-item:last-child { border-bottom: none; }
+    #statsView .stats-price-item-name { font-weight: 700; color: var(--text-light); font-size: var(--aq-fs-small); }
+    #statsView .stats-price-item-sub { font-size: var(--aq-fs-caption-sm); color: var(--text-muted); margin: 1px 0 3px; }
+    #statsView .stats-price-item-value {
+      font-weight: 800; font-size: var(--aq-fs-body-lg); color: var(--aq-prop-green-ink, #023A3A);
+      font-variant-numeric: tabular-nums;
+    }
+    /* القسمان السفليان (سعر المتر لمشروع / نشاط الفريق) بنفس هوية Mint، بلا Card داخل Card:
+       الـ.section نفسه هو اللوحة المستقلة (مستوى واحد فقط). القوائم/الأزرار الداخلية تبقى
+       بيضاء (سطح واضح فوق الخلفية الفاتحة) — لا تغيير في منطقها، فقط تباين بصري واضح. */
+    /* تخصيص أعلى (خاصية مضاعفة .section.stats-mint-panel) ضروري هنا: قاعدة #dashboardView
+       .section اللاحقة في الملف تُعيد الخلفية لسطح أبيض لأي .section داخل شِل لوحة التحكم
+       بنفس درجة التخصيص — فبلا هذا التقوية كانت الخلفية الخضراء لا تظهر فعليًا رغم الكلاس. */
+    #statsView .section.stats-mint-panel {
+      background: var(--aq-prop-green-soft, #E4EDEA) !important;
+      border-color: var(--aq-prop-green-line, #BFD8CF) !important;
+      border-top-color: var(--aq-prop-green-line, #BFD8CF) !important;
+      box-shadow: 0 2px 10px rgba(14,84,70,0.07) !important;
+      margin-bottom: 12px;
+    }
+    #statsView .section.stats-mint-panel h3 {
+      color: var(--aq-prop-green-ink, #023A3A) !important;
+      border-bottom: 1px solid rgba(14,84,70,0.16); padding-bottom: 6px; margin-bottom: 12px;
+    }
+    #statsView .stats-mint-panel .chart-wrap,
+    #statsView .stats-mint-panel .empty-note { background: var(--aq-prop-surface, #fff); }
+    /* صندوق القيمة داخل "قيمة المخزون": سطح أبيض عادي مميَّز عن خلفية اللوحة الخضراء
+       المحيطة (بدل تظليل شبه شفاف كان يندمج بصريًا مع الأخضر فيصعب تمييزه). */
+    #statsView .stats-mint-panel .chart-summary .stat {
+      background: var(--aq-prop-surface, #fff); border-color: var(--aq-prop-green-line, #BFD8CF);
+    }
+    #statsView .stats-month-nav-btn {
+      background: var(--aq-prop-surface, #fff); color: var(--aq-prop-green-ink, #023A3A);
+      border: 1px solid var(--aq-prop-green-line, #BFD8CF); padding: 8px 14px;
+      border-radius: var(--radius-sm); font-weight: 700; cursor: pointer;
+    }
+    #statsView .stats-month-nav-btn:hover { background: var(--aq-prop-green-soft, #E4EDEA); }
+    #statsView .stats-month-nav-label { color: var(--aq-prop-green-ink, #023A3A); font-size: 14px; }
+    /* Badge عدد الوحدات في "آخر الأنشطة" — نفس بيانات النص القديم، عرض فقط */
+    #statsView .stats-activity-count-badge {
+      display: inline-block; background: var(--aq-prop-surface, #fff); color: var(--aq-prop-green-ink, #023A3A);
+      border: 1px solid var(--aq-prop-green-line, #BFD8CF); border-radius: var(--aq-radius-pill, 999px);
+      padding: 2px 10px; font-weight: 800; font-size: var(--aq-fs-caption-sm); font-variant-numeric: tabular-nums;
+    }
+
+    /* قوائم مصغّرة (السداد والتسليم — بلا تغيير) */
+    #statsView .stats-mini-list h4 { margin: 0 0 8px; font-size: var(--aq-fs-caption); color: var(--gold-soft); }
+    #statsView .stats-mini-item {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 6px 2px; font-size: var(--aq-fs-small); border-bottom: 1px solid var(--line-dark);
+    }
+    #statsView .stats-mini-item:last-child { border-bottom: none; }
+    #statsView .stats-mini-item b { color: var(--gold-soft); font-variant-numeric: tabular-nums; }
+    #statsView .stats-recent-title { margin: 0 0 8px; font-size: var(--aq-fs-caption); color: var(--gold-soft); }
+    #statsView #recentActivityList:empty { display: none; }
+    #statsView #recentActivityList { margin-bottom: 14px; }
+    /* نشاط الفريق — ملخّص الشهر / التفصيل اليومي: صفوف Compact بتناوب أبيض/أخضر خفيف
+     * جدًا (Subtle Visual Rhythm) — لا Shadow ولا حدود لكل صف؛ اللوحة نفسها هي البطاقة. */
+    #statsView .stats-activity-summary-title { margin: 0 0 8px; font-size: var(--aq-fs-caption); font-weight: 800; color: var(--gold-soft); }
+    #statsView .stats-activity-emp-header {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+      padding: 0 10px 10px; margin-bottom: 4px; border-bottom: 1px solid rgba(14,84,70,0.14);
+    }
+    #statsView .stats-activity-emp-header b { color: var(--aq-prop-green-ink, #023A3A); font-size: var(--aq-fs-body-lg); }
+    #statsView .stats-activity-emp-header span { color: var(--text-muted); font-size: var(--aq-fs-caption); }
+    #statsView .stats-activity-rows { display: flex; flex-direction: column; }
+    #statsView .stats-activity-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 8px 10px; font-size: var(--aq-fs-small); color: var(--text-light);
+      border-radius: var(--radius-sm);
+    }
+    #statsView .stats-activity-row.is-alt { background: rgba(14,84,70,0.045); }
+
+    @media (max-width: 900px) {
+      #statsView .stats-grid-2 { grid-template-columns: 1fr; }
+    }
     @media (max-width: 640px) {
       #statsView h1 { font-size:  var(--aq-fs-section-title); padding-right: 11px; }
       #statsView .section { padding: 14px; }
@@ -1094,6 +1267,9 @@
       #statsView .kpi-value { font-size:  var(--aq-fs-title-lg); }
       #statsView #mostViewedTable, #statsView #mostRequestedTable { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
       #statsView .chart-summary .stat { min-width: 100%; }
+      #statsView .stats-toolbar { align-items: flex-start; }
+      #statsView .stats-donut-wrap { flex-direction: column; align-items: stretch; }
+      #statsView .stats-donut-canvas { width: 100%; max-width: 220px; margin: 0 auto; }
     }
     @media (max-width: 420px) {
       #statsView .kpi-grid { grid-template-columns: 1fr; }
@@ -3735,20 +3911,95 @@
     <!-- (أُزيلت شاشة قفل كلمة السر القديمة — الوصول مبنيّ على صلاحية VIEW_STATISTICS) -->
 
     <div id="dashboardContent">
-      <button class="refresh-btn" id="refreshBtn">🔄 تحديث الإحصائيات</button>
-
-      <div class="kpi-grid" id="kpiGrid"></div>
-
-      <div class="section">
-        <h3>الوحدات حسب التصنيف</h3>
-        <div id="categoryBars"></div>
+      <div class="stats-toolbar">
+        <p class="stats-toolbar-desc">نظرة شاملة على المخزون والأسعار والمطورين ونشاط فريق المبيعات</p>
+        <div class="stats-toolbar-actions">
+          <span class="stats-updated-at" id="statsUpdatedAt"></span>
+          <button class="refresh-btn" id="refreshBtn">🔄 تحديث البيانات</button>
+        </div>
       </div>
 
-      <div class="section">
-        <h3>أكتر المطورين تكرارًا</h3>
-        <div id="developerBars"></div>
+      <!-- LEVEL 1 — نبض المخزون -->
+      <div class="aq-kpi-grid" id="kpiGrid"></div>
+      <div class="section stats-value-card stats-mint-panel" id="statsValueSection">
+        <h3>قيمة المخزون</h3>
+        <div id="statsValuePanel"></div>
       </div>
 
+      <!-- LEVEL 2 — توزيع المخزون -->
+      <div class="stats-grid-2">
+        <div class="section stats-donut-card">
+          <h3>الوحدات حسب التصنيف</h3>
+          <div class="stats-donut-wrap">
+            <div class="stats-donut-canvas"><canvas id="categoryDonutCanvas"></canvas></div>
+            <div class="stats-legend" id="categoryLegend"></div>
+          </div>
+        </div>
+        <div class="section stats-donut-card">
+          <h3>حالة المخزون</h3>
+          <div class="stats-donut-wrap">
+            <div class="stats-donut-canvas"><canvas id="statusDonutCanvas"></canvas></div>
+            <div class="stats-legend" id="statusLegend"></div>
+          </div>
+          <div class="stats-archived-note" id="statusArchivedNote"></div>
+        </div>
+      </div>
+
+      <!-- LEVEL 3 يبدأ هنا أيضًا: المنطقة والمطورون في صف واحد على Desktop (نفس .stats-grid-2 القائمة) -->
+      <div class="stats-grid-2">
+        <div class="section stats-mint-panel">
+          <h3>توزيع المخزون حسب المنطقة</h3>
+          <div id="geoDistribution"></div>
+        </div>
+
+        <div class="section stats-mint-panel">
+          <h3>أكبر المطورين في المخزون</h3>
+          <div id="developerBars"></div>
+        </div>
+      </div>
+
+      <!-- LEVEL 4 — نشاط فريق المبيعات -->
+      <div class="section stats-sales-section">
+        <h3>نشاط فريق المبيعات على المنصة</h3>
+        <p class="stats-note">البيانات التالية تعكس استخدام فريق المبيعات للمنصة (مشاهدات، تصدير PDF، مشاركة واتساب) — وليست بيانات صادرة عن العملاء.</p>
+        <div class="aq-kpi-grid stats-sub-kpis" id="salesActivityKpis"></div>
+        <div class="stats-grid-2">
+          <div class="stats-table-block stats-mint-panel">
+            <h4>الأكثر استخدامًا (مشاهدة تفاصيل)</h4>
+            <table id="mostViewedTable" class="stats-compact-table">
+              <thead>
+                <tr><th style="width:32px;">#</th><th>رقم الوحدة</th><th>الوحدة</th><th>المشاهدات</th></tr>
+              </thead>
+              <tbody id="mostViewedTableBody"></tbody>
+            </table>
+          </div>
+          <div class="stats-table-block stats-mint-panel">
+            <h4>الأكثر تصديرًا ومشاركة</h4>
+            <table id="mostRequestedTable" class="stats-compact-table">
+              <thead>
+                <tr><th>رقم الوحدة</th><th>المشروع</th><th>PDF</th><th>واتساب</th><th>الإجمالي</th></tr>
+              </thead>
+              <tbody id="mostRequestedTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- LEVEL 5 — تفاصيل وتحليلات الوحدات -->
+      <div class="section">
+        <h3>تحليل الأسعار</h3>
+        <div id="priceAnalytics"></div>
+      </div>
+
+      <div class="section" id="paymentDeliverySection">
+        <h3>نظرة على أنظمة السداد والتسليم</h3>
+        <div id="paymentDeliveryInsights"></div>
+      </div>
+
+      <!-- القسمان السفليان (سعر المتر لمشروع + نشاط إدخال الفريق) في صف واحد على Desktop —
+           نفس .stats-grid-2 القائمة (المستخدمة أعلى للمنطقة/المطورين)، بلا نظام Grid جديد.
+           كل قسم أصبح Panel مستقل بهوية Mint خفيفة (stats-mint-panel) بدل قسمين متتاليين. -->
+      <div class="stats-grid-2">
       <div class="section">
         <h3>تتبع تغيّر سعر المتر لمشروع معيّن</h3>
         <select class="chart-select" id="priceHistoryProjectSelect">
@@ -3759,49 +4010,27 @@
         </div>
       </div>
 
-      <div class="section">
-        <h3>أكثر 10 وحدات مشاهدة لتفاصيلها</h3>
-        <table id="mostViewedTable">
-          <thead>
-            <tr><th style="width:38px;">#</th><th>رقم الوحدة</th><th>الوحدة</th><th>المشاهدات</th></tr>
-          </thead>
-          <tbody id="mostViewedTableBody"></tbody>
-        </table>
-      </div>
-
+      <!-- LEVEL 6 — نشاط الفريق (OWNER فقط) -->
       <div class="section">
         <h3>سجل نشاط إدخال الوحدات لكل موظف</h3>
+        <div id="recentActivityList"></div>
         <select class="chart-select" id="activityEmployeeSelect">
           <option value="">اختر موظف...</option>
         </select>
-        <div id="activityMonthNav" style="display:none; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px;">
-          <button type="button" id="activityPrevMonth" style="background:rgba(255,255,255,0.06); color:var(--text-light); border:1px solid var(--line-dark); padding:8px 14px; border-radius:var(--radius-sm); font-weight:700; cursor:pointer;">◀ الشهر السابق</button>
-          <b id="activityMonthLabel" style="color:var(--gold-soft); font-size:14px;"></b>
-          <button type="button" id="activityNextMonth" style="background:rgba(255,255,255,0.06); color:var(--text-light); border:1px solid var(--line-dark); padding:8px 14px; border-radius:var(--radius-sm); font-weight:700; cursor:pointer;">الشهر التالي ▶</button>
+        <div id="activityMonthNav" class="stats-month-nav" style="display:none; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px;">
+          <button type="button" id="activityPrevMonth" class="stats-month-nav-btn">◀ الشهر السابق</button>
+          <b id="activityMonthLabel" class="stats-month-nav-label"></b>
+          <button type="button" id="activityNextMonth" class="stats-month-nav-btn">الشهر التالي ▶</button>
         </div>
         <div id="activityContent">
-          <div class="empty-note">اختار موظف من القائمة فوق عشان تشوف سجل نشاطه</div>
+          <div class="empty-note">جاري تحميل نشاط الفريق...</div>
         </div>
       </div>
-
-      <div class="section">
-        <h3>التفاعل مع الوحدات (تصدير PDF ومشاركة واتساب)</h3>
-        <div class="kpi-grid" style="margin-bottom:14px;">
-          <div class="kpi-card"><div class="kpi-value" id="statTotalPdf">-</div><div class="kpi-label">إجمالي تصدير PDF (كل الموقع)</div></div>
-          <div class="kpi-card"><div class="kpi-value" id="statTotalWhatsApp">-</div><div class="kpi-label">إجمالي مشاركة واتساب (كل الموقع)</div></div>
-        </div>
-        <h3 style="font-size:12px;">أعلى 10 وحدات تفاعلًا</h3>
-        <table id="mostRequestedTable">
-          <thead>
-            <tr><th>رقم الوحدة</th><th>المشروع</th><th>PDF</th><th>واتساب</th><th>الإجمالي</th></tr>
-          </thead>
-          <tbody id="mostRequestedTableBody"></tbody>
-        </table>
       </div>
     </div>
   </section>
 
-  <!-- ===== المرحلة 3.4 — "لوحة التحكم" كعرض صفحة كامل (مدمج، مش iframe) ===== -->
+<!-- ===== المرحلة 3.4 — "لوحة التحكم" كعرض صفحة كامل (مدمج، مش iframe) ===== -->
   <section id="dashboardView" aria-label="لوحة التحكم">
     <div class="dash-drawer-backdrop" id="dashDrawerBackdrop"></div>
     <div class="dash-shell">
@@ -10978,6 +11207,10 @@
       if (n === null || n === undefined || n === '') return '-';
       return Number(n).toLocaleString('en-US');
     }
+    function fmtPct(n) {
+      if (n === null || n === undefined || isNaN(n)) return '-';
+      return (Math.round(n * 10) / 10).toLocaleString('en-US') + '%';
+    }
 
     function unlockDashboard(pin) {
       // pin هنا = كائن بيانات الدخول القادم من الـ shell (unlockStatsThen) بعد
@@ -11004,9 +11237,74 @@
 
     document.getElementById('refreshBtn').addEventListener('click', loadStats);
 
+    /* ============================================================================
+     * Drill-down — كل النقرات القابلة للفلترة (KPI/تصنيف/حالة/مطور/منطقة) تمرّ من هنا.
+     * تستخدم *نفس* الباك-إند القائم (searchUnits) ونفس مسار عرض النتائج (renderResults/
+     * lastResults) ونفس التنقّل (__aqarGoExplore) — بلا Route جديد ولا endpoint جديد.
+     * تملأ أيضًا حقول فلاتر "استكشف" الموجودة فعليًا (مطور/تصنيف/نوع/مدينة) حيثما أمكن،
+     * فتبقى متزامنة مع الفورم لو المستخدم بحث تاني يدويًا. "الحالة" ليس لها حقل واجهة
+     * فلا تُعرض في الفورم، لكن نتيجة البحث نفسها تُفلتَر بها فعليًا في الباك-إند.
+     * ============================================================================ */
+    function statsGoExplore_(filters) {
+      filters = filters || {};
+      try {
+        if (filters.developer != null) { var fd = document.getElementById('f_developer'); if (fd) fd.value = filters.developer; }
+        if (filters.category != null) { var fc = document.getElementById('f_category'); if (fc) fc.value = filters.category; }
+        if (filters.keyword != null) { var fk = document.getElementById('f_keyword'); if (fk) fk.value = filters.keyword; }
+      } catch (e) {}
+
+      var payload = {
+        keyword: filters.keyword || '',
+        category: filters.category || '',
+        propertyType: '', city: '', district: '', developer: filters.developer || '',
+        finishing: '', rooms: '', minPrice: '', maxPrice: '', minArea: '', maxArea: '', exactArea: '',
+        listingType: ''
+      };
+      if (filters.status) payload.status = filters.status; // لا حقل واجهة له — يُطبَّق مباشرة على البحث
+
+      var container = document.getElementById('results');
+      if (container) container.innerHTML = typeof skeletonCardsHtml === 'function' ? skeletonCardsHtml(6) : '';
+      var rc = document.getElementById('resultsCount'); if (rc) rc.textContent = 'جاري تحميل العقارات...';
+
+      google.script.run.withSuccessHandler(function (units) {
+        if (!Array.isArray(units)) {
+          if (typeof handleAuthLost_ === 'function' && handleAuthLost_(units)) return;
+          if (container) container.innerHTML = '<div class="empty-state"><h3>' + ((units && units.message) || 'حصل خطأ أثناء تحميل النتائج') + '</h3></div>';
+          return;
+        }
+        window.lastResults = units;
+        if (typeof renderResults === 'function' && typeof sortUnits === 'function') {
+          renderResults(sortUnits(units, document.getElementById('f_sort') ? document.getElementById('f_sort').value : 'newest'));
+        }
+        if (typeof window.__aqarGoExplore === 'function') window.__aqarGoExplore(); else location.hash = 'explore';
+      }).withFailureHandler(function (err) {
+        if (container) container.innerHTML = '<div class="empty-state"><h3>حصل خطأ أثناء تحميل النتائج</h3></div>';
+      }).searchUnits(payload, getViewerAdminPin());
+    }
+
+    function statsOpenUnit_(unitId) {
+      if (!unitId) return;
+      google.script.run.withSuccessHandler(function (res) {
+        if (!res || res.success === false) {
+          if (typeof showToast === 'function') showToast((res && res.message) || 'تعذّر فتح الوحدة', 'error');
+          return;
+        }
+        if (typeof showUnitCardOverlay === 'function') showUnitCardOverlay(res);
+      }).withFailureHandler(function () {
+        if (typeof showToast === 'function') showToast('تعذّر فتح الوحدة', 'error');
+      }).getUnitById(unitId, getViewerAdminPin());
+    }
+
     function loadStats() {
       // إحصاءات عامة + مخزون — متاحة لكل مستخدم مُسجَّل دخول (VIEW_STATISTICS)
-      google.script.run.withSuccessHandler(renderStats).getDashboardStats(currentPin);
+      google.script.run.withSuccessHandler(function (res) {
+        renderStats(res);
+        var u = document.getElementById('statsUpdatedAt');
+        if (u && res && res.success) {
+          var now = new Date();
+          u.textContent = 'آخر تحديث: ' + now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+        }
+      }).getDashboardStats(currentPin);
       loadPriceHistoryProjects();
       // أقسام مقيّدة: نُظهرها/نُخفيها ونستدعي الباك-إند فقط لمن يملك الصلاحية.
       // (الباك-إند يعيد التحقق لكل نداء بأي حال — هذا لمنع رسالة رفض بشعة للـ SALES.)
@@ -11018,9 +11316,9 @@
       };
       var canLog = _can('VIEW_ACTIVITY_LOG');
       var canAnalytics = _can('VIEW_ADMIN_ANALYTICS');
-      _showSec('activityEmployeeSelect', canLog);
+      // القسم 4 كله (نشاط فريق المبيعات: KPI + الجدولان) خلف صلاحية واحدة — تُخفى/تُظهر معًا.
       _showSec('mostViewedTable', canAnalytics);
-      _showSec('mostRequestedTable', canAnalytics);
+      _showSec('activityEmployeeSelect', canLog);
       if (canLog) loadEntryActivityLog();
       if (canAnalytics) { loadMostRequested(); loadMostViewed(); }
     }
@@ -11035,36 +11333,38 @@
           return;
         }
         if (!res.units.length) {
-          tbody.innerHTML = '<tr><td colspan="4" class="empty-note">لا توجد مشاهدات مسجّلة بعد</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="4" class="empty-note">لا توجد مشاهدات مسجّلة بعد (استخدام فريق المبيعات)</td></tr>';
           return;
         }
         tbody.innerHTML = res.units.map((u, i) => {
           const desc = [u.propertyType, u.projectName, (u.city && u.district) ? (u.city + ' - ' + u.district) : (u.city || u.district), u.developer]
             .filter(Boolean).join(' · ');
           return `
-            <tr>
+            <tr class="stats-clickable-row" data-unit-id="${u.unitId || ''}">
               <td class="num">${i + 1}</td>
               <td>${u.unitId || '-'}</td>
               <td>${desc || '-'}</td>
               <td class="num">${fmtNum(u.count)}</td>
             </tr>`;
         }).join('');
+        tbody.querySelectorAll('tr[data-unit-id]').forEach(function (tr) {
+          tr.addEventListener('click', function () { statsOpenUnit_(tr.getAttribute('data-unit-id')); });
+        });
       }).getMostViewedUnits(currentPin);
     }
 
-    /* ---------- الأكتر طلبًا ---------- */
+    /* ---------- الأكتر طلبًا (استخدام فريق المبيعات: تصدير/مشاركة) ---------- */
     function loadMostRequested() {
       const tbody = document.getElementById('mostRequestedTableBody');
       tbody.innerHTML = '<tr><td colspan="5" class="empty-note">جاري التحميل...</td></tr>';
       google.script.run.withSuccessHandler(function(res) {
         if (!res.success) { tbody.innerHTML = '<tr><td colspan="5" class="empty-note">' + res.message + '</td></tr>'; return; }
-        var pdfEl = document.getElementById('statTotalPdf');
-        var waEl = document.getElementById('statTotalWhatsApp');
-        if (pdfEl) pdfEl.textContent = fmtNum(res.totalPdf != null ? res.totalPdf : (res.units || []).reduce(function(s,u){return s+(u.pdfCount||0);},0));
-        if (waEl) waEl.textContent = fmtNum(res.totalWhatsApp != null ? res.totalWhatsApp : (res.units || []).reduce(function(s,u){return s+(u.whatsappCount||0);},0));
-        if (!res.units.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-note">لا توجد بيانات بعد</td></tr>'; return; }
+        var totalPdf = res.totalPdf != null ? res.totalPdf : (res.units || []).reduce(function(s,u){return s+(u.pdfCount||0);},0);
+        var totalWa = res.totalWhatsApp != null ? res.totalWhatsApp : (res.units || []).reduce(function(s,u){return s+(u.whatsappCount||0);},0);
+        renderSalesActivityKpis_(totalPdf, totalWa);
+        if (!res.units.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-note">لا توجد بيانات استخدام مسجّلة بعد</td></tr>'; return; }
         tbody.innerHTML = res.units.slice(0, 10).map(u => `
-          <tr>
+          <tr class="stats-clickable-row" data-unit-id="${u.unitId}">
             <td>${u.unitId}</td>
             <td>${u.projectName || '-'}</td>
             <td class="num">${u.pdfCount}</td>
@@ -11072,7 +11372,22 @@
             <td class="num">${u.total}</td>
           </tr>
         `).join('');
+        tbody.querySelectorAll('tr[data-unit-id]').forEach(function (tr) {
+          tr.addEventListener('click', function () { statsOpenUnit_(tr.getAttribute('data-unit-id')); });
+        });
       }).getMostRequestedUnits(currentPin);
+    }
+
+    function renderSalesActivityKpis_(totalPdf, totalWa) {
+      var grid = document.getElementById('salesActivityKpis'); if (!grid) return;
+      grid.textContent = '';
+      var items = [
+        { icon: 'file', tone: 'accent', label: 'إجمالي تصدير PDF', value: totalPdf, caption: 'استخدام فريق المبيعات (كل المنصة)' },
+        { icon: 'share', tone: 'success', label: 'إجمالي مشاركة واتساب', value: totalWa, caption: 'استخدام فريق المبيعات (كل المنصة)' }
+      ];
+      items.forEach(function (it) {
+        grid.appendChild(statsKpiCard_(it, it.value, null));
+      });
     }
 
     /* ---------- تتبع تغيّر سعر المتر ---------- */
@@ -11136,12 +11451,12 @@
           datasets: [{
             label: 'سعر المتر (جنيه)',
             data: points.map(p => p.newPricePerMeter),
-            borderColor: '#c9992e',
-            backgroundColor: 'rgba(201,153,46,0.12)',
+            borderColor: '#0E5446',
+            backgroundColor: 'rgba(14,84,70,0.10)',
             borderWidth: 2.5,
             tension: 0.25,
             fill: true,
-            pointBackgroundColor: '#0f2942',
+            pointBackgroundColor: '#023A3A',
             pointRadius: 4
           }]
         },
@@ -11156,61 +11471,314 @@
       });
     }
 
+    /* ============================================================================
+     * LEVEL 1 — بطاقات KPI (نفس مكوّن aq-kpi/ICON المستخدم في "الرئيسية" — هوية واحدة،
+     * لا CSS جديد للبطاقة نفسها). قابلة للنقر حيث ينطبق ذلك عبر statsGoExplore_.
+     * ============================================================================ */
+    function statsKpiCard_(item, raw, onClick) {
+      // نفس بنية/كلاسات مكوّن aq-kpi القائم (مستخدَم في "الرئيسية" — dashKpiCard_ محليّة
+      // هناك ولا يمكن استدعاؤها من هنا)، مُعاد بناؤها هنا سطرًا بسطر لنفس الهوية البصرية.
+      var card = document.createElement('article');
+      card.className = 'aq-card aq-card--kpi aq-kpi aq-kpi--' + item.tone;
+      card.setAttribute('data-kpi', item.key || item.label);
+      var head = document.createElement('div'); head.className = 'aq-kpi-head';
+      var ico = document.createElement('span'); ico.className = 'aq-kpi-icon'; ico.setAttribute('aria-hidden', 'true');
+      if (typeof ICON !== 'undefined' && ICON[item.icon]) ico.innerHTML = ICON[item.icon];
+      var lbl = document.createElement('span'); lbl.className = 'aq-kpi-label'; lbl.textContent = item.label;
+      head.appendChild(ico); head.appendChild(lbl);
+      var num = document.createElement('div'); num.className = 'aq-kpi-number aq-num';
+      var has = (typeof raw === 'number' && isFinite(raw));
+      var txt = has ? fmtNum(raw) : '—';
+      num.textContent = txt;
+      if (txt.length > 9) num.classList.add('aq-kpi-number--long');
+      num.setAttribute('aria-label', item.label + ': ' + txt);
+      var cap = document.createElement('div'); cap.className = 'aq-kpi-caption aq-caption'; cap.textContent = item.caption || '';
+      card.appendChild(head); card.appendChild(num); card.appendChild(cap);
+      if (onClick) {
+        card.classList.add('stats-kpi-clickable');
+        card.setAttribute('role', 'button');
+        card.setAttribute('tabindex', '0');
+        card.addEventListener('click', onClick);
+        card.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } });
+      }
+      return card;
+    }
+
+    function renderStatsKpis_(res) {
+      var grid = document.getElementById('kpiGrid'); if (!grid) return;
+      grid.textContent = '';
+      var byStatus = res.byStatus || {};
+      var items = [
+        { key: 'total', label: 'إجمالي الوحدات', icon: 'building', tone: 'accent', caption: 'الوحدات النشطة في المخزون', value: res.total, onClick: function () { statsGoExplore_({}); } },
+        { key: 'available', label: 'متاح', icon: 'check', tone: 'success', caption: 'جاهزة للعرض والبيع', value: byStatus['متاح'] || 0, onClick: function () { statsGoExplore_({ status: 'متاح' }); } },
+        { key: 'reserved', label: 'محجوز', icon: 'clock', tone: 'warning', caption: 'قيد الحجز', value: byStatus['محجوز'] || 0, onClick: function () { statsGoExplore_({ status: 'محجوز' }); } },
+        { key: 'sold', label: 'مباع', icon: 'award', tone: 'danger', caption: 'تم بيعها', value: byStatus['مباع'] || 0, onClick: function () { statsGoExplore_({ status: 'مباع' }); } },
+        { key: 'archived', label: 'مؤرشفة', icon: 'folder', tone: 'neutral', caption: 'خارج المخزون النشط (٣٠ يومًا بلا تحديث)', value: res.archivedCount, onClick: null }
+      ];
+      items.forEach(function (it) {
+        grid.appendChild(statsKpiCard_(it, it.value, it.onClick));
+      });
+    }
+
+    /* ============================================================================
+     * LEVEL 1 (تكملة) — قيمة المخزون. الحقول الجديدة (بعد الخصم/إجمالي الخصم) additive
+     * في getDashboardStats؛ إن كانت الاستجابة القادمة من الخادم لا تحتوي عليها بعد (خادم
+     * لم يُنشَر عليه آخر تحديث) نعرض المقياس الوحيد الحالي بلا كسر أي شيء ونوضّح السبب.
+     * ============================================================================ */
+    function renderStatsValuePanel_(res) {
+      var el = document.getElementById('statsValuePanel'); if (!el) return;
+      var hasBreakdown = typeof res.totalAvailableValueAfterDiscount === 'number';
+      if (!res.total) {
+        el.innerHTML = '<div class="empty-note">لا توجد بيانات متاحة</div>';
+        return;
+      }
+      if (hasBreakdown) {
+        el.innerHTML = `
+          <div class="chart-summary">
+            <div class="stat"><div class="lbl">قيمة المخزون المتاح (قبل الخصم)</div><div class="val">${fmtNum(res.totalAvailableValue)} جنيه</div></div>
+            <div class="stat"><div class="lbl">قيمة المخزون المتاح (بعد الخصم)</div><div class="val">${fmtNum(res.totalAvailableValueAfterDiscount)} جنيه</div></div>
+            <div class="stat down"><div class="lbl">إجمالي قيمة الخصومات</div><div class="val">${fmtNum(res.totalAvailableDiscountValue)} جنيه</div></div>
+          </div>`;
+      } else {
+        el.innerHTML = `
+          <div class="chart-summary">
+            <div class="stat"><div class="lbl">قيمة المخزون المتاح (قبل الخصم)</div><div class="val">${fmtNum(res.totalAvailableValue)} جنيه</div></div>
+          </div>
+          <div class="stats-pending-note">تفصيل "قبل/بعد الخصم" سيظهر تلقائيًا بعد نشر آخر تحديث للخادم (Code.gs).</div>`;
+      }
+    }
+
+    /* ============================================================================
+     * LEVEL 2 — Donut التصنيف وDonut الحالة (Chart.js — نفس المكتبة المحمَّلة فعليًا،
+     * لا مكتبة جديدة). Legend مبنية يدويًا (RTL + قابلة للنقر للتصنيف).
+     * ============================================================================ */
+    var categoryChart = null, statusChart = null;
+    var CATEGORY_PALETTE = ['#0E5446', '#1E7145', '#4FA579', '#C99A2E', '#6E7573', '#8A6412'];
+    var STATUS_COLORS = { 'متاح': '#1E7145', 'محجوز': '#8A6412', 'مباع': '#B0271F' };
+
+    function renderDonut_(canvasId, legendId, labels, values, colors, existingChart, onSliceClick) {
+      var canvas = document.getElementById(canvasId);
+      var legend = document.getElementById(legendId);
+      if (!canvas || !legend) return existingChart;
+      if (existingChart) existingChart.destroy();
+      if (!labels.length) {
+        legend.innerHTML = '<div class="empty-note">لا توجد بيانات متاحة</div>';
+        return null;
+      }
+      var total = values.reduce(function (a, b) { return a + b; }, 0) || 1;
+      var chart = new Chart(canvas.getContext('2d'), {
+        type: 'doughnut',
+        data: { labels: labels, datasets: [{ data: values, backgroundColor: colors, borderColor: '#FFFFFF', borderWidth: 2 }] },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '68%', plugins: { legend: { display: false }, tooltip: { rtl: true } } }
+      });
+      legend.innerHTML = labels.map(function (lbl, i) {
+        var pct = Math.round((values[i] / total) * 1000) / 10;
+        return '<div class="stats-legend-item" data-idx="' + i + '"><span class="stats-legend-swatch" style="background:' + colors[i % colors.length] + '"></span>' +
+          '<span class="stats-legend-label">' + lbl + '</span><span class="stats-legend-count">' + fmtNum(values[i]) + ' (' + pct + '%)</span></div>';
+      }).join('');
+      if (onSliceClick) {
+        legend.querySelectorAll('.stats-legend-item').forEach(function (row) {
+          row.classList.add('is-clickable');
+          row.addEventListener('click', function () { onSliceClick(labels[Number(row.getAttribute('data-idx'))]); });
+        });
+      }
+      return chart;
+    }
+
+    function renderCategoryDonut_(byCategory) {
+      var labels = Object.keys(byCategory || {});
+      var values = labels.map(function (l) { return byCategory[l]; });
+      categoryChart = renderDonut_('categoryDonutCanvas', 'categoryLegend', labels, values, CATEGORY_PALETTE, categoryChart, function (label) {
+        statsGoExplore_({ category: label });
+      });
+    }
+
+    function renderStatusDonut_(byStatus, archivedCount) {
+      var order = ['متاح', 'محجوز', 'مباع'];
+      var labels = order.filter(function (k) { return (byStatus || {})[k] > 0; });
+      var values = labels.map(function (l) { return byStatus[l]; });
+      var colors = labels.map(function (l) { return STATUS_COLORS[l]; });
+      statusChart = renderDonut_('statusDonutCanvas', 'statusLegend', labels, values, colors, statusChart, function (label) {
+        statsGoExplore_({ status: label });
+      });
+      var note = document.getElementById('statusArchivedNote');
+      if (note) {
+        note.textContent = (archivedCount > 0)
+          ? ('+ ' + fmtNum(archivedCount) + ' وحدة مؤرشفة (خارج المخزون النشط — غير معروضة في هذه النسبة)')
+          : '';
+      }
+    }
+
+    /* ============================================================================
+     * LEVEL 2 (تكملة) — توزيع المخزون حسب المنطقة (من districtStats الذي يُحسب
+     * ويُرسل بالفعل من getDashboardStats — بلا أي نداء إضافي). تجميع بالمنطقة (عبر كل
+     * أنواع العقار فيها) + متوسط سعر متر مرجَّح بعدد الوحدات في كل مجموعة.
+     * ============================================================================ */
+    function renderGeoDistribution_(districtStats) {
+      var el = document.getElementById('geoDistribution'); if (!el) return;
+      if (!districtStats || !districtStats.length) { el.innerHTML = '<div class="empty-note">لا توجد بيانات متاحة</div>'; return; }
+      var byDistrict = {};
+      districtStats.forEach(function (g) {
+        var d = byDistrict[g.name] || (byDistrict[g.name] = { name: g.name, count: 0, sumPpmWeighted: 0, countForPpm: 0 });
+        d.count += g.count || 0;
+        if (g.avgPricePerMeter) { d.sumPpmWeighted += g.avgPricePerMeter * (g.count || 0); d.countForPpm += (g.count || 0); }
+      });
+      var rows = Object.values(byDistrict).sort(function (a, b) { return b.count - a.count; }).slice(0, 8);
+      var maxCount = Math.max.apply(null, rows.map(function (r) { return r.count; }).concat([1]));
+      el.innerHTML = rows.map(function (r) {
+        var ppm = r.countForPpm > 0 ? Math.round(r.sumPpmWeighted / r.countForPpm) : null;
+        return '<div class="stats-rank-row" data-district="' + r.name.replace(/"/g, '&quot;') + '">' +
+          '<span class="stats-rank-name">' + r.name + '</span>' +
+          '<span class="stats-rank-meta">' + fmtNum(r.count) + ' وحدة' + (ppm ? ' · متوسط سعر المتر (تقديري) ' + fmtNum(ppm) + ' ج/م²' : '') + '</span>' +
+          '<div class="bar-track stats-rank-bar"><div class="bar-fill" style="width:' + (r.count / maxCount * 100) + '%"></div></div></div>';
+      }).join('');
+      el.querySelectorAll('.stats-rank-row').forEach(function (row) {
+        row.addEventListener('click', function () { statsGoExplore_({ keyword: row.getAttribute('data-district') }); });
+      });
+    }
+
+    /* ============================================================================
+     * LEVEL 3 — ترتيب المطورين + Drill-down. القائمة (أعلى 8) من getDashboardStats
+     * كما هي. عند الضغط على مطوّر: نداء واحد إلى searchUnits (endpoint قائم أصلًا،
+     * تستخدمه "استكشف" بالضبط) بفلتر المطوّر فقط، ثم تجميع النتيجة في المتصفح —
+     * بلا أي تعديل أو إضافة في الباك-إند.
+     * ============================================================================ */
+    var devOpenName = null;
+    function renderDeveloperRanking_(topDevelopers, total) {
+      var el = document.getElementById('developerBars'); if (!el) return;
+      if (!topDevelopers || !topDevelopers.length) { el.innerHTML = '<div class="empty-note">لا توجد بيانات بعد</div>'; return; }
+      var maxCount = Math.max.apply(null, topDevelopers.map(function (d) { return d.count; }).concat([1]));
+      el.innerHTML = topDevelopers.map(function (d, i) {
+        var pct = total > 0 ? Math.round((d.count / total) * 1000) / 10 : 0;
+        return '<div class="stats-dev-row" data-dev="' + d.name.replace(/"/g, '&quot;') + '">' +
+          '<div class="stats-rank-row">' +
+          '<div class="stats-rank-top"><span class="stats-dev-avatar">' + devInitialsSafe_(d.name) + '</span>' +
+          '<span class="stats-rank-name">' + (i + 1) + '. ' + d.name + '</span></div>' +
+          '<span class="stats-rank-meta">' + fmtNum(d.count) + ' وحدة · ' + pct + '% من المخزون</span>' +
+          '<div class="bar-track stats-rank-bar stats-dev-bar"><div class="bar-fill" style="width:' + (d.count / maxCount * 100) + '%"></div></div>' +
+          '</div>' +
+          '<div class="stats-dev-expand" hidden></div>' +
+          '</div>';
+      }).join('');
+      el.querySelectorAll('.stats-dev-row').forEach(function (rowWrap) {
+        rowWrap.querySelector('.stats-rank-row').addEventListener('click', function () {
+          toggleDeveloperDrilldown_(rowWrap, rowWrap.getAttribute('data-dev'));
+        });
+      });
+    }
+    function devInitialsSafe_(name) {
+      try { if (typeof devInitials_ === 'function') return devInitials_(name); } catch (e) {}
+      return String(name || '').trim().slice(0, 1).toUpperCase();
+    }
+    function toggleDeveloperDrilldown_(rowWrap, name) {
+      var expand = rowWrap.querySelector('.stats-dev-expand');
+      if (devOpenName === name) {
+        expand.hidden = true; devOpenName = null; return;
+      }
+      document.querySelectorAll('.stats-dev-expand').forEach(function (e) { e.hidden = true; });
+      devOpenName = name;
+      expand.hidden = false;
+      expand.innerHTML = '<div class="empty-note">جاري التحميل...</div>';
+      google.script.run.withSuccessHandler(function (units) {
+        if (!Array.isArray(units)) { expand.innerHTML = '<div class="empty-note">تعذّر تحميل بيانات المطوّر</div>'; return; }
+        expand.innerHTML = buildDeveloperDrilldownHtml_(name, units);
+        var btn = expand.querySelector('[data-explore-dev]');
+        if (btn) btn.addEventListener('click', function (e) { e.stopPropagation(); statsGoExplore_({ developer: name }); });
+      }).withFailureHandler(function () {
+        expand.innerHTML = '<div class="empty-note">تعذّر تحميل بيانات المطوّر</div>';
+      }).searchUnits({ developer: name }, getViewerAdminPin());
+    }
+    function buildDeveloperDrilldownHtml_(name, units) {
+      var byStatus = {}; var availableValue = 0, availableValueAfter = 0, ppmSum = 0, ppmCount = 0, discCount = 0;
+      units.forEach(function (u) {
+        var st = u['Status'] || 'غير محدد';
+        byStatus[st] = (byStatus[st] || 0) + 1;
+        if (st === 'متاح') {
+          var price = Number(u['Price']) || 0;
+          availableValue += price;
+          availableValueAfter += Number(u['Price After Discount']) || price;
+        }
+        var ppm = Number(u['Price per Meter']) || 0;
+        if (ppm > 0) { ppmSum += ppm; ppmCount++; }
+        if ((Number(u['Discount Percentage']) || 0) > 0) discCount++;
+      });
+      var avgPpm = ppmCount > 0 ? Math.round(ppmSum / ppmCount) : null;
+      return '<div class="chart-summary">' +
+        '<div class="stat"><div class="lbl">إجمالي الوحدات</div><div class="val">' + fmtNum(units.length) + '</div></div>' +
+        '<div class="stat"><div class="lbl">متاح</div><div class="val">' + fmtNum(byStatus['متاح'] || 0) + '</div></div>' +
+        '<div class="stat"><div class="lbl">محجوز</div><div class="val">' + fmtNum(byStatus['محجوز'] || 0) + '</div></div>' +
+        '<div class="stat"><div class="lbl">مباع</div><div class="val">' + fmtNum(byStatus['مباع'] || 0) + '</div></div>' +
+        '<div class="stat"><div class="lbl">قيمة المتاح (قبل الخصم)</div><div class="val">' + fmtNum(availableValue) + ' جنيه</div></div>' +
+        '<div class="stat"><div class="lbl">قيمة المتاح (بعد الخصم)</div><div class="val">' + fmtNum(availableValueAfter) + ' جنيه</div></div>' +
+        (avgPpm ? '<div class="stat"><div class="lbl">متوسط سعر المتر</div><div class="val">' + fmtNum(avgPpm) + ' ج/م²</div></div>' : '') +
+        '<div class="stat"><div class="lbl">وحدات بها خصم</div><div class="val">' + fmtNum(discCount) + '</div></div>' +
+        '</div>' +
+        '<button type="button" class="aq-btn aq-btn--ghost stats-dev-explore-btn" data-explore-dev>عرض كل وحدات ' + name + ' في استكشف ←</button>';
+    }
+
+    /* ============================================================================
+     * LEVEL 5 — تحليل الأسعار (من districtStats الموجود + حقول الخصم الإضافية إن وُجدت)
+     * ============================================================================ */
+    function renderPriceAnalytics_(res) {
+      var el = document.getElementById('priceAnalytics'); if (!el) return;
+      var rows = (res.districtStats || []).filter(function (g) { return g.avgPricePerMeter; });
+      if (!rows.length) { el.innerHTML = '<div class="empty-note">لا توجد بيانات كافية</div>'; return; }
+      var sorted = rows.slice().sort(function (a, b) { return b.avgPricePerMeter - a.avgPricePerMeter; });
+      var top = sorted.slice(0, 3), bottom = sorted.slice(-3).reverse();
+      function listHtml(title, list, accentCls) {
+        return '<div class="stats-mint-panel ' + accentCls + '"><h4>' + title + '</h4>' + (list.length ? list.map(function (g) {
+          return '<div class="stats-price-item">' +
+            '<div class="stats-price-item-name">' + g.name + '</div>' +
+            '<div class="stats-price-item-sub">' + g.propertyType + '</div>' +
+            '<div class="stats-price-item-value">' + fmtNum(g.avgPricePerMeter) + ' ج/م²</div>' +
+            '</div>';
+        }).join('') : '<div class="empty-note">لا توجد بيانات كافية</div>') + '</div>';
+      }
+      var html = '<div class="stats-grid-2">' + listHtml('أعلى متوسط سعر متر', top, 'stats-mint-panel--accentHigh') + listHtml('أقل متوسط سعر متر', bottom, 'stats-mint-panel--accentLow') + '</div>';
+      if (typeof res.discountedUnitsCount === 'number') {
+        var pct = res.total > 0 ? Math.round((res.discountedUnitsCount / res.total) * 1000) / 10 : 0;
+        html += '<div class="chart-summary" style="margin-top:12px;">' +
+          '<div class="stat"><div class="lbl">نسبة الوحدات المخفّضة</div><div class="val">' + pct + '%</div></div>' +
+          '<div class="stat"><div class="lbl">عدد الوحدات المخفّضة</div><div class="val">' + fmtNum(res.discountedUnitsCount) + '</div></div>' +
+          '<div class="stat"><div class="lbl">متوسط نسبة الخصم</div><div class="val">' + fmtPct(res.avgDiscountPercent) + '</div></div>' +
+          '</div>';
+      } else {
+        html += '<div class="stats-pending-note">مؤشرات الخصم (النسبة والمتوسط) ستظهر بعد نشر آخر تحديث للخادم.</div>';
+      }
+      el.innerHTML = html;
+    }
+
+    /* ============================================================================
+     * LEVEL 5 (تكملة) — أنظمة السداد والتسليم. قسم كامل جديد يعتمد على حقلين
+     * إضافيين (byPaymentMethod/byDeliveryYear) — يُخفى بالكامل إن كان الخادم القائم
+     * لا يرسلهما بعد (نسخة Code.gs لم تُنشَر) بدل عرض قسم فارغ بلا فائدة.
+     * ============================================================================ */
+    function renderPaymentDeliveryInsights_(res) {
+      var section = document.getElementById('paymentDeliverySection');
+      var el = document.getElementById('paymentDeliveryInsights');
+      if (!section || !el) return;
+      if (!res.byPaymentMethod || !res.byDeliveryYear) { section.style.display = 'none'; return; }
+      section.style.display = '';
+      function listHtml(title, obj) {
+        var keys = Object.keys(obj).sort(function (a, b) { return obj[b] - obj[a]; });
+        if (!keys.length) return '<div class="stats-mini-list"><h4>' + title + '</h4><div class="empty-note">لا توجد بيانات</div></div>';
+        return '<div class="stats-mini-list"><h4>' + title + '</h4>' + keys.map(function (k) {
+          return '<div class="stats-mini-item"><span>' + k + '</span><b>' + fmtNum(obj[k]) + '</b></div>';
+        }).join('') + '</div>';
+      }
+      el.innerHTML = '<div class="stats-grid-2">' + listHtml('طريقة الدفع', res.byPaymentMethod) + listHtml('سنة التسليم', res.byDeliveryYear) + '</div>';
+    }
+
     function renderStats(res) {
       if (!res.success) { showToast(res.message || 'تعذّر تحميل الإحصائيات', 'error'); return; }
-
-      // KPI Cards
-      const statusOrder = [
-        { key: 'متاح', label: 'متاح', cls: 'available' },
-        { key: 'محجوز', label: 'محجوز', cls: 'reserved' },
-        { key: 'مباع', label: 'مباع', cls: 'sold' }
-      ];
-      let kpiHtml = `
-        <div class="kpi-card">
-          <div class="kpi-value">${fmtNum(res.total)}</div>
-          <div class="kpi-label">إجمالي الوحدات</div>
-        </div>`;
-      statusOrder.forEach(s => {
-        kpiHtml += `
-        <div class="kpi-card ${s.cls}">
-          <div class="kpi-value">${fmtNum(res.byStatus[s.key] || 0)}</div>
-          <div class="kpi-label">${s.label}</div>
-        </div>`;
-      });
-      kpiHtml += `
-        <div class="kpi-card archived">
-          <div class="kpi-value">${fmtNum(res.archivedCount || 0)}</div>
-          <div class="kpi-label">مؤرشفة</div>
-        </div>`;
-      kpiHtml += `
-        <div class="kpi-card">
-          <div class="kpi-value">${fmtNum(res.totalAvailableValue)}</div>
-          <div class="kpi-label">إجمالي قيمة الوحدات المتاحة (جنيه)</div>
-        </div>`;
-      document.getElementById('kpiGrid').innerHTML = kpiHtml;
-
-      // Category bars
-      const categories = Object.keys(res.byCategory);
-      const maxCategory = Math.max(...categories.map(c => res.byCategory[c]), 1);
-      document.getElementById('categoryBars').innerHTML = categories.length ? categories.map(c => `
-        <div class="bar-row">
-          <div class="bar-label"><span>${c}</span><b>${res.byCategory[c]}</b></div>
-          <div class="bar-track"><div class="bar-fill" style="width:${(res.byCategory[c] / maxCategory * 100)}%"></div></div>
-        </div>
-      `).join('') : '<div class="empty-note">لا توجد بيانات بعد</div>';
-
-      // Developer bars
-      const maxDev = Math.max(...res.topDevelopers.map(d => d.count), 1);
-      document.getElementById('developerBars').innerHTML = res.topDevelopers.length ? res.topDevelopers.map(d => `
-        <div class="bar-row">
-          <div class="bar-label"><span>${d.name}</span><b>${d.count} وحدة</b></div>
-          <div class="bar-track"><div class="bar-fill" style="width:${(d.count / maxDev * 100)}%"></div></div>
-        </div>
-      `).join('') : '<div class="empty-note">لا توجد بيانات بعد</div>';
-
-      // "متوسط سعر المتر لكل منطقة" اتشال من هنا (موجود بالفعل في مودال "متوسط سعر المتر"
-      // المتاح للكل). res.districtStats لسه بيرجع من getDashboardStats من غير تغيير -
-      // بس مش بيتعرض في اللوحة. أي حساب لسعر المتر في باقي الموقع شغّال زي ما هو.
+      renderStatsKpis_(res);
+      renderStatsValuePanel_(res);
+      renderCategoryDonut_(res.byCategory || {});
+      renderStatusDonut_(res.byStatus || {}, res.archivedCount || 0);
+      renderGeoDistribution_(res.districtStats || []);
+      renderDeveloperRanking_(res.topDevelopers || [], res.total || 0);
+      renderPriceAnalytics_(res);
+      renderPaymentDeliveryInsights_(res);
     }
 
     /* ---------- سجل نشاط إدخال الوحدات لكل موظف ---------- */
@@ -11221,70 +11789,102 @@
       google.script.run.withSuccessHandler(function(res) {
         if (!res.success) return;
         allActivityEntries = res.entries;
+        renderRecentActivity_();
         const select = document.getElementById('activityEmployeeSelect');
         const currentValue = select.value;
         select.innerHTML = '<option value="">اختر موظف...</option>' +
           res.employees.map(e => `<option value="${e}">${e}</option>`).join('');
         if (currentValue && res.employees.indexOf(currentValue) !== -1) select.value = currentValue;
+        renderActivityReport();   // عرض افتراضي فور توفر البيانات: ملخّص الشهر لكل الموظفين
       }).getEntryActivityLog(currentPin);
+    }
+
+    /* آخر الأنشطة: تجميع محلي بالكامل لما هو محمَّل بالفعل (allActivityEntries) —
+     * بلا أي نداء إضافي. نشاط إدخال/تحديث الوحدات فقط (المصدر الوحيد المتاح بتاريخ). */
+    function renderRecentActivity_() {
+      var el = document.getElementById('recentActivityList'); if (!el) return;
+      if (!allActivityEntries.length) { el.innerHTML = ''; return; }
+      var byKey = {};
+      allActivityEntries.forEach(function (e) {
+        var k = e.enteredBy + '|||' + e.year + '-' + e.month + '-' + e.day;
+        if (!byKey[k]) byKey[k] = { enteredBy: e.enteredBy, year: e.year, month: e.month, day: e.day, dateLabel: e.dateLabel, count: 0 };
+        byKey[k].count++;
+      });
+      var rows = Object.values(byKey).sort(function (a, b) {
+        return (b.year - a.year) || (b.month - a.month) || (b.day - a.day);
+      }).slice(0, 5);
+      el.innerHTML = '<h4 class="stats-recent-title">آخر الأنشطة (إدخال وتحديث الوحدات)</h4>' + rows.map(function (r) {
+        return '<div class="stats-mini-item"><span>' + r.enteredBy + ' — ' + r.dateLabel + '</span><b class="stats-activity-count-badge">' + r.count + ' وحدة</b></div>';
+      }).join('');
     }
 
     const MONTH_NAMES_AR = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
 
-    function renderActivityReport() {
-      const employee = document.getElementById('activityEmployeeSelect').value;
-      const content = document.getElementById('activityContent');
-      const nav = document.getElementById('activityMonthNav');
+    /* صف Compact واحد (اسم/تاريخ + Badge العدد) — تناوب أبيض/أخضر خفيف جدًا بينهما فقط
+     * (لا Shadow ولا Card مستقلة لكل صف؛ اللوحة نفسها هي البطاقة). */
+    function activityRowsHtml_(rows) {
+      return '<div class="stats-activity-rows">' + rows.map(function (r, i) {
+        return '<div class="stats-activity-row' + (i % 2 ? ' is-alt' : '') + '">' +
+          '<span>' + r.label + '</span><b class="stats-activity-count-badge">' + fmtNum(r.count) + ' وحدة</b></div>';
+      }).join('') + '</div>';
+    }
 
-      if (!employee) {
-        nav.style.display = 'none';
-        content.innerHTML = '<div class="empty-note">اختار موظف من القائمة فوق عشان تشوف سجل نشاطه</div>';
+    /* بدون موظف محدَّد: إجمالي وحدات كل موظف خلال الشهر المعروض حاليًا (activityViewDate) —
+     * ترتيب تنازليًا. نفس allActivityEntries، فلترة بالشهر فقط (بلا اسم موظف). */
+    function renderMonthlySummary_(year, month) {
+      const content = document.getElementById('activityContent');
+      const monthEntries = allActivityEntries.filter(e => e.year === year && e.month === month);
+      if (!monthEntries.length) {
+        content.innerHTML = '<div class="empty-note">لا توجد وحدات مسجّلة في هذا الشهر</div>';
         return;
       }
+      const byEmp = {};
+      monthEntries.forEach(e => { byEmp[e.enteredBy] = (byEmp[e.enteredBy] || 0) + 1; });
+      const rows = Object.keys(byEmp)
+        .map(name => ({ label: name, count: byEmp[name] }))
+        .sort((a, b) => b.count - a.count);
+      content.innerHTML = '<div class="stats-activity-summary-title">ملخّص الشهر — كل الموظفين</div>' + activityRowsHtml_(rows);
+    }
 
-      nav.style.display = 'flex';
-      const year = activityViewDate.getFullYear();
-      const month = activityViewDate.getMonth() + 1;
-      document.getElementById('activityMonthLabel').textContent = MONTH_NAMES_AR[month - 1] + ' ' + year;
-
+    /* عند اختيار موظف: تفصيل يومي لنفس الشهر المعروض — نفس المصفوفة والفلتر المستخدمين في
+     * renderMonthlySummary_ (بإضافة شرط enteredBy فقط)، فإجمالي الشهر هنا يطابق دائمًا
+     * قيمته في renderMonthlySummary_ لأنهما يُحسَبان من نفس البيانات الخام بالضبط. */
+    function renderDailyBreakdown_(employee, year, month) {
+      const content = document.getElementById('activityContent');
       const monthEntries = allActivityEntries.filter(e => e.enteredBy === employee && e.year === year && e.month === month);
-
       if (!monthEntries.length) {
         content.innerHTML = '<div class="empty-note">مفيش وحدات مسجلة للموظف ده في الشهر ده</div>';
         return;
       }
-
       const byDay = {};
       monthEntries.forEach(e => {
         if (!byDay[e.day]) byDay[e.day] = { day: e.day, dateLabel: e.dateLabel, count: 0 };
         byDay[e.day].count++;
       });
       const days = Object.values(byDay).sort((a, b) => b.day - a.day);
+      const rows = days.map(d => ({ label: d.dateLabel, count: d.count }));
+      const header = '<div class="stats-activity-emp-header"><b>' + employee + '</b>' +
+        '<span>إجمالي ' + fmtNum(monthEntries.length) + ' وحدة</span></div>';
+      content.innerHTML = header + activityRowsHtml_(rows);
+    }
 
-      let html = `
-        <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); margin-bottom:20px;">
-          <div class="kpi-card">
-            <div class="kpi-value">${monthEntries.length}</div>
-            <div class="kpi-label">إجمالي وحدات الشهر</div>
-          </div>
-          <div class="kpi-card available">
-            <div class="kpi-value">${days.length}</div>
-            <div class="kpi-label">عدد أيام النشاط</div>
-          </div>
-        </div>
-        <table>
-          <thead><tr><th>التاريخ</th><th>عدد الوحدات المُضافة</th></tr></thead>
-          <tbody>
-            ${days.map(d => `<tr><td>${d.dateLabel}</td><td class="num">${d.count}</td></tr>`).join('')}
-          </tbody>
-        </table>
-      `;
-      content.innerHTML = html;
+    /* نقطة الدخول الوحيدة للعرض: تُحدَّد الحالة (ملخّص شهري / تفصيل يومي) من قيمة القائمة
+     * المنسدلة فقط؛ الشهر المعروض (activityViewDate) نفسه في الحالتين — لا اعتماد على
+     * تاريخ اليوم بعد أول تحميل. شريط التنقّل الشهري ظاهر دائمًا (يخدم الحالتين معًا). */
+    function renderActivityReport() {
+      const employee = document.getElementById('activityEmployeeSelect').value;
+      const nav = document.getElementById('activityMonthNav');
+      nav.style.display = 'flex';
+      const year = activityViewDate.getFullYear();
+      const month = activityViewDate.getMonth() + 1;
+      document.getElementById('activityMonthLabel').textContent = MONTH_NAMES_AR[month - 1] + ' ' + year;
+
+      if (!employee) { renderMonthlySummary_(year, month); return; }
+      renderDailyBreakdown_(employee, year, month);
     }
 
     document.getElementById('activityEmployeeSelect').addEventListener('change', function() {
-      activityViewDate = new Date();
-      renderActivityReport();
+      renderActivityReport();   // الشهر المعروض يبقى كما هو — لا Reset لتاريخ اليوم عند تبديل الموظف
     });
     document.getElementById('activityPrevMonth').addEventListener('click', function() {
       activityViewDate.setMonth(activityViewDate.getMonth() - 1);
