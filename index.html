@@ -3034,7 +3034,12 @@
      * ========================================================================= */
 
     /* ---------------- الرئيسية: هيرو أكثر سعة ---------------- */
-    body.app-view-search .aq-hero { padding-top: var(--aq-space-8); }
+    /* تقليل المسافة الفارغة بين الشريط العلوي والسطر التعريفي — القيمة السابقة كانت
+       var(--aq-space-8) (32px)؛ لا تلمس #mainContainer المشترك مع كل الصفحات. */
+    body.app-view-search .aq-hero { padding-top: var(--aq-space-5); }
+    /* السطر التعريفي "AqaR Digital · مخزون عقاري احترافي" أكبر قليلًا (12.5px → 14px،
+       ~12%) خاص بهذه الصفحة فقط — بلا لمس التوكن المشترك --aq-fs-label. */
+    body.app-view-search .aq-hero-eyebrow { font-size: 14px; margin-bottom: 12px; }
     body.app-view-search .aq-hero-title { font-size: clamp(30px, 3.6vw, 46px); }
     body.app-view-search .aq-hero-sub { max-width: 72ch; }
 
@@ -3050,7 +3055,18 @@
          بهذا السياق فقط — بلا تغيير في الحدّ أو نصف القطر أو أي شيء آخر. */
       box-shadow: 0 4px 14px rgba(11,40,33,0.10), 0 22px 48px rgba(11,40,33,0.16);
     }
-    body.app-view-search .aq-console .filters-card { background: var(--aq-prop-green-soft, #E4EDEA); }
+    /* الصف السفلي: دمج "مزيدًا من الفلاتر" + "البحث" + "مسح الفلاتر" في صفّ واحد
+       بنفس أسلوب Grid المعتمد أصلًا في "استكشف" (grid-template-areas) — بلا أي نقل
+       لعناصر DOM، فتبقى قواعد "استكشف" (التي تعتمد على .filters-card > العنصر
+       مباشرة) سليمة تمامًا ولا تتأثر إطلاقًا. صفّا "بحث بالفلاتر"/"بحث ذكي" فوق
+       هذا الصندوق (.aq-console-modes) خارج .filters-card بالكامل — لم يُلمَسا. */
+    body.app-view-search .aq-console .filters-card {
+      background: var(--aq-prop-green-soft, #E4EDEA);
+      display: grid;
+      grid-template-columns: auto 1fr;
+      grid-template-areas: "fields fields" "adv actions" "advblk advblk";
+      align-items: center;
+    }
     /* Phase 2C — الحقول الستة الأساسية: صفّان × 3 أعمدة متساوية العرض (ترتيب DOM بعد
        applyHomeFiltersLayout_ يعطي الترتيب البصري RTL المطلوب مباشرة بلا CSS إضافي). */
     body.app-view-search .aq-console .filters-card > .grid {
@@ -3058,6 +3074,10 @@
       gap: var(--aq-space-4) var(--aq-space-3);
       direction: rtl;
     }
+    body.app-view-search .aq-console .filters-card > .grid#aqPrimaryFilters { grid-area: fields; margin-bottom: var(--aq-space-4); }
+    body.app-view-search .aq-console .filters-card > .toggle-details-btn { grid-area: adv; justify-self: start; width: auto; }
+    body.app-view-search .aq-console .filters-card > #advancedFiltersBlock { grid-area: advblk; }
+    body.app-view-search .aq-console .filters-card > .btn-row { grid-area: actions; }
     body.app-view-search .aq-console input,
     body.app-view-search .aq-console select { padding: 12px 14px; }
     @media (max-width: 480px) {
@@ -3066,7 +3086,7 @@
       body.app-view-search .aq-console select { padding: 11px 8px; font-size: var(--aq-fs-caption); }
     }
     /* زر البحث عريض داخل البطاقة (كما في المرجع) ومسح الفلاتر ثانوي بجانبه */
-    body.app-view-search .aq-console .btn-row { margin-top: var(--aq-space-4); gap: var(--aq-space-2); }
+    body.app-view-search .aq-console .btn-row { margin: 0; gap: var(--aq-space-2); justify-content: flex-end; }
     body.app-view-search .aq-console #searchBtn { flex: 1 1 auto; padding: 14px 28px; font-size: var(--aq-fs-body); }
     body.app-view-search .aq-console #clearBtn { flex: 0 0 auto; }
 
