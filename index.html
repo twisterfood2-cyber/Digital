@@ -2481,7 +2481,10 @@
     body.app-view-explore .aq-hero-media,
     body.app-view-explore .aq-hero-copy { display: none; }
     body.app-view-explore .aq-console {
-      box-shadow: none; border: none; padding: 0; background: transparent;
+      box-shadow: none; border: none; padding: 0;
+      /* خلفية الصندوق كاملًا (يشمل صفّ زرَّي "بحث بالفلاتر"/"بحث ذكي" فوق صندوق الحقول) —
+         نفس خلفية "قيمة المخزون" (Mint خفيف). */
+      background: var(--aq-prop-green-soft, #E4EDEA);
     }
     body.app-view-explore .aq-console-modes { margin-bottom: 10px; }
     /* شبكة الفلاتر تتحوّل إلى صف أفقي مضغوط (تسميات صغيرة فوق كل حقل) */
@@ -3039,7 +3042,15 @@
     body.app-view-search .aq-console {
       max-width: 760px; margin-inline: auto;
       padding: var(--aq-space-6) var(--aq-space-5);
+      /* نفس خلفية "قيمة المخزون" (Mint خفيف) — الصندوق كاملًا (يشمل صفّ زرَّي "بحث
+         بالفلاتر"/"بحث ذكي")، بلا أي تغيير آخر. */
+      background: var(--aq-prop-green-soft, #E4EDEA);
+      /* الخلفية الخضراء الفاتحة قريبة جدًا من لون خلفية الصفحة، فقلّ التباين الذي كان
+         يُبرز الصندوق كعنصر Hero. تعويض بظل أعمق/أوضح (طبقتان: قريبة + بعيدة) خاصًا
+         بهذا السياق فقط — بلا تغيير في الحدّ أو نصف القطر أو أي شيء آخر. */
+      box-shadow: 0 4px 14px rgba(11,40,33,0.10), 0 22px 48px rgba(11,40,33,0.16);
     }
+    body.app-view-search .aq-console .filters-card { background: var(--aq-prop-green-soft, #E4EDEA); }
     /* Phase 2C — الحقول الستة الأساسية: صفّان × 3 أعمدة متساوية العرض (ترتيب DOM بعد
        applyHomeFiltersLayout_ يعطي الترتيب البصري RTL المطلوب مباشرة بلا CSS إضافي). */
     body.app-view-search .aq-console .filters-card > .grid {
@@ -3064,6 +3075,9 @@
       display: grid; grid-template-columns: 1fr auto;
       grid-template-areas: "fields fields" "adv actions" "advblk advblk";
       gap: var(--aq-space-2) var(--aq-space-3); align-items: center;
+      /* خلفية صندوق البحث في "استكشف" فقط — نفس خلفية "قيمة المخزون" (Mint خفيف)،
+         بلا أي تغيير في خانات البحث نفسها (Input/Select) ولا في أي صفحة أخرى. */
+      background: var(--aq-prop-green-soft, #E4EDEA);
     }
     body.app-view-explore .aq-console .filters-card > .grid { grid-area: fields; }
     body.app-view-explore .aq-console .filters-card > .toggle-details-btn {
