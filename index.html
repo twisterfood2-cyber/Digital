@@ -3208,6 +3208,25 @@
     /* اسم المشروع + زر "جيب آخر وحدة" في سطر واحد؛ لو الزر مخفي (تعديل/نسخ) الحقل يملأ العرض تلقائيًا */
     #editForm .aq-inline-action { display: flex; flex-wrap: wrap; gap: var(--aq-space-2); align-items: stretch; }
     #editForm .aq-inline-action > input { flex: 1 1 200px; min-width: 0; }
+
+    /* ميزة "الدفعات الإضافية" — نفس شبكة/حقول قسم السعر بالحرف الواحد؛ لا Redesign،
+       تظهر فقط عند الضغط على "+ دفعة أخرى" فلا تزيد ارتفاع النموذج في الحالة الطبيعية. */
+    #additionalPaymentsSection { margin-top: var(--aq-space-3); }
+    #additionalPaymentsList { display: flex; flex-direction: column; gap: var(--aq-space-3); }
+    #editForm .grid.aq-additional-payment-row {
+      padding-top: var(--aq-space-3); border-top: 1px dashed var(--aq-border-strong);
+    }
+    #editForm .aq-additional-payment-remove-wrap { display: flex; }
+    .aq-additional-payment-remove {
+      width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px;
+      background: var(--aq-bg-muted-2); color: var(--error-fg, #c0392b);
+      border: 1px solid var(--line-dark); border-radius: var(--radius-sm);
+      padding: 9px; font-size: var(--aq-fs-caption); font-weight: 600; cursor: pointer;
+      transition: background-color var(--ease), border-color var(--ease);
+    }
+    .aq-additional-payment-remove:hover { background: rgba(192,57,43,0.12); border-color: var(--error-fg, #c0392b); }
+    .aq-additional-payment-remove .ico { width: 14px; height: 14px; }
+    #addAdditionalPaymentBtn { margin-top: var(--aq-space-2); }
     #editForm .aq-inline-action #editFetchLastSimilarBtn { flex: 0 0 auto; margin: 0; min-height: 46px; white-space: nowrap; padding: 10px 14px; font-size: var(--aq-fs-caption); }
 
     /* معاينة القسط: بطاقة مالية هادئة */
@@ -4828,7 +4847,112 @@
           <div><svg class="ico" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h13v4"/><path d="M3 7v10a2 2 0 0 0 2 2h15V7H5"/><path d="M16 13h.01"/></svg> السعر بعد الخصم: <b id="editPriceAfterDiscountValue">-</b> جنيه</div>
           <div><svg class="ico" viewBox="0 0 24 24"><path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2v.3h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2Z"/></svg> القسط الشهري التقريبي: <b id="editMonthlyInstallmentValue">-</b> جنيه/شهريًا</div>
           <div><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg> القسط الربع سنوي التقريبي: <b id="editQuarterlyInstallmentValue">-</b> جنيه/كل 3 شهور</div>
+          <div id="editAdditionalPaymentsSummaryLine" style="display:none;"><svg class="ico" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> إجمالي الدفعات الإضافية: <b id="editAdditionalPaymentsTotalValue">-</b> جنيه — المتبقي بعدها: <b id="editRemainingAfterAllValue">-</b> جنيه</div>
         </div>
+      </div>
+
+      <!-- ميزة "الدفعات الإضافية" (حتى 5، مستقلة تمامًا عن بعضها وعن صفّ "قيمة الدفعة"
+           الأساسي أعلاه الذي لا يُلمَس إطلاقًا) — تظهر فقط عند الضغط على "+ دفعة أخرى"،
+           بنفس الشبكة 12 عمودًا ونفس Typography/الحدود/الخلفية المستخدمة في بقية القسم. -->
+      <div id="additionalPaymentsSection">
+        <div id="additionalPaymentsList">
+          <div class="grid aq-additional-payment-row" data-slot="1" style="display:none;">
+            <div class="aq-c3">
+              <label>دفعة أخرى 1 (نسبة % أو قيمة)</label>
+              <input type="text" name="additionalPayment1" placeholder="مثال: 5% أو 560000">
+              <div class="aq-form-hint" id="editAdditionalPayment1ValueHint" style="display:none;"></div>
+            </div>
+            <div class="aq-c2">
+              <label>عدد الدفعات</label>
+              <input type="number" name="additionalPayment1Count" min="0">
+            </div>
+            <div class="aq-c3">
+              <label>موعد الدفعة</label>
+              <input type="text" name="additionalPayment1Due" placeholder="مثال: بعد 3 أشهر">
+            </div>
+            <div class="aq-c4 aq-additional-payment-remove-wrap">
+              <label>&nbsp;</label>
+              <button type="button" class="aq-additional-payment-remove" data-slot="1" aria-label="حذف الدفعة الإضافية 1" title="حذف هذه الدفعة"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg><span>حذف</span></button>
+            </div>
+          </div>
+          <div class="grid aq-additional-payment-row" data-slot="2" style="display:none;">
+            <div class="aq-c3">
+              <label>دفعة أخرى 2 (نسبة % أو قيمة)</label>
+              <input type="text" name="additionalPayment2" placeholder="مثال: 5% أو 560000">
+              <div class="aq-form-hint" id="editAdditionalPayment2ValueHint" style="display:none;"></div>
+            </div>
+            <div class="aq-c2">
+              <label>عدد الدفعات</label>
+              <input type="number" name="additionalPayment2Count" min="0">
+            </div>
+            <div class="aq-c3">
+              <label>موعد الدفعة</label>
+              <input type="text" name="additionalPayment2Due" placeholder="مثال: بعد 6 أشهر">
+            </div>
+            <div class="aq-c4 aq-additional-payment-remove-wrap">
+              <label>&nbsp;</label>
+              <button type="button" class="aq-additional-payment-remove" data-slot="2" aria-label="حذف الدفعة الإضافية 2" title="حذف هذه الدفعة"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg><span>حذف</span></button>
+            </div>
+          </div>
+          <div class="grid aq-additional-payment-row" data-slot="3" style="display:none;">
+            <div class="aq-c3">
+              <label>دفعة أخرى 3 (نسبة % أو قيمة)</label>
+              <input type="text" name="additionalPayment3" placeholder="مثال: 5% أو 560000">
+              <div class="aq-form-hint" id="editAdditionalPayment3ValueHint" style="display:none;"></div>
+            </div>
+            <div class="aq-c2">
+              <label>عدد الدفعات</label>
+              <input type="number" name="additionalPayment3Count" min="0">
+            </div>
+            <div class="aq-c3">
+              <label>موعد الدفعة</label>
+              <input type="text" name="additionalPayment3Due" placeholder="مثال: عند التسليم">
+            </div>
+            <div class="aq-c4 aq-additional-payment-remove-wrap">
+              <label>&nbsp;</label>
+              <button type="button" class="aq-additional-payment-remove" data-slot="3" aria-label="حذف الدفعة الإضافية 3" title="حذف هذه الدفعة"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg><span>حذف</span></button>
+            </div>
+          </div>
+          <div class="grid aq-additional-payment-row" data-slot="4" style="display:none;">
+            <div class="aq-c3">
+              <label>دفعة أخرى 4 (نسبة % أو قيمة)</label>
+              <input type="text" name="additionalPayment4" placeholder="مثال: 5% أو 560000">
+              <div class="aq-form-hint" id="editAdditionalPayment4ValueHint" style="display:none;"></div>
+            </div>
+            <div class="aq-c2">
+              <label>عدد الدفعات</label>
+              <input type="number" name="additionalPayment4Count" min="0">
+            </div>
+            <div class="aq-c3">
+              <label>موعد الدفعة</label>
+              <input type="text" name="additionalPayment4Due" placeholder="مثال: بعد سنتين">
+            </div>
+            <div class="aq-c4 aq-additional-payment-remove-wrap">
+              <label>&nbsp;</label>
+              <button type="button" class="aq-additional-payment-remove" data-slot="4" aria-label="حذف الدفعة الإضافية 4" title="حذف هذه الدفعة"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg><span>حذف</span></button>
+            </div>
+          </div>
+          <div class="grid aq-additional-payment-row" data-slot="5" style="display:none;">
+            <div class="aq-c3">
+              <label>دفعة أخرى 5 (نسبة % أو قيمة)</label>
+              <input type="text" name="additionalPayment5" placeholder="مثال: 5% أو 560000">
+              <div class="aq-form-hint" id="editAdditionalPayment5ValueHint" style="display:none;"></div>
+            </div>
+            <div class="aq-c2">
+              <label>عدد الدفعات</label>
+              <input type="number" name="additionalPayment5Count" min="0">
+            </div>
+            <div class="aq-c3">
+              <label>موعد الدفعة</label>
+              <input type="text" name="additionalPayment5Due" placeholder="مثال: عند الاستلام">
+            </div>
+            <div class="aq-c4 aq-additional-payment-remove-wrap">
+              <label>&nbsp;</label>
+              <button type="button" class="aq-additional-payment-remove" data-slot="5" aria-label="حذف الدفعة الإضافية 5" title="حذف هذه الدفعة"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg><span>حذف</span></button>
+            </div>
+          </div>
+        </div>
+        <button type="button" id="addAdditionalPaymentBtn" class="aq-btn--form-secondary">+ دفعة أخرى</button>
       </div>
 
       <!-- قسم "بيانات المالك والمسؤول" مخفي من الواجهة (كل الشغل من مطورين — غير مستخدم).
@@ -5271,6 +5395,10 @@
     editUnitImages = [];
     renderEditImagesPreview();
 
+    // ميزة "الدفعات الإضافية": فورم جديد بيبدأ دايمًا بلا أي صفّ إضافي ظاهر
+    editActiveAdditionalPaymentCount = 0;
+    renderAdditionalPaymentRows();
+
     // قسم الذكاء الاصطناعي بيظهر بس في وضع إضافة وحدة جديدة
     document.getElementById('unitAddAiSection').style.display = 'block';
     document.getElementById('unitAddAiPasteText').value = '';
@@ -5334,9 +5462,23 @@
     var paymentCount = num(g('paymentCount'));
     var years = num(g('installmentYears'));
     var months = years * 12;
+
+    // الدفعات الإضافية (حتى 5) - نفس منطق "قيمة الدفعة" الأصلي أعلاه بالحرف الواحد لكل دفعة مستقلة
+    var additionalPaymentsQuote = [];
+    var additionalPaymentsQuoteTotal = 0;
+    for (var _qi = 1; _qi <= 5; _qi++) {
+      var qRaw = (g('additionalPayment' + _qi) || '').replace(/٪/g, '%');
+      var qCount = num(g('additionalPayment' + _qi + 'Count')) || (qRaw ? 1 : 0);
+      var qValue = qRaw.indexOf('%') !== -1
+        ? Math.round(priceAfterDiscount * ((parseFloat(qRaw) || 0) / 100))
+        : num(qRaw);
+      if (qRaw) additionalPaymentsQuoteTotal += qValue * qCount;
+      additionalPaymentsQuote.push({ raw: g('additionalPayment' + _qi), count: qCount || '', due: g('additionalPayment' + _qi + 'Due') });
+    }
+
     var monthly = '';
     if (priceAfterDiscount > 0 && months > 0) {
-      var remaining = priceAfterDiscount - downPaymentValue - (paymentAmountValue * paymentCount);
+      var remaining = priceAfterDiscount - downPaymentValue - (paymentAmountValue * paymentCount) - additionalPaymentsQuoteTotal;
       monthly = Math.round(remaining / months);
     }
 
@@ -5371,6 +5513,11 @@
       'Installment Years': g('installmentYears'),
       'Monthly Installment': monthly,
       'Other Payment Plans': g('otherPaymentPlans'),
+      'Additional Payment 1': additionalPaymentsQuote[0].raw, 'Additional Payment 1 Count': additionalPaymentsQuote[0].count, 'Additional Payment 1 Due': additionalPaymentsQuote[0].due,
+      'Additional Payment 2': additionalPaymentsQuote[1].raw, 'Additional Payment 2 Count': additionalPaymentsQuote[1].count, 'Additional Payment 2 Due': additionalPaymentsQuote[1].due,
+      'Additional Payment 3': additionalPaymentsQuote[2].raw, 'Additional Payment 3 Count': additionalPaymentsQuote[2].count, 'Additional Payment 3 Due': additionalPaymentsQuote[2].due,
+      'Additional Payment 4': additionalPaymentsQuote[3].raw, 'Additional Payment 4 Count': additionalPaymentsQuote[3].count, 'Additional Payment 4 Due': additionalPaymentsQuote[3].due,
+      'Additional Payment 5': additionalPaymentsQuote[4].raw, 'Additional Payment 5 Count': additionalPaymentsQuote[4].count, 'Additional Payment 5 Due': additionalPaymentsQuote[4].due,
       'Delivery Date': g('deliveryDate'),
       'Owner Phone': '',
       'Sales/Agent': g('agent'),
@@ -5532,7 +5679,12 @@
       view: 'view', price: 'price', discountPercent: 'discountPercent', paymentMethod: 'paymentMethod',
       downPayment: 'downPayment', downPaymentBase: 'downPaymentBase', installmentYears: 'installmentYears',
       otherPaymentPlans: 'otherPaymentPlans', deliveryDate: 'deliveryDate', notes: 'notes',
-      paymentAmount: 'paymentAmount', paymentCount: 'paymentCount', paymentSchedule: 'paymentSchedule'
+      paymentAmount: 'paymentAmount', paymentCount: 'paymentCount', paymentSchedule: 'paymentSchedule',
+      additionalPayment1: 'additionalPayment1', additionalPayment1Count: 'additionalPayment1Count', additionalPayment1Due: 'additionalPayment1Due',
+      additionalPayment2: 'additionalPayment2', additionalPayment2Count: 'additionalPayment2Count', additionalPayment2Due: 'additionalPayment2Due',
+      additionalPayment3: 'additionalPayment3', additionalPayment3Count: 'additionalPayment3Count', additionalPayment3Due: 'additionalPayment3Due',
+      additionalPayment4: 'additionalPayment4', additionalPayment4Count: 'additionalPayment4Count', additionalPayment4Due: 'additionalPayment4Due',
+      additionalPayment5: 'additionalPayment5', additionalPayment5Count: 'additionalPayment5Count', additionalPayment5Due: 'additionalPayment5Due'
     };
 
     Object.keys(fieldMap).forEach(key => {
@@ -5544,6 +5696,12 @@
       el.dispatchEvent(new Event('change', { bubbles: true }));
       el.dispatchEvent(new Event('input', { bubbles: true }));
     });
+
+    // إظهار صفوف الدفعات الإضافية اللي الذكاء الاصطناعي ملاها فعليًا (حتى آخر واحدة بها قيمة)
+    for (let _i = 1; _i <= ADDITIONAL_PAYMENT_MAX_SLOTS; _i++) {
+      if (data['additionalPayment' + _i]) editActiveAdditionalPaymentCount = Math.max(editActiveAdditionalPaymentCount, _i);
+    }
+    renderAdditionalPaymentRows();
 
     if (data.city) {
       const cityMatch = Object.keys(CITY_DISTRICTS).find(c => c === data.city || c.includes(data.city) || data.city.includes(c));
@@ -5593,13 +5751,26 @@
         paymentSchedule: u['Payment Schedule'],
         installmentYears: u['Installment Years'], deliveryDate: u['Delivery Date'],
         otherPaymentPlans: u['Other Payment Plans'] || 'لا', status: 'متاح',
-        notes: u['Notes']
+        notes: u['Notes'],
+        // الدفعات الإضافية (حتى 5) تُنسَخ كبيانات مستقلة تمامًا داخل حقول الوحدة الجديدة —
+        // لا ربط بالوحدة الأصلية بعد هذه اللحظة (نفس مبدأ نسخ باقي حقول السعر أعلاه).
+        additionalPayment1: u['Additional Payment 1'], additionalPayment1Count: u['Additional Payment 1 Count'], additionalPayment1Due: u['Additional Payment 1 Due'],
+        additionalPayment2: u['Additional Payment 2'], additionalPayment2Count: u['Additional Payment 2 Count'], additionalPayment2Due: u['Additional Payment 2 Due'],
+        additionalPayment3: u['Additional Payment 3'], additionalPayment3Count: u['Additional Payment 3 Count'], additionalPayment3Due: u['Additional Payment 3 Due'],
+        additionalPayment4: u['Additional Payment 4'], additionalPayment4Count: u['Additional Payment 4 Count'], additionalPayment4Due: u['Additional Payment 4 Due'],
+        additionalPayment5: u['Additional Payment 5'], additionalPayment5Count: u['Additional Payment 5 Count'], additionalPayment5Due: u['Additional Payment 5 Due']
         // عمدًا من غير: ownerName, ownerPhone, agent (بيانات خاصة بالوحدة القديمة بس)
       };
       Object.keys(fieldMap).forEach(name => {
         const el = editForm.elements[name];
         if (el) el.value = fieldMap[name] || '';
       });
+      // إظهار صفوف الدفعات الإضافية المنسوخة من الوحدة الأصلية (نفس منطق loadUnitIntoEditForm)
+      editActiveAdditionalPaymentCount = 0;
+      for (let _i = 1; _i <= ADDITIONAL_PAYMENT_MAX_SLOTS; _i++) {
+        if (String(u['Additional Payment ' + _i] || '').trim()) editActiveAdditionalPaymentCount = _i;
+      }
+      renderAdditionalPaymentRows();
       calcEditMonthlyInstallment();
 
       editCitySelect.value = u['City'] || '';
@@ -6244,6 +6415,21 @@
             <span class="discount-tag">${ICON.tag} خصم ${esc(u['Discount Percentage'])}%</span>
           </div>` : ''}
         </div>`;
+    // الدفعات الإضافية (حتى 5) - تظهر فقط للوحدات التي تحتوي عليها فعليًا (وإلا فلا تغيير
+    // في قسم التفاصيل المالية عن الوحدات القديمة إطلاقًا). كل دفعة سطر مستقل بقيمتها وموعدها.
+    const additionalPaymentTiles = [];
+    for (let _i = 1; _i <= 5; _i++) {
+      const _raw = u['Additional Payment ' + _i];
+      if (!has(_raw)) continue;
+      const _count = Number(u['Additional Payment ' + _i + ' Count']) || 1;
+      const _value = resolveAdditionalPaymentValueClient_(_raw, Number(u['Price After Discount']) || Number(u['Price']) || 0);
+      const _due = u['Additional Payment ' + _i + ' Due'];
+      additionalPaymentTiles.push(
+        tile(ICON.calc, 'دفعة إضافية ' + _i,
+          esc(_raw) + (_count > 1 ? ' × ' + _count : '') + ' = ' + fmtNum(_value) + ' جنيه' + (has(_due) ? ' — ' + esc(_due) : ''))
+      );
+    }
+
     const finTiles = [
       tile(ICON.wallet, 'المقدم', u['Down Payment'] ? esc(u['Down Payment']) + '% = ' + fmtNum(u['Down Payment Value']) + ' جنيه' : ''),
       tile(ICON.calendar, 'القسط الشهري', u['Monthly Installment'] ? fmtNum(u['Monthly Installment']) + ' جنيه' : ''),
@@ -6251,6 +6437,7 @@
       tile(ICON.calc, 'طريقة الدفع', u['Payment Method']),
       tile(ICON.calc, 'الدفعات', u['Payment Count'] ? esc(u['Payment Count']) + ' × ' + fmtNum(u['Payment Amount Value']) + ' جنيه' : ''),
       tile(ICON.calendar, 'موعد الدفعات', u['Payment Schedule']),
+      ...additionalPaymentTiles,
       tile(ICON.file, 'أنظمة سداد أخرى', u['Other Payment Plans']),
       tile(ICON.calendar, 'تاريخ التسليم', u['Delivery Date'])
     ].filter(Boolean).join('');
@@ -6603,6 +6790,16 @@
   /* ---------- مشاركة بيانات الوحدة عبر واتساب (مع الصور لو الجهاز بيدعم) ---------- */
   function buildUnitShareText(u) {
     const hasDiscount = Number(u['Discount Percentage']) > 0;
+    // الدفعات الإضافية (حتى 5) - سطر مستقل لكل دفعة موجودة فعليًا؛ لا شيء يُضاف للوحدات القديمة
+    const additionalPaymentLines = [];
+    for (let _i = 1; _i <= 5; _i++) {
+      const _raw = u['Additional Payment ' + _i];
+      if (!_raw) continue;
+      const _count = Number(u['Additional Payment ' + _i + ' Count']) || 1;
+      const _value = resolveAdditionalPaymentValueClient_(_raw, Number(u['Price After Discount']) || Number(u['Price']) || 0);
+      const _due = u['Additional Payment ' + _i + ' Due'];
+      additionalPaymentLines.push(`➕ دفعة إضافية: ${_raw}${_count > 1 ? ' × ' + _count : ''} = ${fmtNum(_value)} جنيه${_due ? ' - ' + _due : ''}`);
+    }
     return [
       `🏢 ${u['Property Type']}${u['Project Name'] ? ' - ' + u['Project Name'] : ''}`,
       `📍 ${u['City']} - ${u['Area/District']}`,
@@ -6618,6 +6815,7 @@
       u['Payment Method'] ? `💳 الدفع: ${u['Payment Method']}${u['Installment Years'] ? ' ' + u['Installment Years'] + ' سنوات' : ''}` : '',
       u['Down Payment'] ? `💵 المقدم: (${u['Down Payment']}%) = ${fmtNum(u['Down Payment Value'])} جنيه` : '',
       u['Payment Count'] ? `📋 الدفعات: ${u['Payment Count']} دفعة × ${fmtNum(u['Payment Amount Value'])} جنيه${u['Payment Schedule'] ? ' - ' + u['Payment Schedule'] : ''}` : '',
+      ...additionalPaymentLines,
       u['Monthly Installment'] ? `📆 القسط الشهري التقريبي: ${fmtNum(u['Monthly Installment'])} جنيه` : '',
       u['Monthly Installment'] ? `📅 القسط الربع سنوي التقريبي: ${fmtNum(Number(u['Monthly Installment']) * 3)} جنيه` : '',
       u['Other Payment Plans'] === 'نعم' ? '✅ متاح أنظمة سداد أخرى' : '',
@@ -7192,6 +7390,19 @@
           <span style="color:#16211E; font-weight:600;">${value}</span>
         </div>` : '';
 
+      // الدفعات الإضافية (حتى 5) - سطر تفصيلي لكل دفعة موجودة فعليًا فقط؛ لا صفوف فارغة
+      // للوحدات القديمة (detailRow نفسها تتجاهل أي قيمة فارغة تلقائيًا).
+      let additionalPaymentDetailRowsHtml = '';
+      for (let _i = 1; _i <= 5; _i++) {
+        const _raw = u['Additional Payment ' + _i];
+        if (!_raw) continue;
+        const _count = Number(u['Additional Payment ' + _i + ' Count']) || 1;
+        const _value = resolveAdditionalPaymentValueClient_(_raw, Number(u['Price After Discount']) || Number(u['Price']) || 0);
+        const _due = u['Additional Payment ' + _i + ' Due'];
+        additionalPaymentDetailRowsHtml += detailRow('دفعة إضافية ' + _i,
+          `${_raw}${_count > 1 ? ' × ' + _count : ''} = ${fmtNum(_value)} جنيه${_due ? ' - ' + _due : ''}`);
+      }
+
       /* ---------- الصفحة الأولى: الغلاف والمواصفات والسعر ---------- */
       const page1 = document.createElement('div');
       page1.style.position = 'fixed';
@@ -7301,6 +7512,7 @@
           ${detailRow('الفيو', u['View'])}
           ${detailRow('طريقة الدفع', u['Payment Method'])}
           ${detailRow('موعد الدفعات', u['Payment Schedule'])}
+          ${additionalPaymentDetailRowsHtml}
           ${detailRow('عدد سنوات التقسيط', u['Installment Years'])}
           ${detailRow('تاريخ التسليم', u['Delivery Date'])}
           ${detailRow('أنظمة سداد أخرى', u['Other Payment Plans'])}
@@ -7779,6 +7991,13 @@
       { label: 'المقدم', get: u => u['Down Payment'] ? u['Down Payment'] + '% = ' + fmtNum(u['Down Payment Value']) + ' جنيه' : '-' },
       { label: 'الدفعات', get: u => u['Payment Count'] ? u['Payment Count'] + ' × ' + fmtNum(u['Payment Amount Value']) + ' جنيه' : '-' },
       { label: 'موعد الدفعات', get: u => u['Payment Schedule'] || '-' },
+      // الدفعات الإضافية (حتى 5) - كل صف يختفي تلقائيًا لو لا وحدة من المقارَنَتين تملكه
+      // (نفس فلتر rows.filter أدناه)، فلا يظهر أي صف فارغ لوحدات بلا دفعات إضافية.
+      { label: 'دفعة إضافية 1', get: u => u['Additional Payment 1'] ? u['Additional Payment 1'] + (Number(u['Additional Payment 1 Count']) > 1 ? ' × ' + u['Additional Payment 1 Count'] : '') + (u['Additional Payment 1 Due'] ? ' - ' + u['Additional Payment 1 Due'] : '') : '-' },
+      { label: 'دفعة إضافية 2', get: u => u['Additional Payment 2'] ? u['Additional Payment 2'] + (Number(u['Additional Payment 2 Count']) > 1 ? ' × ' + u['Additional Payment 2 Count'] : '') + (u['Additional Payment 2 Due'] ? ' - ' + u['Additional Payment 2 Due'] : '') : '-' },
+      { label: 'دفعة إضافية 3', get: u => u['Additional Payment 3'] ? u['Additional Payment 3'] + (Number(u['Additional Payment 3 Count']) > 1 ? ' × ' + u['Additional Payment 3 Count'] : '') + (u['Additional Payment 3 Due'] ? ' - ' + u['Additional Payment 3 Due'] : '') : '-' },
+      { label: 'دفعة إضافية 4', get: u => u['Additional Payment 4'] ? u['Additional Payment 4'] + (Number(u['Additional Payment 4 Count']) > 1 ? ' × ' + u['Additional Payment 4 Count'] : '') + (u['Additional Payment 4 Due'] ? ' - ' + u['Additional Payment 4 Due'] : '') : '-' },
+      { label: 'دفعة إضافية 5', get: u => u['Additional Payment 5'] ? u['Additional Payment 5'] + (Number(u['Additional Payment 5 Count']) > 1 ? ' × ' + u['Additional Payment 5 Count'] : '') + (u['Additional Payment 5 Due'] ? ' - ' + u['Additional Payment 5 Due'] : '') : '-' },
       { label: 'فترة السداد', get: u => u['Installment Years'] ? u['Installment Years'] + ' سنة' : '-' },
       { label: 'القسط الشهري', get: u => u['Monthly Installment'] ? fmtNum(u['Monthly Installment']) + ' جنيه' : '-' },
       { label: 'القسط الربع سنوي', get: u => u['Monthly Installment'] ? fmtNum(Number(u['Monthly Installment']) * 3) + ' جنيه' : '-' },
@@ -7994,11 +8213,94 @@
   let unitWritePin = null; // كلمة سر (إدخال بيانات أو أدمن) تُرسل للسيرفر للتحقّق قبل حفظ/إضافة وحدة
 
   /* ---------- حساب السعر بعد الخصم والمقدم والقسط الشهري التقريبي لحظيًا (فورم التعديل) ---------- */
-  const editInstallmentFields = ['price', 'discountPercent', 'downPayment', 'downPaymentBase', 'paymentAmount', 'paymentCount', 'installmentYears'];
+  const editInstallmentFields = [
+    'price', 'discountPercent', 'downPayment', 'downPaymentBase', 'paymentAmount', 'paymentCount', 'installmentYears',
+    'additionalPayment1', 'additionalPayment1Count', 'additionalPayment1Due',
+    'additionalPayment2', 'additionalPayment2Count', 'additionalPayment2Due',
+    'additionalPayment3', 'additionalPayment3Count', 'additionalPayment3Due',
+    'additionalPayment4', 'additionalPayment4Count', 'additionalPayment4Due',
+    'additionalPayment5', 'additionalPayment5Count', 'additionalPayment5Due'
+  ];
   const editInstallmentPreview = document.getElementById('editInstallmentPreview');
   const editMonthlyInstallmentValue = document.getElementById('editMonthlyInstallmentValue');
   const editPriceAfterDiscountValue = document.getElementById('editPriceAfterDiscountValue');
   const editDownPaymentValueHint = document.getElementById('editDownPaymentValueHint');
+
+  /* ---------- ميزة "الدفعات الإضافية" (حتى 5، مستقلة تمامًا) ---------- */
+  const ADDITIONAL_PAYMENT_MAX_SLOTS = 5;
+  let editActiveAdditionalPaymentCount = 0; // كام صفّ ظاهر حاليًا (0..5)
+  // نتيجة آخر حساب - يقرأها معالج الإرسال قبل الحفظ لمنع خطة سداد بمتبقٍّ سالب
+  let editLastPlanCheck = { ok: true, remaining: 0 };
+
+  // نفس منطق تحليل "قيمة الدفعة" الأصلي بالحرف الواحد (Code.gs: resolveAdditionalPaymentValue_) - % من priceAfterDiscount أو قيمة ثابتة
+  function resolveAdditionalPaymentValueClient_(raw, priceAfterDiscount) {
+    const s = String(raw || '').trim().replace(/٪/g, '%');
+    if (!s) return 0;
+    if (s.indexOf('%') !== -1) {
+      const pct = parseFloat(s);
+      return isFinite(pct) ? Math.round(priceAfterDiscount * (pct / 100)) : 0;
+    }
+    const n = parseFloat(s);
+    return isFinite(n) ? n : 0;
+  }
+
+  // يجمع الدفعات الإضافية الخمس مباشرة من الفورم - نفس additionalPaymentsBreakdown_ في Code.gs بالحرف الواحد
+  function additionalPaymentsBreakdownFromForm_(priceAfterDiscount) {
+    const slots = [];
+    let total = 0;
+    for (let i = 1; i <= ADDITIONAL_PAYMENT_MAX_SLOTS; i++) {
+      const rawEl = editForm.elements['additionalPayment' + i];
+      const countEl = editForm.elements['additionalPayment' + i + 'Count'];
+      const raw = String((rawEl && rawEl.value) || '').trim().replace(/٪/g, '%');
+      if (!raw) { slots.push({ raw: '', value: 0, count: 0 }); continue; }
+      const value = resolveAdditionalPaymentValueClient_(raw, priceAfterDiscount);
+      const countRaw = parseFloat(countEl && countEl.value);
+      const count = (isFinite(countRaw) && countRaw > 0) ? countRaw : 1; // فاضي/غير صالح = دفعة واحدة
+      total += value * count;
+      slots.push({ raw: raw, value: value, count: count });
+    }
+    return { slots: slots, total: total };
+  }
+
+  function additionalPaymentRow_(slot) { return document.querySelector('.aq-additional-payment-row[data-slot="' + slot + '"]'); }
+
+  // إظهار الصفوف 1..N وإخفاء الباقي، وضبط زر "+ دفعة أخرى" (يختفي عند الوصول لـ5)
+  function renderAdditionalPaymentRows() {
+    for (let i = 1; i <= ADDITIONAL_PAYMENT_MAX_SLOTS; i++) {
+      const row = additionalPaymentRow_(i);
+      if (row) row.style.display = (i <= editActiveAdditionalPaymentCount) ? 'grid' : 'none';
+    }
+    const addBtn = document.getElementById('addAdditionalPaymentBtn');
+    if (addBtn) addBtn.style.display = (editActiveAdditionalPaymentCount >= ADDITIONAL_PAYMENT_MAX_SLOTS) ? 'none' : '';
+  }
+
+  document.getElementById('addAdditionalPaymentBtn').addEventListener('click', function() {
+    if (editActiveAdditionalPaymentCount >= ADDITIONAL_PAYMENT_MAX_SLOTS) return;
+    editActiveAdditionalPaymentCount++;
+    renderAdditionalPaymentRows();
+  });
+
+  // حذف دفعة إضافية: يزيح قيم الصفوف الأحدث لأعلى (بلا فجوات في الترقيم)، يخفي آخر صفّ،
+  // ويعيد حساب المتبقي/الإجمالي فورًا - القيم المحذوفة لا تبقى جزءًا من أي حساب.
+  document.querySelectorAll('.aq-additional-payment-remove').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const deletedSlot = parseInt(this.getAttribute('data-slot'), 10);
+      for (let i = deletedSlot; i < ADDITIONAL_PAYMENT_MAX_SLOTS; i++) {
+        ['', 'Count', 'Due'].forEach(suffix => {
+          const from = editForm.elements['additionalPayment' + (i + 1) + suffix];
+          const to = editForm.elements['additionalPayment' + i + suffix];
+          if (from && to) to.value = from.value;
+        });
+      }
+      ['', 'Count', 'Due'].forEach(suffix => {
+        const last = editForm.elements['additionalPayment' + ADDITIONAL_PAYMENT_MAX_SLOTS + suffix];
+        if (last) last.value = '';
+      });
+      editActiveAdditionalPaymentCount = Math.max(0, editActiveAdditionalPaymentCount - 1);
+      renderAdditionalPaymentRows();
+      calcEditMonthlyInstallment();
+    });
+  });
 
   function calcEditMonthlyInstallment() {
     const price = parseFloat(editForm.elements['price'].value) || 0;
@@ -8035,11 +8337,41 @@
     const years = parseFloat(editForm.elements['installmentYears'].value) || 0;
     const months = years * 12;
 
+    // الدفعات الإضافية (حتى 5) - كل واحدة مستقلة، % من priceAfterDiscount أو قيمة ثابتة
+    const additionalPayments = additionalPaymentsBreakdownFromForm_(priceAfterDiscount);
+    for (let i = 1; i <= ADDITIONAL_PAYMENT_MAX_SLOTS; i++) {
+      const hintEl = document.getElementById('editAdditionalPayment' + i + 'ValueHint');
+      const slot = additionalPayments.slots[i - 1];
+      if (hintEl) {
+        if (slot.raw.indexOf('%') !== -1 && priceAfterDiscount > 0) {
+          hintEl.textContent = '= ' + slot.value.toLocaleString('en-US') + ' جنيه لكل دفعة';
+          hintEl.style.display = 'block';
+        } else {
+          hintEl.style.display = 'none';
+        }
+      }
+    }
+
+    const totalScheduledPayments = (paymentAmount * paymentCount) + additionalPayments.total;
+    const remainingAfterAllPayments = priceAfterDiscount - downPaymentValue - totalScheduledPayments;
+    editLastPlanCheck = { ok: remainingAfterAllPayments >= 0, remaining: remainingAfterAllPayments };
+
+    // ملخص الدفعات الإضافية + المتبقي بعدها - يظهر فقط لو فيه دفعة إضافية واحدة على الأقل مُدخلة فعليًا
+    const summaryLine = document.getElementById('editAdditionalPaymentsSummaryLine');
+    if (additionalPayments.total > 0) {
+      document.getElementById('editAdditionalPaymentsTotalValue').textContent = additionalPayments.total.toLocaleString('en-US');
+      const remainingLabelEl = document.getElementById('editRemainingAfterAllValue');
+      remainingLabelEl.textContent = remainingAfterAllPayments.toLocaleString('en-US');
+      remainingLabelEl.style.color = remainingAfterAllPayments < 0 ? 'var(--error-fg, #c0392b)' : '';
+      summaryLine.style.display = 'block';
+    } else {
+      summaryLine.style.display = 'none';
+    }
+
     if (price > 0) {
       editPriceAfterDiscountValue.textContent = priceAfterDiscount.toLocaleString('en-US');
       if (months > 0) {
-        const remaining = priceAfterDiscount - downPaymentValue - (paymentAmount * paymentCount);
-        const monthly = Math.round(remaining / months);
+        const monthly = Math.round(remainingAfterAllPayments / months);
         editMonthlyInstallmentValue.textContent = monthly.toLocaleString('en-US');
         document.getElementById('editQuarterlyInstallmentValue').textContent = (monthly * 3).toLocaleString('en-US');
       } else {
@@ -8214,12 +8546,24 @@
         paymentSchedule: u['Payment Schedule'],
         installmentYears: u['Installment Years'], deliveryDate: u['Delivery Date'],
         otherPaymentPlans: u['Other Payment Plans'] || 'لا', status: u['Status'],
-        ownerName: u['Owner Name'], ownerPhone: u['Owner Phone'], agent: u['Sales/Agent'], notes: u['Notes']
+        ownerName: u['Owner Name'], ownerPhone: u['Owner Phone'], agent: u['Sales/Agent'], notes: u['Notes'],
+        additionalPayment1: u['Additional Payment 1'], additionalPayment1Count: u['Additional Payment 1 Count'], additionalPayment1Due: u['Additional Payment 1 Due'],
+        additionalPayment2: u['Additional Payment 2'], additionalPayment2Count: u['Additional Payment 2 Count'], additionalPayment2Due: u['Additional Payment 2 Due'],
+        additionalPayment3: u['Additional Payment 3'], additionalPayment3Count: u['Additional Payment 3 Count'], additionalPayment3Due: u['Additional Payment 3 Due'],
+        additionalPayment4: u['Additional Payment 4'], additionalPayment4Count: u['Additional Payment 4 Count'], additionalPayment4Due: u['Additional Payment 4 Due'],
+        additionalPayment5: u['Additional Payment 5'], additionalPayment5Count: u['Additional Payment 5 Count'], additionalPayment5Due: u['Additional Payment 5 Due']
       };
       Object.keys(fieldMap).forEach(name => {
         const el = editForm.elements[name];
         if (el) el.value = fieldMap[name] || '';
       });
+      // إظهار صفوف الدفعات الإضافية المُحمَّلة فعليًا من الوحدة (حتى آخر دفعة بها قيمة) —
+      // لا فجوات: لو الدفعة 2 فاضية والدفعة 3 مليانة (حالة غير متوقعة)، تظهر لغاية 3 لعرض كل البيانات.
+      editActiveAdditionalPaymentCount = 0;
+      for (let _i = 1; _i <= ADDITIONAL_PAYMENT_MAX_SLOTS; _i++) {
+        if (String(u['Additional Payment ' + _i] || '').trim()) editActiveAdditionalPaymentCount = _i;
+      }
+      renderAdditionalPaymentRows();
       calcEditMonthlyInstallment();
 
       // المدينة والمنطقة المترابطة
@@ -8421,6 +8765,18 @@
     // فوق إزالة #editSaveBtn من الـ DOM ورفض الباك-إند. يغطّي إرسال النموذج بمفتاح Enter أيضًا.
     if (!canWriteUnitFromForm_()) { if (typeof showToast === 'function') showToast('صلاحيتك الحالية لا تسمح بحفظ التعديلات', 'error'); return; }
     if (editModalMode === 'edit' && !currentEditUnitId) return;
+
+    // منع حفظ خطة سداد تجعل المتبقي (Remaining Balance) سالبًا - نفس الحساب اللحظي
+    // المعروض للمستخدم أعلاه (calcEditMonthlyInstallment)، يُعاد التحقق منه هنا مباشرة
+    // قبل الإرسال (البلوك الفعلي والموثوق هو تحقّق السيرفر validatePaymentPlanBalance_).
+    calcEditMonthlyInstallment();
+    if (!editLastPlanCheck.ok) {
+      editMsg.className = 'error';
+      editMsg.style.display = 'block';
+      editMsg.textContent = 'إجمالي الدفعات (المقدم + الدفعة الحالية + الدفعات الإضافية) يتجاوز السعر بعد الخصم — راجع النسب/القيم المُدخلة قبل الحفظ.';
+      return;
+    }
+
     editSaveBtn.disabled = true;
     editSaveBtn.textContent = editModalMode === 'clone' ? 'جاري الإضافة...' : 'جاري الحفظ...';
     editMsg.style.display = 'none';
@@ -8490,7 +8846,12 @@
                 installmentYears: (data && data.installmentYears) || '',
                 paymentSchedule: (data && data.paymentSchedule) || '',
                 paymentMethod: (data && data.paymentMethod) || '',
-                otherPaymentPlans: (data && data.otherPaymentPlans) || ''
+                otherPaymentPlans: (data && data.otherPaymentPlans) || '',
+                additionalPayment1: (data && data.additionalPayment1) || '', additionalPayment1Count: (data && data.additionalPayment1Count) || '', additionalPayment1Due: (data && data.additionalPayment1Due) || '',
+                additionalPayment2: (data && data.additionalPayment2) || '', additionalPayment2Count: (data && data.additionalPayment2Count) || '', additionalPayment2Due: (data && data.additionalPayment2Due) || '',
+                additionalPayment3: (data && data.additionalPayment3) || '', additionalPayment3Count: (data && data.additionalPayment3Count) || '', additionalPayment3Due: (data && data.additionalPayment3Due) || '',
+                additionalPayment4: (data && data.additionalPayment4) || '', additionalPayment4Count: (data && data.additionalPayment4Count) || '', additionalPayment4Due: (data && data.additionalPayment4Due) || '',
+                additionalPayment5: (data && data.additionalPayment5) || '', additionalPayment5Count: (data && data.additionalPayment5Count) || '', additionalPayment5Due: (data && data.additionalPayment5Due) || ''
               };
               google.script.run.withSuccessHandler(function(res2) {
                 editSaveBtn.disabled = false; editSaveBtn.textContent = 'حفظ الوحدة الجديدة';
