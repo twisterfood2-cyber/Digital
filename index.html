@@ -6400,7 +6400,9 @@
       tile(ICON.roof, 'الروف', u['Roof Area (sqm)'] ? u['Roof Area (sqm)'] + ' م²' : ''),
       tile(ICON.terrace, 'التراس', u['Terrace Area (sqm)'] ? u['Terrace Area (sqm)'] + ' م²' : ''),
       tile(ICON.area, 'مساحة الأرض', u['Land Area (sqm)'] ? u['Land Area (sqm)'] + ' م²' : ''),
-      tile(ICON.eye, 'الفيو', u['View'])
+      tile(ICON.eye, 'الفيو', u['View']),
+      // منقولة من "التفاصيل المالية" - تظهر فقط لو القيمة "نعم" بالضبط (لا تظهر لقيمة "لا" الافتراضية)
+      u['Other Payment Plans'] === 'نعم' ? tile(ICON.file, 'أنظمة سداد أخرى', u['Other Payment Plans']) : ''
     ].filter(Boolean).join('');
     const extraHtml = section(ICON.info, 'التفاصيل الإضافية', extraTiles ? `<div class="ud-tiles">${extraTiles}</div>` : '');
 
@@ -6438,15 +6440,20 @@
       );
     }
 
+    // القسط الربع سنوي: عرض فقط، بلا أي تغيير في مصدر الحساب - نفس Monthly Installment × 3
+    // المستخدَم بالفعل في أماكن أخرى (نموذج الإدخال/واتساب/المقارنة). لا يظهر إن كان القسط
+    // الشهري نفسه غير متوفر (نفس شرط has() المستخدَم في بقية البلاطات).
+    const quarterlyInstallment = u['Monthly Installment'] ? Number(u['Monthly Installment']) * 3 : '';
+
     const finTiles = [
       tile(ICON.wallet, 'المقدم', u['Down Payment'] ? esc(u['Down Payment']) + '% = ' + fmtNum(u['Down Payment Value']) + ' جنيه' : ''),
       tile(ICON.calendar, 'القسط الشهري', u['Monthly Installment'] ? fmtNum(u['Monthly Installment']) + ' جنيه' : ''),
-      tile(ICON.clock, 'سنوات التقسيط', u['Installment Years'] ? esc(u['Installment Years']) + ' سنة' : ''),
-      tile(ICON.calc, 'طريقة الدفع', u['Payment Method']),
+      tile(ICON.calendar, 'القسط الربع سنوي', quarterlyInstallment ? fmtNum(quarterlyInstallment) + ' جنيه' : ''),
       tile(ICON.calc, 'الدفعات', u['Payment Count'] ? esc(u['Payment Count']) + ' × ' + fmtNum(u['Payment Amount Value']) + ' جنيه' : ''),
       tile(ICON.calendar, 'موعد الدفعات', u['Payment Schedule']),
+      tile(ICON.clock, 'سنوات التقسيط', u['Installment Years'] ? esc(u['Installment Years']) + ' سنة' : ''),
       ...additionalPaymentTiles,
-      tile(ICON.file, 'أنظمة سداد أخرى', u['Other Payment Plans']),
+      tile(ICON.calc, 'طريقة الدفع', u['Payment Method']),
       tile(ICON.calendar, 'تاريخ التسليم', u['Delivery Date'])
     ].filter(Boolean).join('');
     const resaleHtml = u['Listing Type'] === 'ريسيل' ? `
@@ -6470,7 +6477,8 @@
       tile(ICON.building, 'اسم المشروع', u['Project Name']),
       devTile,
       tile(ICON.folder, 'التصنيف', u['Category']),
-      tile(ICON.tag, 'نوع العرض', u['Listing Type']),
+      // "نوع العرض" (Listing Type) مخفي من عرض تفاصيل الوحدة فقط بناءً على طلب صريح -
+      // الحقل والبيانات والمنطق المعتمد عليه (Resale) لم يُمَسّوا إطلاقًا في أي مكان آخر.
       tile(ICON.user, 'السيلز / الوكيل', u['Sales/Agent'])
     ].filter(Boolean).join('');
     const projectHtml = section(ICON.building, 'معلومات المشروع', projTiles ? `<div class="ud-tiles">${projTiles}</div>` : '');
