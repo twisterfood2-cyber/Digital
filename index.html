@@ -4301,6 +4301,25 @@
           <div class="dash-page-title">إدارة المشروعات</div>
           <p class="aq-page-intro">ملفات المشروعات العقارية: البيانات الأساسية، النبذة، المميزات، الموقع، وصور المشروع. اسم المشروع هنا هو نفسه "اسم المشروع" المستخدَم في نموذج الوحدة — عند تطابقهما يصبح اسم المشروع داخل تفاصيل الوحدة قابلًا للضغط ليفتح هذا الملف.</p>
 
+          <section class="aq-admin-card aq-form-assist ai-fill-panel" id="projAiPanel" aria-labelledby="projAiTitle">
+            <div class="aq-admin-card-head">
+              <div>
+                <h3 class="aq-admin-card-title" id="projAiTitle">المساعدة بالذكاء الاصطناعي</h3>
+                <p class="aq-admin-card-sub">الصق أي معلومات خام عن المشروع، وسيساعدك في تعبئة/تحسين الوصف والمميزات والحقول المذكورة صراحةً — راجع البيانات قبل الحفظ. لا يخترع الذكاء الاصطناعي أي معلومة، ولا يستبدل ما كتبته يدويًا.</p>
+              </div>
+            </div>
+            <div class="aq-form-grid aq-form-grid--2">
+              <div class="aq-form-field aq-form-span-2">
+                <label class="aq-form-label" for="projAiPasteText">معلومات خام عن المشروع</label>
+                <textarea id="projAiPasteText" class="aq-form-control" rows="5" placeholder="مثال: مشروع سكني في التجمع الخامس على مساحة 50 فدان، قريب من الجامعة الأمريكية، به Clubhouse وSwimming Pool وGym، والاستشاري الهندسي XYZ، والتسليم 2029..."></textarea>
+              </div>
+              <div class="aq-form-field aq-form-field--end aq-dev-ai-action">
+                <button type="button" id="projAiExtractBtn" class="ai-extract-btn aq-btn--form-primary">استخرج وحسّن تفاصيل المشروع</button>
+              </div>
+            </div>
+            <div id="projAiExtractMsg" class="aq-form-hint" style="display:none;"></div>
+          </section>
+
           <section class="aq-admin-card" id="projFormCard" aria-labelledby="projFormTitle">
             <div class="aq-admin-card-head">
               <div>
@@ -6548,11 +6567,12 @@
           </select>` : '';
 
     /* ---------- اسم المشروع القابل للضغط (يفتح ملف المشروع فوق تفاصيل الوحدة) ----------
-     * يظهر كرابط فقط لو فيه ملف مشروع مسجَّل فعليًا بنفس الاسم (مطابقة مُطبَّعة عبر
-     * الكاش المُحمَّل مسبقًا __projectHasProfileCached) - وإلا نص عادي كما كان تمامًا،
-     * بلا أي خطأ أو نداء شبكة إضافي عند كل فتح تفاصيل. */
+     * قابل للضغط دومًا لو موجود اسم مشروع - بنفس منطق اسم المطوّر تمامًا (devTile):
+     * يفتح Project Profile Modal ويجلب البيانات لحظة الضغط (live fetch)؛ لو معندهوش
+     * ملف Project Profile مسجَّل بنفس الاسم، تظهر رسالة واضحة داخل نفس الـ Modal
+     * بلا أي Error - بلا حاجة لكاش أو نداء شبكة مسبق قبل الضغط. */
     const projectNameRaw = u['Project Name'];
-    const projectIsClickable = has(projectNameRaw) && typeof window.__projectHasProfileCached === 'function' && window.__projectHasProfileCached(projectNameRaw);
+    const projectIsClickable = has(projectNameRaw);
     const projectNameDisplay = esc(projectNameRaw || u['City']);
     const projectNameLinkHtml = projectIsClickable
       ? `<a class="ud-link" href="javascript:void(0)" onclick='event.stopPropagation(); showProjectProfile(${JSON.stringify(projectNameRaw)}, ${JSON.stringify(u['Project Location URL'] || '')})'>${projectNameDisplay}</a>`
@@ -6660,7 +6680,7 @@
 
     /* ---------- معلومات المشروع ---------- */
     const devTile = u['Developer Name'] ? `<div class="ud-tile">${ICON.building}<div class="ud-tile-txt"><span class="ud-tile-label">المطور</span><a class="ud-tile-value ud-link" href="javascript:void(0)" onclick='closeUnitCardOverlay(); showDeveloperProfile(${JSON.stringify(u['Developer Name'])})'>${esc(u['Developer Name'])}</a></div></div>` : '';
-    // نفس منطق ud-name أعلاه بالحرف الواحد: رابط فقط لو فيه ملف مشروع مسجَّل، وإلا نص عادي.
+    // نفس منطق ud-name أعلاه بالحرف الواحد: رابط دومًا لو موجود اسم مشروع (بنفس فلسفة بلاطة "المطور").
     // بخلاف بلاطة "المطور" - لا نغلق تفاصيل الوحدة عند الضغط (ملف المشروع يظهر فوقها).
     const projTile = ppHas_(projectNameRaw) ? `<div class="ud-tile">${ICON.building}<div class="ud-tile-txt"><span class="ud-tile-label">اسم المشروع</span><span class="ud-tile-value">${projectIsClickable ? `<a class="ud-link" href="javascript:void(0)" onclick='event.stopPropagation(); showProjectProfile(${JSON.stringify(projectNameRaw)}, ${JSON.stringify(u['Project Location URL'] || '')})'>${esc(projectNameRaw)}</a>` : esc(projectNameRaw)}</span></div></div>` : '';
     const projTiles = [
@@ -7512,7 +7532,7 @@
 
   function buildProjectProfileHtml_(res, unitLocationFallback) {
     if (!res || !res.success || res.found === false) {
-      return '<div class="ud-top"><h3 class="ud-top-title">' + ICON.building + ' ملف المشروع</h3></div><div class="ud-body"><div class="aq-empty"><h3>لا توجد بيانات لهذا المشروع بعد</h3></div></div>';
+      return '<div class="ud-top"><h3 class="ud-top-title">' + ICON.building + ' ملف المشروع</h3></div><div class="ud-body"><div class="aq-empty"><h3>لا توجد تفاصيل مسجلة لهذا المشروع حاليًا.</h3></div></div>';
     }
     var tile = function (icon, label, value) { return ppHas_(value) ? ('<div class="ud-tile">' + icon + '<div class="ud-tile-txt"><span class="ud-tile-label">' + label + '</span><span class="ud-tile-value">' + ppEsc_(value) + '</span></div></div>') : ''; };
     var section = function (icon, title, inner) { return inner ? ('<section class="ud-sec"><h4 class="ud-sec-title">' + icon + title + '</h4>' + inner + '</section>') : ''; };
@@ -10836,6 +10856,8 @@
     projCoverReset();
     projGalleryImages = []; projRenderGalleryPreview_();
     document.getElementById('projGalleryUploadMsg').textContent = '';
+    var _aiText = document.getElementById('projAiPasteText'); if (_aiText) _aiText.value = '';
+    var _aiMsg = document.getElementById('projAiExtractMsg'); if (_aiMsg) _aiMsg.style.display = 'none';
     projSetFormMode_(null);
   }
   // زر "تفريغ النموذج": نفس إفراغ الحقول + مسح رسالة الحفظ أيضًا (سلوك الزر نفسه لم يتغيّر).
@@ -10844,6 +10866,87 @@
     document.getElementById('saveProjectMsg').textContent = '';
   }
   document.getElementById('clearProjectFormBtn').addEventListener('click', projClearForm_);
+
+  /* ---------- المساعدة بالذكاء الاصطناعي (Add/Edit Project) ----------
+   * نفس فلسفة استخراج بيانات المطوّر بالذكاء الاصطناعي بالضبط (extractDeveloperProfileWithAI):
+   * نص خام → Gemini (عبر callGeminiWithFallback_ المشتركة) → بيانات مُقترحة يراجعها المستخدم
+   * قبل الحفظ. القاعدة الصارمة الإضافية هنا لمشروع: القيمة اليدوية الموجودة تسبق أي اقتراح AI
+   * (Safe Merge) - نملأ الحقل فقط لو كان فاضيًا فعليًا، ولا نحذف أي Feature موجودة، ولا نكتب
+   * على Google Sheets مباشرة من هنا - فقط نملأ النموذج؛ الحفظ الفعلي عبر زر "حفظ المشروع". */
+  document.getElementById('projAiExtractBtn').addEventListener('click', function () {
+    var btn = this;
+    var msg = document.getElementById('projAiExtractMsg');
+    var text = document.getElementById('projAiPasteText').value.trim();
+
+    if (!text) {
+      msg.style.display = 'block';
+      msg.style.color = 'var(--error-fg)';
+      msg.textContent = 'الصق نصًا عن المشروع الأول';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'جاري الاستخراج...';
+    msg.style.display = 'none';
+
+    google.script.run
+      .withSuccessHandler(function (res) {
+        btn.disabled = false;
+        btn.textContent = 'استخرج وحسّن تفاصيل المشروع';
+        if (!res || !res.success) {
+          msg.style.display = 'block';
+          msg.style.color = 'var(--error-fg)';
+          msg.textContent = (res && res.message) || 'تعذّر استخدام المساعدة بالذكاء الاصطناعي حاليًا، يمكنك إدخال البيانات يدويًا.';
+          return;
+        }
+        var d = res.data || {};
+
+        // Safe Merge: نملأ الحقل فقط لو كان فاضيًا فعليًا - القيمة اليدوية الموجودة لا تُستبدَل أبدًا.
+        function safeFill(id, value) {
+          if (value === undefined || value === null || String(value).trim() === '') return;
+          var el = document.getElementById(id);
+          if (!el || el.value.trim()) return;
+          el.value = String(value).trim();
+        }
+        safeFill('projDeveloperInput', d.developerName);
+        safeFill('projCityInput', d.city);
+        safeFill('projDistrictInput', d.district);
+        safeFill('projStatusInput', d.status);
+        safeFill('projDeliveryInput', d.deliveryDate);
+        safeFill('projAreaInput', d.projectArea);
+        safeFill('projEngInput', d.engineeringConsultant);
+        safeFill('projMgmtInput', d.managementCompany);
+        safeFill('projDescInput', d.description);
+        // رابط الموقع: تحقّق إضافي إنه http/https فعليًا قبل القبول - حماية زيادة من اختراع رابط.
+        var locUrl = String(d.locationUrl || '').trim();
+        if (/^https?:\/\//i.test(locUrl)) safeFill('projLocationInput', locUrl);
+
+        // المميزات: دمج بلا تكرار (مقارنة غير حساسة لحالة الأحرف) - بلا حذف أي ميزة موجودة بالفعل.
+        var newFeatures = String(d.features || '').split(/[,\n،]/).map(function (s) { return s.trim(); }).filter(Boolean);
+        var existingUpper = projFeatures.map(function (f) { return f.toUpperCase(); });
+        var addedAny = false;
+        newFeatures.forEach(function (f) {
+          if (existingUpper.indexOf(f.toUpperCase()) === -1) {
+            projFeatures.push(f);
+            existingUpper.push(f.toUpperCase());
+            addedAny = true;
+          }
+        });
+        if (addedAny) projRenderFeatures_();
+
+        msg.style.display = 'block';
+        msg.style.color = 'var(--success-fg)';
+        msg.textContent = 'تم الاستخراج - راجع البيانات المقترحة قبل الحفظ (لم يُستبدل أي حقل مُدخَل يدويًا مسبقًا).';
+      })
+      .withFailureHandler(function () {
+        btn.disabled = false;
+        btn.textContent = 'استخرج وحسّن تفاصيل المشروع';
+        msg.style.display = 'block';
+        msg.style.color = 'var(--error-fg)';
+        msg.textContent = 'تعذّر استخدام المساعدة بالذكاء الاصطناعي حاليًا، يمكنك إدخال البيانات يدويًا.';
+      })
+      .extractProjectDataWithAI(text, projMgmtAuth());
+  });
 
   function editProject(p) {
     document.getElementById('projNameInput').value = p['Project Name'] || '';
