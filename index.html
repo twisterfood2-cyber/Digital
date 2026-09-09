@@ -4428,7 +4428,10 @@
               <div class="images-zone" id="projGalleryZone" tabindex="0">
                 <p>الصق صورة (Ctrl+V) هنا، أو اسحب صورة، أو اختار من جهازك</p>
                 <input type="file" id="projGalleryFileInput" accept="image/*" multiple style="display:none;">
-                <button type="button" class="images-choose-btn" id="projGalleryChooseBtn"><svg class="ico" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg> اختيار صور من الجهاز</button>
+                <div style="display:inline-flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+                  <button type="button" class="images-choose-btn" id="projGalleryChooseBtn"><svg class="ico" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg> اختيار صور من الجهاز</button>
+                  <button type="button" class="images-choose-btn" id="projGalleryPasteBtn"><svg class="ico" viewBox="0 0 24 24"><path d="M9 2a1 1 0 0 0-1 1v1H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2V3a1 1 0 0 0-1-1H9Zm1 2h4v2h-4V4ZM8 11h8v2H8v-2Zm0 4h8v2H8v-2Z"/></svg> لصق صورة</button>
+                </div>
               </div>
               <div id="projGalleryUploadMsg" class="aq-form-hint"></div>
               <div id="projGalleryPreview" class="images-preview"></div>
@@ -10834,9 +10837,53 @@
       e.preventDefault(); zone.classList.remove('drag-over');
       Array.from(e.dataTransfer.files).forEach(projUploadGalleryFile_);
     });
+    // Ctrl+V/Cmd+V داخل المنطقة (بعد الضغط عليها) - بنفس دالة الرفع الحالية بالحرف الواحد؛
+    // الإضافة الوحيدة هنا: رسالة واضحة لو الحافظة نص/رابط بلا صورة (بدل التجاهل الصامت).
     zone.addEventListener('paste', function (e) {
       var items = (e.clipboardData || window.clipboardData).items;
-      for (var i = 0; i < items.length; i++) { if (items[i].type.indexOf('image') === 0) projUploadGalleryFile_(items[i].getAsFile()); }
+      var foundImage = false;
+      for (var i = 0; i < items.length; i++) { if (items[i].type.indexOf('image') === 0) { foundImage = true; projUploadGalleryFile_(items[i].getAsFile()); } }
+      if (!foundImage) {
+        var m = document.getElementById('projGalleryUploadMsg');
+        m.style.color = 'var(--error-fg)';
+        m.textContent = 'لا توجد صورة في الحافظة.';
+      }
+    });
+  })();
+
+  /* ---------- زر "لصق صورة" (معرض صور المشروع) ----------
+   * إضافة UX بس - نفس مسار الرفع الحالي بالحرف الواحد (projUploadGalleryFile_، فبلا Pending
+   * جديد وبلا رفع فوري مختلف عن باقي صور المعرض - سلوك الرفع الفوري نفسه المطبَّق على
+   * الصور المُختارة/المسحوبة حاليًا). navigator.clipboard.read() تدعمها Chrome/Edge لقراءة
+   * صورة الحافظة بضغطة واحدة؛ المتصفحات التي لا تدعمها (أبرزها Safari) يبقى فيها الـ Ctrl+V
+   * اليدوي (Paste Event أعلاه) يعمل بلا أي مشكلة كـ Fallback طبيعي - ما فيش Crash في الحالتين. */
+  (function wireProjGalleryPasteBtn() {
+    var btn = document.getElementById('projGalleryPasteBtn'), zone = document.getElementById('projGalleryZone');
+    if (!btn || !zone) return;
+    btn.addEventListener('click', function () {
+      var msg = document.getElementById('projGalleryUploadMsg');
+      msg.style.color = 'var(--error-fg)'; msg.textContent = '';
+      if (!navigator.clipboard || !navigator.clipboard.read) {
+        msg.textContent = 'تعذر الوصول إلى الحافظة. يمكنك رفع الصورة من الجهاز.';
+        zone.focus();
+        return;
+      }
+      navigator.clipboard.read().then(function (clipItems) {
+        var target = null, targetType = null;
+        for (var i = 0; i < clipItems.length; i++) {
+          var imgType = clipItems[i].types.find(function (t) { return t.indexOf('image/') === 0; });
+          if (imgType) { target = clipItems[i]; targetType = imgType; break; }
+        }
+        if (!target) { msg.textContent = 'لا توجد صورة في الحافظة.'; return; }
+        target.getType(targetType).then(function (blob) {
+          projUploadGalleryFile_(blob);
+        }).catch(function () {
+          msg.textContent = 'تعذر تجهيز الصورة، حاول مرة أخرى.';
+        });
+      }).catch(function () {
+        msg.textContent = 'تعذر الوصول إلى الحافظة. يمكنك رفع الصورة من الجهاز.';
+        zone.focus();
+      });
     });
   })();
 
