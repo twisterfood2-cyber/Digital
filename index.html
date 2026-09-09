@@ -4718,6 +4718,11 @@
             </button>
           </div>
         </div>
+        <div class="aq-c12">
+          <label>موقع المشروع على Google Maps</label>
+          <input type="text" name="projectLocationUrl" placeholder="https://maps.app.goo.gl/xxxxxxxx" autocomplete="off">
+          <div class="aq-form-hint">الصق رابط موقع المشروع من Google Maps (اختياري)</div>
+        </div>
       </div>
 
       <div class="section-title">تفاصيل الوحدة</div>
@@ -5491,6 +5496,7 @@
       'Developer Name': g('developer'),
       'City': g('city'),
       'Area/District': g('district'),
+      'Project Location URL': g('projectLocationUrl'),
       'Unit Area (sqm)': g('unitArea'),
       'Garden Area (sqm)': g('gardenArea'),
       'Terrace Area (sqm)': g('terraceArea'),
@@ -5758,7 +5764,9 @@
         additionalPayment2: u['Additional Payment 2'], additionalPayment2Count: u['Additional Payment 2 Count'], additionalPayment2Due: u['Additional Payment 2 Due'],
         additionalPayment3: u['Additional Payment 3'], additionalPayment3Count: u['Additional Payment 3 Count'], additionalPayment3Due: u['Additional Payment 3 Due'],
         additionalPayment4: u['Additional Payment 4'], additionalPayment4Count: u['Additional Payment 4 Count'], additionalPayment4Due: u['Additional Payment 4 Due'],
-        additionalPayment5: u['Additional Payment 5'], additionalPayment5Count: u['Additional Payment 5 Count'], additionalPayment5Due: u['Additional Payment 5 Due']
+        additionalPayment5: u['Additional Payment 5'], additionalPayment5Count: u['Additional Payment 5 Count'], additionalPayment5Due: u['Additional Payment 5 Due'],
+        // رابط موقع المشروع على Google Maps يُنسَخ كبيانات مستقلة تمامًا (نص فقط) — قابل للتعديل قبل الحفظ
+        projectLocationUrl: u['Project Location URL']
         // عمدًا من غير: ownerName, ownerPhone, agent (بيانات خاصة بالوحدة القديمة بس)
       };
       Object.keys(fieldMap).forEach(name => {
@@ -6474,11 +6482,20 @@
       notesHtml = section(ICON.clipboard, 'ملاحظات', parts.length > 1 ? `<ul class="ud-notes">${parts.map(p => `<li>${p}</li>`).join('')}</ul>` : `<p class="ud-notes-text">${parts[0] || esc(u['Notes'])}</p>`, 'ud-sec-notes');
     }
 
-    /* ---------- موقع الوحدة (بيانات الموقع الموجودة فعلًا: المدينة/المنطقة - رابط خرائط خارجي) ---------- */
+    /* ---------- موقع الوحدة (بيانات الموقع الموجودة فعلًا: المدينة/المنطقة - رابط خرائط خارجي) ----------
+     * لو الوحدة فيها "Project Location URL" محفوظ (رابط Google Maps الفعلي للمشروع)، الزر يفتحه
+     * كما هو مباشرة. غير كده (كل الوحدات القديمة بلا استثناء) — نفس السلوك القديم تمامًا: رابط بحث
+     * Google Maps مبني من (اسم المشروع + المنطقة + المدينة). لا تغيير آخر في هذا القسم. */
     const locQuery = [u['Project Name'], u['Area/District'], u['City']].filter(has).join(' ');
+    // فقط رابط http(s) فعلي يُستخدَم كما هو (حماية بسيطة من كسر خاصية href لو القيمة المحفوظة
+    // ليست رابطًا صالحًا) - أي شيء آخر (فارغ/نص غير رابط) يرجع لسلوك رابط البحث القديم كما هو تمامًا.
+    const savedMapUrl = String(u['Project Location URL'] || '').trim();
+    const mapHref = /^https?:\/\//i.test(savedMapUrl)
+      ? savedMapUrl.replace(/"/g, '%22').replace(/</g, '%3C').replace(/>/g, '%3E')
+      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locQuery)}`;
     const locationHtml = (has(u['City']) || has(u['Area/District'])) ? section(ICON.pin, 'موقع الوحدة', `
         <div class="ud-map">${ICON.pin}<div class="ud-map-txt"><b>${esc(u['Area/District'])}</b><span>${esc(u['City'])}</span></div></div>
-        <a class="ud-map-btn" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locQuery)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${ICON.share} عرض الموقع على الخريطة</a>`, 'ud-sec-location') : '';
+        <a class="ud-map-btn" href="${mapHref}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${ICON.share} عرض الموقع على الخريطة</a>`, 'ud-sec-location') : '';
 
     /* ---------- سجل الوحدة (معلومات ثانوية) ---------- */
     const histTiles = [
@@ -8551,7 +8568,8 @@
         additionalPayment2: u['Additional Payment 2'], additionalPayment2Count: u['Additional Payment 2 Count'], additionalPayment2Due: u['Additional Payment 2 Due'],
         additionalPayment3: u['Additional Payment 3'], additionalPayment3Count: u['Additional Payment 3 Count'], additionalPayment3Due: u['Additional Payment 3 Due'],
         additionalPayment4: u['Additional Payment 4'], additionalPayment4Count: u['Additional Payment 4 Count'], additionalPayment4Due: u['Additional Payment 4 Due'],
-        additionalPayment5: u['Additional Payment 5'], additionalPayment5Count: u['Additional Payment 5 Count'], additionalPayment5Due: u['Additional Payment 5 Due']
+        additionalPayment5: u['Additional Payment 5'], additionalPayment5Count: u['Additional Payment 5 Count'], additionalPayment5Due: u['Additional Payment 5 Due'],
+        projectLocationUrl: u['Project Location URL']
       };
       Object.keys(fieldMap).forEach(name => {
         const el = editForm.elements[name];
