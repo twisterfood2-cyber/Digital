@@ -3618,8 +3618,31 @@
     #aqConfirmModal { z-index: 2200; }
     #devFormModeBadge[hidden], .aq-badge[hidden] { display: none !important; }
 
+    /* ============================================================
+     * كيان "المشروعات" — إعادة استخدام كاملة للغة التصميم الحالية
+     * (.ud-* لتفاصيل الوحدة، .aq-dev-* للوحة تحكّم المطوّرين، .images-zone
+     * لصور الوحدة) بلا أي عناصر تصميم جديدة تقريبًا. الإضافات الحقيقية
+     * الوحيدة: شرائح "المميزات" القابلة للحذف في نموذج التحرير + طبقة Z
+     * أعلى من تفاصيل الوحدة عشان مودال المشروع يظهر فوقها بأمان.
+     * ============================================================ */
+    #projectProfileModal { z-index: 1700; } /* أعلى من .unit-card-overlay (1650) وأقل من #aqConfirmModal (2200) */
+    .pp-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .aq-chip-input-row { display: flex; gap: 8px; }
+    .aq-chip-input-row input { flex: 1; }
+    .aq-chip-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .aq-chip-tag {
+      display: inline-flex; align-items: center; gap: 6px; background: var(--aq-prop-green-soft);
+      color: var(--aq-prop-green-deep); border: 1px solid var(--aq-prop-green-line);
+      border-radius: var(--aq-radius-pill); padding: 5px 6px 5px 12px; font-size: var(--aq-fs-caption); font-weight: 700;
+    }
+    .aq-chip-tag button {
+      background: none; border: none; color: inherit; cursor: pointer; padding: 0;
+      display: flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%;
+    }
+    .aq-chip-tag button:hover { background: rgba(2,58,58,0.12); }
+
     @media (max-width: 1024px) {
-      #dashPanel-developers .aq-form-grid--3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      #dashPanel-developers .aq-form-grid--3, #dashPanel-projects .aq-form-grid--3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 768px) {
       .aq-settings-cover { grid-template-columns: 1fr; }
@@ -3629,7 +3652,8 @@
       #dashPanel-users .um-card { grid-template-columns: auto minmax(0, 1fr); }
       #dashPanel-users .um-right { grid-column: 2; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: flex-start; }
       #dashPanel-users .um-toolbar .aq-admin-card-actions, #dashPanel-users .um-toolbar .aq-admin-card-actions > * { width: 100%; }
-      #dashPanel-developers .aq-form-grid--3, #dashPanel-developers .aq-form-grid--2, #dashPanel-users .aq-form-grid--3 { grid-template-columns: 1fr; }
+      #dashPanel-developers .aq-form-grid--3, #dashPanel-developers .aq-form-grid--2, #dashPanel-users .aq-form-grid--3,
+      #dashPanel-projects .aq-form-grid--3, #dashPanel-projects .aq-form-grid--2 { grid-template-columns: 1fr; }
       #umUserModal .modal-box.um-user-box { padding: var(--aq-space-5) var(--aq-space-4) 0; }
       #umUserBody .um-actions { margin: var(--aq-space-5) calc(-1 * var(--aq-space-4)) 0; padding: var(--aq-space-4); }
       #umUserBody .um-actions button { flex: 1 1 100%; }
@@ -4095,6 +4119,7 @@
                يقرّرها dashNavAllowed_() عبر dashIsOwner_() + DASH_NONOWNER_MENU. data-roles/data-perm للتوثيق فقط. -->
           <button type="button" class="dash-nav-item aq-subnav-item is-active" data-dash="home" data-roles="OWNER,MANAGER,DATA_ENTRY,SALES"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg><span>الرئيسية</span></button>
           <button type="button" class="dash-nav-item aq-subnav-item" data-dash="developers" data-roles="OWNER" data-perm="MANAGE_DEVELOPERS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18ZM10 6h4M10 10h4M10 14h4M10 18h4"/></svg><span>المطوّرون</span></button>
+          <button type="button" class="dash-nav-item aq-subnav-item" data-dash="projects" data-roles="OWNER" data-perm="MANAGE_PROJECTS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M9 11h.01M15 11h.01M9 15h.01M15 15h.01"/></svg><span>المشروعات</span></button>
           <button type="button" class="dash-nav-item aq-subnav-item" data-dash="users" data-roles="OWNER" data-perm="MANAGE_USERS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 5.2a3.5 3.5 0 0 1 0 6.8M18 20a6.5 6.5 0 0 0-3.2-5.6"/></svg><span>المستخدمون</span></button>
           <button type="button" class="dash-nav-item aq-subnav-item" data-dash="stats" data-roles="OWNER,MANAGER,DATA_ENTRY,SALES" data-perm="VIEW_STATISTICS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span>الإحصاءات والمخزون</span></button>
           <button type="button" class="dash-nav-item aq-subnav-item" data-dash="profile" data-roles="OWNER,MANAGER,DATA_ENTRY,SALES"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>الملف الشخصي</span></button>
@@ -4269,6 +4294,142 @@
               </div>
             </div>
             <div id="devProfilesListContent" class="aq-dev-grid"></div>
+          </section>
+        </div>
+
+        <div class="dash-panel" id="dashPanel-projects" hidden>
+          <div class="dash-page-title">إدارة المشروعات</div>
+          <p class="aq-page-intro">ملفات المشروعات العقارية: البيانات الأساسية، النبذة، المميزات، الموقع، وصور المشروع. اسم المشروع هنا هو نفسه "اسم المشروع" المستخدَم في نموذج الوحدة — عند تطابقهما يصبح اسم المشروع داخل تفاصيل الوحدة قابلًا للضغط ليفتح هذا الملف.</p>
+
+          <section class="aq-admin-card" id="projFormCard" aria-labelledby="projFormTitle">
+            <div class="aq-admin-card-head">
+              <div>
+                <h3 class="aq-admin-card-title" id="projFormTitle">إضافة / تعديل مشروع</h3>
+                <p class="aq-admin-card-sub">اكتب اسم المشروع بالضبط كما هو مسجّل في الوحدات حتى يرتبط تلقائيًا بها.</p>
+              </div>
+              <span class="aq-badge aq-badge--info aq-form-mode" id="projFormModeBadge" hidden></span>
+            </div>
+
+            <div class="aq-form-section">
+              <div class="aq-form-section-head"><h4 class="aq-form-section-title">البيانات الأساسية</h4></div>
+              <div class="aq-form-grid aq-form-grid--3">
+                <div class="aq-form-field">
+                  <label class="aq-form-label" for="projNameInput">اسم المشروع</label>
+                  <input type="text" id="projNameInput" class="aq-form-control" list="projNameDatalist" placeholder="اسم المشروع بالضبط زي ما هو مسجل في الوحدات" autocomplete="off">
+                  <datalist id="projNameDatalist"></datalist>
+                </div>
+                <div class="aq-form-field">
+                  <label class="aq-form-label" for="projDeveloperInput">المطوّر</label>
+                  <input type="text" id="projDeveloperInput" class="aq-form-control" list="devProfileNameDatalist" placeholder="اسم المطوّر" autocomplete="off">
+                </div>
+                <div class="aq-form-field">
+                  <label class="aq-form-label" for="projStatusInput">حالة المشروع</label>
+                  <input type="text" id="projStatusInput" class="aq-form-control" placeholder="مثال: قيد الإنشاء / جاهز للاستلام">
+                </div>
+                <div class="aq-form-field">
+                  <label class="aq-form-label" for="projCityInput">المدينة</label>
+                  <input type="text" id="projCityInput" class="aq-form-control" placeholder="المدينة">
+                </div>
+                <div class="aq-form-field">
+                  <label class="aq-form-label" for="projDistrictInput">المنطقة</label>
+                  <input type="text" id="projDistrictInput" class="aq-form-control" placeholder="المنطقة">
+                </div>
+                <div class="aq-form-field">
+                  <label class="aq-form-label" for="projDeliveryInput">موعد التسليم</label>
+                  <input type="text" id="projDeliveryInput" class="aq-form-control" placeholder="مثال: 2029">
+                </div>
+                <div class="aq-form-field">
+                  <label class="aq-form-label" for="projAreaInput">مساحة المشروع الإجمالية (م²)</label>
+                  <input type="text" id="projAreaInput" class="aq-form-control" placeholder="مثال: 50 فدان أو 210,000 م²">
+                </div>
+              </div>
+            </div>
+
+            <div class="aq-form-section">
+              <div class="aq-form-section-head"><h4 class="aq-form-section-title">نبذة المشروع</h4></div>
+              <div class="aq-form-grid aq-form-grid--2">
+                <div class="aq-form-field aq-form-span-2">
+                  <label class="aq-form-label" for="projDescInput">وصف المشروع</label>
+                  <textarea id="projDescInput" class="aq-form-control" rows="5" placeholder="نبذة مختصرة عن المشروع..."></textarea>
+                </div>
+                <div class="aq-form-field">
+                  <label class="aq-form-label" for="projEngInput">الاستشاري الهندسي</label>
+                  <input type="text" id="projEngInput" class="aq-form-control" placeholder="اسم الاستشاري الهندسي (اختياري)">
+                </div>
+                <div class="aq-form-field">
+                  <label class="aq-form-label" for="projMgmtInput">شركة الإدارة والتشغيل</label>
+                  <input type="text" id="projMgmtInput" class="aq-form-control" placeholder="اسم شركة الإدارة والتشغيل (اختياري)">
+                </div>
+              </div>
+            </div>
+
+            <div class="aq-form-section">
+              <div class="aq-form-section-head"><h4 class="aq-form-section-title">المميزات والخدمات</h4></div>
+              <div class="aq-chip-input-row">
+                <input type="text" id="projFeatureInput" class="aq-form-control" placeholder="مثال: حمام سباحة — اكتب واضغط إضافة أو Enter">
+                <button type="button" class="aq-btn--form-secondary" id="projFeatureAddBtn">+ إضافة</button>
+              </div>
+              <div class="aq-chip-list" id="projFeaturesList"></div>
+            </div>
+
+            <div class="aq-form-section">
+              <div class="aq-form-section-head"><h4 class="aq-form-section-title">الموقع</h4></div>
+              <div class="aq-form-grid aq-form-grid--2">
+                <div class="aq-form-field aq-form-span-2">
+                  <label class="aq-form-label" for="projLocationInput">رابط Google Maps</label>
+                  <input type="text" id="projLocationInput" class="aq-form-control" placeholder="https://maps.app.goo.gl/xxxxxxxx">
+                  <div class="aq-form-hint">الصق رابط موقع المشروع من Google Maps (اختياري)</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="aq-form-section">
+              <div class="aq-form-section-head"><h4 class="aq-form-section-title">صورة الغلاف</h4></div>
+              <div class="aq-logo-upload" id="projCoverDropzone" tabindex="0" role="group" aria-label="رفع صورة غلاف المشروع">
+                <div class="aq-logo-upload-preview">
+                  <div class="aq-logo-tile aq-logo-tile--xl" id="projCoverPreviewTile" title="اختر صورة">—</div>
+                </div>
+                <div class="aq-logo-upload-body">
+                  <p class="aq-logo-upload-title" id="projCoverTitle">اسحب صورة الغلاف هنا أو اختر من جهازك</p>
+                  <p class="aq-logo-upload-hint">الصيغ المقبولة: PNG أو JPG أو WebP · الحد الأقصى 5 ميجابايت.</p>
+                  <div class="aq-logo-upload-actions">
+                    <button type="button" class="aq-btn--form-primary" id="projCoverChooseBtn">رفع صورة الغلاف</button>
+                    <button type="button" class="aq-btn--form-secondary" id="projCoverReplaceBtn" hidden>تغيير الصورة</button>
+                    <button type="button" class="aq-btn--form-danger" id="projCoverRemoveBtn" hidden>إزالة</button>
+                  </div>
+                  <div class="aq-logo-upload-status" id="projCoverStatus" aria-live="polite"></div>
+                  <input type="file" id="projCoverFileInput" class="aq-file-input" accept="image/png,image/jpeg,image/webp" aria-label="اختيار صورة الغلاف">
+                  <input type="hidden" id="projCoverUrlInput" value="">
+                </div>
+              </div>
+            </div>
+
+            <div class="aq-form-section">
+              <div class="aq-form-section-head"><h4 class="aq-form-section-title">معرض صور المشروع</h4></div>
+              <div class="images-zone" id="projGalleryZone" tabindex="0">
+                <p>الصق صورة (Ctrl+V) هنا، أو اسحب صورة، أو اختار من جهازك</p>
+                <input type="file" id="projGalleryFileInput" accept="image/*" multiple style="display:none;">
+                <button type="button" class="images-choose-btn" id="projGalleryChooseBtn"><svg class="ico" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg> اختيار صور من الجهاز</button>
+              </div>
+              <div id="projGalleryUploadMsg" class="aq-form-hint"></div>
+              <div id="projGalleryPreview" class="images-preview"></div>
+            </div>
+
+            <div class="aq-form-actions dev-actions">
+              <button type="button" id="saveProjectBtn" class="aq-btn--form-primary">حفظ بيانات المشروع</button>
+              <button type="button" id="clearProjectFormBtn" class="aq-btn--form-secondary">تفريغ النموذج</button>
+              <div id="saveProjectMsg" class="aq-form-msg aq-form-hint"></div>
+            </div>
+          </section>
+
+          <section class="aq-admin-card" id="projListCard" aria-labelledby="projListTitle">
+            <div class="aq-admin-card-head">
+              <div>
+                <h3 class="aq-admin-card-title" id="projListTitle">المشروعات المسجّلة</h3>
+                <p class="aq-admin-card-sub" id="projListCount"></p>
+              </div>
+            </div>
+            <div id="projectsListContent" class="aq-dev-grid"></div>
           </section>
         </div>
 
@@ -4484,6 +4645,17 @@
   <div class="unit-card-overlay-box unit-details-box">
     <button type="button" class="unit-card-overlay-close" id="unitCardOverlayCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     <div class="ud-modal-body" id="unitCardOverlayBody"></div>
+  </div>
+</div>
+
+<!-- ملف المشروع (Project Profile) — يُفتح من اسم المشروع القابل للضغط داخل تفاصيل
+     الوحدة. نفس لغة/حجم مودال تفاصيل الوحدة بالضبط (إعادة استخدام .unit-card-overlay-box
+     .unit-details-box)، بطبقة Z أعلى فيظهر فوقه بلا إغلاقه — إغلاق ملف المشروع يرجّع
+     العرض مباشرة لتفاصيل الوحدة كما كانت. -->
+<div class="unit-card-overlay" id="projectProfileModal">
+  <div class="unit-card-overlay-box unit-details-box">
+    <button type="button" class="unit-card-overlay-close" id="projectProfileCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <div class="ud-modal-body" id="projectProfileBody"></div>
   </div>
 </div>
 
@@ -6154,6 +6326,10 @@
                   perm: 'MANAGE_DEVELOPERS', section: 'developers', label: 'المطوّرون',
                   title: 'إدارة بيانات المطوّرين', crumbs: ['لوحة التحكم'],
                   denyMsg: 'صلاحيتك الحالية لا تسمح بفتح هذا القسم' },
+    projects:   { hash: '#dashboard/projects',   aliases: [],             view: 'dashboard', navId: 'adminFab', navPerm: null,
+                  perm: 'MANAGE_PROJECTS',   section: 'projects',   label: 'المشروعات',
+                  title: 'إدارة المشروعات', crumbs: ['لوحة التحكم'],
+                  denyMsg: 'صلاحيتك الحالية لا تسمح بفتح هذا القسم' },
     settings:   { hash: '#dashboard/settings',   aliases: [],             view: 'dashboard', navId: 'adminFab', navPerm: null,
                   perm: 'MANAGE_SETTINGS',   section: 'settings',   label: 'الإعدادات',
                   title: 'الإعدادات', crumbs: ['لوحة التحكم'],
@@ -6371,6 +6547,17 @@
             <option value="مباع" ${u['Status']==='مباع'?'selected':''}>مباع</option>
           </select>` : '';
 
+    /* ---------- اسم المشروع القابل للضغط (يفتح ملف المشروع فوق تفاصيل الوحدة) ----------
+     * يظهر كرابط فقط لو فيه ملف مشروع مسجَّل فعليًا بنفس الاسم (مطابقة مُطبَّعة عبر
+     * الكاش المُحمَّل مسبقًا __projectHasProfileCached) - وإلا نص عادي كما كان تمامًا،
+     * بلا أي خطأ أو نداء شبكة إضافي عند كل فتح تفاصيل. */
+    const projectNameRaw = u['Project Name'];
+    const projectIsClickable = has(projectNameRaw) && typeof window.__projectHasProfileCached === 'function' && window.__projectHasProfileCached(projectNameRaw);
+    const projectNameDisplay = esc(projectNameRaw || u['City']);
+    const projectNameLinkHtml = projectIsClickable
+      ? `<a class="ud-link" href="javascript:void(0)" onclick='event.stopPropagation(); showProjectProfile(${JSON.stringify(projectNameRaw)}, ${JSON.stringify(u['Project Location URL'] || '')})'>${projectNameDisplay}</a>`
+      : projectNameDisplay;
+
     /* ---------- الملخّص (يمين المعرض على الشاشات العريضة) ---------- */
     const summaryHtml = `
       <div class="ud-summary">
@@ -6378,7 +6565,7 @@
           <span class="ud-code">${esc(u['Unit ID'])}</span>
           ${actionsHtml}
         </div>
-        <div class="ud-name">${esc(u['Project Name'] || u['City'])}</div>
+        <div class="ud-name">${projectNameLinkHtml}</div>
         <div class="ud-type">${esc(u['Property Type'])}</div>
         <div class="ud-locline">${ICON.pin} ${esc(u['City'])} - ${esc(u['Area/District'])}</div>
         <div class="ud-status-row"><span class="status-badge ${u['Status']}"><i class="status-dot"></i>${u['Status']}</span>${statusSelectHtml}</div>
@@ -6473,8 +6660,11 @@
 
     /* ---------- معلومات المشروع ---------- */
     const devTile = u['Developer Name'] ? `<div class="ud-tile">${ICON.building}<div class="ud-tile-txt"><span class="ud-tile-label">المطور</span><a class="ud-tile-value ud-link" href="javascript:void(0)" onclick='closeUnitCardOverlay(); showDeveloperProfile(${JSON.stringify(u['Developer Name'])})'>${esc(u['Developer Name'])}</a></div></div>` : '';
+    // نفس منطق ud-name أعلاه بالحرف الواحد: رابط فقط لو فيه ملف مشروع مسجَّل، وإلا نص عادي.
+    // بخلاف بلاطة "المطور" - لا نغلق تفاصيل الوحدة عند الضغط (ملف المشروع يظهر فوقها).
+    const projTile = ppHas_(projectNameRaw) ? `<div class="ud-tile">${ICON.building}<div class="ud-tile-txt"><span class="ud-tile-label">اسم المشروع</span><span class="ud-tile-value">${projectIsClickable ? `<a class="ud-link" href="javascript:void(0)" onclick='event.stopPropagation(); showProjectProfile(${JSON.stringify(projectNameRaw)}, ${JSON.stringify(u['Project Location URL'] || '')})'>${esc(projectNameRaw)}</a>` : esc(projectNameRaw)}</span></div></div>` : '';
     const projTiles = [
-      tile(ICON.building, 'اسم المشروع', u['Project Name']),
+      projTile,
       devTile,
       tile(ICON.folder, 'التصنيف', u['Category']),
       // "نوع العرض" (Listing Type) مخفي من عرض تفاصيل الوحدة فقط بناءً على طلب صريح -
@@ -7291,6 +7481,124 @@
   }
   document.getElementById('unitCardOverlayCloseBtn').addEventListener('click', closeUnitCardOverlay);
   unitCardOverlay.addEventListener('click', function(e) { if (e.target === this) closeUnitCardOverlay(); });
+
+  /* ============================================================
+   * ملف المشروع (Project Profile) — قراءة فقط، لأي مستخدم مسجَّل دخول
+   * يقدر يشوف تفاصيل الوحدة (نفس منطق ملف المطوّر تمامًا). Cache خفيف:
+   * (1) قائمة أسماء المشاريع المسجَّلة فقط (لتحديد إن كان اسم المشروع
+   *     قابلًا للضغط أصلًا) — تُحمَّل مرة واحدة في الخلفية عند بداية الجلسة.
+   * (2) بيانات كل مشروع بعد أول فتح له — تُخزَّن للجلسة الحالية فلا
+   *     يتكرر النداء لنفس المشروع مرتين.
+   * ============================================================ */
+  var __projectNamesCache = null;   // Set<string> UPPER لكل اسم مشروع مسجَّل، أو null لو لسه ما اتحمّلتش
+  var __projectProfileCache = {};   // { NAME_UPPER: نتيجة getProjectProfile }
+
+  function loadProjectNamesCache_() {
+    google.script.run.withSuccessHandler(function (res) {
+      if (res && res.success) __projectNamesCache = {};
+      if (res && res.success) (res.names || []).forEach(function (n) { __projectNamesCache[String(n).trim().toUpperCase()] = true; });
+    }).withFailureHandler(function () { /* صامت - اسم المشروع يبقى نصًا عاديًا غير قابل للضغط، بلا أي خطأ */ })
+      .getProjectNamesList(getAuthCreds());
+  }
+  // يُستدعى بلا حرج من مسارات متعددة - يحمّل مرة واحدة فقط فعليًا
+  function projectHasProfile_(projectName) {
+    if (!ppHas_(projectName) || !__projectNamesCache) return false;
+    return !!__projectNamesCache[String(projectName).trim().toUpperCase()];
+  }
+  window.__projectHasProfileCached = projectHasProfile_;
+
+  function ppEsc_(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
+  function ppHas_(v) { return v !== undefined && v !== null && String(v).trim() !== ''; }
+
+  function buildProjectProfileHtml_(res, unitLocationFallback) {
+    if (!res || !res.success || res.found === false) {
+      return '<div class="ud-top"><h3 class="ud-top-title">' + ICON.building + ' ملف المشروع</h3></div><div class="ud-body"><div class="aq-empty"><h3>لا توجد بيانات لهذا المشروع بعد</h3></div></div>';
+    }
+    var tile = function (icon, label, value) { return ppHas_(value) ? ('<div class="ud-tile">' + icon + '<div class="ud-tile-txt"><span class="ud-tile-label">' + label + '</span><span class="ud-tile-value">' + ppEsc_(value) + '</span></div></div>') : ''; };
+    var section = function (icon, title, inner) { return inner ? ('<section class="ud-sec"><h4 class="ud-sec-title">' + icon + title + '</h4>' + inner + '</section>') : ''; };
+
+    var coverUrl = res['Cover Image URL'];
+    var coverHtml = coverUrl
+      ? ('<div class="ud-media" style="cursor:default;"><img src="' + ppEsc_(coverUrl) + '" alt="" loading="lazy"></div>')
+      : ('<div class="ud-media ud-media-empty" style="cursor:default;">' + ICON.image + '<span>لا توجد صورة غلاف</span></div>');
+
+    var basicTiles = [
+      tile(ICON.building, 'المطور', res['Developer Name']),
+      tile(ICON.pin, 'المدينة', res['City']),
+      tile(ICON.pin, 'المنطقة', res['District']),
+      tile(ICON.tag, 'حالة المشروع', res['Status']),
+      tile(ICON.calendar, 'موعد التسليم', res['Delivery Date']),
+      tile(ICON.area, 'مساحة المشروع', res['Project Area'])
+    ].filter(Boolean).join('');
+    var basicHtml = section(ICON.clipboard, 'البيانات الأساسية', basicTiles ? ('<div class="ud-tiles">' + basicTiles + '</div>') : '');
+
+    var aboutHtml = '';
+    if (ppHas_(res['Description'])) {
+      var parts = ppEsc_(res['Description']).split(/\s*(?:\n|\r|(?:^|\s)[-–•]\s+)/).map(function (s) { return s.trim(); }).filter(Boolean);
+      aboutHtml = section(ICON.info, 'عن المشروع', parts.length > 1 ? ('<ul class="ud-notes">' + parts.map(function (p) { return '<li>' + p + '</li>'; }).join('') + '</ul>') : ('<p class="ud-notes-text">' + (parts[0] || ppEsc_(res['Description'])) + '</p>'));
+    }
+
+    var engTiles = [
+      tile(ICON.calc, 'الاستشاري الهندسي', res['Engineering Consultant']),
+      tile(ICON.calc, 'شركة الإدارة والتشغيل', res['Management Company'])
+    ].filter(Boolean).join('');
+    var engHtml = section(ICON.clipboard, 'المعلومات الهندسية', engTiles ? ('<div class="ud-tiles">' + engTiles + '</div>') : '');
+
+    var featuresList = String(res['Features'] || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+    var featuresHtml = featuresList.length ? section(ICON.tag, 'المميزات والخدمات',
+      '<div class="pp-chips">' + featuresList.map(function (f) { return '<span class="spec-chip"><span class="spec-txt"><b>' + ppEsc_(f) + '</b></span></span>'; }).join('') + '</div>') : '';
+
+    // رابط الموقع: ملف المشروع أولًا، وإلا رابط موقع الوحدة الحالية (Fallback) - بلا رابط مكسور لو الاتنين غير موجودين
+    var savedLocUrl = String(res['Location URL'] || '').trim();
+    var fallbackLocUrl = String(unitLocationFallback || '').trim();
+    var rawLoc = /^https?:\/\//i.test(savedLocUrl) ? savedLocUrl : (/^https?:\/\//i.test(fallbackLocUrl) ? fallbackLocUrl : '');
+    var locHref = rawLoc.replace(/"/g, '%22').replace(/</g, '%3C').replace(/>/g, '%3E');
+    var locHtml = locHref ? section(ICON.pin, 'الموقع', '<a class="ud-map-btn" href="' + locHref + '" target="_blank" rel="noopener">' + ICON.share + ' عرض الموقع على الخريطة</a>') : '';
+
+    var galleryImgs = String(res['Gallery Images'] || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+    var galleryHtml = galleryImgs.length ? section(ICON.image, 'صور المشروع',
+      '<div class="ud-thumbs">' + galleryImgs.map(function (img, idx) { return '<img src="' + ppEsc_(img) + '" alt="" loading="lazy" onclick=\'openLightbox(' + JSON.stringify(galleryImgs) + ', ' + idx + ')\'>'; }).join('') + '</div>') : '';
+
+    return '' +
+      '<div class="ud-top"><h3 class="ud-top-title">' + ICON.building + ' ملف المشروع</h3></div>' +
+      '<div class="ud-body">' +
+        coverHtml +
+        '<div class="ud-name" style="margin-top:10px;">' + ppEsc_(res['Project Name']) + '</div>' +
+        (ppHas_(res['Developer Name']) ? ('<div class="ud-type">' + ppEsc_(res['Developer Name']) + '</div>') : '') +
+        '<div class="ud-grid">' + basicHtml + aboutHtml + engHtml + '</div>' +
+        '<div class="ud-grid ud-grid-2">' + featuresHtml + locHtml + galleryHtml + '</div>' +
+      '</div>';
+  }
+
+  function showProjectProfile(projectName, unitLocationFallback) {
+    var key = String(projectName || '').trim().toUpperCase();
+    if (!key) return;
+    var modal = document.getElementById('projectProfileModal');
+    var body = document.getElementById('projectProfileBody');
+    modal.classList.add('open');
+    if (__projectProfileCache[key]) {
+      body.innerHTML = buildProjectProfileHtml_(__projectProfileCache[key], unitLocationFallback);
+      return;
+    }
+    body.innerHTML = '<div class="ud-top"><h3 class="ud-top-title">' + ICON.building + ' ملف المشروع</h3></div><div class="ud-body"><div class="aq-skeleton aq-skeleton--card"></div></div>';
+    google.script.run.withSuccessHandler(function (res) {
+      if (res && res.success) __projectProfileCache[key] = res;
+      body.innerHTML = buildProjectProfileHtml_(res, unitLocationFallback);
+    }).withFailureHandler(function (err) {
+      body.innerHTML = '<div class="ud-top"><h3 class="ud-top-title">' + ICON.building + ' ملف المشروع</h3></div><div class="ud-body"><div class="aq-empty"><h3>تعذّر تحميل بيانات المشروع</h3><p>' + ppEsc_(err && err.message) + '</p></div></div>';
+    }).getProjectProfile(projectName, getAuthCreds());
+  }
+  window.showProjectProfile = showProjectProfile;
+
+  function closeProjectProfileModal() {
+    document.getElementById('projectProfileModal').classList.remove('open');
+  }
+  document.getElementById('projectProfileCloseBtn').addEventListener('click', closeProjectProfileModal);
+  document.getElementById('projectProfileModal').addEventListener('click', function (e) { if (e.target === this) closeProjectProfileModal(); });
+
+  // تحميل قائمة أسماء المشاريع في الخلفية بعد استقرار الجلسة - نداء واحد لكل الجلسة
+  // (نفس توقيت loadCoverImage تقريبًا)، فيصبح اسم المشروع قابلًا للضغط من أول فتح تفاصيل وحدة.
+  setTimeout(function () { try { loadProjectNamesCache_(); } catch (e) {} }, 1200);
 
   function closePdfContactModal() {
     pdfContactModal.classList.remove('open');
@@ -10319,6 +10627,359 @@
   });
 
   /* ============================================================
+   * لوحة تحكّم "المشروعات" — نفس نمط لوحة "المطوّرون" بالحرف الواحد
+   * (نفس التفويض authorizeOwnerAdmin_، نفس أسلوب رفع الصورة، نفس نمط
+   * القائمة/التعديل/الحذف + aqConfirm بدل confirm الأصلية). الإضافتان
+   * الحقيقيتان فقط: شرائح "المميزات" القابلة للحذف، ومعرض صور متعدد
+   * بنفس أسلوب صور الوحدة (بلا إعادة ترتيب بالسحب - غير مطلوبة هنا).
+   * ============================================================ */
+  function projMgmtAuth() { return getAuthCreds(); }
+
+  /* ---------- المميزات (Features) - شرائح قابلة للإضافة والحذف ---------- */
+  var projFeatures = [];
+  function projRenderFeatures_() {
+    var wrap = document.getElementById('projFeaturesList');
+    if (!wrap) return;
+    wrap.innerHTML = projFeatures.map(function (f, idx) {
+      return '<span class="aq-chip-tag">' + devEsc_(f) + '<button type="button" aria-label="حذف ' + devEsc_(f) + '" onclick="projRemoveFeature(' + idx + ')">' + ICON.x + '</button></span>';
+    }).join('');
+  }
+  function projAddFeature_() {
+    var input = document.getElementById('projFeatureInput');
+    var v = input.value.trim();
+    if (!v) return;
+    if (projFeatures.indexOf(v) === -1) projFeatures.push(v);
+    input.value = '';
+    projRenderFeatures_();
+    input.focus();
+  }
+  function projRemoveFeature(idx) { projFeatures.splice(idx, 1); projRenderFeatures_(); }
+  window.projRemoveFeature = projRemoveFeature;
+  document.getElementById('projFeatureAddBtn').addEventListener('click', projAddFeature_);
+  document.getElementById('projFeatureInput').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); projAddFeature_(); }
+  });
+
+  /* ---------- صورة الغلاف (Cover) - نفس نمط رفع لوجو المطوّر بالحرف الواحد ---------- */
+  var PROJ_COVER_TYPES = { 'image/png': 1, 'image/jpeg': 1, 'image/webp': 1 };
+  var PROJ_COVER_MAX = 5 * 1024 * 1024;
+  var projCoverPending = null;
+  function projCoverStatus_(text, tone) {
+    var el = document.getElementById('projCoverStatus'); if (!el) return;
+    el.textContent = text || ''; el.className = 'aq-logo-upload-status' + (tone ? ' is-' + tone : '');
+  }
+  function projCoverRender_() {
+    var tile = document.getElementById('projCoverPreviewTile'); if (!tile) return;
+    var current = document.getElementById('projCoverUrlInput').value.trim();
+    var has = !!(projCoverPending || current);
+    tile.innerHTML = projCoverPending ? ('<img src="' + projCoverPending.dataUrl + '" alt="">') : (current ? ('<img src="' + devEsc_(current) + '" alt="" onerror="this.parentNode.textContent=\'—\'">') : '—');
+    document.getElementById('projCoverChooseBtn').hidden = has;
+    document.getElementById('projCoverReplaceBtn').hidden = !has;
+    document.getElementById('projCoverRemoveBtn').hidden = !has;
+    document.getElementById('projCoverTitle').textContent = has
+      ? (projCoverPending ? 'صورة غلاف جديدة جاهزة — ستُرفع عند الحفظ' : 'صورة الغلاف الحالية للمشروع')
+      : 'اسحب صورة الغلاف هنا أو اختر من جهازك';
+  }
+  function projCoverSetCurrent(url) { projCoverPending = null; document.getElementById('projCoverUrlInput').value = url || ''; projCoverRender_(); }
+  function projCoverReset() {
+    projCoverPending = null;
+    document.getElementById('projCoverUrlInput').value = '';
+    var f = document.getElementById('projCoverFileInput'); if (f) f.value = '';
+    projCoverStatus_(''); projCoverRender_();
+  }
+  function projCoverHandleFile(file) {
+    if (!file) return;
+    if (!PROJ_COVER_TYPES[String(file.type).toLowerCase()]) { projCoverStatus_('صيغة غير مدعومة — المسموح PNG أو JPG أو WebP', 'err'); return; }
+    if (file.size > PROJ_COVER_MAX) { projCoverStatus_('الملف كبير جدًا — الحد 5 ميجابايت', 'err'); return; }
+    var reader = new FileReader();
+    reader.onload = function () {
+      var dataUrl = String(reader.result);
+      projCoverPending = { base64: dataUrl.split(',')[1], mime: file.type, dataUrl: dataUrl, name: file.name };
+      projCoverStatus_('تم اختيار «' + file.name + '» — ستُرفع عند الضغط على «حفظ بيانات المشروع»', 'ok');
+      projCoverRender_();
+    };
+    reader.onerror = function () { projCoverStatus_('تعذّر قراءة الملف', 'err'); };
+    reader.readAsDataURL(file);
+  }
+  function projCoverUploadThen_(btn, msg, projectName, proceed) {
+    if (!projCoverPending) { proceed(); return; }
+    btn.disabled = true; btn.textContent = 'جاري رفع صورة الغلاف...';
+    projCoverStatus_('جاري رفع صورة الغلاف…');
+    google.script.run
+      .withSuccessHandler(function (res) {
+        if (!res || !res.success) {
+          btn.disabled = false; btn.textContent = 'حفظ بيانات المشروع';
+          msg.style.color = 'var(--error-fg)'; msg.textContent = (res && res.message) || 'تعذّر رفع صورة الغلاف';
+          projCoverStatus_((res && res.message) || 'تعذّر رفع صورة الغلاف', 'err');
+          return;
+        }
+        document.getElementById('projCoverUrlInput').value = res.url;
+        projCoverPending = null;
+        projCoverStatus_('تم رفع صورة الغلاف', 'ok');
+        projCoverRender_();
+        proceed();
+      })
+      .withFailureHandler(function (err) {
+        btn.disabled = false; btn.textContent = 'حفظ بيانات المشروع';
+        msg.style.color = 'var(--error-fg)'; msg.textContent = 'تعذّر رفع صورة الغلاف: ' + (err && err.message);
+        projCoverStatus_('تعذّر رفع صورة الغلاف: ' + (err && err.message), 'err');
+      })
+      .uploadProjectImage(projMgmtAuth(), projectName, projCoverPending.base64, projCoverPending.mime);
+  }
+  (function wireProjCoverUpload() {
+    var zone = document.getElementById('projCoverDropzone'), fileIn = document.getElementById('projCoverFileInput');
+    if (!zone || !fileIn) return;
+    var pick = function () { fileIn.click(); };
+    document.getElementById('projCoverChooseBtn').addEventListener('click', pick);
+    document.getElementById('projCoverReplaceBtn').addEventListener('click', pick);
+    document.getElementById('projCoverPreviewTile').addEventListener('click', pick);
+    document.getElementById('projCoverRemoveBtn').addEventListener('click', function () {
+      var hadCurrent = !!document.getElementById('projCoverUrlInput').value.trim();
+      projCoverPending = null; document.getElementById('projCoverUrlInput').value = ''; fileIn.value = '';
+      projCoverStatus_(hadCurrent ? 'ستُزال صورة الغلاف الحالية عند الحفظ' : '', hadCurrent ? 'ok' : '');
+      projCoverRender_();
+    });
+    fileIn.addEventListener('change', function () { projCoverHandleFile(this.files && this.files[0]); });
+    ['dragenter', 'dragover'].forEach(function (ev) { zone.addEventListener(ev, function (e) { e.preventDefault(); zone.classList.add('drag-over'); }); });
+    ['dragleave', 'drop'].forEach(function (ev) { zone.addEventListener(ev, function (e) { e.preventDefault(); zone.classList.remove('drag-over'); }); });
+    zone.addEventListener('drop', function (e) { projCoverHandleFile(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]); });
+    zone.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target === zone) { e.preventDefault(); pick(); } });
+    projCoverRender_();
+  })();
+
+  /* ---------- معرض صور المشروع (Gallery) - نفس نمط صور الوحدة (رفع فوري)، بلا إعادة ترتيب ---------- */
+  var projGalleryImages = [];
+  var projGalleryUploadingCount = 0;
+  function projRenderGalleryPreview_() {
+    var wrap = document.getElementById('projGalleryPreview'); if (!wrap) return;
+    wrap.innerHTML = projGalleryImages.map(function (url, idx) {
+      return '<div class="image-thumb"><img src="' + devEsc_(url) + '" alt="" onclick="if (typeof openLightbox === \'function\') openLightbox(' + JSON.stringify(projGalleryImages).replace(/"/g, '&quot;') + ', ' + idx + ')"><button type="button" class="remove-img" onclick="projRemoveGalleryImage(' + idx + ')">' + ICON.x + '</button></div>';
+    }).join('');
+  }
+  function projRemoveGalleryImage(idx) { projGalleryImages.splice(idx, 1); projRenderGalleryPreview_(); }
+  window.projRemoveGalleryImage = projRemoveGalleryImage;
+  function projAddGalleryPlaceholder_() {
+    var wrap = document.getElementById('projGalleryPreview');
+    var div = document.createElement('div');
+    div.className = 'image-thumb';
+    div.innerHTML = '<div class="uploading-overlay">جاري الرفع...</div>';
+    wrap.appendChild(div);
+    return div;
+  }
+  function projUploadGalleryFile_(file) {
+    if (!file || !file.type || file.type.indexOf('image/') !== 0) return;
+    var currentProjectName = document.getElementById('projNameInput').value.trim();
+    if (!currentProjectName) {
+      document.getElementById('projGalleryUploadMsg').style.color = 'var(--error-fg)';
+      document.getElementById('projGalleryUploadMsg').textContent = 'اكتب اسم المشروع أولًا قبل رفع صور المعرض';
+      return;
+    }
+    projGalleryUploadingCount++;
+    var placeholder = projAddGalleryPlaceholder_();
+    document.getElementById('projGalleryUploadMsg').textContent = '';
+    var reader = new FileReader();
+    reader.onload = function () {
+      var base64Data = reader.result.split(',')[1];
+      google.script.run
+        .withSuccessHandler(function (res) {
+          projGalleryUploadingCount--;
+          placeholder.remove();
+          if (res && res.success) { projGalleryImages.push(res.url); projRenderGalleryPreview_(); }
+          else {
+            document.getElementById('projGalleryUploadMsg').style.color = 'var(--error-fg)';
+            document.getElementById('projGalleryUploadMsg').textContent = 'فشل رفع إحدى الصور: ' + ((res && res.message) || '');
+          }
+        })
+        .withFailureHandler(function (err) {
+          projGalleryUploadingCount--;
+          placeholder.remove();
+          document.getElementById('projGalleryUploadMsg').style.color = 'var(--error-fg)';
+          document.getElementById('projGalleryUploadMsg').textContent = 'حدث خطأ أثناء رفع الصورة: ' + (err && err.message);
+        })
+        .uploadProjectImage(projMgmtAuth(), currentProjectName, base64Data, file.type);
+    };
+    reader.readAsDataURL(file);
+  }
+  (function wireProjGallery() {
+    var zone = document.getElementById('projGalleryZone'), fileIn = document.getElementById('projGalleryFileInput'), chooseBtn = document.getElementById('projGalleryChooseBtn');
+    if (!zone || !fileIn || !chooseBtn) return;
+    chooseBtn.addEventListener('click', function () { fileIn.click(); });
+    fileIn.addEventListener('change', function () {
+      Array.from(fileIn.files).forEach(projUploadGalleryFile_);
+      fileIn.value = '';
+    });
+    zone.addEventListener('dragover', function (e) { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', function () { zone.classList.remove('drag-over'); });
+    zone.addEventListener('drop', function (e) {
+      e.preventDefault(); zone.classList.remove('drag-over');
+      Array.from(e.dataTransfer.files).forEach(projUploadGalleryFile_);
+    });
+    zone.addEventListener('paste', function (e) {
+      var items = (e.clipboardData || window.clipboardData).items;
+      for (var i = 0; i < items.length; i++) { if (items[i].type.indexOf('image') === 0) projUploadGalleryFile_(items[i].getAsFile()); }
+    });
+  })();
+
+  /* ---------- نموذج المشروع: وضع/تفريغ/تحميل للتعديل ---------- */
+  function projSetFormMode_(name) {
+    var b = document.getElementById('projFormModeBadge'); if (!b) return;
+    if (name) { b.textContent = 'وضع التعديل: ' + name; b.hidden = false; } else { b.textContent = ''; b.hidden = true; }
+  }
+  // إفراغ الحقول فقط - بلا لمس رسالة الحفظ (saveProjectMsg). نفس فصل Developer Profile
+  // بالضبط: مسار "بعد نجاح الحفظ" ومسار "زر تفريغ النموذج" لهما احتياجان مختلفان تجاه
+  // رسالة الحفظ (الأول يجب أن يُبقيها ظاهرة، الثاني يجب أن يمسحها) فلا تشتركان بدالة واحدة.
+  function projClearFormFields_() {
+    ['projNameInput', 'projDeveloperInput', 'projStatusInput', 'projCityInput', 'projDistrictInput',
+     'projDeliveryInput', 'projAreaInput', 'projDescInput', 'projEngInput', 'projMgmtInput', 'projLocationInput'
+    ].forEach(function (id) { var el = document.getElementById(id); if (el) el.value = ''; });
+    projFeatures = []; projRenderFeatures_();
+    projCoverReset();
+    projGalleryImages = []; projRenderGalleryPreview_();
+    document.getElementById('projGalleryUploadMsg').textContent = '';
+    projSetFormMode_(null);
+  }
+  // زر "تفريغ النموذج": نفس إفراغ الحقول + مسح رسالة الحفظ أيضًا (سلوك الزر نفسه لم يتغيّر).
+  function projClearForm_() {
+    projClearFormFields_();
+    document.getElementById('saveProjectMsg').textContent = '';
+  }
+  document.getElementById('clearProjectFormBtn').addEventListener('click', projClearForm_);
+
+  function editProject(p) {
+    document.getElementById('projNameInput').value = p['Project Name'] || '';
+    document.getElementById('projDeveloperInput').value = p['Developer Name'] || '';
+    document.getElementById('projStatusInput').value = p['Status'] || '';
+    document.getElementById('projCityInput').value = p['City'] || '';
+    document.getElementById('projDistrictInput').value = p['District'] || '';
+    document.getElementById('projDeliveryInput').value = p['Delivery Date'] || '';
+    document.getElementById('projAreaInput').value = p['Project Area'] || '';
+    document.getElementById('projDescInput').value = p['Description'] || '';
+    document.getElementById('projEngInput').value = p['Engineering Consultant'] || '';
+    document.getElementById('projMgmtInput').value = p['Management Company'] || '';
+    document.getElementById('projLocationInput').value = p['Location URL'] || '';
+    projFeatures = String(p['Features'] || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+    projRenderFeatures_();
+    projCoverSetCurrent(p['Cover Image URL'] || '');
+    var _f = document.getElementById('projCoverFileInput'); if (_f) _f.value = '';
+    projGalleryImages = String(p['Gallery Images'] || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+    projRenderGalleryPreview_();
+    projSetFormMode_(p['Project Name'] || '');
+    var card = document.getElementById('projFormCard');
+    if (card && card.scrollIntoView) card.scrollIntoView({ behavior: 'smooth', block: 'start' }); else window.scrollTo(0, 0);
+  }
+  window.editProject = editProject;
+
+  function removeProject(projectName) {
+    aqConfirm({ title: 'حذف المشروع', text: 'سيتم حذف ملف المشروع "' + projectName + '" نهائيًا. لن يتم حذف أي وحدة.', okText: 'حذف', danger: true }).then(function (confirmed) {
+      if (!confirmed) return;
+      google.script.run.withSuccessHandler(function (res) {
+        if (!res.success) { showToast(res.message, 'error'); return; }
+        showToast('تم حذف ملف المشروع', 'success');
+        var key = String(projectName || '').trim().toUpperCase();
+        if (__projectNamesCache) delete __projectNamesCache[key];
+        delete __projectProfileCache[key];
+        loadProjectsList();
+      }).deleteProjectProfile(projMgmtAuth(), projectName);
+    });
+  }
+  window.removeProject = removeProject;
+
+  function renderProjectsList(projects) {
+    var content = document.getElementById('projectsListContent');
+    var countEl = document.getElementById('projListCount');
+    if (countEl) countEl.textContent = projects.length ? (projects.length + ' مشروع مسجَّل — اضغط "تعديل" لتحميل البيانات في النموذج') : '';
+    if (!projects.length) {
+      content.innerHTML = '<div class="aq-empty" style="grid-column:1/-1"><h3>لا توجد مشروعات مسجَّلة بعد</h3><p>أضف أول ملف مشروع من النموذج أعلاه.</p></div>';
+      return;
+    }
+    content.innerHTML = projects.map(function (p) {
+      var name = String(p['Project Name'] || '');
+      var payload = JSON.stringify(p).replace(/&/g, '&amp;').replace(/'/g, '&#39;');
+      var nameJs = name.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      var cover = p['Cover Image URL'];
+      var tileHtml = cover ? ('<img src="' + devEsc_(cover) + '" alt="" loading="lazy" onerror="this.parentNode.textContent=\'' + devEsc_(devInitials_(name)).replace(/'/g, '') + '\'">') : devEsc_(devInitials_(name));
+      return '' +
+        '<article class="aq-dev-card">' +
+          '<div class="aq-logo-tile aq-logo-tile--lg">' + tileHtml + '</div>' +
+          '<div class="aq-list-body">' +
+            '<div class="aq-dev-card-name">' + devEsc_(name) + '</div>' +
+            '<div class="aq-dev-card-meta">' + devEsc_(p['Developer Name'] || 'بدون مطوّر مسجَّل') + '</div>' +
+          '</div>' +
+          '<div class="aq-dev-card-foot">' +
+            '<span class="aq-dev-card-year">' + devEsc_([p['City'], p['District']].filter(Boolean).join(' - ') || 'بلا مدينة/منطقة مسجَّلة') + '</span>' +
+            '<span class="aq-list-actions">' +
+              '<button type="button" class="aq-btn aq-btn--ghost aq-btn--icon" title="تعديل" aria-label="تعديل ' + devEsc_(name) + '" onclick=\'editProject(' + payload + ')\'>' + ICON.edit + '</button>' +
+              '<button type="button" class="aq-btn aq-btn--danger aq-btn--icon" title="حذف" aria-label="حذف ' + devEsc_(name) + '" onclick="removeProject(\'' + nameJs + '\')">' + ICON.trash + '</button>' +
+            '</span>' +
+          '</div>' +
+        '</article>';
+    }).join('');
+  }
+
+  function loadProjectsList() {
+    var content = document.getElementById('projectsListContent');
+    content.innerHTML = '<div class="aq-skeleton aq-skeleton--card"></div><div class="aq-skeleton aq-skeleton--card"></div><div class="aq-skeleton aq-skeleton--card"></div>';
+    google.script.run.withSuccessHandler(function (res) {
+      if (!res.success) { content.innerHTML = '<div class="aq-empty" style="grid-column:1/-1"><h3>تعذّر تحميل المشروعات</h3><p>' + devEsc_(res.message) + '</p></div>'; return; }
+      renderProjectsList(res.projects);
+      var dl = document.getElementById('projNameDatalist');
+      if (dl) dl.innerHTML = res.projects.map(function (p) { return '<option value="' + devEsc_(p['Project Name']) + '">'; }).join('');
+    }).getAllProjects(projMgmtAuth());
+  }
+
+  function loadProjectManagementSection() { loadProjectsList(); }
+  window.__aqarLoadProjects = function () {
+    if (typeof hasPermission === 'function' && !hasPermission('MANAGE_PROJECTS')) return;   // إدارة المشروعات — مالك فقط (authorizeOwnerAdmin_)
+    return loadProjectManagementSection.apply(this, arguments);
+  };
+
+  document.getElementById('saveProjectBtn').addEventListener('click', function () {
+    var btn = this;
+    var msg = document.getElementById('saveProjectMsg');
+    var projectName = document.getElementById('projNameInput').value.trim();
+    if (!projectName) { msg.style.color = 'var(--error-fg)'; msg.textContent = 'لازم تكتب اسم المشروع'; return; }
+
+    projCoverUploadThen_(btn, msg, projectName, function () {
+      btn.disabled = true; btn.textContent = 'جاري الحفظ...';
+      var projectData = {
+        'Project Name': projectName,
+        'Developer Name': document.getElementById('projDeveloperInput').value.trim(),
+        'City': document.getElementById('projCityInput').value.trim(),
+        'District': document.getElementById('projDistrictInput').value.trim(),
+        'Status': document.getElementById('projStatusInput').value.trim(),
+        'Delivery Date': document.getElementById('projDeliveryInput').value.trim(),
+        'Project Area': document.getElementById('projAreaInput').value.trim(),
+        'Description': document.getElementById('projDescInput').value.trim(),
+        'Engineering Consultant': document.getElementById('projEngInput').value.trim(),
+        'Management Company': document.getElementById('projMgmtInput').value.trim(),
+        'Features': projFeatures.join(','),
+        'Location URL': document.getElementById('projLocationInput').value.trim(),
+        'Cover Image URL': document.getElementById('projCoverUrlInput').value.trim(),
+        'Gallery Images': projGalleryImages.join(',')
+      };
+      google.script.run
+        .withSuccessHandler(function (res) {
+          btn.disabled = false; btn.textContent = 'حفظ بيانات المشروع';
+          msg.style.color = res.success ? 'var(--success-fg)' : 'var(--error-fg)';
+          msg.textContent = res.message;
+          if (res.success) {
+            var key = projectName.trim().toUpperCase();
+            if (!__projectNamesCache) __projectNamesCache = {};
+            __projectNamesCache[key] = true;
+            delete __projectProfileCache[key]; // تحديث القادم يجيب النسخة الجديدة
+            projClearFormFields_(); // إفراغ الحقول فقط - رسالة النجاح المضبوطة أعلاه تبقى ظاهرة (لا تُمسَح هنا)
+            loadProjectsList();
+          }
+        })
+        .withFailureHandler(function (err) {
+          btn.disabled = false; btn.textContent = 'حفظ بيانات المشروع';
+          msg.style.color = 'var(--error-fg)'; msg.textContent = 'حدث خطأ: ' + err.message;
+        })
+        .saveProjectProfile(projMgmtAuth(), projectData);
+    });
+  });
+
+  /* ============================================================
    * التنقّل الموحّد داخل نفس النافذة (SPA): البحث / إدخال وحدة / الإحصائيات والمخزون / لوحة التحكم
    * - كل الأقسام تُعرض داخل نفس المستند — مفيش iframe ولا صفحة منفصلة.
    * - التفويض لكل قسم مبنيّ على جلسة الدخول والدور فقط (gateHasPerm_ / hasPermission):
@@ -10784,13 +11445,13 @@
       }
     }
 
-    var DASH_PANEL_KEYS = ['home', 'developers', 'users', 'stats', 'profile', 'settings', 'audit'];
+    var DASH_PANEL_KEYS = ['home', 'developers', 'projects', 'users', 'stats', 'profile', 'settings', 'audit'];
     // المستوى الثاني (تفويض، مش مجرد إخفاء زر): أقسام إدارية حصرية للمالك — أي مستخدم غير
     // OWNER يُمنَع من فتحها حتى لو استُدعيت dashSelect برمجيًا / عبر hash / Console / API.
     // مرآة للباك-إند authorizeOwnerAdmin_ (OWNER فقط) — والباك-إند يعيد التحقق دائمًا.
-    var DASH_PANEL_OWNER_ONLY = { developers: 1, users: 1, settings: 1, audit: 1 };
+    var DASH_PANEL_OWNER_ONLY = { developers: 1, projects: 1, users: 1, settings: 1, audit: 1 };
     // حارس دفاعي إضافي بالصلاحية ("الإحصاءات والمخزون" = VIEW_STATISTICS، متاحة لكل الأدوار).
-    var DASH_PANEL_PERMS = { users: 'MANAGE_USERS', developers: 'MANAGE_DEVELOPERS', settings: 'MANAGE_SETTINGS', audit: 'MANAGE_USERS', stats: 'VIEW_STATISTICS' };
+    var DASH_PANEL_PERMS = { users: 'MANAGE_USERS', developers: 'MANAGE_DEVELOPERS', projects: 'MANAGE_PROJECTS', settings: 'MANAGE_SETTINGS', audit: 'MANAGE_USERS', stats: 'VIEW_STATISTICS' };
 
     // "الإحصائيات والمخزون" — يُعرَض داخل شِل لوحة التحكم: نُعيد توطين #statsView داخل
     // #dashStatsMount (مرة واحدة)، ثم نفتح موديول الإحصائيات ببيانات الدخول (VIEW_STATISTICS).
@@ -10840,6 +11501,7 @@
       else if (key === 'users' && typeof window.__aqarLoadUsers === 'function') window.__aqarLoadUsers();
       else if (key === 'settings') dashReparentSettingsOnce();
       else if (key === 'developers' && typeof window.__aqarLoadDevelopers === 'function') window.__aqarLoadDevelopers();
+      else if (key === 'projects' && typeof window.__aqarLoadProjects === 'function') window.__aqarLoadProjects();
       else if (key === 'audit' && typeof window.__aqarLoadAudit === 'function') window.__aqarLoadAudit();
     }
 
@@ -11537,6 +12199,7 @@
       profile:    function () { enterDashSection_('profile', true); },   // profileOnly لمن لا يملك VIEW_STATISTICS (كما كان)
       users:      function () { enterDashSection_('users'); },
       developers: function () { enterDashSection_('developers'); },
+      projects:   function () { enterDashSection_('projects'); },
       settings:   function () { enterDashSection_('settings'); },
       audit:      function () { enterDashSection_('audit'); }
     };
