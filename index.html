@@ -4413,6 +4413,7 @@
                   <p class="aq-logo-upload-hint">الصيغ المقبولة: PNG أو JPG أو WebP · الحد الأقصى 5 ميجابايت.</p>
                   <div class="aq-logo-upload-actions">
                     <button type="button" class="aq-btn--form-primary" id="projCoverChooseBtn">رفع صورة الغلاف</button>
+                    <button type="button" class="aq-btn--form-secondary" id="projCoverPasteBtn">لصق صورة</button>
                     <button type="button" class="aq-btn--form-secondary" id="projCoverReplaceBtn" hidden>تغيير الصورة</button>
                     <button type="button" class="aq-btn--form-danger" id="projCoverRemoveBtn" hidden>إزالة</button>
                   </div>
@@ -10767,7 +10768,54 @@
     ['dragleave', 'drop'].forEach(function (ev) { zone.addEventListener(ev, function (e) { e.preventDefault(); zone.classList.remove('drag-over'); }); });
     zone.addEventListener('drop', function (e) { projCoverHandleFile(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]); });
     zone.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target === zone) { e.preventDefault(); pick(); } });
+    // Ctrl+V/Cmd+V داخل منطقة الغلاف (بعد الضغط عليها) - بنفس دالة المعالجة/التحقق الحالية
+    // projCoverHandleFile بالحرف الواحد (نفس أنواع الصور المسموحة، نفس حد 5 ميجابايت،
+    // نفس تخزين Pending حتى الحفظ) - فقط رسالة واضحة لو الحافظة نص/رابط بلا صورة.
+    zone.addEventListener('paste', function (e) {
+      var items = (e.clipboardData || window.clipboardData).items;
+      var foundImage = false;
+      for (var i = 0; i < items.length; i++) { if (items[i].type.indexOf('image') === 0) { foundImage = true; projCoverHandleFile(items[i].getAsFile()); } }
+      if (!foundImage) projCoverStatus_('لا توجد صورة في الحافظة.', 'err');
+    });
     projCoverRender_();
+  })();
+
+  /* ---------- زر "لصق صورة" (صورة الغلاف) ----------
+   * نفس فلسفة زر لصق صورة معرض المشروع بالضبط - navigator.clipboard.read() لقراءة صورة
+   * الحافظة بضغطة واحدة (Chrome/Edge)، ثم تمريرها لـ projCoverHandleFile الموجودة أصلًا
+   * بلا أي تعديل عليها - فتُطبَّق نفس قواعد النوع/الحجم/التخزين Pending تلقائيًا. المتصفحات
+   * التي لا تدعم القراءة (أبرزها Safari) يبقى فيها الـ Ctrl+V اليدوي أعلاه يعمل كـ Fallback. */
+  (function wireProjCoverPasteBtn() {
+    var btn = document.getElementById('projCoverPasteBtn'), zone = document.getElementById('projCoverDropzone');
+    if (!btn || !zone) return;
+    btn.addEventListener('click', function () {
+      if (!navigator.clipboard || !navigator.clipboard.read) {
+        projCoverStatus_('تعذر الوصول إلى الحافظة. يمكنك رفع الصورة من الجهاز.', 'err');
+        zone.focus();
+        return;
+      }
+      navigator.clipboard.read().then(function (clipItems) {
+        var target = null, targetType = null;
+        for (var i = 0; i < clipItems.length; i++) {
+          var imgType = clipItems[i].types.find(function (t) { return t.indexOf('image/') === 0; });
+          if (imgType) { target = clipItems[i]; targetType = imgType; break; }
+        }
+        if (!target) { projCoverStatus_('لا توجد صورة في الحافظة.', 'err'); return; }
+        target.getType(targetType).then(function (blob) {
+          // Blob من Clipboard API بلا اسم ملف - نغلّفه بـ File باسم افتراضي فقط حتى تعمل
+          // رسالة projCoverHandleFile الحالية (تعرض file.name) بشكل سليم - نفس التحقق/التخزين
+          // الموجودَين بالفعل داخل الدالة بلا أي تعديل عليها.
+          var ext = (blob.type.split('/')[1] || 'png').replace('jpeg', 'jpg');
+          var namedFile = new File([blob], 'pasted-image.' + ext, { type: blob.type });
+          projCoverHandleFile(namedFile);
+        }).catch(function () {
+          projCoverStatus_('تعذر تجهيز الصورة، حاول مرة أخرى.', 'err');
+        });
+      }).catch(function () {
+        projCoverStatus_('تعذر الوصول إلى الحافظة. يمكنك رفع الصورة من الجهاز.', 'err');
+        zone.focus();
+      });
+    });
   })();
 
   /* ---------- معرض صور المشروع (Gallery) - نفس نمط صور الوحدة (رفع فوري)، بلا إعادة ترتيب ---------- */
