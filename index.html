@@ -5384,7 +5384,7 @@
   }
 
   function loadFilterOptions() {
-    google.script.run.withSuccessHandler(applyFilterOptionsToUI).getFilterOptions(getAuthCreds());
+    google.script.run.withSuccessHandler(applyFilterOptionsToUI).withFailureHandler(apiFailure_('تعذّر تحميل قوائم الفلاتر — تحقّق من الاتصال')).getFilterOptions(getAuthCreds());
   }
 
   // فلاتر المدينة والمنطقة المترابطة
@@ -5564,7 +5564,7 @@
       if (!res || !res.success) { if (c) c.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:24px;">حصل خطأ في التحميل</div>'; return; }
       lastPriceStats = res.districtStats;
       renderPriceStatsTable(lastPriceStats);
-    }).getDistrictPriceStats(getAuthCreds());
+    }).withFailureHandler(apiFailure_('تعذّر تحميل إحصاءات أسعار المناطق')).getDistrictPriceStats(getAuthCreds());
   };
   // "سعر المتر" — يفتح كصفحة داخل مساحة المحتوى الرئيسية (مش Modal). البيانات/المنطق كما هي.
   document.getElementById('priceInfoFabBtn').addEventListener('click', function() {
@@ -6212,6 +6212,34 @@
       return true;
     }
     return false;
+  }
+
+  /* ============================================================
+   * معالِجات فشل موحّدة لاستدعاءات google.script.run (2026-09-11)
+   * ------------------------------------------------------------
+   * المشكلة: محوّل google.script.run (أعلى الملف) عند الفشل بلا معالج فشل ينفّذ
+   * console.error فقط — أي أن أخطاء الشبكة/السيرفر تمرّ **صامتة تمامًا** بالنسبة
+   * للمستخدم: أزرار تبقى معطّلة "جاري الحفظ..." للأبد، شاشات تفضل فاضية بلا سبب،
+   * وعمليات حذف/حفظ لا يُعرف إن كانت نجحت أم لا.
+   *
+   * apiFailure_        → للعمليات التي يراها المستخدم: رسالة واضحة + تنظيف اختياري
+   *                      (إعادة تفعيل زر، إزالة هيكل تحميل... إلخ).
+   * backgroundFailure_ → للعمليات الخلفية غير الحرجة (نبضات/تسجيل نشاط): لا نزعج
+   *                      المستخدم برسالة، لكن نترك أثرًا صريحًا في الـ Console بدل
+   *                      ابتلاع الخطأ (وهذا هو السلوك الصحيح لها، لا إخفاء).
+   * ============================================================ */
+  function apiFailure_(userMessage, cleanupFn) {
+    return function (err) {
+      try { if (typeof cleanupFn === 'function') cleanupFn(err); } catch (e) {}
+      var detail = (err && err.message) ? (' — ' + err.message) : '';
+      try { console.error('[AqaR] ' + userMessage, err); } catch (e) {}
+      try { showToast(userMessage + detail, 'error'); } catch (e) {}
+    };
+  }
+  function backgroundFailure_(label) {
+    return function (err) {
+      try { console.warn('[AqaR] فشل خلفي غير حرج (' + label + '):', (err && err.message) ? err.message : err); } catch (e) {}
+    };
   }
   /* ============================================================
    * Phase 3C — AqarDataService: طبقة رقيقة موحّدة فوق الـ API shim القائم
@@ -7089,7 +7117,7 @@
       return;
     }
     // على اللابتوب/الكمبيوتر: نص بس مباشرة على واتساب (Web Share API بالصور مش مدعومة كويس هنا)
-    if (u['Unit ID']) google.script.run.logUnitActivity(u['Unit ID'], u['Project Name'], 'WhatsApp', getAuthCreds()); // عرض السعر التقديري بلا رقم وحدة — لا نسجّل نشاطًا
+    if (u['Unit ID']) google.script.run.withFailureHandler(backgroundFailure_('تسجيل نشاط الوحدة')).logUnitActivity(u['Unit ID'], u['Project Name'], 'WhatsApp', getAuthCreds()); // عرض السعر التقديري بلا رقم وحدة — لا نسجّل نشاطًا
     const lines = buildUnitShareText(u);
 
     const waDomain = ['h', 't', 't', 'p', 's', ':', '/', '/'].join('') + ['w', 'a', '.', 'm', 'e'].join('');
@@ -7186,7 +7214,7 @@
         showToast('الجهاز ده مش بيدعم مشاركة الصور، هتتشارك التفاصيل بس', 'error');
       }
 
-      google.script.run.logUnitActivity(shareImagesUnit['Unit ID'], shareImagesUnit['Project Name'], 'WhatsApp', getAuthCreds());
+      google.script.run.withFailureHandler(backgroundFailure_('تسجيل نشاط الوحدة')).logUnitActivity(shareImagesUnit['Unit ID'], shareImagesUnit['Project Name'], 'WhatsApp', getAuthCreds());
       await navigator.share(shareData);
       shareImagesModal.classList.remove('open');
     } catch (err) {
@@ -7249,7 +7277,7 @@
       pdfAgentPhoneInput.value = localStorage.getItem('pdfAgentPhone') || '';
     } catch (e) {}
     pdfContactModal.classList.add('open');
-    if (u['Unit ID']) google.script.run.logUnitActivity(u['Unit ID'], u['Project Name'], 'PDF', getAuthCreds()); // عرض سعر تقديري بلا رقم وحدة — لا نسجّل نشاطًا
+    if (u['Unit ID']) google.script.run.withFailureHandler(backgroundFailure_('تسجيل نشاط الوحدة')).logUnitActivity(u['Unit ID'], u['Project Name'], 'PDF', getAuthCreds()); // عرض سعر تقديري بلا رقم وحدة — لا نسجّل نشاطًا
   }
   window.downloadUnitPDF = downloadUnitPDF;
 
@@ -8788,7 +8816,7 @@
     });
     const sortedProjects = Array.from(allProjects).sort((a, b) => a.localeCompare(b, 'ar'));
     document.getElementById('f_projectDatalist').innerHTML = sortedProjects.map(p => `<option value="${p}">`).join('');
-  }).getDeveloperProjectMap(getAuthCreds());
+  }).withFailureHandler(apiFailure_('تعذّر تحميل قائمة المطوّرين والمشروعات')).getDeveloperProjectMap(getAuthCreds());
 
   function refreshEditProjectSuggestions() {
     const dev = editDeveloperInput.value.trim();
@@ -8834,7 +8862,7 @@
       if (typeDefaults.otherPaymentPlans) editForm.elements['otherPaymentPlans'].value = typeDefaults.otherPaymentPlans;
       calcEditMonthlyInstallment();
       showToast('اتملت بيانات الدفع والتشطيب تلقائيًا من آخر وحدة بنفس المشروع والنوع - راجعها وعدّل اللي محتاج تغيير', 'info');
-    }).getProjectTypeDefaults(dev, proj, currentType, getAuthCreds());
+    }).withFailureHandler(apiFailure_('تعذّر جلب بيانات آخر وحدة مشابهة')).getProjectTypeDefaults(dev, proj, currentType, getAuthCreds());
   }
   document.getElementById('editFetchLastSimilarBtn').addEventListener('click', editFetchLastSimilarUnitData);
 
@@ -9213,7 +9241,7 @@
                 editMsg.className = res2.success ? 'success' : 'error';
                 editMsg.textContent = res2.message;
                 if (res2.success) { clearClientSearchCache(); runSearch(); resetAddUnitFormAfterSuccess(res2.message); }
-              }).confirmAddAsSameUnit(data, res.matchUnitId);
+              }).withFailureHandler(apiFailure_('تعذّر تحديث الوحدة — لم يتم حفظ أي تعديل', function(){ try{ editSaveBtn.disabled=false; editSaveBtn.textContent='حفظ الوحدة الجديدة'; }catch(e){} })).confirmAddAsSameUnit(data, res.matchUnitId);
             });
             if (_canTermsUpdate) document.getElementById('editSameTermsBtn').addEventListener('click', function() {
               editSaveBtn.disabled = true; editSaveBtn.textContent = 'جاري تحديث السعر ونظام السداد...';
@@ -9241,7 +9269,7 @@
                 editMsg.className = res2.success ? 'success' : 'error';
                 editMsg.textContent = res2.message;
                 if (res2.success) { clearClientSearchCache(); runSearch(); resetAddUnitFormAfterSuccess(res2.message); }
-              }).updateUnitCommercialTerms(res.matchUnitId, _terms, getAuthCreds());
+              }).withFailureHandler(apiFailure_('تعذّر تحديث الشروط التجارية — لم يتم حفظ أي تعديل', function(){ try{ editSaveBtn.disabled=false; editSaveBtn.textContent='حفظ الوحدة الجديدة'; }catch(e){} })).updateUnitCommercialTerms(res.matchUnitId, _terms, getAuthCreds());
             });
             document.getElementById('editDifferentUnitBtn').addEventListener('click', function() {
               editSaveBtn.disabled = true; editSaveBtn.textContent = 'جاري الحفظ...';
@@ -9251,7 +9279,7 @@
                 editMsg.className = res2.success ? 'success' : 'error';
                 editMsg.textContent = res2.message;
                 if (res2.success) { clearClientSearchCache(); runSearch(); resetAddUnitFormAfterSuccess(res2.message); }
-              }).confirmAddAsNewUnit(data);
+              }).withFailureHandler(apiFailure_('تعذّر حفظ الوحدة الجديدة — لم يتم حفظ أي بيانات', function(){ try{ editSaveBtn.disabled=false; editSaveBtn.textContent='حفظ الوحدة الجديدة'; }catch(e){} })).confirmAddAsNewUnit(data);
             });
             return;
           }
@@ -9543,7 +9571,7 @@
     // 0) Phase 1B: أبطل الجلسة على السيرفر أولًا (fire-and-forget) — التوكن القديم يُرفض بعدها نهائيًا.
     try {
       var _tk = localStorage.getItem('aqarSession') || '';
-      if (_tk) google.script.run.logoutSession(_tk);
+      if (_tk) google.script.run.withFailureHandler(backgroundFailure_('إنهاء الجلسة على السيرفر')).logoutSession(_tk);
     } catch (e) {}
     // 1) أوقف كل المؤقتات/النبضات/المستمعات المرتبطة بجلسة المستخدم
     try { stopPresenceHeartbeat(); } catch (e) {}                                   // نبضة حضور المستخدم
@@ -9702,7 +9730,7 @@
   let visitorName = '';
 
   function sendHeartbeat() {
-    google.script.run.heartbeat(sessionId, visitorName, getAuthCreds());
+    google.script.run.withFailureHandler(backgroundFailure_('نبضة العدّاد')).heartbeat(sessionId, visitorName, getAuthCreds());
   }
 
   /* ---------- المرحلة 3.6+ — نبضة حضور المستخدم المُسجَّل دخول (Presence) ----------
@@ -9711,7 +9739,7 @@
   var __presenceHbTimer = null;
   function sendPresenceHeartbeat() {
     if (!window.__currentUser) return;
-    try { google.script.run.heartbeatPresence(getAuthCreds()); } catch (e) {}
+    try { google.script.run.withFailureHandler(backgroundFailure_('نبضة الحضور')).heartbeatPresence(getAuthCreds()); } catch (e) {}
   }
   function startPresenceHeartbeat() {
     if (__presenceHbTimer) return;           // نبضة واحدة فقط — التنقّل بين الأقسام ما يبدأش حلقات جديدة
@@ -9727,7 +9755,7 @@
   window.__aqarStopPresenceHeartbeat = stopPresenceHeartbeat;
   // محاولة أخيرة أفضل-جهد عند إغلاق الصفحة (مش المصدر الأساسي — المهلة في السيرفر هي الحكم).
   window.addEventListener('beforeunload', function () {
-    if (window.__currentUser) { try { google.script.run.heartbeatPresence(getAuthCreds()); } catch (e) {} }
+    if (window.__currentUser) { try { google.script.run.withFailureHandler(backgroundFailure_('نبضة الحضور')).heartbeatPresence(getAuthCreds()); } catch (e) {} }
   });
   // زرّ الرجوع / استعادة من bfcache بعد تسجيل الخروج: لو التبويب مُعلَّم بخروج متعمَّد
   // ولا يوجد دخول محفوظ → أعِد التحميل حتى لا تظهر نسخة قديمة من التطبيق كمستخدم مُصادَق.
@@ -9777,7 +9805,7 @@
         if (url) localStorage.setItem(COVER_URL_CACHE_KEY_, url);
         else localStorage.removeItem(COVER_URL_CACHE_KEY_);
       } catch (e) {}
-    }).getCoverImageUrl(getAuthCreds());
+    }).withFailureHandler(backgroundFailure_('صورة الغلاف (يبقى المعروض من الكاش المحلي)')).getCoverImageUrl(getAuthCreds());
   }
 
   /* ---------- لوحة تحكم المسؤول (مخفية، محمية بكلمة سر) ---------- */
@@ -9833,7 +9861,7 @@
           listDiv.innerHTML = '';
         }
       }
-    }).getActiveUsersCount(getAuthCreds());
+    }).withFailureHandler(apiFailure_('تعذّر تحميل عدد المتصلين الآن')).getActiveUsersCount(getAuthCreds());
   }
 
   document.getElementById('coverUploadBtn').addEventListener('click', function() {
@@ -10182,7 +10210,7 @@
         u.lastSeen = (p && p.lastSeen) ? p.lastSeen : (u.lastSeen || '');
       });
       umApplyPresenceInPlace();
-    }).getUsersPresence(umAuth());
+    }).withFailureHandler(apiFailure_('تعذّر تحميل حالة حضور المستخدمين')).getUsersPresence(umAuth());
   }
 
   function umStartPresencePoll() {
@@ -10540,7 +10568,7 @@
     google.script.run.withSuccessHandler(function (res) {
       var dl = document.getElementById('devProfileNameDatalist');
       if (dl && res && res.developers) dl.innerHTML = res.developers.map(function (d) { return '<option value="' + d + '">'; }).join('');
-    }).getDeveloperProjectMap(getAuthCreds());
+    }).withFailureHandler(apiFailure_('تعذّر تحميل قائمة المطوّرين والمشروعات')).getDeveloperProjectMap(getAuthCreds());
   }
   window.__aqarLoadDevelopers = function () {
     if (typeof hasPermission === 'function' && !hasPermission('MANAGE_USERS')) return;   // إدارة بيانات المطوّرين — مالك فقط (authorizeOwnerAdmin_)
@@ -10631,7 +10659,7 @@
     google.script.run.withSuccessHandler(function(res) {
       if (!res.success) { content.innerHTML = '<div class="aq-empty" style="grid-column:1/-1"><h3>تعذّر تحميل المطوّرين</h3><p>' + devEsc_(res.message) + '</p></div>'; return; }
       renderDevProfilesList(res.profiles);
-    }).getAllDeveloperProfiles(devMgmtAuth());
+    }).withFailureHandler(apiFailure_('تعذّر تحميل قائمة المطوّرين')).getAllDeveloperProfiles(devMgmtAuth());
   }
 
   function renderDevProfilesList(profiles) {
@@ -10686,7 +10714,7 @@
         if (!res.success) { showToast(res.message, 'error'); return; }
         showToast('تم حذف بيانات المطور', 'success');
         loadDevProfilesList();
-      }).deleteDeveloperProfile(devMgmtAuth(), developerName);
+      }).withFailureHandler(apiFailure_('تعذّر حذف بيانات المطوّر — لم يتم الحذف')).deleteDeveloperProfile(devMgmtAuth(), developerName);
     });
   }
   window.removeDevProfile = removeDevProfile;
@@ -11074,7 +11102,7 @@
     msg.style.display = 'none';
 
     google.script.run
-      .withSuccessHandler(function (res) {
+      .withFailureHandler(apiFailure_('تعذّر استخدام المساعدة بالذكاء الاصطناعي — يمكنك الإدخال يدويًا', function(){ try{ btn.disabled=false; btn.textContent='استخرج وحسّن تفاصيل المشروع'; }catch(e){} })).withSuccessHandler(function (res) {
         btn.disabled = false;
         btn.textContent = 'استخرج وحسّن تفاصيل المشروع';
         if (!res || !res.success) {
@@ -11166,7 +11194,7 @@
         if (__projectNamesCache) delete __projectNamesCache[key];
         delete __projectProfileCache[key];
         loadProjectsList();
-      }).deleteProjectProfile(projMgmtAuth(), projectName);
+      }).withFailureHandler(apiFailure_('تعذّر حذف ملف المشروع — لم يتم الحذف')).deleteProjectProfile(projMgmtAuth(), projectName);
     });
   }
   window.removeProject = removeProject;
@@ -11211,7 +11239,7 @@
       renderProjectsList(res.projects);
       var dl = document.getElementById('projNameDatalist');
       if (dl) dl.innerHTML = res.projects.map(function (p) { return '<option value="' + devEsc_(p['Project Name']) + '">'; }).join('');
-    }).getAllProjects(projMgmtAuth());
+    }).withFailureHandler(apiFailure_('تعذّر تحميل قائمة المشروعات')).getAllProjects(projMgmtAuth());
   }
 
   function loadProjectManagementSection() { loadProjectsList(); }
@@ -12675,7 +12703,7 @@
           var now = new Date();
           u.textContent = 'آخر تحديث: ' + now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
         }
-      }).getDashboardStats(currentPin);
+      }).withFailureHandler(apiFailure_('تعذّر تحميل الإحصائيات')).getDashboardStats(currentPin);
       loadPriceHistoryProjects();
       // أقسام مقيّدة: نُظهرها/نُخفيها ونستدعي الباك-إند فقط لمن يملك الصلاحية.
       // (الباك-إند يعيد التحقق لكل نداء بأي حال — هذا لمنع رسالة رفض بشعة للـ SALES.)
@@ -12721,7 +12749,7 @@
         tbody.querySelectorAll('tr[data-unit-id]').forEach(function (tr) {
           tr.addEventListener('click', function () { statsOpenUnit_(tr.getAttribute('data-unit-id')); });
         });
-      }).getMostViewedUnits(currentPin);
+      }).withFailureHandler(apiFailure_('تعذّر تحميل الوحدات الأكثر مشاهدة')).getMostViewedUnits(currentPin);
     }
 
     /* ---------- الأكتر طلبًا (استخدام فريق المبيعات: تصدير/مشاركة) ---------- */
@@ -12746,7 +12774,7 @@
         tbody.querySelectorAll('tr[data-unit-id]').forEach(function (tr) {
           tr.addEventListener('click', function () { statsOpenUnit_(tr.getAttribute('data-unit-id')); });
         });
-      }).getMostRequestedUnits(currentPin);
+      }).withFailureHandler(apiFailure_('تعذّر تحميل الوحدات الأكثر طلبًا')).getMostRequestedUnits(currentPin);
     }
 
     function renderSalesActivityKpis_(totalPdf, totalWa) {
@@ -12772,7 +12800,7 @@
         select.innerHTML = '<option value="">اختر مشروع...</option>' +
           res.projects.map(p => `<option value="${p}">${p}</option>`).join('');
         if (currentValue && res.projects.indexOf(currentValue) !== -1) select.value = currentValue;
-      }).getPriceHistoryProjects(currentPin);
+      }).withFailureHandler(apiFailure_('تعذّر تحميل مشروعات تاريخ الأسعار')).getPriceHistoryProjects(currentPin);
     }
 
     document.getElementById('priceHistoryProjectSelect').addEventListener('change', function() {
@@ -12786,7 +12814,7 @@
       google.script.run.withSuccessHandler(function(res) {
         if (!res.success) { content.innerHTML = '<div class="empty-note">' + res.message + '</div>'; return; }
         renderPriceHistoryChart(res.points);
-      }).getPriceHistoryForProject(currentPin, project);
+      }).withFailureHandler(apiFailure_('تعذّر تحميل تاريخ أسعار المشروع')).getPriceHistoryForProject(currentPin, project);
     });
 
     function renderPriceHistoryChart(points) {
@@ -13167,7 +13195,7 @@
           res.employees.map(e => `<option value="${e}">${e}</option>`).join('');
         if (currentValue && res.employees.indexOf(currentValue) !== -1) select.value = currentValue;
         renderActivityReport();   // عرض افتراضي فور توفر البيانات: ملخّص الشهر لكل الموظفين
-      }).getEntryActivityLog(currentPin);
+      }).withFailureHandler(apiFailure_('تعذّر تحميل سجل نشاط الإدخال')).getEntryActivityLog(currentPin);
     }
 
     /* آخر الأنشطة: تجميع محلي بالكامل لما هو محمَّل بالفعل (allActivityEntries) —
