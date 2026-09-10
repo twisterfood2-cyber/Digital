@@ -9396,8 +9396,11 @@
     // العادية بالظبط زي ما هي.
     document.getElementById('results').innerHTML = skeletonCardsHtml(6);
     document.getElementById('resultsCount').textContent = 'جاري تحميل العقارات...';
-    google.script.run
-      .withSuccessHandler(function(data) {
+
+    /* Perf fix (2026-09-11): نفس معالجات النجاح/الفشل السابقة بالحرف الواحد، لكن كدوال
+       مُسمّاة بدل دوال مجهولة داخل السلسلة — عشان نقدر نستهلك بها نتيجة "الجلب المسبق"
+       المتوازي (أدناه) أو ننادي السيرفر عاديًا. لا تغيير في أي سطر منطق بداخلها. */
+    function onInitialSearchData(data) {
         // لازم نتأكد إن الرد فعلاً شكله سليم قبل ما نعتبره نتيجة حقيقية -
         // رد ناقص أو غير متوقع مينفعش نتعامل معه على إنه "صفر نتائج"
         if (!data || !Array.isArray(data.units)) {
@@ -9428,8 +9431,8 @@
           try { buildDevelopersRow_(); } catch (e) {}
         }
         applyFilterOptionsToUI(data.filterOptions);
-      })
-      .withFailureHandler(function(err) {
+    }
+    function onInitialSearchDataFailure(err) {
         document.getElementById('results').innerHTML = `
           <div class="empty-state">
             <div class="icon">${ICON.alert}</div>
@@ -9439,8 +9442,31 @@
           </div>`;
         document.getElementById('resultsCount').textContent = '';
         loadFilterOptions(); // شبكة أمان - لو الطلب المجمّع فشل، قوائم الفلاتر تتحمل لوحدها على الأقل
-      })
-      .getInitialSearchData(getViewerAdminPin()); // السيرفر بيتحقق من الكلمة؛ العدّاد بيرجع للأدمن بس
+    }
+    function requestInitialSearchData() {
+      google.script.run
+        .withSuccessHandler(onInitialSearchData)
+        .withFailureHandler(onInitialSearchDataFailure)
+        .getInitialSearchData(getViewerAdminPin()); // السيرفر بيتحقق من الكلمة؛ العدّاد بيرجع للأدمن بس
+    }
+
+    /* Perf fix (2026-09-11) — استهلاك "الجلب المسبق" إن وُجد.
+       قياس حي: كل نداء Apps Script تكلفته الثابتة ~1.6 ثانية (حتى أرخص نداء بلا قراءة شيت)،
+       وكان التحميل تسلسليًا: validateSession (~2.2s) ← ثم getInitialSearchData (~2.5s) ≈ 4.7s
+       قبل ظهور أي محتوى. الآن يبدأ جلب بيانات الشاشة الأولى **بالتوازي** مع التحقق من الجلسة
+       (يُطلَق في كتلة استعادة الجلسة أدناه)، فيُوفَّر زمن أحد النداءين بالكامل.
+       Fail-safe بالتصميم: لو لم يوجد جلب مسبق، أو فشل، أو رجع بشكل غير متوقَّع → ننفّذ
+       requestInitialSearchData() الأصلية بالحرف، أي أسوأ حالة = سلوك اليوم نفسه بالضبط. */
+    var __pf = window.__aqarInitialPrefetch;
+    window.__aqarInitialPrefetch = null; // استهلاك لمرة واحدة فقط
+    if (__pf && typeof __pf.then === 'function') {
+      __pf.then(function (data) {
+        if (data && Array.isArray(data.units)) onInitialSearchData(data);
+        else requestInitialSearchData();
+      }, function () { requestInitialSearchData(); });
+    } else {
+      requestInitialSearchData();
+    }
 
     setTimeout(function() {
       visitorName = getVisitorName();
@@ -9449,10 +9475,16 @@
       try { localStorage.removeItem('adminPin'); } catch (e) {}
     }, 1000);
 
+    /* Perf fix (2026-09-11): كانت النبضة الأولى تنطلق بعد 1.5 ثانية — أي **داخل** نافذة تحميل
+       المحتوى الحرجة تمامًا، فتزاحم نداء البيانات على منافذ التنفيذ المتزامن المحدودة في
+       Apps Script (كل نداء تكلفته الثابتة ~1.6 ثانية مقيسة). النبضة ليست حرجة إطلاقًا (عدّاد
+       حضور)، فأُخِّرت إلى ما بعد استقرار المحتوى. والتواتر 45 → 90 ثانية: يظل داخل نافذة
+       "متصل الآن" (دقيقتان: ACTIVE_SESSION_TTL_MS/PRESENCE_ONLINE_MS_) فلا يتأثر العرض،
+       بينما ينخفض حِمل الباك-إند الخلفي للنصف (كان 160 تنفيذًا/ساعة لكل تبويب مفتوح). */
     setTimeout(function() {
       sendHeartbeat();
-      heartbeatTimer = setInterval(sendHeartbeat, 45000);   // مؤقّت عمر الجلسة — نُوقفه عند تسجيل الخروج
-    }, 1500);
+      heartbeatTimer = setInterval(sendHeartbeat, 90000);   // مؤقّت عمر الجلسة — نُوقفه عند تسجيل الخروج
+    }, 8000);
   }
   var heartbeatTimer = null;
 
@@ -9598,6 +9630,21 @@
     if (savedToken && !loggedOut) {
       // Phase 1B: استعادة الجلسة بالتحقق السيرفري من التوكن — كلمة السر لا تُخزَّن ولا تُرسَل هنا.
       window.__aqarAuthRestoring = true;
+
+      /* Perf fix (2026-09-11): ابدأ جلب بيانات الشاشة الأولى **بالتوازي** مع التحقق من الجلسة
+         بدل الانتظار التسلسلي (كان: validateSession ~2.2s ← ثم getInitialSearchData ~2.5s).
+         السيرفر يتحقق من التوكن داخل getInitialSearchData نفسها كالمعتاد، فلا تجاوز لأي تفويض:
+         لو التوكن غير صالح يرجع authRequired ويُعالَج بنفس المسار القائم. النتيجة تُستهلَك في
+         unlockApp، ولو غابت أو فشلت يعود التحميل للمسار الأصلي حرفيًا (fail-safe). */
+      try {
+        window.__aqarInitialPrefetch = new Promise(function (resolve) {
+          google.script.run
+            .withSuccessHandler(function (d) { resolve(d); })
+            .withFailureHandler(function () { resolve(null); })
+            .getInitialSearchData(getViewerAdminPin());
+        });
+      } catch (e) { window.__aqarInitialPrefetch = null; }
+
       google.script.run
         .withSuccessHandler(function (res) {
           if (res && res.success) {
@@ -9668,8 +9715,11 @@
   }
   function startPresenceHeartbeat() {
     if (__presenceHbTimer) return;           // نبضة واحدة فقط — التنقّل بين الأقسام ما يبدأش حلقات جديدة
-    sendPresenceHeartbeat();
-    __presenceHbTimer = setInterval(sendPresenceHeartbeat, 45000);
+    /* Perf fix (2026-09-11): كانت النبضة الأولى تنطلق فورًا مع تطبيق الدور (أي في قلب نافذة
+       التحميل)، وبتواتر 45 ثانية. أُخِّرت أول نبضة وخُفِّض التواتر للنصف — يظل داخل نافذة
+       "متصل الآن" (دقيقتان) فلا يتغيّر أي سلوك ظاهر للمستخدم. */
+    setTimeout(sendPresenceHeartbeat, 6000);
+    __presenceHbTimer = setInterval(sendPresenceHeartbeat, 90000);
   }
   function stopPresenceHeartbeat() {
     if (__presenceHbTimer) { clearInterval(__presenceHbTimer); __presenceHbTimer = null; }
@@ -9705,13 +9755,28 @@
     img.hidden = !has; if (empty) empty.hidden = has;
     if (state) { state.textContent = has ? 'صورة الغلاف مرفوعة' : 'لا توجد صورة'; state.className = 'aq-badge ' + (has ? 'aq-badge--success' : 'aq-badge--neutral'); }
   }
+  /* Perf fix (2026-09-11): رحلة شبكة كاملة (~1.7 ثانية مقيسة) لمجرد جلب رابط صورة الغلاف،
+     وكانت تنطلق داخل نافذة التحميل. صورة الغلاف نادرة التغيير، فنعرض الرابط المحفوظ محليًا
+     فورًا (بلا انتظار)، ثم نحدّثه في الخلفية ونخزّنه — فيبقى دائمًا محدَّثًا بلا تأخير للمستخدم. */
+  var COVER_URL_CACHE_KEY_ = 'aqarCoverUrl';
+  function applyCoverUrl_(url) {
+    if (url) {
+      document.getElementById('coverImg').src = url;
+      document.getElementById('coverWrap').classList.add('has-image');
+    }
+    syncSettingsCover_(url);
+  }
   function loadCoverImage() {
+    try {
+      var cached = localStorage.getItem(COVER_URL_CACHE_KEY_) || '';
+      if (cached) applyCoverUrl_(cached);   // عرض فوري بلا انتظار الشبكة
+    } catch (e) {}
     google.script.run.withSuccessHandler(function(url) {
-      if (url) {
-        document.getElementById('coverImg').src = url;
-        document.getElementById('coverWrap').classList.add('has-image');
-      }
-      syncSettingsCover_(url);
+      applyCoverUrl_(url);
+      try {
+        if (url) localStorage.setItem(COVER_URL_CACHE_KEY_, url);
+        else localStorage.removeItem(COVER_URL_CACHE_KEY_);
+      } catch (e) {}
     }).getCoverImageUrl(getAuthCreds());
   }
 
