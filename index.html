@@ -3661,17 +3661,27 @@
   </style>
 </head>
 <body>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!-- Perf fix (2026-09-10): المكتبات الثلاث (~232KB مضغوطة) كانت تُحمَّل بشكل حاجب (blocking)
+     في أعلى <body>، فتؤخّر تحليل بقية الصفحة وأول رسم قبل أن يبدأ سكربت التطبيق أصلًا.
+     ولا واحدة منها مستخدَمة وقت التحميل: jsPDF/html2canvas تُستدعيان فقط عند تصدير PDF
+     (بإجراء من المستخدم، ومع فحص وجودهما مسبقًا قبل الاستخدام)، وChart.js تُستدعى فقط عند
+     فتح شاشة "الإحصائيات والمخزون". defer يُبقي ترتيب التنفيذ بينها كما هو ويضمن اكتمالها
+     قبل DOMContentLoaded - أي قبل أي استخدام فعلي لها. -->
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <!-- Chart.js: used by the inline "الإحصائيات والمخزون" view (price-history line chart) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script>
   /* dark-theme defaults for Chart.js so axis ticks / grid lines stay readable on the navy panels */
-  if (window.Chart) {
-    Chart.defaults.color = 'rgba(234,240,246,0.72)';
-    Chart.defaults.borderColor = 'rgba(255,255,255,0.10)';
-    Chart.defaults.font.family = "'Cairo','Segoe UI',Tahoma,Arial,sans-serif";
-  }
+  /* Perf fix: بعد تحويل Chart.js إلى defer لم تعد مُحمَّلة وقت تنفيذ هذا السطر مباشرةً،
+     فنؤجّل الضبط إلى DOMContentLoaded (سكربتات defer تُنفَّذ بالكامل قبله) - نفس القيم بالضبط. */
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.Chart) {
+      Chart.defaults.color = 'rgba(234,240,246,0.72)';
+      Chart.defaults.borderColor = 'rgba(255,255,255,0.10)';
+      Chart.defaults.font.family = "'Cairo','Segoe UI',Tahoma,Arial,sans-serif";
+    }
+  });
 </script>
 
 <script>
