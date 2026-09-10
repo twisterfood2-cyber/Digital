@@ -5990,6 +5990,12 @@
       editMsg.className = '';
       editMsg.textContent = 'تم استنساخ بيانات الوحدة ' + unitId + ' وصورها - راجع كل حاجة (خصوصًا الدور والسعر والصور) قبل الحفظ';
       editMsg.style.display = 'block';
+    }).withFailureHandler(function(err) {
+      // Bug fix: نفس عيب loadUnitIntoEditForm بالضبط — النموذج يُفتح ويُفرَّغ قبل الاستدعاء،
+      // فأي فشل شبكة/سيرفر كان يترك نموذج الاستنساخ مفتوحًا فارغًا بلا رسالة، وزر "إضافة
+      // كوحدة جديدة" مُفعَّل (يُنشئ وحدة فارغة لو ضُغط). الآن: رسالة واضحة + إغلاق فوري.
+      showToast('تعذّر تحميل بيانات الوحدة للاستنساخ — تحقّق من الاتصال وحاول مرة أخرى', 'error');
+      closeEditModal();
     }).getUnitById(unitId, getAuthCreds());
   }
   window.cloneUnit = cloneUnit;
@@ -8931,6 +8937,14 @@
       // تحميل الصور الحالية
       editUnitImages = (u['Images'] || '').split(',').map(s => s.trim()).filter(Boolean);
       renderEditImagesPreview();
+    }).withFailureHandler(function(err) {
+      // Bug fix: النموذج يُفتح ويُفرَّغ (editModal.classList.add('open') + editForm.reset())
+      // **قبل** هذا الاستدعاء. بدون معالج فشل، أي فشل شبكة/سيرفر كان يمرّ صامتًا
+      // (console.error فقط في محوّل google.script.run) فيبقى نموذج التعديل مفتوحًا **فارغًا**
+      // بلا أي رسالة — وزر "حفظ التعديلات" مُفعَّل، فحفظه يكتب حقولًا فارغة فوق بيانات
+      // الوحدة الحقيقية (خطر فقدان بيانات). الآن: رسالة واضحة + إغلاق النموذج فورًا.
+      showToast('تعذّر تحميل بيانات الوحدة — تحقّق من الاتصال وحاول مرة أخرى', 'error');
+      closeEditModal();
     }).getUnitById(unitId, getAuthCreds());
   }
 
