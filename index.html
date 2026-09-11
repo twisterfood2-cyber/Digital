@@ -3626,6 +3626,11 @@
      * أعلى من تفاصيل الوحدة عشان مودال المشروع يظهر فوقها بأمان.
      * ============================================================ */
     #projectProfileModal { z-index: 1700; } /* أعلى من .unit-card-overlay (1650) وأقل من #aqConfirmModal (2200) */
+    /* (2026-09-11) نافذة بيانات وكيل PDF ونافذة اختيار صور المشاركة تُفتحان من داخل "تفاصيل الوحدة"
+       ويجب أن تظهرا فوقها (كانتا بـ .modal-overlay = 1600 أي خلف الـ overlay 1650، ولهذا كان يُغلق
+       قبل فتحهما). 1690 = فوق تفاصيل الوحدة (1650) وتحت الـ lightbox (1700) وأقل من #aqConfirmModal (2200).
+       #similarUnitsModal يبقى 1600 عمدًا لأن تفاصيل الوحدة تُفتح *من داخله* ويجب أن تعلوه. */
+    #pdfContactModal, #shareImagesModal { z-index: 1690; }
     .pp-chips { display: flex; flex-wrap: wrap; gap: 6px; }
     .aq-chip-input-row { display: flex; gap: 8px; }
     .aq-chip-input-row input { flex: 1; }
@@ -6174,7 +6179,7 @@
     OWNER:      ['*'],
     MANAGER:    CLIENT_BASE_PERMS.concat(['ADD_UNIT','EDIT_UNIT','DELETE_UNIT','CLONE_UNIT','CHANGE_UNIT_STATUS','VIEW_STATISTICS','UPDATE_UNIT_TERMS','VIEW_ADMIN_ANALYTICS']),
     DATA_ENTRY: CLIENT_BASE_PERMS.concat(['ADD_UNIT','UPDATE_UNIT_TERMS','VIEW_STATISTICS']),
-    SALES:      CLIENT_BASE_PERMS.concat(['VIEW_STATISTICS'])
+    SALES:      CLIENT_BASE_PERMS.concat(['VIEW_STATISTICS', 'CHANGE_UNIT_STATUS']) // (2026-09-11) + تغيير الحالة فقط — مطابق للباك-إند PERMISSIONS_BY_ROLE_.SALES
   };
   // هل يملك الدور الحالي أي صلاحية كتابة على الوحدات من نموذج الوحدة؟ (يقرّر ظهور زر الحفظ + حارس الإرسال)
   function canWriteUnitFromForm_() {
@@ -6595,12 +6600,17 @@
     const tile = (icon, label, value) => has(value) ? `<div class="ud-tile">${icon}<div class="ud-tile-txt"><span class="ud-tile-label">${label}</span><span class="ud-tile-value">${esc(value)}</span></div></div>` : '';
     const section = (icon, title, inner, extraClass) => inner ? `<section class="ud-sec ${extraClass || ''}"><h4 class="ud-sec-title">${icon}${title}</h4>${inner}</section>` : '';
 
-    /* ---------- الإجراءات: نفس الأزرار ونفس شروط الصلاحيات والدوال حرفيًا (بلا أي تغيير) ---------- */
+    /* ---------- الإجراءات: نفس الأزرار ونفس شروط الصلاحيات والدوال حرفيًا (بلا أي تغيير) ----------
+     * (2026-09-11) واتساب وPDF: أُزيل closeUnitCardOverlay() من بداية onclick لهذين الزرّين فقط.
+     * كان يُغلق تفاصيل الوحدة قبل تنفيذ الإجراء لأن نافذتَي PDF/اختيار الصور (.modal-overlay
+     * = z-index 1600) كانتا ستُفتحان **خلف** الـ overlay (1650). عولج بترتيب الطبقات في CSS
+     * (#pdfContactModal / #shareImagesModal = 1690)، فصار الإجراء يتم والنافذة تبقى مفتوحة.
+     * باقي الأزرار (تعديل/نسخ/مشابهة/المطوّر) تنتقل لشاشة أخرى، فإغلاقها أولًا مقصود ويبقى كما هو. */
     const actionsHtml = `
         <div class="ud-actions card-icon-row">
           ${uiAllows('EDIT_UNIT') ? `<button type="button" class="icon-action-btn ud-act-primary" onclick="closeUnitCardOverlay(); openEditModal('${u['Unit ID']}')" title="تعديل الوحدة">${ICON.edit}تعديل</button>` : ''}
-          <button type="button" class="icon-action-btn" onclick='closeUnitCardOverlay(); shareOnWhatsApp(${JSON.stringify(u)})' title="مشاركة على واتساب">${ICON.share}واتساب</button>
-          <button type="button" class="icon-action-btn" onclick='closeUnitCardOverlay(); downloadUnitPDF(${JSON.stringify(u)}, this)' title="تصدير PDF">${ICON.file}PDF</button>
+          <button type="button" class="icon-action-btn" onclick='shareOnWhatsApp(${JSON.stringify(u)})' title="مشاركة على واتساب">${ICON.share}واتساب</button>
+          <button type="button" class="icon-action-btn" onclick='downloadUnitPDF(${JSON.stringify(u)}, this)' title="تصدير PDF">${ICON.file}PDF</button>
           <button type="button" class="icon-action-btn" onclick='closeUnitCardOverlay(); showSimilarUnits(${JSON.stringify(u)})' title="وحدات مشابهة">${ICON.search}مشابهة</button>
           ${ hasPermission('CLONE_UNIT')
             ? `<button type="button" class="icon-action-btn" onclick="closeUnitCardOverlay(); cloneUnit('${u['Unit ID']}')" title="استنساخ الوحدة">${ICON.clipboard}نسخ</button>`
@@ -6971,7 +6981,7 @@
   }
 
   function changeStatus(unitId, newStatus) {
-    // Phase 1B: التفويض بجلسة المستخدم فقط — CHANGE_UNIT_STATUS (OWNER/MANAGER)، السيرفر يحسم.
+    // Phase 1B: التفويض بجلسة المستخدم فقط — CHANGE_UNIT_STATUS (OWNER/MANAGER/SALES منذ 2026-09-11)، السيرفر يحسم.
     var auth = getAuthCreds();
     google.script.run
       .withSuccessHandler(function (res) {
@@ -6979,7 +6989,31 @@
           showToast(res.message || 'غير مصرّح لك بتغيير حالة الوحدة', 'error');
           clearClientSearchCache();
           runSearch(); // نرجّع العرض للحالة الحقيقية من السيرفر
+          return;
         }
+        /* (2026-09-11) كان معالج النجاح فارغًا: الحالة تتغيّر في الشيت لكن الكارت في "استكشف"
+           والذاكرة (lastResults) وشارة الحالة داخل تفاصيل الوحدة تبقى على القيمة القديمة حتى
+           بحث/تحميل جديد. الآن: تحديث محلي من نفس القيمة التي أكّدها السيرفر — بلا أي نداء
+           شبكة إضافي (كاش الكلاينت يُمسح فقط حتى لا يُعيد نتيجة قديمة). لا تغيير في منطق التحديث. */
+        try {
+          var rec = (typeof lastResults !== 'undefined' && lastResults && lastResults.find)
+            ? lastResults.find(function (x) { return x['Unit ID'] === unitId; }) : null;
+          if (rec) rec['Status'] = newStatus;
+          clearClientSearchCache();
+          // شارات الحالة داخل نافذة التفاصيل المفتوحة (إن وُجدت) — نفس الكلاس ونفس النص
+          var body = document.getElementById('unitCardOverlayBody');
+          if (body) {
+            Array.prototype.forEach.call(body.querySelectorAll('.status-badge'), function (b) {
+              b.classList.remove('متاح', 'محجوز', 'مباع'); b.classList.add(newStatus);
+              b.innerHTML = '<i class="status-dot"></i>' + newStatus;
+            });
+          }
+          // إعادة رسم كروت "استكشف" من الذاكرة (نفس النمط المستخدم في الملف عند تغيير الترتيب)
+          if (document.body.classList.contains('app-view-explore') && typeof renderResults === 'function') {
+            renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
+          }
+          showToast('تم تحديث حالة الوحدة إلى "' + newStatus + '"', 'success');
+        } catch (e) { /* تحديث عرض فقط — لا يؤثر على نجاح العملية نفسها */ }
       })
       .withFailureHandler(function () { /* صامت - تغيير الحالة وظيفة ثانوية */ })
       .updateUnitStatus(unitId, newStatus, auth);
