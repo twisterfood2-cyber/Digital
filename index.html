@@ -5299,12 +5299,32 @@
 
   // تصغير مقاس صور جوجل درايف لعرضها كصورة كارت صغيرة (بدل تحميل الحجم الكامل 1000px
   // لصورة هتتعرض في مساحة صغيرة جدًا - ده أكبر سبب لبطء ظهور الصور على الموبايل)
+  // الصور الجديدة على Cloudflare R2 (img.aqaratdigital.com): القاعدة بتخزّن رابط full فقط، والنسخة المصغّرة card
+  // بنفس الاسم تحت /card/ بدل /full/ — بنشتقّها هنا للعرض فقط (روابط Drive القديمة وأي رابط تاني زي ما هم).
+  var R2_IMG_BASE = 'https://img.aqaratdigital.com/';
+  function isR2ImageUrl_(url) { return typeof url === 'string' && url.indexOf(R2_IMG_BASE) === 0; }
+  function r2CardUrl_(url) {
+    if (!isR2ImageUrl_(url)) return url;
+    return url.replace(/^(https:\/\/img\.aqaratdigital\.com\/(?:units|projects)\/)full\//, '$1card/');
+  }
   function getThumbUrl(url) {
     if (!url) return url;
+    if (isR2ImageUrl_(url)) return r2CardUrl_(url); // R2: full → card (للمصغّرات فقط)
     if (url.indexOf('drive.google.com') === -1) return url; // روابط خارجية نسيبها زي ما هي
     if (url.indexOf('sz=w') !== -1) return url.replace(/sz=w\d+/, 'sz=w400');
     if (url.indexOf('thumbnail?id=') !== -1) return url + '&sz=w400';
     return url;
+  }
+  // الصورة الرئيسية في التفاصيل/المعرض: R2 → full كما هو مخزّن؛ Drive → نفس سلوك getThumbUrl القديم بدون تغيير
+  function getMainImageUrl_(url) { return isR2ImageUrl_(url) ? url : getThumbUrl(url); }
+  // لو نسخة card مش موجودة لأي سبب: نرجع لـ full مرة واحدة فقط (بدون loop) — للروابط R2 فقط
+  function thumbFallback_(img) {
+    if (!img || img.getAttribute('data-full-tried') === '1') return false;
+    var s = img.getAttribute('src') || '';
+    if (!isR2ImageUrl_(s) || s.indexOf('/card/') === -1) return false;
+    img.setAttribute('data-full-tried', '1');
+    img.src = s.replace('/card/', '/full/');
+    return true;
   }
 
   // بيانات المدن والمناطق التابعة لها - مشتركة بين شاشة الإدخال وشاشة البحث
@@ -6470,7 +6490,7 @@
         </div>`;
     const coverHtml = images.length > 0 ? `
       <div class="unit-cover">
-        <img src="${getThumbUrl(images[0])}" alt="صورة الوحدة" loading="lazy" decoding="async">
+        <img src="${getThumbUrl(images[0])}" alt="صورة الوحدة" loading="lazy" decoding="async" onerror="thumbFallback_(this)">
         ${coverStrip}
       </div>` : `<div class="unit-cover unit-cover-empty">${coverStrip}</div>`;
 
@@ -6582,7 +6602,7 @@
     /* ---------- المعرض: الحاوية هي التي تحدد المساحة (نسبة ثابتة) وليس الصورة ---------- */
     const mediaHtml = images.length > 0 ? `
       <div class="ud-media" onclick='udGalleryOpenLightbox()'>
-        <img src="${getThumbUrl(images[0])}" alt="صورة الوحدة" loading="lazy" decoding="async">
+        <img src="${getMainImageUrl_(images[0])}" alt="صورة الوحدة" loading="lazy" decoding="async">
         <span class="status-badge ud-media-status ${u['Status']}"><i class="status-dot"></i>${u['Status']}</span>
         ${images.length > 1 ? `
         <button type="button" class="ud-nav ud-nav-prev" onclick="event.stopPropagation(); udGalleryNav(-1)" aria-label="الصورة السابقة">${ICON.chevronLeft}</button>
@@ -6593,7 +6613,7 @@
           ${images.length > 1 ? `<span class="img-count-badge">${ICON.camera} <span class="ud-counter" dir="ltr">1 / ${images.length}</span></span>` : ''}
         </div>
       </div>
-      ${images.length > 1 ? `<div class="ud-thumbs">${images.map((img, idx) => `<img src="${getThumbUrl(img)}" alt="" loading="lazy" class="${idx === 0 ? 'active' : ''}" onclick="event.stopPropagation(); udGallerySelect(${idx})">`).join('')}</div>` : ''}
+      ${images.length > 1 ? `<div class="ud-thumbs">${images.map((img, idx) => `<img src="${getThumbUrl(img)}" alt="" loading="lazy" class="${idx === 0 ? 'active' : ''}" onerror="thumbFallback_(this)" onclick="event.stopPropagation(); udGallerySelect(${idx})">`).join('')}</div>` : ''}
     ` : `<div class="ud-media ud-media-empty">${ICON.image}<span>لا توجد صور لهذه الوحدة</span></div>`;
 
     /* ---------- بلاطة معلومة: أيقونة + تسمية + قيمة (تظهر فقط إن وُجدت القيمة) ---------- */
@@ -7055,7 +7075,7 @@
   function udGalleryRender() {
     const mainImg = document.querySelector('#unitCardOverlayBody .ud-media img');
     if (!mainImg || !udGalleryImages.length) return;
-    mainImg.src = getThumbUrl(udGalleryImages[udGalleryIndex]);
+    mainImg.src = getMainImageUrl_(udGalleryImages[udGalleryIndex]);
     document.querySelectorAll('#unitCardOverlayBody .ud-thumbs img').forEach((t, i) => {
       t.classList.toggle('active', i === udGalleryIndex);
     });
@@ -7549,7 +7569,7 @@
       return `
         <div style="display:flex; gap:12px; background:var(--white); border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:10px; align-items:center;">
           <div style="display:flex; gap:12px; align-items:center; flex:1; min-width:0; cursor:pointer;" onclick='showUnitCardOverlay(${JSON.stringify(u)})' title="عرض كارت الوحدة">
-            ${coverImg ? `<img src="${getThumbUrl(coverImg)}" style="width:70px; height:70px; border-radius:8px; object-fit:cover; flex-shrink:0;" loading="lazy">` : `<div style="width:70px; height:70px; border-radius:8px; background:var(--bg); flex-shrink:0; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:11px;">لا صورة</div>`}
+            ${coverImg ? `<img src="${getThumbUrl(coverImg)}" style="width:70px; height:70px; border-radius:8px; object-fit:cover; flex-shrink:0;" loading="lazy" onerror="thumbFallback_(this)">` : `<div style="width:70px; height:70px; border-radius:8px; background:var(--bg); flex-shrink:0; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:11px;">لا صورة</div>`}
             <div style="flex:1; min-width:0;">
               <div style="font-weight:800; color:var(--navy); font-size:13px;">${u['Property Type'] || ''} - ${u['Unit Area (sqm)'] || '-'} م²</div>
               <div style="font-size:11px; color:var(--muted); margin-top:2px;">${u['Project Name'] || ''} - ${u['Area/District'] || ''}</div>
@@ -7659,7 +7679,7 @@
 
     var galleryImgs = String(res['Gallery Images'] || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
     var galleryHtml = galleryImgs.length ? section(ICON.image, 'صور المشروع',
-      '<div class="ud-thumbs">' + galleryImgs.map(function (img, idx) { return '<img src="' + ppEsc_(img) + '" alt="" loading="lazy" onclick=\'openLightbox(' + JSON.stringify(galleryImgs) + ', ' + idx + ')\'>'; }).join('') + '</div>') : '';
+      '<div class="ud-thumbs">' + galleryImgs.map(function (img, idx) { return '<img src="' + ppEsc_(r2CardUrl_(img)) + '" alt="" loading="lazy" onerror="thumbFallback_(this)" onclick=\'openLightbox(' + JSON.stringify(galleryImgs) + ', ' + idx + ')\'>'; }).join('') + '</div>') : '';
 
     return '' +
       '<div class="ud-top"><h3 class="ud-top-title">' + ICON.building + ' ملف المشروع</h3></div>' +
@@ -8404,7 +8424,7 @@
           const dataUrl = imageResolver(u);
           return dataUrl ? `<img src="${dataUrl}" style="width:100%;height:90px;object-fit:cover;border-radius:8px;">` : '-';
         }
-        return imgs[0] ? `<img src="${getThumbUrl(imgs[0])}" style="width:100%;height:90px;object-fit:cover;border-radius:8px;" loading="lazy">` : '-';
+        return imgs[0] ? `<img src="${getThumbUrl(imgs[0])}" style="width:100%;height:90px;object-fit:cover;border-radius:8px;" loading="lazy" onerror="thumbFallback_(this)">` : '-';
       }},
       { label: 'نوع العقار', get: u => u['Property Type'] || '-' },
       { label: 'المطور', get: u => u['Developer Name'] || '-' },
@@ -9034,7 +9054,7 @@
   function renderEditImagesPreview() {
     editImagesPreview.innerHTML = editUnitImages.map((url, idx) => `
       <div class="image-thumb" draggable="true" data-idx="${idx}">
-        <img src="${url}" alt="صورة الوحدة" onclick="if (typeof openLightbox === 'function') openLightbox(editUnitImages, ${idx})">
+        <img src="${r2CardUrl_(url)}" alt="صورة الوحدة" onerror="thumbFallback_(this)" onclick="if (typeof openLightbox === 'function') openLightbox(editUnitImages, ${idx})">
         <button type="button" class="remove-img" onclick="removeEditUnitImage(${idx})">${ICON.x}</button>
       </div>
     `).join('');
@@ -10975,7 +10995,7 @@
   function projRenderGalleryPreview_() {
     var wrap = document.getElementById('projGalleryPreview'); if (!wrap) return;
     wrap.innerHTML = projGalleryImages.map(function (url, idx) {
-      return '<div class="image-thumb"><img src="' + devEsc_(url) + '" alt="" onclick="if (typeof openLightbox === \'function\') openLightbox(' + JSON.stringify(projGalleryImages).replace(/"/g, '&quot;') + ', ' + idx + ')"><button type="button" class="remove-img" onclick="projRemoveGalleryImage(' + idx + ')">' + ICON.x + '</button></div>';
+      return '<div class="image-thumb"><img src="' + devEsc_(r2CardUrl_(url)) + '" alt="" onerror="thumbFallback_(this)" onclick="if (typeof openLightbox === \'function\') openLightbox(' + JSON.stringify(projGalleryImages).replace(/"/g, '&quot;') + ', ' + idx + ')"><button type="button" class="remove-img" onclick="projRemoveGalleryImage(' + idx + ')">' + ICON.x + '</button></div>';
     }).join('');
   }
   function projRemoveGalleryImage(idx) { projGalleryImages.splice(idx, 1); projRenderGalleryPreview_(); }
@@ -11246,7 +11266,7 @@
       var payload = JSON.stringify(p).replace(/&/g, '&amp;').replace(/'/g, '&#39;');
       var nameJs = name.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
       var cover = p['Cover Image URL'];
-      var tileHtml = cover ? ('<img src="' + devEsc_(cover) + '" alt="" loading="lazy" onerror="this.parentNode.textContent=\'' + devEsc_(devInitials_(name)).replace(/'/g, '') + '\'">') : devEsc_(devInitials_(name));
+      var tileHtml = cover ? ('<img src="' + devEsc_(r2CardUrl_(cover)) + '" alt="" loading="lazy" onerror="if(!thumbFallback_(this)){this.parentNode.textContent=\'' + devEsc_(devInitials_(name)).replace(/'/g, '') + '\'}">') : devEsc_(devInitials_(name));
       return '' +
         '<article class="aq-dev-card">' +
           '<div class="aq-logo-tile aq-logo-tile--lg">' + tileHtml + '</div>' +
