@@ -5318,6 +5318,13 @@
   // الصورة الرئيسية في التفاصيل/المعرض: R2 → full كما هو مخزّن؛ Drive → نفس سلوك getThumbUrl القديم بدون تغيير
   function getMainImageUrl_(url) { return isR2ImageUrl_(url) ? url : getThumbUrl(url); }
   // لو نسخة card مش موجودة لأي سبب: نرجع لـ full مرة واحدة فقط (بدون loop) — للروابط R2 فقط
+  // ---- تهريب HTML للقيم القادمة من القاعدة/المستخدم قبل دمجها في قوالب innerHTML (تصحيح Stored XSS — REPORTS/041) ----
+  // escHtml_: نص/قيمة سمة داخل علامات اقتباس · attrJs_: نص كـ JS string literal داخل سمة onclick · attrJson_: كائن JSON داخل سمة onclick
+  function escHtml_(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
+  function attrJs_(v) { return escHtml_(JSON.stringify(String(v == null ? '' : v))); }
+  function attrJson_(o) { return escHtml_(JSON.stringify(o)); }
+  // نسخة من كائن الوحدة كل قيمه النصية مهرَّبة — للقوالب الكبيرة (PDF) اللي بتعرض عشرات الحقول كنص فقط
+  function escUnitFields_(u) { var out = {}; if (u && typeof u === 'object') { for (var k in u) { if (Object.prototype.hasOwnProperty.call(u, k)) out[k] = (typeof u[k] === 'string') ? escHtml_(u[k]) : u[k]; } } return out; }
   function thumbFallback_(img) {
     if (!img || img.getAttribute('data-full-tried') === '1') return false;
     var s = img.getAttribute('src') || '';
@@ -5404,7 +5411,7 @@
       });
     });
     const developerValues = (opts.developers || []).slice().sort((a, b) => a.localeCompare(b, 'ar'));
-    document.getElementById('f_developerDatalist').innerHTML = developerValues.map(v => `<option value="${v}">`).join('');
+    document.getElementById('f_developerDatalist').innerHTML = developerValues.map(v => `<option value="${escHtml_(v)}">`).join('');
     restoreDropdownFilters();
   }
 
@@ -6483,14 +6490,14 @@
      * (openCardDetailsFromEl_) يقرأ رقم الوحدة منها. */
     const coverStrip = `
         <div class="unit-cover-strip">
-          <span class="status-badge ${u['Status']}"><i class="status-dot"></i>${u['Status']}</span>
+          <span class="status-badge ${escHtml_(u['Status'])}"><i class="status-dot"></i>${escHtml_(u['Status'])}</span>
           <i class="cover-strip-divider"></i>
-          <span class="unit-id">${u['Unit ID']}</span>
+          <span class="unit-id">${escHtml_(u['Unit ID'])}</span>
           ${images.length > 1 ? `<span class="img-count-badge">${ICON.camera} ${images.length}</span>` : ''}
         </div>`;
     const coverHtml = images.length > 0 ? `
       <div class="unit-cover">
-        <img src="${getThumbUrl(images[0])}" alt="صورة الوحدة" loading="lazy" decoding="async" onerror="thumbFallback_(this)">
+        <img src="${escHtml_(getThumbUrl(images[0]))}" alt="صورة الوحدة" loading="lazy" decoding="async" onerror="thumbFallback_(this)">
         ${coverStrip}
       </div>` : `<div class="unit-cover unit-cover-empty">${coverStrip}</div>`;
 
@@ -6512,7 +6519,7 @@
     }
 
     // شريحة مواصفة: أيقونة + قيمة (بارزة) + تسمية صغيرة - سطر واحد للحفاظ على ارتفاع الكارت
-    const chip = (icon, value, label) => `<span class="spec-chip">${icon}<span class="spec-txt"><b>${value}</b><small>${label}</small></span></span>`;
+    const chip = (icon, value, label) => `<span class="spec-chip">${icon}<span class="spec-txt"><b>${escHtml_(value)}</b><small>${label}</small></span></span>`;
     /* ترتيب العرض الثابت (أولوية منطقية، لا ترتيب الحقول الخام) - بصريًا من اليمين لليسار
      * لأن شبكة .unit-specs مضبوطة صراحةً على direction:rtl (أول عنصر في DOM = أقصى اليمين):
      *   الصف 1: المساحة ← الغرف ← الحمامات
@@ -6545,7 +6552,7 @@
               <span class="price-old-label">السعر قبل الخصم</span>
               <span class="old-price">${fmtNum(u['Price'])} جنيه</span>
             </div>
-            <span class="discount-tag">${ICON.tag} خصم ${u['Discount Percentage']}%</span>
+            <span class="discount-tag">${ICON.tag} خصم ${escHtml_(u['Discount Percentage'])}%</span>
           </div>
           <div class="price-center">
             <div class="final-price">${fmtNum(u['Price After Discount'])} <span class="cur">جنيه</span></div>
@@ -6561,27 +6568,27 @@
 
     const added = cardDate_(u['Date Added']), updated = cardDate_(u['Last Updated']);
     const metaLine = (added || updated) ? `
-        <div class="unit-meta-line">${ICON.calendar}<span>${added ? 'أضيفت ' + added : ''}${added && updated ? ' <i>•</i> ' : ''}${updated ? 'آخر تعديل ' + updated : ''}</span></div>` : '';
+        <div class="unit-meta-line">${ICON.calendar}<span>${added ? 'أضيفت ' + escHtml_(added) : ''}${added && updated ? ' <i>•</i> ' : ''}${updated ? 'آخر تعديل ' + escHtml_(updated) : ''}</span></div>` : '';
 
     return `
-    <div class="unit-card status-${u['Status']}" role="button" tabindex="0"
-         aria-label="عرض تفاصيل الوحدة ${u['Unit ID']} - ${u['Property Type']}${u['Project Name'] ? ' - ' + u['Project Name'] : ''}">
+    <div class="unit-card status-${escHtml_(u['Status'])}" role="button" tabindex="0"
+         aria-label="عرض تفاصيل الوحدة ${escHtml_(u['Unit ID'])} - ${escHtml_(u['Property Type'])}${u['Project Name'] ? ' - ' + escHtml_(u['Project Name']) : ''}">
       ${coverHtml}
       ${priceDropBadge}
-      <button type="button" class="fav-btn ${isFavorite(u['Unit ID']) ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite('${u['Unit ID']}', this, ${currentPrice})" title="إضافة للمفضلة" aria-label="إضافة للمفضلة" aria-pressed="${isFavorite(u['Unit ID']) ? 'true' : 'false'}">${ICON.heart}</button>
+      <button type="button" class="fav-btn ${isFavorite(u['Unit ID']) ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite(${attrJs_(u['Unit ID'])}, this, ${currentPrice})" title="إضافة للمفضلة" aria-label="إضافة للمفضلة" aria-pressed="${isFavorite(u['Unit ID']) ? 'true' : 'false'}">${ICON.heart}</button>
       <label class="compare-checkbox" title="إضافة للمقارنة" onclick="event.stopPropagation()">
-        <input type="checkbox" ${compareList.indexOf(u['Unit ID']) !== -1 ? 'checked' : ''} onchange="toggleCompare('${u['Unit ID']}', this)" aria-label="إضافة للمقارنة">
+        <input type="checkbox" ${compareList.indexOf(u['Unit ID']) !== -1 ? 'checked' : ''} onchange="toggleCompare(${attrJs_(u['Unit ID'])}, this)" aria-label="إضافة للمقارنة">
       </label>
       <div class="unit-info-block">
-        <div class="unit-title"><span class="unit-title-name">${u['Project Name'] || u['City']}</span> <span class="unit-title-type">- ${u['Property Type']}</span></div>
-        <div class="unit-loc">${ICON.pin} ${u['City']} - ${u['Area/District']}</div>
+        <div class="unit-title"><span class="unit-title-name">${escHtml_(u['Project Name'] || u['City'])}</span> <span class="unit-title-type">- ${escHtml_(u['Property Type'])}</span></div>
+        <div class="unit-loc">${ICON.pin} ${escHtml_(u['City'])} - ${escHtml_(u['Area/District'])}</div>
         ${row1.length ? `<div class="unit-specs">${row1.join('')}</div>` : ''}
         ${row2.length ? `<div class="unit-specs unit-specs-2">${row2.join('')}</div>` : ''}
         ${row3.length ? `<div class="unit-specs unit-specs-3">${row3.join('')}</div>` : ''}
       </div>
       <div class="unit-card-footer">
         ${priceHtml}
-        ${u['Developer Name'] ? `<div class="unit-dev-row">${ICON.building}<span class="dev-label">المطور:</span> <span class="dev-name">${u['Developer Name']}</span></div>` : ''}
+        ${u['Developer Name'] ? `<div class="unit-dev-row">${ICON.building}<span class="dev-label">المطور:</span> <span class="dev-name">${escHtml_(u['Developer Name'])}</span></div>` : ''}
         ${metaLine}
       </div>
     </div>`;
@@ -6596,14 +6603,14 @@
     const resalePurchasePPM = Number(u['Resale Price Per Meter At Purchase']) || 0;
     const resaleCurrentPPM = Number(u['Resale Current Price Per Meter']) || 0;
     const resalePPMDiff = (resalePurchasePPM > 0 && resaleCurrentPPM > 0) ? (resaleCurrentPPM - resalePurchasePPM) : null;
-    const esc = (v) => String(v == null ? '' : v);
+    const esc = escHtml_;
     const has = (v) => v !== undefined && v !== null && String(v).trim() !== '';
 
     /* ---------- المعرض: الحاوية هي التي تحدد المساحة (نسبة ثابتة) وليس الصورة ---------- */
     const mediaHtml = images.length > 0 ? `
       <div class="ud-media" onclick='udGalleryOpenLightbox()'>
-        <img src="${getMainImageUrl_(images[0])}" alt="صورة الوحدة" loading="lazy" decoding="async">
-        <span class="status-badge ud-media-status ${u['Status']}"><i class="status-dot"></i>${u['Status']}</span>
+        <img src="${escHtml_(getMainImageUrl_(images[0]))}" alt="صورة الوحدة" loading="lazy" decoding="async">
+        <span class="status-badge ud-media-status ${esc(u['Status'])}"><i class="status-dot"></i>${esc(u['Status'])}</span>
         ${images.length > 1 ? `
         <button type="button" class="ud-nav ud-nav-prev" onclick="event.stopPropagation(); udGalleryNav(-1)" aria-label="الصورة السابقة">${ICON.chevronLeft}</button>
         <button type="button" class="ud-nav ud-nav-next" onclick="event.stopPropagation(); udGalleryNav(1)" aria-label="الصورة التالية">${ICON.chevronRight}</button>
@@ -6613,7 +6620,7 @@
           ${images.length > 1 ? `<span class="img-count-badge">${ICON.camera} <span class="ud-counter" dir="ltr">1 / ${images.length}</span></span>` : ''}
         </div>
       </div>
-      ${images.length > 1 ? `<div class="ud-thumbs">${images.map((img, idx) => `<img src="${getThumbUrl(img)}" alt="" loading="lazy" class="${idx === 0 ? 'active' : ''}" onerror="thumbFallback_(this)" onclick="event.stopPropagation(); udGallerySelect(${idx})">`).join('')}</div>` : ''}
+      ${images.length > 1 ? `<div class="ud-thumbs">${images.map((img, idx) => `<img src="${escHtml_(getThumbUrl(img))}" alt="" loading="lazy" class="${idx === 0 ? 'active' : ''}" onerror="thumbFallback_(this)" onclick="event.stopPropagation(); udGallerySelect(${idx})">`).join('')}</div>` : ''}
     ` : `<div class="ud-media ud-media-empty">${ICON.image}<span>لا توجد صور لهذه الوحدة</span></div>`;
 
     /* ---------- بلاطة معلومة: أيقونة + تسمية + قيمة (تظهر فقط إن وُجدت القيمة) ---------- */
@@ -6628,17 +6635,17 @@
      * باقي الأزرار (تعديل/نسخ/مشابهة/المطوّر) تنتقل لشاشة أخرى، فإغلاقها أولًا مقصود ويبقى كما هو. */
     const actionsHtml = `
         <div class="ud-actions card-icon-row">
-          ${uiAllows('EDIT_UNIT') ? `<button type="button" class="icon-action-btn ud-act-primary" onclick="closeUnitCardOverlay(); openEditModal('${u['Unit ID']}')" title="تعديل الوحدة">${ICON.edit}تعديل</button>` : ''}
-          <button type="button" class="icon-action-btn" onclick='shareOnWhatsApp(${JSON.stringify(u)})' title="مشاركة على واتساب">${ICON.share}واتساب</button>
-          <button type="button" class="icon-action-btn" onclick='downloadUnitPDF(${JSON.stringify(u)}, this)' title="تصدير PDF">${ICON.file}PDF</button>
-          <button type="button" class="icon-action-btn" onclick='closeUnitCardOverlay(); showSimilarUnits(${JSON.stringify(u)})' title="وحدات مشابهة">${ICON.search}مشابهة</button>
+          ${uiAllows('EDIT_UNIT') ? `<button type="button" class="icon-action-btn ud-act-primary" onclick="closeUnitCardOverlay(); openEditModal(${attrJs_(u['Unit ID'])})" title="تعديل الوحدة">${ICON.edit}تعديل</button>` : ''}
+          <button type="button" class="icon-action-btn" onclick='shareOnWhatsApp(${attrJson_(u)})' title="مشاركة على واتساب">${ICON.share}واتساب</button>
+          <button type="button" class="icon-action-btn" onclick='downloadUnitPDF(${attrJson_(u)}, this)' title="تصدير PDF">${ICON.file}PDF</button>
+          <button type="button" class="icon-action-btn" onclick='closeUnitCardOverlay(); showSimilarUnits(${attrJson_(u)})' title="وحدات مشابهة">${ICON.search}مشابهة</button>
           ${ hasPermission('CLONE_UNIT')
-            ? `<button type="button" class="icon-action-btn" onclick="closeUnitCardOverlay(); cloneUnit('${u['Unit ID']}')" title="استنساخ الوحدة">${ICON.clipboard}نسخ</button>`
+            ? `<button type="button" class="icon-action-btn" onclick="closeUnitCardOverlay(); cloneUnit(${attrJs_(u['Unit ID'])})" title="استنساخ الوحدة">${ICON.clipboard}نسخ</button>`
             : (currentUserRole() === 'SALES')
-              ? `<button type="button" class="icon-action-btn" onclick="closeUnitCardOverlay(); salesOpenUnitView('${u['Unit ID']}')" title="فتح الوحدة">${ICON.clipboard}نسخ</button>`
+              ? `<button type="button" class="icon-action-btn" onclick="closeUnitCardOverlay(); salesOpenUnitView(${attrJs_(u['Unit ID'])})" title="فتح الوحدة">${ICON.clipboard}نسخ</button>`
               : ''}
         </div>`;
-    const statusSelectHtml = uiAllows('CHANGE_UNIT_STATUS') ? `<select class="status-select ud-status-select" onchange="changeStatus('${u['Unit ID']}', this.value)" title="تغيير حالة الوحدة">
+    const statusSelectHtml = uiAllows('CHANGE_UNIT_STATUS') ? `<select class="status-select ud-status-select" onchange="changeStatus(${attrJs_(u['Unit ID'])}, this.value)" title="تغيير حالة الوحدة">
             <option value="متاح" ${u['Status']==='متاح'?'selected':''}>متاح</option>
             <option value="محجوز" ${u['Status']==='محجوز'?'selected':''}>محجوز</option>
             <option value="مباع" ${u['Status']==='مباع'?'selected':''}>مباع</option>
@@ -6653,7 +6660,7 @@
     const projectIsClickable = has(projectNameRaw);
     const projectNameDisplay = esc(projectNameRaw || u['City']);
     const projectNameLinkHtml = projectIsClickable
-      ? `<a class="ud-link" href="javascript:void(0)" onclick='event.stopPropagation(); showProjectProfile(${JSON.stringify(projectNameRaw)}, ${JSON.stringify(u['Project Location URL'] || '')})'>${projectNameDisplay}</a>`
+      ? `<a class="ud-link" href="javascript:void(0)" onclick='event.stopPropagation(); showProjectProfile(${attrJson_(projectNameRaw)}, ${attrJson_(u['Project Location URL'] || '')})'>${projectNameDisplay}</a>`
       : projectNameDisplay;
 
     /* ---------- الملخّص (يمين المعرض على الشاشات العريضة) ---------- */
@@ -6666,7 +6673,7 @@
         <div class="ud-name">${projectNameLinkHtml}</div>
         <div class="ud-type">${esc(u['Property Type'])}</div>
         <div class="ud-locline">${ICON.pin} ${esc(u['City'])} - ${esc(u['Area/District'])}</div>
-        <div class="ud-status-row"><span class="status-badge ${u['Status']}"><i class="status-dot"></i>${u['Status']}</span>${statusSelectHtml}</div>
+        <div class="ud-status-row"><span class="status-badge ${esc(u['Status'])}"><i class="status-dot"></i>${esc(u['Status'])}</span>${statusSelectHtml}</div>
         ${section(ICON.clipboard, 'البيانات الأساسية', `<div class="ud-tiles ud-tiles-basic">
           ${tile(ICON.area, 'المساحة', u['Unit Area (sqm)'] ? u['Unit Area (sqm)'] + ' م²' : '')}
           ${tile(ICON.building, 'نوع العقار', u['Property Type'])}
@@ -6747,8 +6754,8 @@
         <div class="resale-row-grid">
           ${u['Resale Paid Amount'] ? `<div class="resale-item"><span class="resale-label">المدفوع حتى الآن</span><span class="resale-value">${fmtNum(u['Resale Paid Amount'])} جنيه</span></div>` : ''}
           ${u['Resale Remaining Amount'] ? `<div class="resale-item"><span class="resale-label">المتبقي على الوحدة</span><span class="resale-value">${fmtNum(u['Resale Remaining Amount'])} جنيه</span></div>` : ''}
-          ${u['Resale Over Price'] ? `<div class="resale-item highlight"><span class="resale-label">الأوفر المطلوب</span><span class="resale-value">${u['Resale Over Price']}</span></div>` : ''}
-          ${u['Resale Remaining Period'] ? `<div class="resale-item"><span class="resale-label">الفترة المتبقية للسداد</span><span class="resale-value">${u['Resale Remaining Period']}</span></div>` : ''}
+          ${u['Resale Over Price'] ? `<div class="resale-item highlight"><span class="resale-label">الأوفر المطلوب</span><span class="resale-value">${esc(u['Resale Over Price'])}</span></div>` : ''}
+          ${u['Resale Remaining Period'] ? `<div class="resale-item"><span class="resale-label">الفترة المتبقية للسداد</span><span class="resale-value">${esc(u['Resale Remaining Period'])}</span></div>` : ''}
           ${resalePurchasePPM ? `<div class="resale-item"><span class="resale-label">سعر المتر عند الشراء</span><span class="resale-value">${fmtNum(resalePurchasePPM)} ج/م²</span></div>` : ''}
           ${resaleCurrentPPM ? `<div class="resale-item"><span class="resale-label">سعر المتر الحالي بالشركة</span><span class="resale-value">${fmtNum(resaleCurrentPPM)} ج/م²</span></div>` : ''}
           ${resalePPMDiff !== null ? `<div class="resale-item highlight"><span class="resale-label">فرق سعر المتر</span><span class="resale-value">${resalePPMDiff >= 0 ? '+' : ''}${fmtNum(resalePPMDiff)} ج/م²</span></div>` : ''}
@@ -6757,10 +6764,10 @@
     const financeHtml = section(ICON.wallet, 'التفاصيل المالية', `${priceHero}${finTiles ? `<div class="ud-tiles">${finTiles}</div>` : ''}${resaleHtml}`, 'ud-sec-finance');
 
     /* ---------- معلومات المشروع ---------- */
-    const devTile = u['Developer Name'] ? `<div class="ud-tile">${ICON.building}<div class="ud-tile-txt"><span class="ud-tile-label">المطور</span><a class="ud-tile-value ud-link" href="javascript:void(0)" onclick='closeUnitCardOverlay(); showDeveloperProfile(${JSON.stringify(u['Developer Name'])})'>${esc(u['Developer Name'])}</a></div></div>` : '';
+    const devTile = u['Developer Name'] ? `<div class="ud-tile">${ICON.building}<div class="ud-tile-txt"><span class="ud-tile-label">المطور</span><a class="ud-tile-value ud-link" href="javascript:void(0)" onclick='closeUnitCardOverlay(); showDeveloperProfile(${attrJson_(u['Developer Name'])})'>${esc(u['Developer Name'])}</a></div></div>` : '';
     // نفس منطق ud-name أعلاه بالحرف الواحد: رابط دومًا لو موجود اسم مشروع (بنفس فلسفة بلاطة "المطور").
     // بخلاف بلاطة "المطور" - لا نغلق تفاصيل الوحدة عند الضغط (ملف المشروع يظهر فوقها).
-    const projTile = ppHas_(projectNameRaw) ? `<div class="ud-tile">${ICON.building}<div class="ud-tile-txt"><span class="ud-tile-label">اسم المشروع</span><span class="ud-tile-value">${projectIsClickable ? `<a class="ud-link" href="javascript:void(0)" onclick='event.stopPropagation(); showProjectProfile(${JSON.stringify(projectNameRaw)}, ${JSON.stringify(u['Project Location URL'] || '')})'>${esc(projectNameRaw)}</a>` : esc(projectNameRaw)}</span></div></div>` : '';
+    const projTile = ppHas_(projectNameRaw) ? `<div class="ud-tile">${ICON.building}<div class="ud-tile-txt"><span class="ud-tile-label">اسم المشروع</span><span class="ud-tile-value">${projectIsClickable ? `<a class="ud-link" href="javascript:void(0)" onclick='event.stopPropagation(); showProjectProfile(${attrJson_(projectNameRaw)}, ${attrJson_(u['Project Location URL'] || '')})'>${esc(projectNameRaw)}</a>` : esc(projectNameRaw)}</span></div></div>` : '';
     const projTiles = [
       projTile,
       devTile,
@@ -7200,8 +7207,8 @@
         <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px;">
           ${images.map((img, i) => `
             <label style="position:relative; display:block; cursor:pointer;">
-              <img src="${img}" style="width:100%; height:90px; object-fit:cover; border-radius:8px; border:2px solid var(--border);">
-              <input type="checkbox" class="share-img-checkbox" value="${img}" checked style="position:absolute; top:6px; left:6px; width:18px; height:18px; cursor:pointer;">
+              <img src="${escHtml_(img)}" style="width:100%; height:90px; object-fit:cover; border-radius:8px; border:2px solid var(--border);">
+              <input type="checkbox" class="share-img-checkbox" value="${escHtml_(img)}" checked style="position:absolute; top:6px; left:6px; width:18px; height:18px; cursor:pointer;">
             </label>
           `).join('')}
         </div>
@@ -7423,9 +7430,9 @@
       <div style="background:linear-gradient(155deg, var(--navy-soft) 0%, var(--navy-deep) 100%); border:1px solid var(--border-gold); border-radius:16px; padding:22px 18px; margin-bottom:16px; text-align:center; position:relative; overflow:hidden;">
         <div style="position:absolute; top:-30px; left:-30px; width:100px; height:100px; background:rgba(201,154,46,0.12); border-radius:50%;"></div>
         <div style="position:absolute; bottom:-40px; right:-20px; width:120px; height:120px; background:rgba(201,154,46,0.08); border-radius:50%;"></div>
-        ${res.logoUrl ? `<img src="${res.logoUrl}" style="max-width:130px; max-height:70px; object-fit:contain; margin-bottom:10px; position:relative;">` : ''}
-        <div style="color:var(--text-light); font-size:18px; font-weight:800; position:relative;">${res.developerName}</div>
-        ${res.foundedYear ? `<div style="color:var(--gold-soft); font-size:12px; font-weight:700; margin-top:4px; position:relative;">تأسست عام ${res.foundedYear}</div>` : ''}
+        ${res.logoUrl ? `<img src="${escHtml_(res.logoUrl)}" style="max-width:130px; max-height:70px; object-fit:contain; margin-bottom:10px; position:relative;">` : ''}
+        <div style="color:var(--text-light); font-size:18px; font-weight:800; position:relative;">${escHtml_(res.developerName)}</div>
+        ${res.foundedYear ? `<div style="color:var(--gold-soft); font-size:12px; font-weight:700; margin-top:4px; position:relative;">تأسست عام ${escHtml_(res.foundedYear)}</div>` : ''}
       </div>
 
       ${res.ownerName ? `
@@ -7433,20 +7440,20 @@
         <div style="width:38px; height:38px; border-radius:50%; background:var(--navy); color:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">${ICON.user}</div>
         <div>
           <div style="color:var(--muted); font-size:11px; font-weight:700;">صاحب الشركة</div>
-          <div style="color:var(--navy); font-size:14px; font-weight:800;">${res.ownerName}</div>
+          <div style="color:var(--navy); font-size:14px; font-weight:800;">${escHtml_(res.ownerName)}</div>
         </div>
       </div>` : ''}
 
       ${res.description ? `
       <div style="border-right:3px solid var(--gold); background:var(--bg); border-radius:0 12px 12px 0; padding:14px 16px; margin-bottom:12px;">
         <div style="color:var(--gold-dark); font-size:12px; font-weight:800; margin-bottom:6px; display:flex; align-items:center; gap:6px;">${ICON.info} نبذة عن الشركة</div>
-        <div style="color:var(--text); font-size:13px; line-height:1.9; white-space:pre-wrap;">${res.description}</div>
+        <div style="color:var(--text); font-size:13px; line-height:1.9; white-space:pre-wrap;">${escHtml_(res.description)}</div>
       </div>` : ''}
 
       ${res.previousWorks ? `
       <div style="border-right:3px solid var(--navy); background:var(--bg); border-radius:0 12px 12px 0; padding:14px 16px; margin-bottom:16px;">
         <div style="color:var(--navy); font-size:12px; font-weight:800; margin-bottom:6px; display:flex; align-items:center; gap:6px;">${ICON.award} أعمال سابقة</div>
-        <div style="color:var(--text); font-size:13px; line-height:1.9; white-space:pre-wrap;">${res.previousWorks}</div>
+        <div style="color:var(--text); font-size:13px; line-height:1.9; white-space:pre-wrap;">${escHtml_(res.previousWorks)}</div>
       </div>` : ''}
 
       ${buttonsHtml}
@@ -7523,7 +7530,7 @@
         </div>
 
         <div style="margin-top:auto;background:#0f2942;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
-          <span style="font-size:12px;color:#fff;font-weight:700;">${agentName || 'Digital Real Estate Team'}${agentPhone ? ' — ' : ''}<span style="color:#ecd08c;">${agentPhone || ''}</span></span>
+          <span style="font-size:12px;color:#fff;font-weight:700;">${escHtml_(agentName || 'Digital Real Estate Team')}${agentPhone ? ' — ' : ''}<span style="color:#ecd08c;">${escHtml_(agentPhone || '')}</span></span>
           <span style="font-size:9px;color:#9fb0c2;white-space:nowrap;">Contact Info</span>
         </div>
         <div style="padding:10px 20px;text-align:center;font-size:10px;color:#9aa4ae;">
@@ -7568,15 +7575,15 @@
       // مستقل عن زر واتساب (شقيقه في نفس الصف)، فلا تعارض نقر بينهما ولا حاجة لـ stopPropagation.
       return `
         <div style="display:flex; gap:12px; background:var(--white); border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:10px; align-items:center;">
-          <div style="display:flex; gap:12px; align-items:center; flex:1; min-width:0; cursor:pointer;" onclick='showUnitCardOverlay(${JSON.stringify(u)})' title="عرض كارت الوحدة">
-            ${coverImg ? `<img src="${getThumbUrl(coverImg)}" style="width:70px; height:70px; border-radius:8px; object-fit:cover; flex-shrink:0;" loading="lazy" onerror="thumbFallback_(this)">` : `<div style="width:70px; height:70px; border-radius:8px; background:var(--bg); flex-shrink:0; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:11px;">لا صورة</div>`}
+          <div style="display:flex; gap:12px; align-items:center; flex:1; min-width:0; cursor:pointer;" onclick='showUnitCardOverlay(${attrJson_(u)})' title="عرض كارت الوحدة">
+            ${coverImg ? `<img src="${escHtml_(getThumbUrl(coverImg))}" style="width:70px; height:70px; border-radius:8px; object-fit:cover; flex-shrink:0;" loading="lazy" onerror="thumbFallback_(this)">` : `<div style="width:70px; height:70px; border-radius:8px; background:var(--bg); flex-shrink:0; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:11px;">لا صورة</div>`}
             <div style="flex:1; min-width:0;">
-              <div style="font-weight:800; color:var(--navy); font-size:13px;">${u['Property Type'] || ''} - ${u['Unit Area (sqm)'] || '-'} م²</div>
-              <div style="font-size:11px; color:var(--muted); margin-top:2px;">${u['Project Name'] || ''} - ${u['Area/District'] || ''}</div>
+              <div style="font-weight:800; color:var(--navy); font-size:13px;">${escHtml_(u['Property Type'] || '')} - ${escHtml_(u['Unit Area (sqm)'] || '-')} م²</div>
+              <div style="font-size:11px; color:var(--muted); margin-top:2px;">${escHtml_(u['Project Name'] || '')} - ${escHtml_(u['Area/District'] || '')}</div>
               <div style="font-weight:800; color:var(--gold); font-size:14px; margin-top:4px;">${fmtNum(u['Price'])} جنيه</div>
             </div>
           </div>
-          <button type="button" onclick='shareOnWhatsApp(${JSON.stringify(u)})' style="flex-shrink:0; padding:8px 12px; border:none; border-radius:8px; background:#4FA579; color:#fff; font-weight:700; font-size:11px; cursor:pointer;">واتساب</button>
+          <button type="button" onclick='shareOnWhatsApp(${attrJson_(u)})' style="flex-shrink:0; padding:8px 12px; border:none; border-radius:8px; background:#4FA579; color:#fff; font-weight:700; font-size:11px; cursor:pointer;">واتساب</button>
         </div>
       `;
     }).join('');
@@ -7679,7 +7686,7 @@
 
     var galleryImgs = String(res['Gallery Images'] || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
     var galleryHtml = galleryImgs.length ? section(ICON.image, 'صور المشروع',
-      '<div class="ud-thumbs">' + galleryImgs.map(function (img, idx) { return '<img src="' + ppEsc_(r2CardUrl_(img)) + '" alt="" loading="lazy" onerror="thumbFallback_(this)" onclick=\'openLightbox(' + JSON.stringify(galleryImgs) + ', ' + idx + ')\'>'; }).join('') + '</div>') : '';
+      '<div class="ud-thumbs">' + galleryImgs.map(function (img, idx) { return '<img src="' + ppEsc_(r2CardUrl_(img)) + '" alt="" loading="lazy" onerror="thumbFallback_(this)" onclick=\'openLightbox(' + attrJson_(galleryImgs) + ', ' + idx + ')\'>'; }).join('') + '</div>') : '';
 
     return '' +
       '<div class="ud-top"><h3 class="ud-top-title">' + ICON.building + ' ملف المشروع</h3></div>' +
@@ -7838,6 +7845,7 @@
       // لو الحارس الزمني ضرب أثناء انتظار الصور (تبويب ظاهر وتجاوزنا المهلة)، لا داعي لإكمال
       // أي عمل تقيل بعد كده - رسالة الفشل ظهرت للمستخدم بالفعل ويجب ألا يستمر أي شيء بعدها.
       if (timedOut) return;
+      u = escUnitFields_(u); // كل الحقول النصية مهرَّبة قبل قوالب الـ PDF (نفس النص المعروض، بدون تفسير HTML)
 
       const detailRow = (label, value) => value ? `
         <div style="padding:8px 0; border-bottom:1px solid #E3E6E5; display:flex; justify-content:space-between; font-size:12px;">
@@ -7978,7 +7986,7 @@
         </div>
 
         <div style="margin-top:auto;background:#004C43;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
-          <span style="font-size:12px;color:#fff;font-weight:700;">${agentName || 'Digital Real Estate Team'}${agentPhone ? ' — ' : ''}<span style="color:#B4FF6C;">${agentPhone || ''}</span></span>
+          <span style="font-size:12px;color:#fff;font-weight:700;">${escHtml_(agentName || 'Digital Real Estate Team')}${agentPhone ? ' — ' : ''}<span style="color:#B4FF6C;">${escHtml_(agentPhone || '')}</span></span>
           <span style="font-size:9px;color:#BFD8CF;white-space:nowrap;">Contact Info</span>
         </div>
         <div style="padding:10px 20px;text-align:center;font-size:10px;color:#8A908E;">
@@ -8010,7 +8018,7 @@
             <img src="${img}" style="max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;display:block;border-radius:8px;">
           </div>
           <div style="background:#004C43;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0;">
-            <span style="font-size:12px;color:#fff;font-weight:700;">${agentName || 'Digital Real Estate Team'}${agentPhone ? ' — ' : ''}<span style="color:#B4FF6C;">${agentPhone || ''}</span></span>
+            <span style="font-size:12px;color:#fff;font-weight:700;">${escHtml_(agentName || 'Digital Real Estate Team')}${agentPhone ? ' — ' : ''}<span style="color:#B4FF6C;">${escHtml_(agentPhone || '')}</span></span>
             <span style="font-size:9px;color:#BFD8CF;white-space:nowrap;">Contact Info</span>
           </div>
         `;
@@ -8418,13 +8426,13 @@
      بالظبط (getThumbUrl + loading="lazy"). */
   function buildCompareRows(units, imageResolver) {
     const rows = [
-      { label: 'الصورة', get: u => {
+      { label: 'الصورة', html: true, get: u => {
         const imgs = (u['Images'] || '').split(',').map(s => s.trim()).filter(Boolean);
         if (imageResolver) {
           const dataUrl = imageResolver(u);
-          return dataUrl ? `<img src="${dataUrl}" style="width:100%;height:90px;object-fit:cover;border-radius:8px;">` : '-';
+          return dataUrl ? `<img src="${escHtml_(dataUrl)}" style="width:100%;height:90px;object-fit:cover;border-radius:8px;">` : '-';
         }
-        return imgs[0] ? `<img src="${getThumbUrl(imgs[0])}" style="width:100%;height:90px;object-fit:cover;border-radius:8px;" loading="lazy" onerror="thumbFallback_(this)">` : '-';
+        return imgs[0] ? `<img src="${escHtml_(getThumbUrl(imgs[0]))}" style="width:100%;height:90px;object-fit:cover;border-radius:8px;" loading="lazy" onerror="thumbFallback_(this)">` : '-';
       }},
       { label: 'نوع العقار', get: u => u['Property Type'] || '-' },
       { label: 'المطور', get: u => u['Developer Name'] || '-' },
@@ -8469,14 +8477,14 @@
         <thead>
           <tr>
             <th style="width:110px;"></th>
-            ${units.map(u => `<th>${u['Unit ID']}</th>`).join('')}
+            ${units.map(u => `<th>${escHtml_(u['Unit ID'])}</th>`).join('')}
           </tr>
         </thead>
         <tbody>
           ${visibleRows.map(r => `
             <tr>
               <td class="row-label">${r.label}</td>
-              ${units.map(u => `<td>${r.get(u)}</td>`).join('')}
+              ${units.map(u => `<td>${r.html ? r.get(u) : escHtml_(r.get(u))}</td>`).join('')}
             </tr>
           `).join('')}
         </tbody>
@@ -8562,7 +8570,7 @@
         </div>
         <div style="padding:18px 24px;background:${EXPORT_BG};">${tableHtml}</div>
         <div style="background:#0f2942;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;">
-          <span style="font-size:12px;color:#fff;font-weight:700;">${agentName || 'Digital Real Estate Team'}${agentPhone ? ' — ' : ''}<span style="color:#ecd08c;">${agentPhone || ''}</span></span>
+          <span style="font-size:12px;color:#fff;font-weight:700;">${escHtml_(agentName || 'Digital Real Estate Team')}${agentPhone ? ' — ' : ''}<span style="color:#ecd08c;">${escHtml_(agentPhone || '')}</span></span>
           <span style="font-size:9px;color:#9fb0c2;white-space:nowrap;">Contact Info</span>
         </div>
       `;
@@ -8861,7 +8869,7 @@
     // في سلوك المستخدم المسجَّل دخوله — نفس النمط المستخدم بالفعل في نداء getDeveloperProjectMap الآخر).
     if (!res || !res.developers) return;
     editDevProjectMap = res;
-    editDeveloperDatalist.innerHTML = res.developers.map(d => `<option value="${d}">`).join('');
+    editDeveloperDatalist.innerHTML = res.developers.map(d => `<option value="${escHtml_(d)}">`).join('');
 
     // نجمع كل أسماء المشاريع من كل المطورين في قائمة واحدة لاقتراحها في خانة البحث العام
     const allProjects = new Set();
@@ -8869,13 +8877,13 @@
       Object.keys(projects).forEach(p => allProjects.add(p));
     });
     const sortedProjects = Array.from(allProjects).sort((a, b) => a.localeCompare(b, 'ar'));
-    document.getElementById('f_projectDatalist').innerHTML = sortedProjects.map(p => `<option value="${p}">`).join('');
+    document.getElementById('f_projectDatalist').innerHTML = sortedProjects.map(p => `<option value="${escHtml_(p)}">`).join('');
   }).withFailureHandler(apiFailure_('تعذّر تحميل قائمة المطوّرين والمشروعات')).getDeveloperProjectMap(getAuthCreds());
 
   function refreshEditProjectSuggestions() {
     const dev = editDeveloperInput.value.trim();
     const projects = (editDevProjectMap.map[dev]) ? Object.keys(editDevProjectMap.map[dev]) : [];
-    editProjectDatalist.innerHTML = projects.map(p => `<option value="${p}">`).join('');
+    editProjectDatalist.innerHTML = projects.map(p => `<option value="${escHtml_(p)}">`).join('');
   }
   editDeveloperInput.addEventListener('input', refreshEditProjectSuggestions);
 
@@ -9054,7 +9062,7 @@
   function renderEditImagesPreview() {
     editImagesPreview.innerHTML = editUnitImages.map((url, idx) => `
       <div class="image-thumb" draggable="true" data-idx="${idx}">
-        <img src="${r2CardUrl_(url)}" alt="صورة الوحدة" onerror="thumbFallback_(this)" onclick="if (typeof openLightbox === 'function') openLightbox(editUnitImages, ${idx})">
+        <img src="${escHtml_(r2CardUrl_(url))}" alt="صورة الوحدة" onerror="thumbFallback_(this)" onclick="if (typeof openLightbox === 'function') openLightbox(editUnitImages, ${idx})">
         <button type="button" class="remove-img" onclick="removeEditUnitImage(${idx})">${ICON.x}</button>
       </div>
     `).join('');
@@ -9909,7 +9917,7 @@
         if (res.visitors && res.visitors.length > 0) {
           listDiv.innerHTML = res.visitors.map(v => {
             const label = v.name ? v.name : (v.email ? v.email : 'زائر بدون اسم');
-            return ICON.user + ' ' + label + (v.email ? ' <span style="opacity:.6">(' + v.email + ')</span>' : '');
+            return ICON.user + ' ' + escHtml_(label) + (v.email ? ' <span style="opacity:.6">(' + escHtml_(v.email) + ')</span>' : '');
           }).join('<br>');
         } else {
           listDiv.innerHTML = '';
@@ -10621,7 +10629,7 @@
     if (typeof loadDevProfilesList === 'function') loadDevProfilesList();
     google.script.run.withSuccessHandler(function (res) {
       var dl = document.getElementById('devProfileNameDatalist');
-      if (dl && res && res.developers) dl.innerHTML = res.developers.map(function (d) { return '<option value="' + d + '">'; }).join('');
+      if (dl && res && res.developers) dl.innerHTML = res.developers.map(function (d) { return '<option value="' + escHtml_(d) + '">'; }).join('');
     }).withFailureHandler(apiFailure_('تعذّر تحميل قائمة المطوّرين والمشروعات')).getDeveloperProjectMap(getAuthCreds());
   }
   window.__aqarLoadDevelopers = function () {
@@ -12793,10 +12801,10 @@
           const desc = [u.propertyType, u.projectName, (u.city && u.district) ? (u.city + ' - ' + u.district) : (u.city || u.district), u.developer]
             .filter(Boolean).join(' · ');
           return `
-            <tr class="stats-clickable-row" data-unit-id="${u.unitId || ''}">
+            <tr class="stats-clickable-row" data-unit-id="${escHtml_(u.unitId || '')}">
               <td class="num">${i + 1}</td>
-              <td>${u.unitId || '-'}</td>
-              <td>${desc || '-'}</td>
+              <td>${escHtml_(u.unitId || '-')}</td>
+              <td>${escHtml_(desc || '-')}</td>
               <td class="num">${fmtNum(u.count)}</td>
             </tr>`;
         }).join('');
@@ -12817,9 +12825,9 @@
         renderSalesActivityKpis_(totalPdf, totalWa);
         if (!res.units.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-note">لا توجد بيانات استخدام مسجّلة بعد</td></tr>'; return; }
         tbody.innerHTML = res.units.slice(0, 10).map(u => `
-          <tr class="stats-clickable-row" data-unit-id="${u.unitId}">
-            <td>${u.unitId}</td>
-            <td>${u.projectName || '-'}</td>
+          <tr class="stats-clickable-row" data-unit-id="${escHtml_(u.unitId)}">
+            <td>${escHtml_(u.unitId)}</td>
+            <td>${escHtml_(u.projectName || '-')}</td>
             <td class="num">${u.pdfCount}</td>
             <td class="num">${u.whatsappCount}</td>
             <td class="num">${u.total}</td>
@@ -12852,7 +12860,7 @@
         const select = document.getElementById('priceHistoryProjectSelect');
         const currentValue = select.value;
         select.innerHTML = '<option value="">اختر مشروع...</option>' +
-          res.projects.map(p => `<option value="${p}">${p}</option>`).join('');
+          res.projects.map(p => `<option value="${escHtml_(p)}">${escHtml_(p)}</option>`).join('');
         if (currentValue && res.projects.indexOf(currentValue) !== -1) select.value = currentValue;
       }).withFailureHandler(apiFailure_('تعذّر تحميل مشروعات تاريخ الأسعار')).getPriceHistoryProjects(currentPin);
     }
@@ -13027,7 +13035,7 @@
       legend.innerHTML = labels.map(function (lbl, i) {
         var pct = Math.round((values[i] / total) * 1000) / 10;
         return '<div class="stats-legend-item" data-idx="' + i + '"><span class="stats-legend-swatch" style="background:' + colors[i % colors.length] + '"></span>' +
-          '<span class="stats-legend-label">' + lbl + '</span><span class="stats-legend-count">' + fmtNum(values[i]) + ' (' + pct + '%)</span></div>';
+          '<span class="stats-legend-label">' + escHtml_(lbl) + '</span><span class="stats-legend-count">' + fmtNum(values[i]) + ' (' + pct + '%)</span></div>';
       }).join('');
       if (onSliceClick) {
         legend.querySelectorAll('.stats-legend-item').forEach(function (row) {
@@ -13080,8 +13088,8 @@
       var maxCount = Math.max.apply(null, rows.map(function (r) { return r.count; }).concat([1]));
       el.innerHTML = rows.map(function (r) {
         var ppm = r.countForPpm > 0 ? Math.round(r.sumPpmWeighted / r.countForPpm) : null;
-        return '<div class="stats-rank-row" data-district="' + r.name.replace(/"/g, '&quot;') + '">' +
-          '<span class="stats-rank-name">' + r.name + '</span>' +
+        return '<div class="stats-rank-row" data-district="' + escHtml_(r.name) + '">' +
+          '<span class="stats-rank-name">' + escHtml_(r.name) + '</span>' +
           '<span class="stats-rank-meta">' + fmtNum(r.count) + ' وحدة' + (ppm ? ' · متوسط سعر المتر (تقديري) ' + fmtNum(ppm) + ' ج/م²' : '') + '</span>' +
           '<div class="bar-track stats-rank-bar"><div class="bar-fill" style="width:' + (r.count / maxCount * 100) + '%"></div></div></div>';
       }).join('');
@@ -13103,10 +13111,10 @@
       var maxCount = Math.max.apply(null, topDevelopers.map(function (d) { return d.count; }).concat([1]));
       el.innerHTML = topDevelopers.map(function (d, i) {
         var pct = total > 0 ? Math.round((d.count / total) * 1000) / 10 : 0;
-        return '<div class="stats-dev-row" data-dev="' + d.name.replace(/"/g, '&quot;') + '">' +
+        return '<div class="stats-dev-row" data-dev="' + escHtml_(d.name) + '">' +
           '<div class="stats-rank-row">' +
-          '<div class="stats-rank-top"><span class="stats-dev-avatar">' + devInitialsSafe_(d.name) + '</span>' +
-          '<span class="stats-rank-name">' + (i + 1) + '. ' + d.name + '</span></div>' +
+          '<div class="stats-rank-top"><span class="stats-dev-avatar">' + escHtml_(devInitialsSafe_(d.name)) + '</span>' +
+          '<span class="stats-rank-name">' + (i + 1) + '. ' + escHtml_(d.name) + '</span></div>' +
           '<span class="stats-rank-meta">' + fmtNum(d.count) + ' وحدة · ' + pct + '% من المخزون</span>' +
           '<div class="bar-track stats-rank-bar stats-dev-bar"><div class="bar-fill" style="width:' + (d.count / maxCount * 100) + '%"></div></div>' +
           '</div>' +
@@ -13246,7 +13254,7 @@
         const select = document.getElementById('activityEmployeeSelect');
         const currentValue = select.value;
         select.innerHTML = '<option value="">اختر موظف...</option>' +
-          res.employees.map(e => `<option value="${e}">${e}</option>`).join('');
+          res.employees.map(e => `<option value="${escHtml_(e)}">${escHtml_(e)}</option>`).join('');
         if (currentValue && res.employees.indexOf(currentValue) !== -1) select.value = currentValue;
         renderActivityReport();   // عرض افتراضي فور توفر البيانات: ملخّص الشهر لكل الموظفين
       }).withFailureHandler(apiFailure_('تعذّر تحميل سجل نشاط الإدخال')).getEntryActivityLog(currentPin);
@@ -13267,7 +13275,7 @@
         return (b.year - a.year) || (b.month - a.month) || (b.day - a.day);
       }).slice(0, 5);
       el.innerHTML = '<h4 class="stats-recent-title">آخر الأنشطة (إدخال وتحديث الوحدات)</h4>' + rows.map(function (r) {
-        return '<div class="stats-mini-item"><span>' + r.enteredBy + ' — ' + r.dateLabel + '</span><b class="stats-activity-count-badge">' + r.count + ' وحدة</b></div>';
+        return '<div class="stats-mini-item"><span>' + escHtml_(r.enteredBy) + ' — ' + escHtml_(r.dateLabel) + '</span><b class="stats-activity-count-badge">' + r.count + ' وحدة</b></div>';
       }).join('');
     }
 
@@ -13278,7 +13286,7 @@
     function activityRowsHtml_(rows) {
       return '<div class="stats-activity-rows">' + rows.map(function (r, i) {
         return '<div class="stats-activity-row' + (i % 2 ? ' is-alt' : '') + '">' +
-          '<span>' + r.label + '</span><b class="stats-activity-count-badge">' + fmtNum(r.count) + ' وحدة</b></div>';
+          '<span>' + escHtml_(r.label) + '</span><b class="stats-activity-count-badge">' + fmtNum(r.count) + ' وحدة</b></div>';
       }).join('') + '</div>';
     }
 
