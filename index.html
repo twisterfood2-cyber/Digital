@@ -5322,16 +5322,28 @@
     if (!isR2ImageUrl_(url)) return url;
     return url.replace(/^(https:\/\/img\.aqaratdigital\.com\/(?:units|projects)\/)full\//, '$1card/');
   }
+  /* REPORTS/049: مصغّرات Drive بنفس العرض w400 لكن بترميز JPEG (لاحقة -rj اللي بيفهمها خادم صور Google) بدل PNG:
+   * نفس الأبعاد (400×252 مثلًا)، نفس الرابط والـ id، بدون أي تعديل في القاعدة — بس ~37KB بدل ~185KB للصورة.
+   * لو الخادم تجاهل اللاحقة يومًا بيرجّع PNG عادي، ولو رجّع خطأ thumbFallback_ بيجرّب w400 العادي مرة واحدة. */
+  var DRIVE_THUMB_SZ = 'w400-rj';   // مصغّرات الكروت/المعرض/المقارنة/المشابهة (بدّلها لـ 'w400' للرجوع للسلوك القديم)
+  var DRIVE_MAIN_SZ = 'w400';       // الصورة الرئيسية في التفاصيل — زي ما كانت بالظبط (بدون تغيير)
+  function driveThumbUrl_(url, sz) {
+    if (url.indexOf('sz=w') !== -1) return url.replace(/sz=w\d+(?:-[a-z0-9]+)*/, 'sz=' + sz);
+    if (url.indexOf('thumbnail?id=') !== -1) return url + '&sz=' + sz;
+    return url;
+  }
   function getThumbUrl(url) {
     if (!url) return url;
     if (isR2ImageUrl_(url)) return r2CardUrl_(url); // R2: full → card (للمصغّرات فقط)
     if (url.indexOf('drive.google.com') === -1) return url; // روابط خارجية نسيبها زي ما هي
-    if (url.indexOf('sz=w') !== -1) return url.replace(/sz=w\d+/, 'sz=w400');
-    if (url.indexOf('thumbnail?id=') !== -1) return url + '&sz=w400';
+    return driveThumbUrl_(url, DRIVE_THUMB_SZ);
+  }
+  // الصورة الرئيسية في التفاصيل/المعرض: R2 → full كما هو مخزّن؛ Drive → نفس سلوك w400 القديم بدون تغيير (بدون -rj)
+  function getMainImageUrl_(url) {
+    if (isR2ImageUrl_(url)) return url;
+    if (url && url.indexOf('drive.google.com') !== -1) return driveThumbUrl_(url, DRIVE_MAIN_SZ);
     return url;
   }
-  // الصورة الرئيسية في التفاصيل/المعرض: R2 → full كما هو مخزّن؛ Drive → نفس سلوك getThumbUrl القديم بدون تغيير
-  function getMainImageUrl_(url) { return isR2ImageUrl_(url) ? url : getThumbUrl(url); }
   // لو نسخة card مش موجودة لأي سبب: نرجع لـ full مرة واحدة فقط (بدون loop) — للروابط R2 فقط
   // ---- تهريب HTML للقيم القادمة من القاعدة/المستخدم قبل دمجها في قوالب innerHTML (تصحيح Stored XSS — REPORTS/041) ----
   // escHtml_: نص/قيمة سمة داخل علامات اقتباس · attrJs_: نص كـ JS string literal داخل سمة onclick · attrJson_: كائن JSON داخل سمة onclick
@@ -5343,10 +5355,18 @@
   function thumbFallback_(img) {
     if (!img || img.getAttribute('data-full-tried') === '1') return false;
     var s = img.getAttribute('src') || '';
-    if (!isR2ImageUrl_(s) || s.indexOf('/card/') === -1) return false;
-    img.setAttribute('data-full-tried', '1');
-    img.src = s.replace('/card/', '/full/');
-    return true;
+    if (isR2ImageUrl_(s) && s.indexOf('/card/') !== -1) {
+      img.setAttribute('data-full-tried', '1');
+      img.src = s.replace('/card/', '/full/');
+      return true;
+    }
+    // REPORTS/049: مصغّرة Drive بلاحقة -rj فشلت → نفس الرابط بـ w400 العادي (مرة واحدة فقط — بدون أي loop)
+    if (s.indexOf('drive.google.com') !== -1 && /sz=w\d+-/.test(s)) {
+      img.setAttribute('data-full-tried', '1');
+      img.src = s.replace(/sz=w(\d+)(?:-[a-z0-9]+)+/, 'sz=w$1');
+      return true;
+    }
+    return false;
   }
 
   // بيانات المدن والمناطق التابعة لها - مشتركة بين شاشة الإدخال وشاشة البحث
@@ -6501,8 +6521,19 @@
     return s.split(/\s+/)[0];
   }
 
-  function buildUnitCardHtml(u) {
+  /* REPORTS/049: أول الكروت الظاهرة في الشاشة (صفّان من الشبكة الحالية) بتحمّل صورها فورًا وبأولوية عالية (LCP)،
+   * والباقي lazy زي ما كان. eagerCardImages_ بيتحسب مرة عند كل رسم من عدد أعمدة الشبكة الفعلي (1–6). */
+  var eagerCardImages_ = 0;
+  function computeEagerCardImages_() {
+    try {
+      var cols = String(getComputedStyle(document.getElementById('results')).gridTemplateColumns || '').trim().split(/\s+/).filter(Boolean).length;
+      return Math.max(2, Math.min(12, (cols || 2) * 2));
+    } catch (e) { return 4; }
+  }
+  function buildUnitCardHtml(u, idx) {
     const images = (u['Images'] || '').split(',').map(s => s.trim()).filter(Boolean);
+    const eager = typeof idx === 'number' && idx < (typeof eagerCardImages_ === 'number' ? eagerCardImages_ : 0);
+    const imgLoadAttrs = eager ? 'loading="eager" fetchpriority="high" decoding="async"' : 'loading="lazy" decoding="async"';
     /* الحالة + رقم الوحدة (+ عدّاد الصور) فوق الجزء السفلي من الصورة نفسها (Overlay) - بلا صف
      * مستقل أسفل الصورة، فيوفَّر ارتفاع صف كامل. .unit-id تبقى داخل الكارت لأن فتح التفاصيل
      * (openCardDetailsFromEl_) يقرأ رقم الوحدة منها. */
@@ -6515,7 +6546,7 @@
         </div>`;
     const coverHtml = images.length > 0 ? `
       <div class="unit-cover">
-        <img src="${escHtml_(getThumbUrl(images[0]))}" alt="صورة الوحدة" loading="lazy" decoding="async" onerror="thumbFallback_(this)">
+        <img src="${escHtml_(getThumbUrl(images[0]))}" alt="صورة الوحدة" ${imgLoadAttrs} onerror="thumbFallback_(this)">
         ${coverStrip}
       </div>` : `<div class="unit-cover unit-cover-empty">${coverStrip}</div>`;
 
@@ -6627,7 +6658,7 @@
     /* ---------- المعرض: الحاوية هي التي تحدد المساحة (نسبة ثابتة) وليس الصورة ---------- */
     const mediaHtml = images.length > 0 ? `
       <div class="ud-media" onclick='udGalleryOpenLightbox()'>
-        <img src="${escHtml_(getMainImageUrl_(images[0]))}" alt="صورة الوحدة" loading="lazy" decoding="async">
+        <img src="${escHtml_(getMainImageUrl_(images[0]))}" alt="صورة الوحدة" loading="eager" fetchpriority="high" decoding="async">
         <span class="status-badge ud-media-status ${esc(u['Status'])}"><i class="status-dot"></i>${esc(u['Status'])}</span>
         ${images.length > 1 ? `
         <button type="button" class="ud-nav ud-nav-prev" onclick="event.stopPropagation(); udGalleryNav(-1)" aria-label="الصورة السابقة">${ICON.chevronLeft}</button>
@@ -6638,7 +6669,7 @@
           ${images.length > 1 ? `<span class="img-count-badge">${ICON.camera} <span class="ud-counter" dir="ltr">1 / ${images.length}</span></span>` : ''}
         </div>
       </div>
-      ${images.length > 1 ? `<div class="ud-thumbs">${images.map((img, idx) => `<img src="${escHtml_(getThumbUrl(img))}" alt="" loading="lazy" class="${idx === 0 ? 'active' : ''}" onerror="thumbFallback_(this)" onclick="event.stopPropagation(); udGallerySelect(${idx})">`).join('')}</div>` : ''}
+      ${images.length > 1 ? `<div class="ud-thumbs">${images.map((img, idx) => `<img src="${escHtml_(getThumbUrl(img))}" alt="" loading="lazy" decoding="async" class="${idx === 0 ? 'active' : ''}" onerror="thumbFallback_(this)" onclick="event.stopPropagation(); udGallerySelect(${idx})">`).join('')}</div>` : ''}
     ` : `<div class="ud-media ud-media-empty">${ICON.image}<span>لا توجد صور لهذه الوحدة</span></div>`;
 
     /* ---------- بلاطة معلومة: أيقونة + تسمية + قيمة (تظهر فقط إن وُجدت القيمة) ---------- */
@@ -6873,9 +6904,22 @@
       updateResultsPager_();
       return;
     }
+    eagerCardImages_ = computeEagerCardImages_();
     container.innerHTML = units.map(buildUnitCardHtml).join('');
     updateResultsPager_();
     try { buildDevelopersRow_(); } catch (e) {}   /* عرض فقط — لا يؤثر على النتائج */
+  }
+  /* REPORTS/049: "عرض المزيد" بيضيف كروت الصفحة الجديدة بس في آخر الشبكة (بدل إعادة بناء كل الكروت المحمَّلة —
+   * اللي كان بيعيد إنشاء كل عناصر <img> وفكّ ترميز صورها من جديد). نفس buildUnitCardHtml ونفس الترتيب. */
+  function appendResultCards_(newUnits) {
+    const container = document.getElementById('results');
+    if (!container.querySelector('.unit-card')) { renderResults(lastResults); return; }   // مفيش كروت مرسومة → رسم كامل
+    let units = newUnits;
+    if (showFavoritesOnly) { const favIds = getFavoriteIds(); units = units.filter(u => favIds.indexOf(u['Unit ID']) !== -1); }
+    eagerCardImages_ = 0;   // الكروت المضافة كلها تحت الشاشة → lazy
+    container.insertAdjacentHTML('beforeend', units.map(buildUnitCardHtml).join(''));
+    document.getElementById('resultsCount').textContent = resultsCountLabel_(container.querySelectorAll('.unit-card').length);
+    updateResultsPager_();
   }
   /* "عرض 60 من 706 نتيجة" لو فيه صفحات باقية، وإلا "N نتيجة" زي القديم */
   function resultsCountLabel_(shown) {
@@ -7243,7 +7287,7 @@
         <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px;">
           ${images.map((img, i) => `
             <label style="position:relative; display:block; cursor:pointer;">
-              <img src="${escHtml_(img)}" style="width:100%; height:90px; object-fit:cover; border-radius:8px; border:2px solid var(--border);">
+              <img src="${escHtml_(getThumbUrl(img))}" style="width:100%; height:90px; object-fit:cover; border-radius:8px; border:2px solid var(--border);" loading="lazy" decoding="async" onerror="thumbFallback_(this)">
               <input type="checkbox" class="share-img-checkbox" value="${escHtml_(img)}" checked style="position:absolute; top:6px; left:6px; width:18px; height:18px; cursor:pointer;">
             </label>
           `).join('')}
@@ -7612,7 +7656,7 @@
       return `
         <div style="display:flex; gap:12px; background:var(--white); border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:10px; align-items:center;">
           <div style="display:flex; gap:12px; align-items:center; flex:1; min-width:0; cursor:pointer;" onclick='showUnitCardOverlay(${attrJson_(u)})' title="عرض كارت الوحدة">
-            ${coverImg ? `<img src="${escHtml_(getThumbUrl(coverImg))}" style="width:70px; height:70px; border-radius:8px; object-fit:cover; flex-shrink:0;" loading="lazy" onerror="thumbFallback_(this)">` : `<div style="width:70px; height:70px; border-radius:8px; background:var(--bg); flex-shrink:0; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:11px;">لا صورة</div>`}
+            ${coverImg ? `<img src="${escHtml_(getThumbUrl(coverImg))}" style="width:70px; height:70px; border-radius:8px; object-fit:cover; flex-shrink:0;" loading="lazy" decoding="async" onerror="thumbFallback_(this)">` : `<div style="width:70px; height:70px; border-radius:8px; background:var(--bg); flex-shrink:0; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:11px;">لا صورة</div>`}
             <div style="flex:1; min-width:0;">
               <div style="font-weight:800; color:var(--navy); font-size:13px;">${escHtml_(u['Property Type'] || '')} - ${escHtml_(u['Unit Area (sqm)'] || '-')} م²</div>
               <div style="font-size:11px; color:var(--muted); margin-top:2px;">${escHtml_(u['Project Name'] || '')} - ${escHtml_(u['Area/District'] || '')}</div>
@@ -8222,10 +8266,11 @@
   }
 
   function applySearchPage_(res, append) {
+    var added = [];
     if (append) {
       var seen = {};
       lastResults.forEach(function (u) { seen[u['Unit ID']] = true; });
-      res.units.forEach(function (u) { if (!seen[u['Unit ID']]) lastResults.push(u); });   // أمان: لو اتضافت وحدة بين صفحتين
+      res.units.forEach(function (u) { if (!seen[u['Unit ID']]) { lastResults.push(u); added.push(u); } });   // أمان: لو اتضافت وحدة بين صفحتين
     } else {
       lastResults = res.units.slice();
     }
@@ -8233,7 +8278,7 @@
     searchPaging_.totalCount = res.totalCount;
     searchPaging_.hasMore = res.units.length > 0 && lastResults.length < res.totalCount;
     if (Array.isArray(res.topDevelopers)) lastTopDevelopers_ = res.topDevelopers;
-    renderResults(lastResults);
+    if (append) appendResultCards_(added); else renderResults(lastResults);   // REPORTS/049: الإضافة بدون إعادة رسم الكروت المحمَّلة
   }
 
   function setSearchLoading_(on) {
@@ -8580,7 +8625,7 @@
           const dataUrl = imageResolver(u);
           return dataUrl ? `<img src="${escHtml_(dataUrl)}" style="width:100%;height:90px;object-fit:cover;border-radius:8px;">` : '-';
         }
-        return imgs[0] ? `<img src="${escHtml_(getThumbUrl(imgs[0]))}" style="width:100%;height:90px;object-fit:cover;border-radius:8px;" loading="lazy" onerror="thumbFallback_(this)">` : '-';
+        return imgs[0] ? `<img src="${escHtml_(getThumbUrl(imgs[0]))}" style="width:100%;height:90px;object-fit:cover;border-radius:8px;" loading="lazy" decoding="async" onerror="thumbFallback_(this)">` : '-';
       }},
       { label: 'نوع العقار', get: u => u['Property Type'] || '-' },
       { label: 'المطور', get: u => u['Developer Name'] || '-' },
@@ -9232,7 +9277,7 @@
   function renderEditImagesPreview() {
     editImagesPreview.innerHTML = editUnitImages.map((url, idx) => `
       <div class="image-thumb" draggable="true" data-idx="${idx}">
-        <img src="${escHtml_(r2CardUrl_(url))}" alt="صورة الوحدة" onerror="thumbFallback_(this)" onclick="if (typeof openLightbox === 'function') openLightbox(editUnitImages, ${idx})">
+        <img src="${escHtml_(getThumbUrl(url))}" alt="صورة الوحدة" loading="lazy" decoding="async" onerror="thumbFallback_(this)" onclick="if (typeof openLightbox === 'function') openLightbox(editUnitImages, ${idx})">
         <button type="button" class="remove-img" onclick="removeEditUnitImage(${idx})">${ICON.x}</button>
       </div>
     `).join('');
