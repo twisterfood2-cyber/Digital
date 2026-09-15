@@ -8224,6 +8224,15 @@
   function clearClientSearchCache() {
     Object.keys(clientSearchCache).forEach(k => delete clientSearchCache[k]);
   }
+  /* REPORTS/050: الإدخالات المنتهية (أقدم من 30 ثانية) كانت بتفضل في الذاكرة لحد ما الكاش يتمسح كله —
+   * كل بحث مختلف = صفحة (~50KB) محتجزة طول الجلسة. بنشيل المنتهي وقت إضافة إدخال جديد (بدون أي تغيير في
+   * سلوك الكاش نفسه: نفس المفتاح ونفس الـ 30 ثانية). */
+  function pruneClientSearchCache_(now) {
+    Object.keys(clientSearchCache).forEach(function (k) {
+      var e = clientSearchCache[k];
+      if (!e || (now - e.time) >= CLIENT_CACHE_DURATION_MS) delete clientSearchCache[k];
+    });
+  }
 
   // التفويض للحقول الإدارية في نتائج البحث (عدّاد المشاهدة) بقى مبنيًّا على جلسة
   // الدخول والدور فقط — بنبعت بيانات دخول المستخدم الحالي، والسيرفر
@@ -8314,6 +8323,7 @@
             document.getElementById('resultsCount').textContent = '';
             resolve(false); return;
           }
+          pruneClientSearchCache_(Date.now());
           clientSearchCache[cacheKey] = { res: res, time: Date.now() };
           applySearchPage_(res, append);
           resolve(true);
