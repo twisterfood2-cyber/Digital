@@ -3683,10 +3683,10 @@
      (بإجراء من المستخدم، ومع فحص وجودهما مسبقًا قبل الاستخدام)، وChart.js تُستدعى فقط عند
      فتح شاشة "الإحصائيات والمخزون". defer يُبقي ترتيب التنفيذ بينها كما هو ويضمن اكتمالها
      قبل DOMContentLoaded - أي قبل أي استخدام فعلي لها. -->
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk" crossorigin="anonymous"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous"></script>
 <!-- Chart.js: used by the inline "الإحصائيات والمخزون" view (price-history line chart) -->
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js" integrity="sha384-DhxhYObIMeMNGyAG7iK11OHzBIKyEIeRL0ad1iFPAOwZB8iirUlTT0O/WJJUk8+o" crossorigin="anonymous"></script>
 <script>
   /* dark-theme defaults for Chart.js so axis ticks / grid lines stay readable on the navy panels */
   /* Perf fix: بعد تحويل Chart.js إلى defer لم تعد مُحمَّلة وقت تنفيذ هذا السطر مباشرةً،
