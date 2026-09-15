@@ -690,6 +690,14 @@
       padding: 10px 22px; border-radius: var(--radius-sm); font-size:  var(--aq-fs-small); font-weight: 700; cursor: pointer;
     }
     .empty-state button:hover { background: var(--navy-deep); }
+    /* صفحات النتائج (REPORTS/048) — زر "عرض المزيد" بنفس مظهر زر empty-state (لا خط جديد ولا ألوان جديدة) */
+    .aq-results-pager { display: flex; justify-content: center; padding: 18px 0 6px; }
+    .aq-results-pager button {
+      background: var(--navy); color: var(--gold-soft); border: 1px solid var(--border-gold);
+      padding: 10px 22px; border-radius: var(--radius-sm); font-size:  var(--aq-fs-small); font-weight: 700; cursor: pointer;
+    }
+    .aq-results-pager button:hover { background: var(--navy-deep); }
+    .aq-results-pager button[disabled] { opacity: .6; cursor: default; }
 
     /* Toast Notifications */
     .toast-container {
@@ -2938,6 +2946,9 @@
     body.aq-search-ui .empty-state button {
       background: var(--aq-prop-green-ink); color: #fff; border-color: var(--aq-prop-green-ink);
     }
+    body.aq-search-ui .aq-results-pager button {
+      background: var(--aq-prop-green-ink); color: #fff; border-color: var(--aq-prop-green-ink);
+    }
     body.aq-search-ui .skel-card {
       background: var(--aq-prop-surface); border: 1px solid var(--aq-prop-border);
       border-radius: var(--aq-prop-radius);
@@ -3995,6 +4006,10 @@
     <h3>ابدأ البحث عن وحدتك المثالية</h3>
     <p>استخدم البحث الذكي أو الفلاتر للوصول إلى الوحدات والمشروعات التي تناسب احتياجك وميزانيتك.</p>
   </div></div>
+  <!-- صفحات النتائج (REPORTS/048): الصفحة الأولى 60 كارت، والباقي بالضغط — نفس الشبكة ونفس الكروت -->
+  <div class="aq-results-pager" id="resultsPager" hidden>
+    <button type="button" id="loadMoreBtn">عرض المزيد</button>
+  </div>
 </section>
 
   <!-- ===== عرض "الإحصائيات والمخزون" — مدمج داخل نفس الصفحة (مش iframe) ===== -->
@@ -6097,7 +6112,7 @@
     }
     try { localStorage.setItem('favoriteUnits', JSON.stringify(favs)); } catch (e) {}
     updateFavCount();
-    if (showFavoritesOnly) renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
+    if (showFavoritesOnly) renderResults(lastResults);
   }
   window.toggleFavorite = toggleFavorite;
 
@@ -6108,6 +6123,9 @@
     if (el) el.textContent = 'المفضلة (' + getFavorites().length + ')';
   }
 
+  /* REPORTS/048: الترتيب بقى على السيرفر (searchUnits مع page/sort/ppmYears — src/units/search-page.js نسخة حرفية من
+   * هذه الدالة تُطبَّق قبل القصّ). الدالة باقية هنا كمرجع للتكافؤ (test/search-parity.test.js يقارنها بالنسخة السيرفرية)
+   * ولا تُستدعى في مسار العرض. */
   function sortUnits(units, sortBy) {
     let arr = units.slice();
     const num = (v) => {
@@ -6361,7 +6379,7 @@
     }
     // لو النتائج اترسمت قبل ما نعرف الدور، نعيد رسمها بالصلاحيات الصحيحة
     if (roleActive() && typeof lastResults !== 'undefined' && lastResults && lastResults.length) {
-      try { renderResults(sortUnits(lastResults, document.getElementById('f_sort').value)); } catch (e) {}
+      try { renderResults(lastResults); } catch (e) {}
     }
     // Phase 2A: تحديث هوية الشِل (اسم/دور/صورة) — طبقة عرض فقط
     try { if (window.__aqarShellIdentity) window.__aqarShellIdentity(); } catch (e) {}
@@ -6833,6 +6851,8 @@
   }
 
   var resultsCardsBuilt = false;   // Perf fix: الرئيسية لا تبني كروت الوحدات المخفية إلا عند دخول "استكشف" فعليًا
+  /* REPORTS/048: units = الصفحات المحمَّلة (بترتيب السيرفر). فلتر المفضلة المحلي باقٍ كطبقة أمان (السيرفر بيحصر
+   * بـ unitIds أصلًا، والفلتر هنا بيشيل فورًا اللي اتشال من المفضلة بدون طلب جديد — نفس السلوك القديم). */
   function renderResults(units) {
     resultsCardsBuilt = true;
     if (showFavoritesOnly) {
@@ -6841,7 +6861,7 @@
     }
     const container = document.getElementById('results');
     const count = document.getElementById('resultsCount');
-    count.textContent = units.length + ' نتيجة';
+    count.textContent = resultsCountLabel_(units.length);
     if (units.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
@@ -6850,10 +6870,27 @@
           <p>جرّب توسّع نطاق السعر أو المساحة، أو امسح بعض الفلاتر وحاول تاني</p>
           <button type="button" onclick="document.getElementById('clearBtn').click()">مسح كل الفلاتر</button>
         </div>`;
+      updateResultsPager_();
       return;
     }
     container.innerHTML = units.map(buildUnitCardHtml).join('');
+    updateResultsPager_();
     try { buildDevelopersRow_(); } catch (e) {}   /* عرض فقط — لا يؤثر على النتائج */
+  }
+  /* "عرض 60 من 706 نتيجة" لو فيه صفحات باقية، وإلا "N نتيجة" زي القديم */
+  function resultsCountLabel_(shown) {
+    var total = searchPaging_.totalCount;
+    if (searchPaging_.hasMore && total > shown) return 'عرض ' + shown + ' من ' + total + ' نتيجة';
+    return shown + ' نتيجة';
+  }
+  function updateResultsPager_() {
+    var pager = document.getElementById('resultsPager');
+    var btn = document.getElementById('loadMoreBtn');
+    if (!pager || !btn) return;
+    pager.hidden = !searchPaging_.hasMore;
+    btn.disabled = !!searchPaging_.loading;
+    var left = Math.max(searchPaging_.totalCount - lastResults.length, 0);
+    btn.textContent = searchPaging_.loading ? 'جاري التحميل...' : ('عرض المزيد (' + left + ' متبقية)');
   }
 
   /* ============================================================================
@@ -6866,18 +6903,17 @@
   var DEVS_ROW_LIMIT = 5;   // متابعة المرحلة 2C: حد عرض الرئيسية فقط — منطق الترتيب/العدّ بلا تغيير
   var devsRowBuilt = false;
 
+  /* REPORTS/048: العدّ بقى من السيرفر (topDevelopers في رد البحث — نفس العدّ والترتيب على النتيجة الكاملة، مش على
+   * الصفحة المحمَّلة) — lastResults دلوقتي صفحة واحدة فما ينفعش العدّ منها. */
   function buildDevelopersRow_() {
     if (devsRowBuilt) return;
     var section = document.getElementById('aqDevsSection');
     var row = document.getElementById('aqDevsRow');
-    if (!section || !row || !Array.isArray(lastResults) || !lastResults.length) return;
+    if (!section || !row || !Array.isArray(lastTopDevelopers_) || !lastTopDevelopers_.length) return;
 
     var counts = {};
-    lastResults.forEach(function (u) {
-      var d = String((u && u['Developer Name']) || '').trim();
-      if (d) counts[d] = (counts[d] || 0) + 1;
-    });
-    var names = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; }).slice(0, DEVS_ROW_LIMIT);
+    lastTopDevelopers_.forEach(function (d) { if (d && d.name) counts[d.name] = Number(d.count) || 0; });
+    var names = lastTopDevelopers_.map(function (d) { return d && d.name; }).filter(Boolean).slice(0, DEVS_ROW_LIMIT);
     if (!names.length) return;
 
     devsRowBuilt = true;
@@ -7037,7 +7073,7 @@
           }
           // إعادة رسم كروت "استكشف" من الذاكرة (نفس النمط المستخدم في الملف عند تغيير الترتيب)
           if (document.body.classList.contains('app-view-explore') && typeof renderResults === 'function') {
-            renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
+            renderResults(lastResults);
           }
           showToast('تم تحديث حالة الوحدة إلى "' + newStatus + '"', 'success');
         } catch (e) { /* تحديث عرض فقط — لا يؤثر على نجاح العملية نفسها */ }
@@ -7597,6 +7633,32 @@
    * (buildUnitDetailsHtml) من نفس كائن الوحدة الموجود بالذاكرة بلا أي نداء سيرفر
    * جديد. إغلاقه لا يمسّ #similarUnitsModal ولا يُفرِّغ محتواه. */
   const unitCardOverlay = document.getElementById('unitCardOverlay');
+  /* REPORTS/048: كائنات نتائج البحث بقت خفيفة (حقول الكارت فقط) — التفاصيل الكاملة تُجلب لحظة الفتح من getUnitById
+   * (نفس المسار المستخدم أصلًا من لوحة الإحصاءات statsOpenUnit_). النافذة تظهر فورًا بحالة تحميل، ورد متأخر لوحدة
+   * أخرى أو بعد الإغلاق يُتجاهل. */
+  var openDetailsSeq_ = 0;
+  function openUnitDetailsById_(unitId) {
+    var body = document.getElementById('unitCardOverlayBody');
+    var mySeq = ++openDetailsSeq_;
+    body.innerHTML = '<div class="ud-top"><h3 class="ud-top-title">' + ICON.building + ' تفاصيل الوحدة</h3></div><div class="ud-body"><div class="aq-empty"><h3>جاري تحميل تفاصيل الوحدة ' + escHtml_(unitId) + '...</h3></div></div>';
+    unitCardOverlay.classList.add('open');
+    function fail(msg) {
+      body.innerHTML = '<div class="ud-top"><h3 class="ud-top-title">' + ICON.building + ' تفاصيل الوحدة</h3></div><div class="ud-body"><div class="empty-state"><div class="icon">' + ICON.alert + '</div><h3>' + escHtml_(msg) + '</h3><button type="button" onclick="openUnitDetailsById_(' + attrJs_(unitId) + ')">إعادة المحاولة</button></div></div>';
+    }
+    google.script.run.withSuccessHandler(function (res) {
+      if (mySeq !== openDetailsSeq_ || !unitCardOverlay.classList.contains('open')) return;
+      if (!res || res.success === false) {
+        if (handleAuthLost_(res)) return;
+        fail((res && res.message) || 'تعذّر تحميل تفاصيل الوحدة');
+        return;
+      }
+      showUnitCardOverlay(res);
+    }).withFailureHandler(function () {
+      if (mySeq !== openDetailsSeq_ || !unitCardOverlay.classList.contains('open')) return;
+      fail('تعذّر تحميل تفاصيل الوحدة — تحقّق من الاتصال وحاول مرة أخرى');
+    }).getUnitById(unitId, getAuthCreds());
+  }
+  window.openUnitDetailsById_ = openUnitDetailsById_;
   function showUnitCardOverlay(u) {
     document.getElementById('unitCardOverlayBody').innerHTML = buildUnitDetailsHtml(u);
     udGalleryImages = (u['Images'] || '').split(',').map(s => s.trim()).filter(Boolean);
@@ -8127,57 +8189,142 @@
     return (typeof getAuthCreds === 'function') ? getAuthCreds() : { authEmail: '', authPassword: '' };
   }
 
-  function runSearch() {
-    const filters = collectFilters();
-    const cacheKey = JSON.stringify(filters);
-    const cached = clientSearchCache[cacheKey];
+  /* ============================================================================
+   * صفحات البحث (REPORTS/048)
+   * ----------------------------------------------------------------------------
+   * searchUnits مع { page, pageSize, sort, ppmYears, unitIds } بيرجّع { units, page, pageSize, totalCount, sort,
+   * topDevelopers }: نفس فلاتر السيرفر القديمة، ثم نفس ترتيب sortUnits القديم (منقول للسيرفر بالحرف) قبل القصّ،
+   * ووحدات الصفحة بحقول الكارت فقط. lastResults = الصفحات المحمَّلة حتى الآن بترتيب السيرفر.
+   * تغيير الترتيب / سنوات التقسيط / المفضلة = طلب الصفحة الأولى من جديد بنفس فلاتر آخر بحث (lastSearchBase_).
+   * ========================================================================== */
+  var SEARCH_PAGE_SIZE = 60;
+  var lastSearchBase_ = null;        // فلاتر آخر بحث (بدون مفاتيح الصفحة)
+  var lastTopDevelopers_ = null;     // أعلى المطوّرين من آخر رد بحث (على النتيجة الكاملة)
+  var searchPaging_ = { page: 0, totalCount: 0, hasMore: false, loading: false, seq: 0 };
+
+  function buildSearchRequest_(base, page) {
+    var req = {};
+    Object.keys(base || {}).forEach(function (k) {   // المفاتيح الفاضية بتتشال (السيرفر بيتجاهلها أصلًا) — عشان مفتاح الكاش يبقى ثابت
+      var v = base[k];
+      if (v !== '' && v !== null && v !== undefined) req[k] = v;
+    });
+    req.page = page;
+    req.pageSize = SEARCH_PAGE_SIZE;
+    req.sort = document.getElementById('f_sort').value || 'newest';
+    var yrs = document.getElementById('f_ppmYears');
+    req.ppmYears = yrs ? yrs.value.trim() : '';
+    if (showFavoritesOnly) {
+      var favIds = getFavoriteIds();
+      req.unitIds = favIds;
+      req.pageSize = Math.max(favIds.length, 1);   // كل المفضلة في صفحة واحدة (السقف على السيرفر 500) — نفس عرض المفضلة القديم
+    }
+    return req;
+  }
+
+  function applySearchPage_(res, append) {
+    if (append) {
+      var seen = {};
+      lastResults.forEach(function (u) { seen[u['Unit ID']] = true; });
+      res.units.forEach(function (u) { if (!seen[u['Unit ID']]) lastResults.push(u); });   // أمان: لو اتضافت وحدة بين صفحتين
+    } else {
+      lastResults = res.units.slice();
+    }
+    searchPaging_.page = res.page;
+    searchPaging_.totalCount = res.totalCount;
+    searchPaging_.hasMore = res.units.length > 0 && lastResults.length < res.totalCount;
+    if (Array.isArray(res.topDevelopers)) lastTopDevelopers_ = res.topDevelopers;
+    renderResults(lastResults);
+  }
+
+  function setSearchLoading_(on) {
+    searchPaging_.loading = on;
+    try { updateResultsPager_(); } catch (e) {}
+  }
+
+  /** @returns {Promise<boolean>} true لو الصفحة اتعرضت */
+  function requestSearchPage_(base, page, append) {
+    var req = buildSearchRequest_(base, page);
+    var cacheKey = JSON.stringify(req);
+    var cached = clientSearchCache[cacheKey];
+    var mySeq = ++searchPaging_.seq;
 
     if (cached && (Date.now() - cached.time < CLIENT_CACHE_DURATION_MS)) {
-      lastResults = cached.units;
-      renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
-      return Promise.resolve();
+      applySearchPage_(cached.res, append);
+      return Promise.resolve(true);
     }
 
-    document.getElementById('results').innerHTML = skeletonCardsHtml(6);
-    document.getElementById('resultsCount').textContent = 'جاري تحميل العقارات...';
+    if (!append) {
+      document.getElementById('results').innerHTML = skeletonCardsHtml(6);
+      document.getElementById('resultsCount').textContent = 'جاري تحميل العقارات...';
+    }
+    setSearchLoading_(true);
     return new Promise(function(resolve) {
       google.script.run
-        .withSuccessHandler(function(units) {
-          if (!Array.isArray(units)) {           // Phase 1B: رفض تفويض/جلسة منتهية → رد كائن لا مصفوفة
-            if (handleAuthLost_(units)) { resolve(); return; }
-            document.getElementById('results').innerHTML = '<div class="empty-state"><h3>' + ((units && units.message) || 'حصل خطأ أثناء تحميل النتائج') + '</h3></div>';
+        .withSuccessHandler(function(res) {
+          if (mySeq !== searchPaging_.seq) { resolve(false); return; }   // طلب أحدث سبقه — نتجاهل الرد القديم
+          setSearchLoading_(false);
+          if (!res || !Array.isArray(res.units)) {   // Phase 1B: رفض تفويض/جلسة منتهية → رد بلا units
+            if (handleAuthLost_(res)) { resolve(false); return; }
+            document.getElementById('results').innerHTML = '<div class="empty-state"><h3>' + escHtml_((res && res.message) || 'حصل خطأ أثناء تحميل النتائج') + '</h3></div>';
             document.getElementById('resultsCount').textContent = '';
-            resolve(); return;
+            resolve(false); return;
           }
-          lastResults = units;
-          clientSearchCache[cacheKey] = { units: units, time: Date.now() };
-          renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
-          resolve();
+          clientSearchCache[cacheKey] = { res: res, time: Date.now() };
+          applySearchPage_(res, append);
+          resolve(true);
         })
         .withFailureHandler(function(err) {
+          if (mySeq !== searchPaging_.seq) { resolve(false); return; }
+          setSearchLoading_(false);
+          if (append) { showToast('تعذّر تحميل المزيد من النتائج — حاول مرة أخرى', 'error'); resolve(false); return; }
           document.getElementById('results').innerHTML = `
             <div class="empty-state">
               <div class="icon">${ICON.alert}</div>
               <h3>حصل خطأ أثناء تحميل النتائج</h3>
-              <p>${err && err.message ? err.message : 'جرّب تحدّث الصفحة، ولو المشكلة استمرت كلّم المسؤول عن النظام'}</p>
+              <p>${err && err.message ? escHtml_(err.message) : 'جرّب تحدّث الصفحة، ولو المشكلة استمرت كلّم المسؤول عن النظام'}</p>
               <button type="button" onclick="runSearch()">إعادة المحاولة</button>
             </div>`;
           document.getElementById('resultsCount').textContent = '';
-          resolve();
+          resolve(false);
         })
-        .searchUnits(filters, getViewerAdminPin());
+        .searchUnits(req, getViewerAdminPin());
     });
   }
+
+  function runSearch() {
+    lastSearchBase_ = collectFilters();
+    return requestSearchPage_(lastSearchBase_, 1, false);
+  }
+  /* خيارات الصفحة الأولى لـ getInitialSearchData(options, auth): نفس البحث الافتراضي بدون فلاتر، بترتيب f_sort الحالي */
+  function initialSearchOptions_() {
+    var yrs = document.getElementById('f_ppmYears');
+    return { pageSize: SEARCH_PAGE_SIZE, sort: document.getElementById('f_sort').value || 'newest', ppmYears: yrs ? yrs.value.trim() : '' };
+  }
+  window.initialSearchOptions_ = initialSearchOptions_;
+  /* الصفحة الأولى من جديد بنفس فلاتر آخر بحث (تغيير الترتيب / سنوات التقسيط / المفضلة) */
+  function refreshSearchPage_() {
+    return requestSearchPage_(lastSearchBase_ || collectFilters(), 1, false);
+  }
+  function loadMoreResults_() {
+    if (!searchPaging_.hasMore || searchPaging_.loading) return;
+    requestSearchPage_(lastSearchBase_ || collectFilters(), searchPaging_.page + 1, true);
+  }
+  document.getElementById('loadMoreBtn').addEventListener('click', loadMoreResults_);
   window.runSearch = runSearch;
 
   document.getElementById('f_sort').addEventListener('change', function() {
     const isPPMSort = this.value === 'pricePerMeter_asc' || this.value === 'pricePerMeter_desc';
     document.getElementById('ppmYearsFilterWrap').style.display = isPPMSort ? 'block' : 'none';
-    renderResults(sortUnits(lastResults, this.value));
+    refreshSearchPage_();   // REPORTS/048: الترتيب على السيرفر قبل القصّ — الصفحة الأولى من جديد بنفس الفلاتر
   });
 
+  /* سنوات التقسيط بتأثر بس مع ترتيب سعر المتر (زي filterByPPMYears القديمة) — طلب واحد بعد توقّف الكتابة */
+  var ppmYearsTimer_ = null;
   document.getElementById('f_ppmYears').addEventListener('input', function() {
-    renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
+    var sortVal = document.getElementById('f_sort').value;
+    if (sortVal !== 'pricePerMeter_asc' && sortVal !== 'pricePerMeter_desc') return;
+    clearTimeout(ppmYearsTimer_);
+    ppmYearsTimer_ = setTimeout(refreshSearchPage_, 350);
   });
 
   /* ============================================================================
@@ -8228,9 +8375,8 @@
     function openCardDetailsFromEl_(card) {
       var idEl = card.querySelector('.unit-id');
       var unitId = idEl ? idEl.textContent.trim() : '';
-      if (!unitId || !Array.isArray(lastResults)) return;
-      var u = lastResults.filter(function (x) { return String(x['Unit ID']) === unitId; })[0];
-      if (u && typeof showUnitCardOverlay === 'function') showUnitCardOverlay(u);
+      if (!unitId) return;
+      openUnitDetailsById_(unitId);   // REPORTS/048: الكائن الكامل من getUnitById (الكارت خفيف)
     }
     if (results) results.addEventListener('click', function (e) {
       var card = e.target && e.target.closest ? e.target.closest('.unit-card') : null;
@@ -8349,9 +8495,10 @@
     showFavoritesOnly = !showFavoritesOnly;
     this.classList.toggle('active', showFavoritesOnly);
     this.setAttribute('aria-pressed', showFavoritesOnly ? 'true' : 'false');
-    renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
-
-    if (showFavoritesOnly) {
+    // REPORTS/048: المفضلة بتتحصر على السيرفر (unitIds) على النتيجة الكاملة — مش على الصفحة المحمَّلة
+    refreshSearchPage_().then(function (ok) {
+    if (!ok || !showFavoritesOnly) return;
+    {
       const favs = getFavorites();
       const droppedCount = lastResults.filter(u => {
         const fav = favs.find(f => f.id === u['Unit ID']);
@@ -8364,6 +8511,7 @@
       if (droppedCount > 0) showToast(droppedCount + ' من وحداتك المفضلة نزل سعرها', 'success');
       if (increasedCount > 0) showToast(increasedCount + ' من وحداتك المفضلة زاد سعرها', 'error');
     }
+    });
   });
   updateFavCount();
 
@@ -8415,7 +8563,7 @@
     compareList = [];
     Object.keys(compareUnitsById).forEach(k => delete compareUnitsById[k]);
     updateCompareBar();
-    renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
+    renderResults(lastResults);
   });
 
   document.getElementById('compareGoBtn').addEventListener('click', openCompareModal);
@@ -8492,17 +8640,39 @@
     `;
   }
 
+  /* REPORTS/048: نسخة الوحدة المحفوظة وقت الاختيار خفيفة (حقول الكارت) — قبل بناء الجدول نجيب الكائن الكامل لكل وحدة
+   * مختارة من getUnitById مرة واحدة ونحفظه في compareUnitsById (نفس فكرة النسخة المحفوظة: المقارنة تفضل شغالة بعد بحث جديد). */
+  function isFullUnitObject_(u) { return !!u && Object.prototype.hasOwnProperty.call(u, 'Payment Method'); }
+  function ensureFullUnits_(idList) {
+    var need = idList.filter(function (id) { return !isFullUnitObject_(compareUnitsById[id]); });
+    if (!need.length) return Promise.resolve(true);
+    return Promise.all(need.map(function (id) {
+      return new Promise(function (resolve) {
+        google.script.run.withSuccessHandler(function (res) {
+          if (res && res.success !== false && res['Unit ID']) compareUnitsById[id] = res;
+          resolve();
+        }).withFailureHandler(function () { resolve(); }).getUnitById(id, getAuthCreds());
+      });
+    })).then(function () { return need.every(function (id) { return isFullUnitObject_(compareUnitsById[id]); }); });
+  }
   function openCompareModal() {
-    const units = getCompareUnits();
     const content = document.getElementById('compareModalContent');
-    if (units.length < 2) {
+    if (compareList.length < 2) {
       content.innerHTML = '<div class="compare-empty">اختر وحدتين على الأقل من نتائج البحث لعرض المقارنة</div>';
       document.getElementById('compareModal').classList.add('open');
       return;
     }
-    const visibleRows = buildCompareRows(units);
-    content.innerHTML = buildCompareTableHtml(units, visibleRows);
+    content.innerHTML = '<div class="compare-empty">جاري تحميل بيانات المقارنة...</div>';
     document.getElementById('compareModal').classList.add('open');
+    ensureFullUnits_(compareList.slice()).then(function (ok) {
+      const units = getCompareUnits();
+      if (!ok || units.length < 2) {
+        content.innerHTML = '<div class="compare-empty">تعذّر تحميل بيانات المقارنة — تحقّق من الاتصال وحاول مرة أخرى</div>';
+        return;
+      }
+      const visibleRows = buildCompareRows(units);
+      content.innerHTML = buildCompareTableHtml(units, visibleRows);
+    });
   }
 
   document.getElementById('compareModalCloseBtn').addEventListener('click', function() {
@@ -9506,17 +9676,21 @@
           loadFilterOptions();
           return;
         }
-        lastResults = data.units;
-        const filters = collectFilters();
-        const cacheKey = JSON.stringify(filters);
-        clientSearchCache[cacheKey] = { units: data.units, time: Date.now() };
+        // REPORTS/048: الرد صفحة أولى (units + page/pageSize/totalCount/topDevelopers) + filterOptions — نفس البحث الافتراضي بدون فلاتر
+        lastSearchBase_ = {};
+        clientSearchCache[JSON.stringify(buildSearchRequest_({}, 1))] = { res: data, time: Date.now() };
+        lastResults = data.units.slice();
+        searchPaging_.page = data.page || 1;
+        searchPaging_.totalCount = typeof data.totalCount === 'number' ? data.totalCount : data.units.length;
+        searchPaging_.hasMore = data.units.length > 0 && lastResults.length < searchPaging_.totalCount;
+        if (Array.isArray(data.topDevelopers)) lastTopDevelopers_ = data.topDevelopers;
         initialResultsReady = true;
         // Perf fix: الرئيسية لا تعرض كروت الوحدات (مخفية بـ CSS خلف .aq-results-section) — لا داعي
         // لبناء 625 كارت في الـ DOM وقت التحميل الأول إلا لو المستخدم بالفعل داخل "استكشف" (مثال:
         // رابط مباشر لـ #explore). غير كده نبني شريط "أكثر المطوّرين نشاطًا" فقط من نفس lastResults
         // المحمَّل في الذاكرة، ونؤجل بناء الكروت لحد ما showExploreView() تُستدعى — بلا أي نداء شبكة إضافي.
         if (document.body.classList.contains('app-view-explore')) {
-          renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
+          renderResults(lastResults);
         } else {
           try { buildDevelopersRow_(); } catch (e) {}
         }
@@ -9537,7 +9711,7 @@
       google.script.run
         .withSuccessHandler(onInitialSearchData)
         .withFailureHandler(onInitialSearchDataFailure)
-        .getInitialSearchData(getViewerAdminPin()); // السيرفر بيتحقق من الكلمة؛ العدّاد بيرجع للأدمن بس
+        .getInitialSearchData(initialSearchOptions_(), getViewerAdminPin()); // السيرفر بيتحقق من الكلمة؛ العدّاد بيرجع للأدمن بس
     }
 
     /* Perf fix (2026-09-11) — استهلاك "الجلب المسبق" إن وُجد.
@@ -9731,7 +9905,7 @@
           google.script.run
             .withSuccessHandler(function (d) { resolve(d); })
             .withFailureHandler(function () { resolve(null); })
-            .getInitialSearchData(getViewerAdminPin());
+            .getInitialSearchData(initialSearchOptions_(), getViewerAdminPin());
         });
       } catch (e) { window.__aqarInitialPrefetch = null; }
 
@@ -11575,7 +11749,7 @@
       // (الرئيسية أجّلتها) — ابنيها دلوقتي من نفس lastResults المحمَّل في الذاكرة، بلا أي نداء شبكة
       // جديد. أي بحث لاحق (runSearch) أو تغيير ترتيب هيعيد البناء بشكل طبيعي زي ما هو تمامًا.
       if (initialResultsReady && !resultsCardsBuilt) {
-        renderResults(sortUnits(lastResults, document.getElementById('f_sort').value));
+        renderResults(lastResults);
       }
     }
     function showSearchView() {
@@ -12723,24 +12897,13 @@
       };
       if (filters.status) payload.status = filters.status; // لا حقل واجهة له — يُطبَّق مباشرة على البحث
 
-      var container = document.getElementById('results');
-      if (container) container.innerHTML = typeof skeletonCardsHtml === 'function' ? skeletonCardsHtml(6) : '';
-      var rc = document.getElementById('resultsCount'); if (rc) rc.textContent = 'جاري تحميل العقارات...';
-
-      google.script.run.withSuccessHandler(function (units) {
-        if (!Array.isArray(units)) {
-          if (typeof handleAuthLost_ === 'function' && handleAuthLost_(units)) return;
-          if (container) container.innerHTML = '<div class="empty-state"><h3>' + ((units && units.message) || 'حصل خطأ أثناء تحميل النتائج') + '</h3></div>';
-          return;
-        }
-        window.lastResults = units;
-        if (typeof renderResults === 'function' && typeof sortUnits === 'function') {
-          renderResults(sortUnits(units, document.getElementById('f_sort') ? document.getElementById('f_sort').value : 'newest'));
-        }
+      // REPORTS/048: نفس مسار صفحات "استكشف" (requestSearchPage_) بنفس الفلاتر — بما فيها status اللي مالوش حقل واجهة
+      if (typeof requestSearchPage_ !== 'function') return;
+      lastSearchBase_ = payload;
+      requestSearchPage_(payload, 1, false).then(function (ok) {
+        if (!ok) return;
         if (typeof window.__aqarGoExplore === 'function') window.__aqarGoExplore(); else location.hash = 'explore';
-      }).withFailureHandler(function (err) {
-        if (container) container.innerHTML = '<div class="empty-state"><h3>حصل خطأ أثناء تحميل النتائج</h3></div>';
-      }).searchUnits(payload, getViewerAdminPin());
+      });
     }
 
     function statsOpenUnit_(unitId) {
