@@ -3674,6 +3674,31 @@
       #umUserBody .um-actions { margin: var(--aq-space-5) calc(-1 * var(--aq-space-4)) 0; padding: var(--aq-space-4); }
       #umUserBody .um-actions button { flex: 1 1 100%; }
     }
+    /* PHASE 4 / STEP 3 (Report 062): جرس الإشعارات + المركز — نفس التوكنات، Cairo، RTL؛ بدون نظام تصميم جديد */
+    .aq-notif-bell { display: none; position: relative; align-items: center; justify-content: center; width: 38px; height: 38px; padding: 0; border-radius: var(--aq-radius-sm, 10px); background: transparent; border: 1px solid var(--aq-prop-border, #E3E6E5); color: var(--aq-prop-text-muted, #6E7573); cursor: pointer; font-family: var(--aq-font); }
+    .aq-notif-bell svg { width: 18px; height: 18px; }
+    .aq-notif-bell:hover, .aq-notif-bell[aria-expanded="true"] { color: var(--navy); border-color: var(--gold); }
+    body.aq-app-on .aq-notif-bell { display: inline-flex; }
+    .aq-notif-badge { position: absolute; top: -6px; inset-inline-end: -6px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--danger, #b91c1c); color: #fff; font-size: 11px; font-weight: 800; line-height: 18px; text-align: center; font-variant-numeric: tabular-nums; }
+    .notif-box { max-width: 520px; }
+    .notif-header-actions { display: flex; align-items: center; gap: 8px; }
+    .notif-unread-label { font-size: var(--aq-fs-small); color: var(--muted); font-weight: 600; margin-inline-start: 6px; }
+    .notif-markall { font-size: var(--aq-fs-small); }
+    .notif-list { display: flex; flex-direction: column; gap: 8px; min-height: 120px; }
+    .notif-item { display: grid; grid-template-columns: 10px 1fr auto; gap: 10px; align-items: start; width: 100%; text-align: start; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm, 10px); background: var(--bg); color: var(--text); font-family: var(--aq-font); cursor: pointer; }
+    .notif-item:hover { border-color: var(--border-gold); }
+    .notif-item.is-unread { background: rgba(201,154,46,0.08); border-color: rgba(201,154,46,0.35); }
+    .notif-dot { width: 8px; height: 8px; margin-top: 7px; border-radius: 50%; background: transparent; }
+    .notif-item.is-unread .notif-dot { background: var(--gold); }
+    .notif-title { font-weight: 700; font-size: var(--aq-fs-body); }
+    .notif-body { color: var(--muted); font-size: var(--aq-fs-small); margin-top: 2px; }
+    .notif-time { color: var(--muted); font-size: var(--aq-fs-label); white-space: nowrap; }
+    .notif-empty { text-align: center; color: var(--muted); padding: 28px 8px; }
+    #notifPager[hidden], #archivePager[hidden] { display: none !important; } /* .aq-results-pager بتفرض display:flex — الإخفاء بالسمة لازم يغلب */
+    @media (max-width: 640px) {
+      #notifModal { padding: 0; align-items: stretch; }
+      #notifModal .notif-box { max-width: none; min-height: 100%; border-radius: 0; border-inline: 0; }
+    }
     /* PHASE 4 / STEP 1 (Report 060): الأرشيف — بطاقات القائمة + لافتة "مؤرشفة" في التفاصيل. نفس التوكنات والخط (Cairo) — بدون نظام تصميم جديد. */
     .arc-card { cursor: pointer; }
     .arc-card .aq-logo-tile { overflow: hidden; }
@@ -3832,6 +3857,8 @@
     <button type="button" class="top-action-btn app-nav-btn top-action-admin" id="adminFab" data-app-view="dashboard" data-route="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>لوحة التحكم</span></button>
   </nav>
   <div class="aq-header-end">
+    <!-- PHASE 4 / STEP 3 (Report 062): جرس الإشعارات — يظهر بعد الدخول فقط (body.aq-app-on)؛ العدّ من نبضة الحضور القائمة (90 ث) + طلب واحد عند فتح التطبيق -->
+    <button type="button" class="aq-notif-bell" id="notifBellBtn" aria-label="الإشعارات" aria-haspopup="dialog" aria-expanded="false" title="الإشعارات"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="aq-notif-badge" id="notifBadge" hidden aria-live="polite">0</span></button>
     <div class="aq-header-identity" id="aqHeaderIdentity">
       <div class="aq-id-text"><span class="aq-id-name"></span><span class="aq-id-role"></span></div>
       <div class="aq-avatar" aria-hidden="true"></div>
@@ -4683,6 +4710,21 @@
       تصدير مقارنة PDF
     </button>
     <div id="compareModalContent"></div>
+  </div>
+</div>
+
+<!-- PHASE 4 / STEP 3 (Report 062): مركز الإشعارات — نفس نمط .modal-overlay/.modal-box القائم (desktop: صندوق مثبّت، mobile: ورقة بكامل الارتفاع) -->
+<div class="modal-overlay" id="notifModal" role="dialog" aria-modal="true" aria-labelledby="notifModalTitle">
+  <div class="modal-box notif-box">
+    <div class="modal-header">
+      <div class="modal-title" id="notifModalTitle">الإشعارات <span class="notif-unread-label" id="notifUnreadLabel"></span></div>
+      <div class="notif-header-actions">
+        <button type="button" class="aq-btn aq-btn--ghost notif-markall" id="notifMarkAllBtn">تعليم الكل كمقروء</button>
+        <button class="modal-close" id="notifModalCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      </div>
+    </div>
+    <div id="notifList" class="notif-list" aria-live="polite"></div>
+    <div class="aq-results-pager" id="notifPager" hidden><button type="button" class="aq-btn aq-btn--secondary" id="notifLoadMoreBtn">عرض المزيد</button></div>
   </div>
 </div>
 
@@ -9852,6 +9894,7 @@
   function showApp() {
     document.documentElement.classList.remove('session-restoring'); // انتهت الاستعادة بنجاح — أزل السبلاش
     document.body.classList.add('aq-app-on'); // Phase 2A: إظهار هيكل الشِل (هيدر+سايدبار) — عرض فقط
+    if (typeof window.__aqarNotifInit === 'function') window.__aqarNotifInit(); // Report 062: عدّ غير المقروء مرة عند فتح التطبيق (بعدها النبضة كل 90 ث)
     document.getElementById('loginGate').style.display = 'none';
     document.getElementById('mainContainer').style.display = 'block';
     unlockApp();
@@ -10071,7 +10114,7 @@
   var __presenceHbTimer = null;
   function sendPresenceHeartbeat() {
     if (!window.__currentUser) return;
-    try { google.script.run.withFailureHandler(backgroundFailure_('نبضة الحضور')).heartbeatPresence(getAuthCreds()); } catch (e) {}
+    try { google.script.run.withSuccessHandler(function (res) { if (res && typeof res.unreadNotifications === 'number' && typeof window.__aqarNotifSetUnread === 'function') window.__aqarNotifSetUnread(res.unreadNotifications); }).withFailureHandler(backgroundFailure_('نبضة الحضور')).heartbeatPresence(getAuthCreds()); } catch (e) {}
   }
   function startPresenceHeartbeat() {
     if (__presenceHbTimer) return;           // نبضة واحدة فقط — التنقّل بين الأقسام ما يبدأش حلقات جديدة
@@ -13779,6 +13822,117 @@
     }
     window.__aqarLoadArchive = function () { reload_(); };
     window.openArchivedUnitDetails_ = openArchivedUnitDetails_;
+  })();
+
+  /* ============================================================================
+   * PHASE 4 / STEP 3 (Report 062) — مركز الإشعارات داخل التطبيق
+   * ----------------------------------------------------------------------------
+   * - المصدر = صفوف realestate.notifications (السيرفر، مقيّدة بمستخدم الجلسة). العدّ يوصل من نبضة الحضور القائمة (90 ث) + طلب واحد عند فتح التطبيق.
+   * - الجرس + البادج في الهيدر؛ اللوحة = نفس .modal-overlay القائم؛ القائمة صفحات 20 + "عرض المزيد"؛ حالة فاضية/تحميل.
+   * - النقر على إشعار: تعليمه كمقروء (غير حاجب) ثم فتح الكيان (unit → تفاصيل الوحدة القائمة). الروابط تُبنى محليًا من entityType/entityId فقط.
+   * - كل القيم بتتهرّب (escHtml_) — لا innerHTML خام. لا BroadcastChannel (تبويبات متعددة = كل تبويب على نبضته).
+   * ========================================================================== */
+  (function notificationCenterModule_() {
+    var PAGE = 20;
+    var bell = document.getElementById('notifBellBtn'), badge = document.getElementById('notifBadge');
+    var modal = document.getElementById('notifModal'), list = document.getElementById('notifList'), pager = document.getElementById('notifPager');
+    var moreBtn = document.getElementById('notifLoadMoreBtn'), markAllBtn = document.getElementById('notifMarkAllBtn'), unreadLabel = document.getElementById('notifUnreadLabel');
+    if (!bell || !modal || !list) return;
+    var state = { items: [], page: 0, total: 0, unread: 0, loading: false, seq: 0 };
+
+    function setUnread(n) {
+      state.unread = Math.max(0, Number(n) || 0);
+      badge.textContent = state.unread > 99 ? '99+' : String(state.unread);
+      badge.hidden = state.unread === 0;
+      bell.setAttribute('aria-label', state.unread ? 'الإشعارات — ' + state.unread + ' غير مقروء' : 'الإشعارات');
+      unreadLabel.textContent = state.unread ? '(' + state.unread + ' غير مقروء)' : '';
+      markAllBtn.disabled = state.unread === 0;
+    }
+    window.__aqarNotifSetUnread = setUnread;
+    window.__aqarNotifInit = function () {
+      setUnread(0);
+      AqarDataService.get('getUnreadNotificationCount', [getAuthCreds()]).then(function (res) { if (res && res.success) setUnread(res.unreadCount); }).catch(function () {});
+    };
+
+    function timeAgo_(iso) {
+      var t = Date.parse(iso); if (!t) return '';
+      var diff = Math.max(0, Date.now() - t);
+      if (diff < 60000) return 'الآن';
+      if (diff < 3600000) return 'منذ ' + Math.floor(diff / 60000) + ' دقيقة';
+      if (diff < 86400000) return 'منذ ' + Math.floor(diff / 3600000) + ' ساعة';
+      try { return new Date(t).toLocaleString('ar-EG', { timeZone: 'Africa/Cairo', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; }
+    }
+    var TYPE_ICON = { UNIT_CREATED: ICON.building, PRICE_CHANGED: ICON.tag, UNIT_RESTORED: ICON.clipboard, SYSTEM: ICON.alert };
+    function itemHtml_(n) {
+      return '<button type="button" class="notif-item' + (n.unread ? ' is-unread' : '') + '" data-id="' + escHtml_(n.id) + '" data-entity-type="' + escHtml_(n.entityType || '') + '" data-entity-id="' + escHtml_(n.entityId || '') + '" aria-label="' + escHtml_(n.title) + '">' +
+        '<span class="notif-dot" aria-hidden="true"></span>' +
+        '<span><span class="notif-title">' + (TYPE_ICON[n.type] || '') + ' ' + escHtml_(n.title) + '</span>' + (n.body ? '<div class="notif-body">' + escHtml_(n.body) + '</div>' : '') + '</span>' +
+        '<span class="notif-time" dir="rtl">' + escHtml_(timeAgo_(n.createdAt)) + '</span>' +
+      '</button>';
+    }
+    function render_(append, added) {
+      if (!append) list.innerHTML = '';
+      if (!state.items.length) { list.innerHTML = '<div class="notif-empty"><h3>لا توجد إشعارات</h3><p>هيظهر هنا أي إشعار جديد يخصّك.</p></div>'; pager.hidden = true; return; }
+      list.insertAdjacentHTML('beforeend', (append ? added : state.items).map(itemHtml_).join(''));
+      pager.hidden = !(state.items.length < state.total);
+      moreBtn.disabled = state.loading;
+    }
+    function fetchPage_(page, append) {
+      var mySeq = ++state.seq;
+      state.loading = true; moreBtn.disabled = true;
+      if (!append) list.innerHTML = '<div class="aq-skeleton aq-skeleton--card"></div><div class="aq-skeleton aq-skeleton--card"></div>';
+      return AqarDataService.get('getNotifications', [{ page: page, pageSize: PAGE }, getAuthCreds()]).then(function (res) {
+        if (mySeq !== state.seq) return;
+        state.loading = false;
+        if (!res || res.success !== true || !Array.isArray(res.notifications)) {
+          if (typeof handleAuthLost_ === 'function' && handleAuthLost_(res)) return;
+          list.innerHTML = '<div class="aq-alert aq-alert--danger" role="alert">' + escHtml_((res && res.message) || 'تعذّر تحميل الإشعارات') + '</div>'; pager.hidden = true; return;
+        }
+        state.items = append ? state.items.concat(res.notifications) : res.notifications.slice();
+        state.page = res.page; state.total = res.totalCount; setUnread(res.unreadCount);
+        render_(append, res.notifications);
+      }).catch(function (err) {
+        if (mySeq !== state.seq) return;
+        state.loading = false;
+        list.innerHTML = '<div class="aq-alert aq-alert--danger" role="alert">' + escHtml_('تعذّر تحميل الإشعارات — ' + ((err && err.message) || 'تحقّق من الاتصال')) + '</div>'; pager.hidden = true;
+      });
+    }
+    function open_() { modal.classList.add('open'); bell.setAttribute('aria-expanded', 'true'); fetchPage_(1, false); setTimeout(function () { var c = document.getElementById('notifModalCloseBtn'); if (c) c.focus(); }, 0); }
+    function close_() { modal.classList.remove('open'); bell.setAttribute('aria-expanded', 'false'); }
+    bell.addEventListener('click', function () { if (modal.classList.contains('open')) close_(); else open_(); });
+    document.getElementById('notifModalCloseBtn').addEventListener('click', close_);
+    modal.addEventListener('click', function (e) { if (e.target === modal) close_(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && modal.classList.contains('open')) close_(); });
+    moreBtn.addEventListener('click', function () { if (!state.loading && state.items.length < state.total) fetchPage_(state.page + 1, true); });
+    markAllBtn.addEventListener('click', function () {
+      markAllBtn.disabled = true;
+      AqarDataService.get('markAllNotificationsRead', [getAuthCreds()]).then(function (res) {
+        if (!res || res.success !== true) { markAllBtn.disabled = false; if (typeof handleAuthLost_ === 'function' && handleAuthLost_(res)) return; showToast((res && res.message) || 'تعذّر التعليم', 'error'); return; }
+        state.items.forEach(function (n) { n.unread = false; });
+        list.querySelectorAll('.notif-item.is-unread').forEach(function (el) { el.classList.remove('is-unread'); });
+        setUnread(0);
+        if (res.updated) showToast('تم تعليم ' + res.updated + ' إشعار كمقروء', 'success');
+      }).catch(function () { markAllBtn.disabled = false; showToast('تعذّر التعليم — تحقّق من الاتصال', 'error'); });
+    });
+    function markReadNonBlocking_(id, el) {
+      var n = state.items.find(function (x) { return x.id === id; });
+      if (!n || !n.unread) return;
+      n.unread = false; if (el) el.classList.remove('is-unread'); setUnread(state.unread - 1);
+      AqarDataService.get('markNotificationRead', [id, getAuthCreds()]).then(function (res) {
+        if (res && res.success && typeof res.unreadCount === 'number') setUnread(res.unreadCount);
+        else if (res && res.success === false) { n.unread = true; if (el) el.classList.add('is-unread'); setUnread(state.unread + 1); }
+      }).catch(function () { n.unread = true; if (el) el.classList.add('is-unread'); setUnread(state.unread + 1); }); // فشل = يفضل غير مقروء ويتعاد لاحقًا
+    }
+    function openEntity_(type, id) {
+      if (type === 'unit' && /^UNIT-\d{1,10}$/.test(id) && typeof window.openUnitDetailsById_ === 'function') { close_(); window.openUnitDetailsById_(id); }
+    }
+    list.addEventListener('click', function (e) {
+      var el = e.target && e.target.closest ? e.target.closest('.notif-item') : null;
+      if (!el) return;
+      markReadNonBlocking_(el.getAttribute('data-id'), el);
+      openEntity_(el.getAttribute('data-entity-type'), el.getAttribute('data-entity-id'));
+    });
+    window.__aqarNotifOpen = open_; // للاختبار/الاستخدام الداخلي
   })();
 </script>
 </body>
