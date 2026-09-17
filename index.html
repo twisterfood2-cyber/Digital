@@ -3674,6 +3674,18 @@
       #umUserBody .um-actions { margin: var(--aq-space-5) calc(-1 * var(--aq-space-4)) 0; padding: var(--aq-space-4); }
       #umUserBody .um-actions button { flex: 1 1 100%; }
     }
+    /* PHASE 4 / STEP 1 (Report 060): الأرشيف — بطاقات القائمة + لافتة "مؤرشفة" في التفاصيل. نفس التوكنات والخط (Cairo) — بدون نظام تصميم جديد. */
+    .arc-card { cursor: pointer; }
+    .arc-card .aq-logo-tile { overflow: hidden; }
+    .arc-card .aq-logo-tile img { width: 100%; height: 100%; object-fit: cover; }
+    .arc-card-specs { color: var(--text-muted); font-size: var(--aq-fs-small); }
+    .arc-card-archived { color: var(--text-muted); font-size: var(--aq-fs-label); }
+    .ud-archived-banner { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 12px; padding: 12px 14px; border-radius: 12px; background: rgba(201,154,46,0.12); border: 1px solid rgba(201,154,46,0.45); }
+    .ud-archived-banner b { font-weight: 800; }
+    .ud-archived-banner .ud-archived-meta { flex: 1 1 240px; font-size: var(--aq-fs-small); color: var(--text-muted); }
+    .ud-archived-banner .ud-archived-warn { flex-basis: 100%; font-size: var(--aq-fs-small); color: var(--danger, #b91c1c); }
+    .unit-card-overlay.ud-archived-mode .ud-actions, .unit-card-overlay.ud-archived-mode .ud-status-select { display: none !important; }
+    .unit-card-overlay.ud-archived-mode .ud-media-status { opacity: 0.55; }
   </style>
 </head>
 <body>
@@ -4150,6 +4162,7 @@
           <button type="button" class="dash-nav-item aq-subnav-item is-active" data-dash="home" data-roles="OWNER,MANAGER,DATA_ENTRY,SALES"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg><span>الرئيسية</span></button>
           <button type="button" class="dash-nav-item aq-subnav-item" data-dash="developers" data-roles="OWNER" data-perm="MANAGE_DEVELOPERS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18ZM10 6h4M10 10h4M10 14h4M10 18h4"/></svg><span>المطوّرون</span></button>
           <button type="button" class="dash-nav-item aq-subnav-item" data-dash="projects" data-roles="OWNER" data-perm="MANAGE_PROJECTS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M9 11h.01M15 11h.01M9 15h.01M15 15h.01"/></svg><span>المشروعات</span></button>
+          <button type="button" class="dash-nav-item aq-subnav-item" data-dash="archive" data-roles="OWNER" data-perm="MANAGE_ARCHIVE"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h18v4H3zM5 8v12h14V8M10 12h4"/></svg><span>الأرشيف</span></button>
           <button type="button" class="dash-nav-item aq-subnav-item" data-dash="users" data-roles="OWNER" data-perm="MANAGE_USERS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 5.2a3.5 3.5 0 0 1 0 6.8M18 20a6.5 6.5 0 0 0-3.2-5.6"/></svg><span>المستخدمون</span></button>
           <button type="button" class="dash-nav-item aq-subnav-item" data-dash="stats" data-roles="OWNER,MANAGER,DATA_ENTRY,SALES" data-perm="VIEW_STATISTICS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span>الإحصاءات والمخزون</span></button>
           <button type="button" class="dash-nav-item aq-subnav-item" data-dash="profile" data-roles="OWNER,MANAGER,DATA_ENTRY,SALES"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>الملف الشخصي</span></button>
@@ -4483,6 +4496,28 @@
               </div>
             </div>
             <div id="projectsListContent" class="aq-dev-grid"></div>
+          </section>
+        </div>
+
+        <!-- PHASE 4 / STEP 1 (Report 060): عرض الأرشيف + الاسترجاع الآمن — للمالك فقط (الحماية الحقيقية في السيرفر: getArchivedUnits / getArchivedUnitById / restoreArchivedUnit). -->
+        <div class="dash-panel" id="dashPanel-archive" hidden>
+          <div class="dash-page-title">الأرشيف</div>
+          <p class="aq-page-intro">الوحدات اللي اتأرشفت (خرجت من البحث النشط) بنفس أرقامها. الاسترجاع بيرجّع الوحدة نفسها لنفس الرقم — وبيترفض تلقائيًا لو فيه وحدة نشطة مطابقة (نفس قواعد كشف التكرار في الإدخال). الأرشفة نفسها ما بتتشغّلش من هنا.</p>
+          <section class="aq-admin-card" id="archiveFilterCard" aria-labelledby="archiveFilterTitle">
+            <div class="aq-admin-card-head"><div><h3 class="aq-admin-card-title" id="archiveFilterTitle">بحث في الأرشيف</h3><p class="aq-admin-card-sub">الأحدث أرشفةً أولًا</p></div></div>
+            <form class="aq-form-grid aq-form-grid--2" id="archiveFilterForm" autocomplete="off">
+              <div class="aq-form-field"><label class="aq-form-label" for="arcUnitId">رقم الوحدة</label><input class="aq-form-control" id="arcUnitId" type="text" placeholder="UNIT-…" dir="ltr"></div>
+              <div class="aq-form-field"><label class="aq-form-label" for="arcDeveloper">المطوّر</label><input class="aq-form-control" id="arcDeveloper" type="text" list="f_developerDatalist"></div>
+              <div class="aq-form-field"><label class="aq-form-label" for="arcProject">المشروع</label><input class="aq-form-control" id="arcProject" type="text" list="f_projectDatalist"></div>
+              <div class="aq-form-field"><label class="aq-form-label" for="arcType">نوع الوحدة</label><input class="aq-form-control" id="arcType" type="text" placeholder="شقة، فيلا، …"></div>
+              <div class="aq-form-field"><label class="aq-form-label" for="arcDistrict">المنطقة</label><input class="aq-form-control" id="arcDistrict" type="text"></div>
+              <div class="aq-form-field aq-form-actions"><button type="submit" class="aq-btn aq-btn--primary" id="arcSearchBtn">بحث</button> <button type="button" class="aq-btn aq-btn--ghost" id="arcClearBtn">مسح</button></div>
+            </form>
+          </section>
+          <section class="aq-admin-card" id="archiveListCard" aria-labelledby="archiveListTitle">
+            <div class="aq-admin-card-head"><div><h3 class="aq-admin-card-title" id="archiveListTitle">الوحدات المؤرشفة</h3><p class="aq-admin-card-sub" id="archiveListCount" aria-live="polite"></p></div></div>
+            <div id="archiveListContent" class="aq-dev-grid"></div>
+            <div class="aq-results-pager" id="archivePager" hidden><button type="button" class="aq-btn aq-btn--secondary" id="archiveLoadMoreBtn">عرض المزيد</button></div>
           </section>
         </div>
 
@@ -6467,6 +6502,10 @@
                   perm: 'MANAGE_PROJECTS',   section: 'projects',   label: 'المشروعات',
                   title: 'إدارة المشروعات', crumbs: ['لوحة التحكم'],
                   denyMsg: 'صلاحيتك الحالية لا تسمح بفتح هذا القسم' },
+    archive:    { hash: '#dashboard/archive',    aliases: [],             view: 'dashboard', navId: 'adminFab', navPerm: null,
+                  perm: 'MANAGE_ARCHIVE',    section: 'archive',    label: 'الأرشيف',
+                  title: 'الأرشيف', crumbs: ['لوحة التحكم'],
+                  denyMsg: 'صلاحيتك الحالية لا تسمح بفتح هذا القسم' },
     settings:   { hash: '#dashboard/settings',   aliases: [],             view: 'dashboard', navId: 'adminFab', navPerm: null,
                   perm: 'MANAGE_SETTINGS',   section: 'settings',   label: 'الإعدادات',
                   title: 'الإعدادات', crumbs: ['لوحة التحكم'],
@@ -7704,6 +7743,7 @@
   }
   window.openUnitDetailsById_ = openUnitDetailsById_;
   function showUnitCardOverlay(u) {
+    unitCardOverlay.classList.remove('ud-archived-mode'); // Report 060: التفاصيل العادية = وضع نشط دائمًا
     document.getElementById('unitCardOverlayBody').innerHTML = buildUnitDetailsHtml(u);
     udGalleryImages = (u['Images'] || '').split(',').map(s => s.trim()).filter(Boolean);
     udGalleryIndex = 0;
@@ -7713,6 +7753,7 @@
   window.showUnitCardOverlay = showUnitCardOverlay;
   function closeUnitCardOverlay() {
     unitCardOverlay.classList.remove('open');
+    unitCardOverlay.classList.remove('ud-archived-mode'); // Report 060
   }
   document.getElementById('unitCardOverlayCloseBtn').addEventListener('click', closeUnitCardOverlay);
   unitCardOverlay.addEventListener('click', function(e) { if (e.target === this) closeUnitCardOverlay(); });
@@ -12051,13 +12092,13 @@
       }
     }
 
-    var DASH_PANEL_KEYS = ['home', 'developers', 'projects', 'users', 'stats', 'profile', 'settings', 'audit'];
+    var DASH_PANEL_KEYS = ['home', 'developers', 'projects', 'archive', 'users', 'stats', 'profile', 'settings', 'audit'];
     // المستوى الثاني (تفويض، مش مجرد إخفاء زر): أقسام إدارية حصرية للمالك — أي مستخدم غير
     // OWNER يُمنَع من فتحها حتى لو استُدعيت dashSelect برمجيًا / عبر hash / Console / API.
     // مرآة للباك-إند authorizeOwnerAdmin_ (OWNER فقط) — والباك-إند يعيد التحقق دائمًا.
-    var DASH_PANEL_OWNER_ONLY = { developers: 1, projects: 1, users: 1, settings: 1, audit: 1 };
+    var DASH_PANEL_OWNER_ONLY = { developers: 1, projects: 1, archive: 1, users: 1, settings: 1, audit: 1 };
     // حارس دفاعي إضافي بالصلاحية ("الإحصاءات والمخزون" = VIEW_STATISTICS، متاحة لكل الأدوار).
-    var DASH_PANEL_PERMS = { users: 'MANAGE_USERS', developers: 'MANAGE_DEVELOPERS', projects: 'MANAGE_PROJECTS', settings: 'MANAGE_SETTINGS', audit: 'MANAGE_USERS', stats: 'VIEW_STATISTICS' };
+    var DASH_PANEL_PERMS = { users: 'MANAGE_USERS', developers: 'MANAGE_DEVELOPERS', projects: 'MANAGE_PROJECTS', archive: 'MANAGE_ARCHIVE', settings: 'MANAGE_SETTINGS', audit: 'MANAGE_USERS', stats: 'VIEW_STATISTICS' };
 
     // "الإحصائيات والمخزون" — يُعرَض داخل شِل لوحة التحكم: نُعيد توطين #statsView داخل
     // #dashStatsMount (مرة واحدة)، ثم نفتح موديول الإحصائيات ببيانات الدخول (VIEW_STATISTICS).
@@ -12108,6 +12149,7 @@
       else if (key === 'settings') dashReparentSettingsOnce();
       else if (key === 'developers' && typeof window.__aqarLoadDevelopers === 'function') window.__aqarLoadDevelopers();
       else if (key === 'projects' && typeof window.__aqarLoadProjects === 'function') window.__aqarLoadProjects();
+      else if (key === 'archive' && typeof window.__aqarLoadArchive === 'function') window.__aqarLoadArchive();
       else if (key === 'audit' && typeof window.__aqarLoadAudit === 'function') window.__aqarLoadAudit();
     }
 
@@ -12806,6 +12848,7 @@
       users:      function () { enterDashSection_('users'); },
       developers: function () { enterDashSection_('developers'); },
       projects:   function () { enterDashSection_('projects'); },
+      archive:    function () { enterDashSection_('archive'); },   // Report 060
       settings:   function () { enterDashSection_('settings'); },
       audit:      function () { enterDashSection_('audit'); }
     };
@@ -13573,6 +13616,169 @@
       activityViewDate.setMonth(activityViewDate.getMonth() + 1);
       renderActivityReport();
     });
+  })();
+
+  /* ============================================================================
+   * PHASE 4 / STEP 1 (Report 060) — الأرشيف: عرض الوحدات المؤرشفة + الاسترجاع الآمن (OWNER فقط)
+   * ----------------------------------------------------------------------------
+   * - الحماية الحقيقية في السيرفر (getArchivedUnits / getArchivedUnitById / restoreArchivedUnit = OWNER عبر الجلسة).
+   *   الإخفاء هنا (MANAGE_ARCHIVE = '*' للمالك فقط في CLIENT_PERMS) مجرد واجهة.
+   * - القائمة: صفحات (60) + "عرض المزيد" (append) — بدون DOM ضخم؛ الأحدث أرشفةً أولًا (ترتيب السيرفر).
+   * - التفاصيل: نفس buildUnitDetailsHtml + لافتة "مؤرشفة" ووضع ud-archived-mode (يخفي أزرار التعديل/الحالة) + زر الاسترجاع.
+   *   بدون logUnitDetailsView (مش تفاصيل نشطة).
+   * - الاسترجاع: تأكيد صريح (aqConfirm) → restoreArchivedUnit → نجاح: toast + إغلاق + إعادة تحميل القائمة + مسح كاش البحث
+   *   (الوحدة تظهر في البحث النشط عند أول بحث جديد). محجوب (تكرار/غير مؤرشفة/…): رسالة السيرفر كما هي، بدون أي تغيير.
+   * - كل القيم بتتهرّب بـ escHtml_ (لا innerHTML خام لبيانات القاعدة).
+   * ========================================================================== */
+  (function archiveViewModule_() {
+    var ARC_PAGE = 60;
+    var state = { filters: {}, page: 0, total: 0, loading: false, seq: 0, items: [] };
+    var content = document.getElementById('archiveListContent');
+    var countEl = document.getElementById('archiveListCount');
+    var pager = document.getElementById('archivePager');
+    var moreBtn = document.getElementById('archiveLoadMoreBtn');
+    var form = document.getElementById('archiveFilterForm');
+    if (!content || !form) return;
+
+    function readFilters_() {
+      return {
+        unitId: document.getElementById('arcUnitId').value.trim(),
+        developer: document.getElementById('arcDeveloper').value.trim(),
+        projectName: document.getElementById('arcProject').value.trim(),
+        propertyType: document.getElementById('arcType').value.trim(),
+        district: document.getElementById('arcDistrict').value.trim()
+      };
+    }
+    function cardHtml_(u) {
+      var imgs = String(u['Images'] || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+      var tile = imgs.length
+        ? '<img src="' + escHtml_(getThumbUrl(imgs[0])) + '" alt="" loading="lazy" decoding="async" onerror="thumbFallback_(this)">'
+        : escHtml_(String(u['Property Type'] || '').slice(0, 2));
+      var specs = [
+        u['Unit Area (sqm)'] ? escHtml_(u['Unit Area (sqm)']) + ' م²' : '',
+        u['Rooms'] ? escHtml_(u['Rooms']) + ' غرف' : '',
+        u['Floor'] ? 'الدور ' + escHtml_(u['Floor']) : ''
+      ].filter(Boolean).join(' · ');
+      var price = Number(u['Price']) > 0 ? fmtNum(u['Price']) + ' جنيه' : 'بدون سعر';
+      return '' +
+        '<article class="aq-dev-card arc-card" role="button" tabindex="0" data-unit-id="' + escHtml_(u['Unit ID']) + '" aria-label="فتح الوحدة المؤرشفة ' + escHtml_(u['Unit ID']) + '">' +
+          '<div class="aq-logo-tile aq-logo-tile--lg">' + tile + '</div>' +
+          '<div class="aq-list-body">' +
+            '<div class="aq-dev-card-name"><span class="unit-id" dir="ltr">' + escHtml_(u['Unit ID']) + '</span> — ' + escHtml_(u['Project Name'] || u['City'] || '') + ' <span class="unit-title-type">' + escHtml_(u['Property Type'] || '') + '</span></div>' +
+            '<div class="aq-dev-card-meta">' + escHtml_(u['Developer Name'] || 'بدون مطوّر') + ' · ' + escHtml_([u['City'], u['Area/District']].filter(Boolean).join(' - ')) + '</div>' +
+            (specs ? '<div class="arc-card-specs">' + specs + '</div>' : '') +
+          '</div>' +
+          '<div class="aq-dev-card-foot">' +
+            '<span class="aq-dev-card-year">' + price + '</span>' +
+            '<span class="arc-card-archived">أُرشفت ' + escHtml_(u['Archived At'] || '') + '</span>' +
+          '</div>' +
+        '</article>';
+    }
+    function render_(append, added) {
+      var html = (append ? added : state.items).map(cardHtml_).join('');
+      if (append) content.insertAdjacentHTML('beforeend', html);
+      else content.innerHTML = state.items.length ? html : '<div class="aq-empty" style="grid-column:1/-1"><h3>لا توجد وحدات مؤرشفة' + (Object.keys(state.filters).some(function (k) { return state.filters[k]; }) ? ' تطابق البحث' : '') + '</h3><p>الأرشيف فاضي حاليًا — وده طبيعي.</p></div>';
+      countEl.textContent = state.total ? ('معروض ' + state.items.length + ' من ' + state.total + ' وحدة مؤرشفة') : '';
+      pager.hidden = !(state.items.length < state.total);
+      moreBtn.disabled = state.loading;
+    }
+    function fetchPage_(page, append) {
+      var mySeq = ++state.seq;
+      state.loading = true; moreBtn.disabled = true;
+      if (!append) { content.innerHTML = '<div class="aq-skeleton aq-skeleton--card"></div><div class="aq-skeleton aq-skeleton--card"></div><div class="aq-skeleton aq-skeleton--card"></div>'; countEl.textContent = 'جاري التحميل…'; }
+      var req = Object.assign({}, state.filters, { page: page, pageSize: ARC_PAGE });
+      return AqarDataService.get('getArchivedUnits', [req, getAuthCreds()]).then(function (res) {
+        if (mySeq !== state.seq) return;
+        state.loading = false;
+        if (!res || res.success !== true || !Array.isArray(res.units)) {
+          if (typeof handleAuthLost_ === 'function' && handleAuthLost_(res)) return;
+          content.innerHTML = '<div class="aq-alert aq-alert--danger" role="alert" style="grid-column:1/-1">' + escHtml_((res && res.message) || 'تعذّر تحميل الأرشيف') + '</div>';
+          countEl.textContent = ''; pager.hidden = true; return;
+        }
+        var added = res.units;
+        if (append) state.items = state.items.concat(added); else state.items = added.slice();
+        state.page = res.page; state.total = res.totalCount;
+        render_(append, added);
+      }).catch(function (err) {
+        if (mySeq !== state.seq) return;
+        state.loading = false;
+        content.innerHTML = '<div class="aq-alert aq-alert--danger" role="alert" style="grid-column:1/-1">' + escHtml_('تعذّر تحميل الأرشيف — ' + ((err && err.message) || 'تحقّق من الاتصال')) + '</div>';
+        countEl.textContent = ''; pager.hidden = true;
+      });
+    }
+    function reload_() { state.filters = readFilters_(); return fetchPage_(1, false); }
+    form.addEventListener('submit', function (e) { e.preventDefault(); reload_(); });
+    document.getElementById('arcClearBtn').addEventListener('click', function () { form.reset(); reload_(); });
+    moreBtn.addEventListener('click', function () { if (!state.loading && state.items.length < state.total) fetchPage_(state.page + 1, true); });
+    content.addEventListener('click', function (e) {
+      var card = e.target && e.target.closest ? e.target.closest('.arc-card') : null;
+      if (card) openArchivedUnitDetails_(card.getAttribute('data-unit-id'));
+    });
+    content.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      var card = e.target && e.target.closest ? e.target.closest('.arc-card') : null;
+      if (card) { e.preventDefault(); openArchivedUnitDetails_(card.getAttribute('data-unit-id')); }
+    });
+
+    /* ---------- التفاصيل + الاسترجاع ---------- */
+    var openSeq = 0;
+    function openArchivedUnitDetails_(unitId) {
+      if (!unitId) return;
+      var body = document.getElementById('unitCardOverlayBody');
+      var mySeq = ++openSeq;
+      unitCardOverlay.classList.add('ud-archived-mode');
+      body.innerHTML = '<div class="ud-top"><h3 class="ud-top-title">' + ICON.building + ' وحدة مؤرشفة</h3></div><div class="ud-body"><div class="aq-empty"><h3>جاري تحميل الوحدة المؤرشفة ' + escHtml_(unitId) + '…</h3></div></div>';
+      unitCardOverlay.classList.add('open');
+      AqarDataService.get('getArchivedUnitById', [unitId, getAuthCreds()]).then(function (u) {
+        if (mySeq !== openSeq || !unitCardOverlay.classList.contains('open')) return;
+        if (!u || u.success !== true) {
+          if (typeof handleAuthLost_ === 'function' && handleAuthLost_(u)) return;
+          body.innerHTML = '<div class="ud-top"><h3 class="ud-top-title">' + ICON.building + ' وحدة مؤرشفة</h3></div><div class="ud-body"><div class="empty-state"><div class="icon">' + ICON.alert + '</div><h3>' + escHtml_((u && u.message) || 'تعذّر تحميل الوحدة المؤرشفة') + '</h3></div></div>';
+          return;
+        }
+        var missing = (u.imageDeletions || []).filter(function (d) { return d.status === 'deleted'; }).length;
+        var canRestore = (typeof hasPermission === 'function') && hasPermission('MANAGE_ARCHIVE');
+        var banner = '<div class="ud-archived-banner" role="status">' +
+          '<b>مؤرشفة</b><span class="ud-archived-meta">أُرشفت في ' + escHtml_(u['Archived At'] || '—') + ' · الرقم ' + escHtml_(u['Unit ID']) + ' ثابت ولن يتغيّر عند الاسترجاع</span>' +
+          (canRestore ? '<button type="button" class="aq-btn aq-btn--primary" id="arcRestoreBtn">استرجاع الوحدة</button>' : '') +
+          (missing ? '<span class="ud-archived-warn">' + escHtml_(missing + ' من صور R2 الخاصة بالوحدة اتحذفت فعلًا بعد الأرشفة — الاسترجاع ما بيرجّعهاش') + '</span>' : '') +
+          '</div>';
+        body.innerHTML = banner + buildUnitDetailsHtml(u);
+        udGalleryImages = String(u['Images'] || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+        udGalleryIndex = 0;
+        var btn = document.getElementById('arcRestoreBtn');
+        if (btn) btn.addEventListener('click', function () { confirmRestore_(u, btn); });
+      }).catch(function () {
+        if (mySeq !== openSeq) return;
+        body.innerHTML = '<div class="ud-top"><h3 class="ud-top-title">' + ICON.building + ' وحدة مؤرشفة</h3></div><div class="ud-body"><div class="empty-state"><div class="icon">' + ICON.alert + '</div><h3>تعذّر تحميل الوحدة المؤرشفة — تحقّق من الاتصال</h3></div></div>';
+      });
+    }
+    function confirmRestore_(u, btn) {
+      var text = 'هتسترجع الوحدة ' + u['Unit ID'] + (u['Project Name'] ? ' — ' + u['Project Name'] : '') + (u['Developer Name'] ? ' (' + u['Developer Name'] + ')' : '') +
+        ' إلى الوحدات النشطة بنفس الرقم وبنفس بياناتها. الاسترجاع هيترفض تلقائيًا لو فيه وحدة نشطة مطابقة. متأكد؟';
+      aqConfirm({ title: 'استرجاع وحدة مؤرشفة', text: text, okText: 'نعم، استرجع', danger: true }).then(function (ok) {
+        if (!ok) return;
+        btn.disabled = true; btn.textContent = 'جاري الاسترجاع…';
+        AqarDataService.get('restoreArchivedUnit', [u['Unit ID'], getAuthCreds()]).then(function (res) {
+          btn.disabled = false; btn.textContent = 'استرجاع الوحدة';
+          if (!res || res.success !== true) {
+            if (typeof handleAuthLost_ === 'function' && handleAuthLost_(res)) return;
+            showToast((res && res.message) || 'تعذّر الاسترجاع', 'error');
+            return;
+          }
+          showToast(res.message || ('تم استرجاع الوحدة ' + u['Unit ID']), res.images && res.images.missingObjects && res.images.missingObjects.length ? 'error' : 'success');
+          closeUnitCardOverlay();
+          unitCardOverlay.classList.remove('ud-archived-mode');
+          Object.keys(clientSearchCache).forEach(function (k) { delete clientSearchCache[k]; }); // البحث النشط الجاي يشوف الوحدة
+          fetchPage_(1, false);
+        }).catch(function (err) {
+          btn.disabled = false; btn.textContent = 'استرجاع الوحدة';
+          showToast('تعذّر الاسترجاع — ' + ((err && err.message) || 'تحقّق من الاتصال'), 'error');
+        });
+      });
+    }
+    window.__aqarLoadArchive = function () { reload_(); };
+    window.openArchivedUnitDetails_ = openArchivedUnitDetails_;
   })();
 </script>
 </body>
