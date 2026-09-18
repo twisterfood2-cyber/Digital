@@ -1028,22 +1028,7 @@
       display: grid; grid-template-columns: repeat(auto-fit, minmax(172px, 1fr));
       gap: 12px; margin-bottom: 14px;
     }
-    #statsView .kpi-card {
-      background: var(--glass-card);
-      -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
-      border: 1px solid var(--border-gold); border-radius: var(--radius-md);
-      padding: 15px 16px; box-shadow: var(--shadow-card);
-      display: flex; flex-direction: column; justify-content: center; min-height: 96px;
-    }
-    #statsView .kpi-card.available { border-color: rgba(127,211,163,0.32); }
-    #statsView .kpi-card.reserved  { border-color: rgba(230,201,120,0.40); }
-    #statsView .kpi-card.sold      { border-color: rgba(233,144,138,0.34); }
-    #statsView .kpi-card.archived  { border-color: rgba(174,185,198,0.30); }
-    #statsView .kpi-value { font-size:  var(--aq-fs-page-title); font-weight: 800; color: var(--gold-soft); line-height: 1.15; letter-spacing: 0.3px; }
-    #statsView .kpi-card.available .kpi-value { color: var(--ok); }
-    #statsView .kpi-card.sold      .kpi-value { color: var(--danger); }
-    #statsView .kpi-card.archived  .kpi-value { color: var(--text-muted); }
-    #statsView .kpi-label { font-size:  var(--aq-fs-caption); color: var(--text-muted); margin-top: 3px; font-weight: 600; line-height: 1.4; }
+    /* Report 071: قواعد .kpi-card / .kpi-value / .kpi-label القديمة اتشالت — مفيش عنصر بيستخدمها (المؤشرات على .aq-kpi من aqar-foundation.css) */
     #statsView .section {
       background: var(--glass-panel);
       -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
@@ -1063,7 +1048,7 @@
     }
     #statsView .bar-label b { color: var(--gold-soft); font-weight: 700; white-space: nowrap; }
     #statsView .bar-track { background: var(--aq-bg-muted-2); border-radius:  var(--aq-radius-pill); height: 9px; overflow: hidden; }
-    #statsView .bar-fill { height: 100%; border-radius:  var(--aq-radius-pill); background: linear-gradient(90deg, var(--gold-dark), var(--gold-soft)); }
+    #statsView .bar-fill { height: 100%; border-radius:  var(--aq-radius-pill); background: var(--aq-color-primary); } /* Report 071: تعبئة مسطّحة بدل التدرّج */
     #statsView table { width: 100%; border-collapse: collapse; font-size:  var(--aq-fs-small); }
     #statsView th, #statsView td { padding: 9px 8px; text-align: right; border-bottom: 1px solid var(--line-dark); }
     #statsView th { color: var(--text-muted); font-weight: 700; }
@@ -1072,9 +1057,9 @@
     #statsView tbody tr:last-child td { border-bottom: none; }
     #statsView .empty-note { color: var(--text-muted); font-size:  var(--aq-fs-small); text-align: center; padding: 18px; }
     #statsView .chart-select {
-      width: 100%; padding: 9px 12px;
-      border: 1px solid var(--border-gold); border-radius: var(--radius-sm);
-      font-size:  var(--aq-fs-small); margin-bottom: 12px;
+      width: 100%; height: var(--aq-input-h); padding: 0 12px;
+      border: 1px solid var(--aq-color-border); border-radius: var(--radius-sm);
+      font-size:  var(--aq-fs-small); margin-bottom: var(--aq-space-3);
       background: var(--navy-deep); color: var(--text-light); color-scheme: dark;
       transition: border-color var(--ease), box-shadow var(--ease);
     }
@@ -1092,7 +1077,7 @@
       border-radius: var(--radius-sm); padding: 9px 14px; flex: 1; min-width: 132px;
     }
     #statsView .chart-summary .stat .lbl { font-size:  var(--aq-fs-caption-sm); color: var(--text-muted); }
-    #statsView .chart-summary .stat .val { font-size:  var(--aq-fs-body-lg); font-weight: 800; color: var(--gold-soft); margin-top: 2px; }
+    #statsView .chart-summary .stat .val { font-size:  var(--aq-fs-body-lg); font-weight: 700; color: var(--aq-color-primary); margin-top: 2px; font-variant-numeric: tabular-nums; }
     #statsView .chart-summary .stat.up .val { color: var(--danger); }
     #statsView .chart-summary .stat.down .val { color: var(--ok); }
 
@@ -1108,7 +1093,7 @@
     }
     #statsView .stats-toolbar-desc { margin: 0; color: var(--text-muted); font-size: var(--aq-fs-small); max-width: 56ch; }
     #statsView .stats-toolbar-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-    #statsView .stats-updated-at { font-size: var(--aq-fs-caption-sm); color: var(--text-muted); white-space: nowrap; }
+    #statsView .stats-updated-at { font-size: var(--aq-fs-caption); color: var(--aq-color-text-muted); white-space: nowrap; }
     #statsView .stats-toolbar .refresh-btn { margin-bottom: 0; }
 
     #statsView .stats-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
@@ -1130,14 +1115,15 @@
     #statsView .stats-donut-canvas { position: relative; width: 150px; height: 150px; flex: 0 0 auto; }
     #statsView .stats-legend { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
     #statsView .stats-legend-item {
-      display: flex; align-items: center; gap: 8px; font-size: var(--aq-fs-small);
-      padding: 4px 6px; border-radius: var(--radius-sm); transition: background-color var(--ease);
+      display: flex; align-items: center; gap: var(--aq-space-2); font-size: var(--aq-fs-small);
+      padding: var(--aq-space-1) var(--aq-space-2); border-radius: var(--radius-sm); transition: background-color var(--ease);
     }
     #statsView .stats-legend-item.is-clickable { cursor: pointer; }
-    #statsView .stats-legend-item.is-clickable:hover { background: var(--aq-bg-muted-2, rgba(16,33,30,0.05)); }
+    #statsView .stats-legend-item.is-clickable:hover { background: var(--aq-bg-muted-2); }
+    #statsView .stats-legend-item.is-clickable:focus-visible { outline: 2px solid var(--aq-color-primary); outline-offset: 2px; }
     #statsView .stats-legend-swatch { width: 11px; height: 11px; border-radius: 3px; flex: 0 0 auto; }
-    #statsView .stats-legend-label { flex: 1; min-width: 0; color: var(--text-light); font-weight: 600; }
-    #statsView .stats-legend-count { color: var(--text-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+    #statsView .stats-legend-label { flex: 1; min-width: 0; color: var(--aq-color-text); font-weight: 600; }
+    #statsView .stats-legend-count { color: var(--aq-color-text-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
     #statsView .stats-archived-note { margin-top: 10px; font-size: var(--aq-fs-caption-sm); color: var(--text-muted); }
 
     /* صفوف ترتيب (المناطق/المطورون) — Compact: الاسم ثم العدد/النسبة ثم Bar رفيع بعرض
@@ -1147,9 +1133,10 @@
       display: flex; flex-direction: column; gap: 3px; padding: 6px 6px; cursor: pointer;
       border-radius: var(--radius-sm); transition: background-color var(--ease);
     }
-    #statsView .stats-rank-row:hover { background: var(--aq-bg-muted-2, rgba(16,33,30,0.05)); }
+    #statsView .stats-rank-row:hover { background: var(--aq-bg-muted-2); }
+    #statsView .stats-rank-row:focus-visible { outline: 2px solid var(--aq-color-primary); outline-offset: 2px; }
     #statsView .stats-rank-top { display: flex; align-items: center; gap: 8px; min-width: 0; }
-    #statsView .stats-rank-name { font-weight: 700; color: var(--text-light); font-size: var(--aq-fs-small); }
+    #statsView .stats-rank-name { font-weight: 700; color: var(--aq-color-text); font-size: var(--aq-fs-small); }
     #statsView .stats-rank-meta { font-size: var(--aq-fs-caption-sm); color: var(--text-muted); }
     #statsView .stats-rank-bar { width: 100%; height: 5px; margin-top: 1px; }
     #statsView #geoDistribution > .stats-rank-row + .stats-rank-row,
@@ -1164,39 +1151,52 @@
 
     /* نشاط فريق المبيعات */
     #statsView .stats-note { margin: 0 0 12px; font-size: var(--aq-fs-caption); color: var(--text-muted); }
-    #statsView .stats-table-block h4 { margin: 0 0 8px; font-size: var(--aq-fs-caption); color: var(--gold-soft); }
-    #statsView .stats-compact-table { font-size: var(--aq-fs-caption); }
-    #statsView .stats-compact-table th, #statsView .stats-compact-table td { padding: 7px 6px; }
+    /* Report 071: الجداول المضغوطة — حاوية تمرير أفقي بدل انضغاط الأعمدة (صفوف 92px على 390)، رأس واضح، أرقام بلون النص، الأخضر للقيمة المرتّبة فقط */
+    #statsView .stats-table-block h4 { margin: 0 0 var(--aq-space-2); font-size: var(--aq-fs-caption); color: var(--aq-color-text-muted); }
+    #statsView .stats-table-block { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    #statsView .stats-compact-table { font-size: var(--aq-fs-small); min-width: 600px; border-collapse: collapse; }
+    #statsView .stats-compact-table th, #statsView .stats-compact-table td { padding: var(--aq-space-2) var(--aq-space-3); height: 40px; vertical-align: middle; }
+    #statsView .stats-compact-table thead th {
+      font-size: var(--aq-fs-caption); font-weight: 700; color: var(--aq-color-text-muted);
+      background: var(--aq-color-surface-subtle); border-bottom: 1px solid var(--aq-color-border); white-space: nowrap;
+    }
+    #statsView .stats-compact-table tbody td { color: var(--aq-color-text); font-weight: 400; border-bottom: 1px solid var(--aq-color-border-subtle); }
+    #statsView .stats-compact-table tbody tr:last-child td { border-bottom: none; }
+    #statsView .stats-compact-table td.num { font-weight: 600; font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; text-align: right; }
+    #statsView .stats-compact-table td.num:last-child { color: var(--aq-color-primary); font-weight: 700; }  /* القيمة المرتّبة (المشاهدات / الإجمالي) */
+    #statsView .stats-compact-table td.empty-note { height: auto; font-weight: 400; text-align: center; }
     #statsView .stats-clickable-row { cursor: pointer; transition: background-color var(--ease); }
-    #statsView .stats-clickable-row:hover { background: var(--aq-bg-muted-2, rgba(16,33,30,0.05)); }
+    #statsView .stats-clickable-row:hover { background: var(--aq-bg-muted-2); }
+    #statsView .stats-clickable-row:focus-visible { outline: 2px solid var(--aq-color-primary); outline-offset: -2px; }
 
     /* ============================================================================
      * Visual Refinement — لوحات "Mint" مستقلة (تحليل الأسعار الداخلية + القسمان
      * السفليان). خلفية خضراء فاتحة جدًا من هوية الموقع نفسها (نفس توكن --aq-prop-green-soft
      * المستخدَم أصلًا في خلفية نموذج الوحدة)، حدّ وظل ناعمان، بلا تدرّجات أو ألوان جديدة.
      * ============================================================================ */
+    /* Report 071: لوحة "مينت" واحدة (surface-accent + primary-line + shadow-0 + radius-lg) للتأكيد فقط؛ العناوين بلون النص 700 */
     #statsView .stats-mint-panel {
-      background: var(--aq-prop-green-soft, #E4EDEA);
-      border: 1px solid var(--aq-prop-green-line, #BFD8CF);
-      border-radius: var(--aq-prop-radius, 10px);
-      box-shadow: 0 2px 10px rgba(14,84,70,0.07);
-      padding: 14px 16px;
+      background: var(--aq-color-surface-accent);
+      border: 1px solid var(--aq-color-primary-line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-0);
+      padding: var(--aq-space-4);
     }
     #statsView .stats-mint-panel h3,
     #statsView .stats-mint-panel h4 {
-      margin: 0 0 10px; font-size: var(--aq-fs-caption); font-weight: 800;
-      color: var(--aq-prop-green-ink, #023A3A); border: none; padding: 0;
+      margin: 0 0 var(--aq-space-2); font-size: var(--aq-fs-small); font-weight: 700;
+      color: var(--aq-color-text); border: none; padding: 0;
     }
     /* اختلاف بسيط جدًا بين اللوحتين (أعلى/أقل) — نفس العائلة، لا تباين مبالغ فيه */
-    #statsView .stats-mint-panel--accentHigh { border-inline-start: 3px solid var(--aq-prop-green, #0E5446); }
-    #statsView .stats-mint-panel--accentLow { border-inline-start: 3px solid var(--aq-prop-green-deep, #004C43); }
+    #statsView .stats-mint-panel--accentHigh { border-inline-start: 3px solid var(--aq-color-primary); }
+    #statsView .stats-mint-panel--accentLow { border-inline-start: 3px solid var(--aq-color-primary-line); }
     /* صفوف تحليل الأسعار: التسلسل الاسم ← نوع العقار ← السعر (الأبرز) */
-    #statsView .stats-price-item { padding: 7px 2px; border-bottom: 1px solid rgba(14,84,70,0.10); }
+    #statsView .stats-price-item { padding: var(--aq-space-2) 2px; border-bottom: 1px solid var(--aq-color-border-subtle); }
     #statsView .stats-price-item:last-child { border-bottom: none; }
-    #statsView .stats-price-item-name { font-weight: 700; color: var(--text-light); font-size: var(--aq-fs-small); }
-    #statsView .stats-price-item-sub { font-size: var(--aq-fs-caption-sm); color: var(--text-muted); margin: 1px 0 3px; }
+    #statsView .stats-price-item-name { font-weight: 700; color: var(--aq-color-text); font-size: var(--aq-fs-small); }
+    #statsView .stats-price-item-sub { font-size: var(--aq-fs-caption-sm); color: var(--aq-color-text-muted); margin: 1px 0 3px; }
     #statsView .stats-price-item-value {
-      font-weight: 800; font-size: var(--aq-fs-body-lg); color: var(--aq-prop-green-ink, #023A3A);
+      font-weight: 700; font-size: var(--aq-fs-body-lg); color: var(--aq-color-primary);
       font-variant-numeric: tabular-nums;
     }
     /* القسمان السفليان (سعر المتر لمشروع / نشاط الفريق) بنفس هوية Mint، بلا Card داخل Card:
@@ -1205,23 +1205,25 @@
     /* تخصيص أعلى (خاصية مضاعفة .section.stats-mint-panel) ضروري هنا: قاعدة #dashboardView
        .section اللاحقة في الملف تُعيد الخلفية لسطح أبيض لأي .section داخل شِل لوحة التحكم
        بنفس درجة التخصيص — فبلا هذا التقوية كانت الخلفية الخضراء لا تظهر فعليًا رغم الكلاس. */
-    #statsView .section.stats-mint-panel {
-      background: var(--aq-prop-green-soft, #E4EDEA) !important;
-      border-color: var(--aq-prop-green-line, #BFD8CF) !important;
-      border-top-color: var(--aq-prop-green-line, #BFD8CF) !important;
-      box-shadow: 0 2px 10px rgba(14,84,70,0.07) !important;
-      margin-bottom: 12px;
+    /* Report 071: الأقسام (الترتيب حسب المنطقة/المطورين) وكتل الجداول = كارت أبيض قياسي؛ المينت محجوز للتأكيد (قيمة المخزون + تحليل الأسعار) */
+    #statsView .section.stats-mint-panel,
+    #statsView .stats-table-block.stats-mint-panel {
+      background: var(--aq-color-surface); border-color: var(--aq-color-border); border-top-color: var(--aq-color-border);
+      box-shadow: var(--shadow-1); margin-bottom: var(--aq-space-3);
+    }
+    #statsView #statsValueSection.section.stats-mint-panel {
+      background: var(--aq-color-surface-accent); border-color: var(--aq-color-primary-line); border-top-color: var(--aq-color-primary-line); box-shadow: var(--shadow-0);
     }
     #statsView .section.stats-mint-panel h3 {
-      color: var(--aq-prop-green-ink, #023A3A) !important;
-      border-bottom: 1px solid rgba(14,84,70,0.16); padding-bottom: 6px; margin-bottom: 12px;
+      color: var(--aq-color-text); font-size: var(--aq-fs-card-title); font-weight: 700;
+      border-bottom: 1px solid var(--aq-color-border-subtle); padding-bottom: var(--aq-space-2); margin-bottom: var(--aq-space-3);
     }
     #statsView .stats-mint-panel .chart-wrap,
-    #statsView .stats-mint-panel .empty-note { background: var(--aq-prop-surface, #fff); }
+    #statsView .stats-mint-panel .empty-note { background: var(--aq-color-surface); }
     /* صندوق القيمة داخل "قيمة المخزون": سطح أبيض عادي مميَّز عن خلفية اللوحة الخضراء
        المحيطة (بدل تظليل شبه شفاف كان يندمج بصريًا مع الأخضر فيصعب تمييزه). */
     #statsView .stats-mint-panel .chart-summary .stat {
-      background: var(--aq-prop-surface, #fff); border-color: var(--aq-prop-green-line, #BFD8CF);
+      background: var(--aq-color-surface); border-color: var(--aq-color-primary-line);
     }
     #statsView .stats-month-nav-btn {
       background: var(--aq-color-surface); color: var(--aq-color-primary);
@@ -1229,33 +1231,33 @@
       border-radius: var(--radius-sm); font-weight: 700; cursor: pointer;
     }
     #statsView .stats-month-nav-btn:hover { background: var(--aq-color-surface-accent); border-color: var(--aq-color-primary-line); }
-    #statsView .stats-month-nav-label { color: var(--aq-prop-green-ink, #023A3A); font-size: 14px; }
+    #statsView .stats-month-nav-label { color: var(--aq-color-text); font-size: var(--aq-fs-body); font-weight: 700; }
     /* Badge عدد الوحدات في "آخر الأنشطة" — نفس بيانات النص القديم، عرض فقط */
     #statsView .stats-activity-count-badge {
-      display: inline-block; background: var(--aq-prop-surface, #fff); color: var(--aq-prop-green-ink, #023A3A);
-      border: 1px solid var(--aq-prop-green-line, #BFD8CF); border-radius: var(--aq-radius-pill, 999px);
-      padding: 2px 10px; font-weight: 800; font-size: var(--aq-fs-caption-sm); font-variant-numeric: tabular-nums;
+      display: inline-block; background: var(--aq-color-surface); color: var(--aq-color-primary);
+      border: 1px solid var(--aq-color-primary-line); border-radius: var(--aq-radius-pill);
+      padding: 2px 10px; font-weight: 700; font-size: var(--aq-fs-caption-sm); font-variant-numeric: tabular-nums;
     }
 
     /* قوائم مصغّرة (السداد والتسليم — بلا تغيير) */
-    #statsView .stats-mini-list h4 { margin: 0 0 8px; font-size: var(--aq-fs-caption); color: var(--gold-soft); }
+    #statsView .stats-mini-list h4 { margin: 0 0 var(--aq-space-2); font-size: var(--aq-fs-caption); color: var(--aq-color-text-muted); font-weight: 700; }
     #statsView .stats-mini-item {
       display: flex; align-items: center; justify-content: space-between; gap: 10px;
       padding: 6px 2px; font-size: var(--aq-fs-small); border-bottom: 1px solid var(--line-dark);
     }
     #statsView .stats-mini-item:last-child { border-bottom: none; }
-    #statsView .stats-mini-item b { color: var(--gold-soft); font-variant-numeric: tabular-nums; }
-    #statsView .stats-recent-title { margin: 0 0 8px; font-size: var(--aq-fs-caption); color: var(--gold-soft); }
+    #statsView .stats-mini-item b { color: var(--aq-color-primary); font-weight: 700; font-variant-numeric: tabular-nums; }
+    #statsView .stats-recent-title { margin: 0 0 var(--aq-space-2); font-size: var(--aq-fs-caption); color: var(--aq-color-text-muted); font-weight: 700; }
     #statsView #recentActivityList:empty { display: none; }
     #statsView #recentActivityList { margin-bottom: 14px; }
     /* نشاط الفريق — ملخّص الشهر / التفصيل اليومي: صفوف Compact بتناوب أبيض/أخضر خفيف
      * جدًا (Subtle Visual Rhythm) — لا Shadow ولا حدود لكل صف؛ اللوحة نفسها هي البطاقة. */
-    #statsView .stats-activity-summary-title { margin: 0 0 8px; font-size: var(--aq-fs-caption); font-weight: 800; color: var(--gold-soft); }
+    #statsView .stats-activity-summary-title { margin: 0 0 var(--aq-space-2); font-size: var(--aq-fs-caption); font-weight: 700; color: var(--aq-color-text-muted); }
     #statsView .stats-activity-emp-header {
       display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
-      padding: 0 10px 10px; margin-bottom: 4px; border-bottom: 1px solid rgba(14,84,70,0.14);
+      padding: 0 10px 10px; margin-bottom: 4px; border-bottom: 1px solid var(--aq-color-border-subtle);
     }
-    #statsView .stats-activity-emp-header b { color: var(--aq-prop-green-ink, #023A3A); font-size: var(--aq-fs-body-lg); }
+    #statsView .stats-activity-emp-header b { color: var(--aq-color-text); font-size: var(--aq-fs-body-lg); font-weight: 700; }
     #statsView .stats-activity-emp-header span { color: var(--text-muted); font-size: var(--aq-fs-caption); }
     #statsView .stats-activity-rows { display: flex; flex-direction: column; }
     #statsView .stats-activity-row {
@@ -1359,20 +1361,7 @@
       display: grid; grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
       gap: 12px; margin-bottom: 14px;
     }
-    #dashboardView .kpi-card {
-      background: var(--glass-card);
-      -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
-      border: 1px solid var(--border-gold); border-radius: var(--radius-md);
-      padding: 15px 16px; box-shadow: var(--shadow-card);
-      display: flex; flex-direction: column; justify-content: center; min-height: 92px;
-    }
-    #dashboardView .kpi-card.available { border-color: rgba(127,211,163,0.32); }
-    #dashboardView .kpi-card.reserved  { border-color: rgba(230,201,120,0.40); }
-    #dashboardView .kpi-card.sold      { border-color: rgba(233,144,138,0.34); }
-    #dashboardView .kpi-value { font-size:  var(--aq-fs-page-title); font-weight: 800; color: var(--gold-soft); line-height: 1.15; }
-    #dashboardView .kpi-card.available .kpi-value { color: var(--ok); }
-    #dashboardView .kpi-card.sold      .kpi-value { color: var(--danger); }
-    #dashboardView .kpi-label { font-size:  var(--aq-fs-caption); color: var(--text-muted); margin-top: 3px; font-weight: 600; line-height: 1.4; }
+    /* Report 071: قواعد .kpi-card القديمة (لوحة التحكم) اتشالت — ميتة */
     #dashboardView .section {
       background: var(--glass-panel);
       -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
@@ -1389,7 +1378,7 @@
     #dashboardView .bar-label { display: flex; justify-content: space-between; gap: 12px; font-size:  var(--aq-fs-caption); margin-bottom: 5px; color: var(--text-light); }
     #dashboardView .bar-label b { color: var(--gold-soft); font-weight: 700; white-space: nowrap; }
     #dashboardView .bar-track { background: var(--aq-bg-muted-2); border-radius:  var(--aq-radius-pill); height: 9px; overflow: hidden; }
-    #dashboardView .bar-fill { height: 100%; border-radius:  var(--aq-radius-pill); background: linear-gradient(90deg, var(--gold-dark), var(--gold-soft)); }
+    #dashboardView .bar-fill { height: 100%; border-radius:  var(--aq-radius-pill); background: var(--aq-color-primary); }
     #dashboardView .empty-note { color: var(--text-muted); font-size:  var(--aq-fs-small); text-align: center; padding: 18px; }
     #dashboardView .dash-cta {
       display: inline-flex; align-items: center; gap: 8px;
@@ -1465,7 +1454,7 @@
     .dash-role-badge {
       display: inline-block; margin-top: 6px; padding: 3px 10px; border-radius:  var(--aq-radius-pill);
       background: var(--aq-color-primary-tint-3); border: 1px solid var(--border-gold);
-      color: var(--gold-soft); font-size:  var(--aq-fs-caption-sm); font-weight: 800;
+      color: var(--aq-color-primary); font-size:  var(--aq-fs-caption-sm); font-weight: 700;
     }
     .dash-field-row {
       display: flex; justify-content: space-between; align-items: center; gap: 14px;
@@ -1481,7 +1470,7 @@
       border-radius: var(--radius-sm); color: var(--text-light);
       font-family: inherit; font-size:  var(--aq-fs-small); font-weight: 700; padding: 8px 10px;
     }
-    .dash-prof-input:focus { outline: none; border-color: var(--border-gold); background: rgba(27,52,74,0.85); }
+    .dash-prof-input:focus { outline: none; border-color: var(--aq-color-primary); background: var(--aq-color-surface); box-shadow: var(--aq-focus-ring); } /* Report 071: كان يقلب لخلفية navy داكنة عند التركيز */
     .dash-prof-input::placeholder { color: var(--text-muted); font-weight: 500; }
     .dash-prof-photo-actions { margin-inline-start: auto; }
     .dash-prof-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
@@ -1536,8 +1525,8 @@
        ألواح لوحة التحكم الداكنة (نفس أسلوب #calcModal / #editModal في الريبو). */
     #dashPanel-developers .section-title { color: var(--gold-soft); border-bottom-color: var(--border-gold); }
     #dashPanel-developers label { color: var(--text-light); }
-    #dashPanel-developers .ai-fill-panel { background: var(--aq-accent-tint-1); }
-    #dashPanel-developers .ai-fill-panel .section-title { color: var(--gold-soft); }
+    #dashPanel-developers .ai-fill-panel { background: var(--aq-color-surface-accent); }
+    #dashPanel-developers .ai-fill-panel .section-title { color: var(--aq-color-text); }
     #dashPanel-developers input,
     #dashPanel-developers textarea {
       background: var(--input-dark); color: var(--text-light);
@@ -1600,7 +1589,7 @@
     .um-online-sum b { color: var(--ok); font-size:  var(--aq-fs-body-lg); }
     .um-presence {
       display: inline-flex; align-items: center; gap: 6px;
-      font-size:  var(--aq-fs-caption-sm); font-weight: 700; margin-top: 4px; white-space: nowrap;
+      font-size:  var(--aq-fs-caption); font-weight: 700; margin-top: 4px; white-space: nowrap;
     }
     .um-presence .um-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: var(--text-muted); }
     .um-presence.is-online { color: var(--ok); }
@@ -1746,7 +1735,7 @@
       cursor: pointer; transition: var(--ease);
     }
     .um-card:hover { border-color: var(--border-gold); box-shadow: var(--shadow-card); }
-    .um-card.is-owner { border-color: var(--gold); background: linear-gradient(180deg, #fffdf6, var(--white)); }
+    .um-card.is-owner { border-color: var(--aq-color-primary-line); background: var(--aq-color-surface-accent); }
     .um-avatar {
       width: 42px; height: 42px; border-radius: 50%; object-fit: cover; flex-shrink: 0;
       background: var(--navy); color: var(--gold-soft); display: flex; align-items: center; justify-content: center;
@@ -1758,7 +1747,7 @@
     .um-sub { font-size:  var(--aq-fs-caption-sm); color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .um-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
     .um-badge {
-      font-size:  var(--aq-fs-micro); font-weight: 800; padding: 2px 8px; border-radius:  var(--aq-radius-pill); letter-spacing: .3px;
+      font-size:  var(--aq-fs-caption-sm); font-weight: 700; padding: 2px 9px; border-radius:  var(--aq-radius-pill); letter-spacing: .2px;
       border: 1px solid transparent;
     }
     /* شارة المالك: خلفية خضراء صلبة ونص أبيض (بعد تحويل اللوحة، الذهبي صار أخضر) */
@@ -1766,7 +1755,7 @@
     .um-badge.role-MANAGER { background: var(--aq-role-manager-bg); color: var(--aq-role-manager-fg); }
     .um-badge.role-SALES { background: var(--aq-role-sales-bg); color: var(--aq-role-sales-fg); }
     .um-badge.role-DATA_ENTRY { background: var(--aq-role-entry-bg); color: var(--aq-role-entry-fg); }
-    .um-status { font-size:  var(--aq-fs-micro); font-weight: 800; padding: 2px 9px; border-radius:  var(--aq-radius-pill); }
+    .um-status { font-size:  var(--aq-fs-caption-sm); font-weight: 700; padding: 2px 9px; border-radius:  var(--aq-radius-pill); }
     .um-status.active { background: var(--success-bg); color: var(--success-fg); }
     .um-status.inactive { background: var(--error-bg); color: var(--error-fg); }
 
@@ -2160,13 +2149,14 @@
     .unit-card:has(.unit-cover) .unit-top { padding: 2px 0 0; }
 
     /* ===== AI auto-fill panel — navy/gold, replaces the old purple accent ===== */
+    /* Report 071: لوحة المساعدة بالذكاء الاصطناعي = معالجة واحدة (surface-accent + primary-line + radius-lg) في المطورين والمشاريع والنموذج */
     .ai-fill-panel {
-      background: var(--aq-color-primary-tint-1);
-      border: 1px solid var(--border-gold);
-      border-radius: var(--radius-sm);
-      padding: 14px; margin-bottom: 16px;
+      background: var(--aq-color-surface-accent);
+      border: 1px solid var(--aq-color-primary-line);
+      border-radius: var(--radius-lg);
+      padding: var(--aq-space-4); margin-bottom: var(--aq-space-4);
     }
-    .ai-fill-panel .section-title { color: var(--gold-dark); margin-top: 0; }
+    .ai-fill-panel .section-title { color: var(--aq-color-text); margin-top: 0; }
     .ai-paste-zone {
       margin-top: 8px; border: 1.5px dashed var(--border-gold); border-radius: var(--radius-sm);
       padding: 14px; text-align: center; cursor: pointer; color: var(--gold-dark);
@@ -2176,13 +2166,13 @@
     .ai-paste-zone:hover, .ai-paste-zone:focus { border-color: var(--gold); background: var(--aq-accent-tint-1); }
     .ai-paste-zone.is-armed { border-color: var(--gold); background: var(--aq-color-primary-tint-2); color: var(--gold-dark); }
     .ai-extract-btn {
-      width: 100%; margin-top: 10px; padding: 11px;
-      border: 1px solid var(--border-gold); border-radius: var(--radius-sm);
-      background: var(--navy); color: var(--gold-soft);
-      font-weight: 700; font-size:  var(--aq-fs-small); cursor: pointer;
+      width: 100%; margin-top: var(--aq-space-2); min-height: var(--aq-btn-h); padding: 0 16px;
+      border: 1px solid var(--aq-color-primary); border-radius: var(--radius-sm);
+      background: var(--aq-color-primary); color: var(--aq-color-on-primary);
+      font-weight: 700; font-size:  var(--aq-fs-button); cursor: pointer;
       transition: background-color var(--ease), border-color var(--ease);
     }
-    .ai-extract-btn:hover { background: var(--navy-deep); border-color: var(--aq-border-accent-strong); }
+    .ai-extract-btn:hover { background: var(--aq-color-primary-dark); border-color: var(--aq-color-primary-dark); }
 
     /* ===== modal interior rhythm ===== */
     .modal-box .section-title:first-of-type { margin-top: 2px; }
@@ -3266,7 +3256,7 @@
       display: inline-flex; align-items: center; justify-content: center;
     }
     #editModal #unitAddAiPastedImageRemove .ico { width: 12px; height: 12px; }
-    #editModal .ai-extract-btn { width: 100%; margin: 0; min-height: 48px; padding: 10px 16px; font-size: var(--aq-fs-small); }
+    #editModal .ai-extract-btn { width: 100%; margin: 0; min-height: var(--aq-btn-h); padding: 0 16px; font-size: var(--aq-fs-button); }
     #editModal #unitAddAiExtractMsg { margin-top: var(--aq-space-2); }
 
     /* الصور: منطقة اللصق/السحب + صفّ الرابط جنبًا إلى جنب (7|5) بدل صفّين متراصّين */
@@ -3396,12 +3386,14 @@
       border-radius: var(--aq-radius-lg); padding: var(--aq-space-6); margin-bottom: var(--aq-space-5);
       box-shadow: var(--aq-shadow-subtle); -webkit-backdrop-filter: none; backdrop-filter: none;
     }
-    #dashboardView .section h3 { color: var(--aq-prop-text); font-size: var(--aq-fs-card-title); letter-spacing: 0; text-transform: none; }
-    #dashboardView .dash-live-card { background: var(--aq-prop-green-deep); border: 0; border-radius: var(--aq-radius-lg); padding: 14px 18px; margin: 0 0 var(--aq-space-5); }
+    #dashboardView .section h3 { color: var(--aq-color-text); font-size: var(--aq-fs-card-title); font-weight: 700; letter-spacing: 0; text-transform: none; }
+    #dashboardView .dash-about-toggle { background: transparent; border-color: transparent; color: var(--aq-color-text-muted); font-weight: 700; min-height: var(--aq-btn-h); }
+    #dashboardView .dash-about-toggle:hover { background: var(--aq-color-surface-subtle); border-color: transparent; color: var(--aq-color-primary); }
+    #dashboardView .dash-live-card { background: var(--aq-color-primary-deep); border: 0; border-radius: var(--radius-lg); padding: var(--aq-space-4) var(--aq-space-5); margin: 0 0 var(--aq-space-5); }
     #dashboardView .um-empty { color: var(--aq-prop-text-muted); }
 
     /* ---- المطوّرون ---- */
-    #dashPanel-developers .ai-fill-panel { background: var(--aq-prop-green-soft); border: 1px solid var(--aq-prop-green-line); box-shadow: none; }
+    #dashPanel-developers .ai-fill-panel { background: var(--aq-color-surface-accent); border: 1px solid var(--aq-color-primary-line); box-shadow: var(--shadow-0); }
     #dashPanel-developers .aq-dev-ai-action .ai-extract-btn { width: 100%; margin: 0; }
     #dashPanel-developers .aq-form-control, #dashPanel-developers .aq-file-input { width: 100%; }
     #dashPanel-developers .aq-form-actions {
@@ -3450,13 +3442,13 @@
       background: var(--aq-prop-surface); border: 1px solid var(--aq-prop-border); border-radius: var(--aq-radius-md);
     }
     #dashPanel-users .um-card:hover { border-color: var(--aq-prop-green-line); box-shadow: var(--aq-shadow-subtle); }
-    #dashPanel-users .um-card.is-owner { background: var(--aq-prop-green-soft); border-color: var(--aq-prop-green-line); }
+    #dashPanel-users .um-card.is-owner { background: var(--aq-color-surface-accent); border-color: var(--aq-color-primary-line); } /* Report 071: تظليل أهدأ مع بقاء الحدّ الأخضر والنجمة */
     #dashPanel-users .um-card .um-avatar {
       width: 48px; height: 48px; border-radius: 12px; background: var(--aq-prop-green-soft); color: var(--aq-prop-green);
       border: 1px solid var(--aq-prop-green-line); font-size: var(--aq-fs-body-lg);
     }
     #dashPanel-users .um-card.is-owner .um-avatar { border: 2px solid var(--aq-prop-green); }
-    #dashPanel-users .um-name { font-size: var(--aq-fs-body); font-weight: 800; color: var(--aq-prop-text); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    #dashPanel-users .um-name { font-size: var(--aq-fs-body); font-weight: 700; color: var(--aq-color-text); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     #dashPanel-users .um-sub { font-size: var(--aq-fs-caption); color: var(--aq-prop-text-muted); margin-top: 2px; overflow-wrap: anywhere; }
     #dashPanel-users .um-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
     .um-badge.aq-badge, .um-status.aq-badge { padding: 2px 10px; }
@@ -13086,6 +13078,7 @@
         }).join('');
         tbody.querySelectorAll('tr[data-unit-id]').forEach(function (tr) {
           tr.addEventListener('click', function () { statsOpenUnit_(tr.getAttribute('data-unit-id')); });
+          aqMakeKeyActivatable_(tr); /* Report 071: وصول بلوحة المفاتيح (Enter/Space) لنفس النقر */
         });
       }).withFailureHandler(apiFailure_('تعذّر تحميل الوحدات الأكثر مشاهدة')).getMostViewedUnits(currentPin);
     }
@@ -13111,6 +13104,7 @@
         `).join('');
         tbody.querySelectorAll('tr[data-unit-id]').forEach(function (tr) {
           tr.addEventListener('click', function () { statsOpenUnit_(tr.getAttribute('data-unit-id')); });
+          aqMakeKeyActivatable_(tr);
         });
       }).withFailureHandler(apiFailure_('تعذّر تحميل الوحدات الأكثر طلبًا')).getMostRequestedUnits(currentPin);
     }
@@ -13290,9 +13284,17 @@
      * لا مكتبة جديدة). Legend مبنية يدويًا (RTL + قابلة للنقر للتصنيف).
      * ============================================================================ */
     var categoryChart = null, statusChart = null;
-    var CATEGORY_PALETTE = ['#0E5446', '#1E7145', '#4FA579', '#C99A2E', '#6E7573', '#8A6412'];
-    var STATUS_COLORS = { 'متاح': '#1E7145', 'محجوز': '#8A6412', 'مباع': '#B0271F' };
+    /* Report 071: لوحة ألوان الرسوم من توكنز الهوية (بدون الذهبي القديم ولا الأخضرين المتقاعدين) — القيم الاحتياطية = نفس التوكنز */
+    function aqTokenColor_(name, fallback) { try { var v = getComputedStyle(document.documentElement).getPropertyValue(name).trim(); return v || fallback; } catch (e) { return fallback; } }
+    var CATEGORY_PALETTE = [aqTokenColor_('--aq-color-primary', '#0E5446'), aqTokenColor_('--aq-color-success', '#1E6E45'), aqTokenColor_('--aq-color-warning', '#8A6412'), aqTokenColor_('--aq-color-text-muted', '#5F6866'), aqTokenColor_('--aq-color-primary-deep', '#004C43'), aqTokenColor_('--aq-color-primary-line', '#BFD8CF')];
+    var STATUS_COLORS = { 'متاح': aqTokenColor_('--aq-color-success', '#1E6E45'), 'محجوز': aqTokenColor_('--aq-color-warning', '#8A6412'), 'مباع': aqTokenColor_('--aq-color-danger', '#B0271F') };
 
+    /* Report 071 (معتمد من المالك): عنصر قابل للنقر فعليًا يبقى قابلًا للتركيز والتفعيل بالكيبورد — نفس معالج النقر، بلا تغيير في المنطق */
+    function aqMakeKeyActivatable_(el) {
+      if (!el || el.getAttribute('data-aq-key')) return;
+      el.setAttribute('data-aq-key', '1'); el.setAttribute('tabindex', '0'); el.setAttribute('role', 'button');
+      el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); } });
+    }
     function renderDonut_(canvasId, legendId, labels, values, colors, existingChart, onSliceClick) {
       var canvas = document.getElementById(canvasId);
       var legend = document.getElementById(legendId);
@@ -13317,6 +13319,7 @@
         legend.querySelectorAll('.stats-legend-item').forEach(function (row) {
           row.classList.add('is-clickable');
           row.addEventListener('click', function () { onSliceClick(labels[Number(row.getAttribute('data-idx'))]); });
+          aqMakeKeyActivatable_(row);
         });
       }
       return chart;
@@ -13371,6 +13374,7 @@
       }).join('');
       el.querySelectorAll('.stats-rank-row').forEach(function (row) {
         row.addEventListener('click', function () { statsGoExplore_({ keyword: row.getAttribute('data-district') }); });
+        aqMakeKeyActivatable_(row);
       });
     }
 
@@ -13398,9 +13402,11 @@
           '</div>';
       }).join('');
       el.querySelectorAll('.stats-dev-row').forEach(function (rowWrap) {
-        rowWrap.querySelector('.stats-rank-row').addEventListener('click', function () {
+        var head = rowWrap.querySelector('.stats-rank-row');
+        head.addEventListener('click', function () {
           toggleDeveloperDrilldown_(rowWrap, rowWrap.getAttribute('data-dev'));
         });
+        aqMakeKeyActivatable_(head);
       });
     }
     function devInitialsSafe_(name) {

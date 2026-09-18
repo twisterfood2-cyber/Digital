@@ -291,7 +291,7 @@
 .aq-kpi {
   position: relative; box-sizing: border-box; height: 100%; min-height: 128px;
   gap: var(--aq-space-2); padding: var(--aq-space-4) var(--aq-space-4) var(--aq-space-3);
-  border-color: var(--aq-border-strong);
+  border-color: var(--aq-color-border); border-radius: var(--radius-lg);   /* Report 071: نفس لغة الكروت (16 + الحدّ القياسي) */
   transition: border-color var(--aq-motion-base), box-shadow var(--aq-motion-base);
 }
 .aq-kpi:hover { border-color: var(--aq-border-accent); box-shadow: var(--aq-shadow-2); }
@@ -626,13 +626,13 @@ select.aq-form-control { height: var(--aq-input-h); padding-block: 0; }
 /* ---------------------------------------------------------- ASSIST PANEL
  * لوحة "المساعدة" (الذكاء الاصطناعي): سطح أخضر باهت داخل النموذج — ميزة مقصودة
  * لا نموذجًا ثانيًا. */
-.aq-form-assist {
-  background: var(--aq-prop-green-soft); border: 1px solid var(--aq-prop-green-line);
-  border-radius: var(--aq-prop-radius); padding: var(--aq-space-4) var(--aq-space-4);
+.aq-form-assist {   /* Report 071: نفس معالجة لوحة المساعدة في كل الشاشات (surface-accent + primary-line + radius-lg) */
+  background: var(--aq-color-surface-accent); border: 1px solid var(--aq-color-primary-line);
+  border-radius: var(--radius-lg); padding: var(--aq-space-4) var(--aq-space-4); box-shadow: var(--shadow-0);
   margin-bottom: var(--aq-space-6);
 }
 .aq-form-assist .aq-form-section-head { margin-bottom: 6px; }
-.aq-form-assist .aq-form-section-title { color: var(--aq-prop-green-ink); }
+.aq-form-assist .aq-form-section-title { color: var(--aq-color-text); }
 .aq-form-assist .aq-form-help { margin-bottom: var(--aq-space-3); color: var(--aq-prop-text-muted); }
 
 /* ---------------------------------------------------------- UPLOAD ZONE */
@@ -725,9 +725,10 @@ select.aq-form-control { height: var(--aq-input-h); padding-block: 0; }
 .aq-subnav-item.is-active { background: var(--aq-color-primary-soft); color: var(--aq-color-primary); border-color: var(--aq-color-primary-line); }
 .aq-subnav-item--danger { color: var(--aq-danger-soft); margin-inline-start: auto; }
 .aq-subnav-item--danger:hover { background: var(--aq-danger-tint); color: var(--aq-danger-soft); }
-@media (max-width: 640px) {
+@media (max-width: 1024px) {   /* Report 071: صف واحد قابل للتمرير حتى 1024 (كان يلتف صفّين بين 641 و1024) */
   .aq-subnav { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
   .aq-subnav::-webkit-scrollbar { display: none; }
+  .aq-subnav-item { flex: 0 0 auto; }
   .aq-subnav-item--danger { margin-inline-start: 0; }
 }
 /* -------------------------------------------------------- ADMIN CARD */
@@ -741,7 +742,7 @@ select.aq-form-control { height: var(--aq-input-h); padding-block: 0; }
   flex-wrap: wrap; margin-bottom: var(--aq-space-5);
 }
 .aq-admin-card-title {
-  margin: 0; font-size: var(--aq-fs-card-title); font-weight: 800; color: var(--aq-prop-text);
+  margin: 0; font-size: var(--aq-fs-card-title); font-weight: 700; color: var(--aq-color-text);
   display: flex; align-items: center; gap: 10px; line-height: 1.4;
 }
 .aq-admin-card-title::before { content: ''; width: 4px; height: 18px; border-radius: 2px; background: var(--aq-prop-green); flex: 0 0 auto; }
@@ -765,7 +766,7 @@ select.aq-form-control { height: var(--aq-input-h); padding-block: 0; }
 .aq-list-row--interactive { cursor: pointer; }
 .aq-list-row--interactive:hover { border-color: var(--aq-prop-green-line); box-shadow: var(--aq-shadow-subtle); }
 .aq-list-body { min-width: 0; }
-.aq-list-title { font-size: var(--aq-fs-body); font-weight: 800; color: var(--aq-prop-text); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.aq-list-title { font-size: var(--aq-fs-body); font-weight: 700; color: var(--aq-color-text); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .aq-list-meta { font-size: var(--aq-fs-caption); color: var(--aq-prop-text-muted); margin-top: 2px; overflow-wrap: anywhere; }
 .aq-list-trailing { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
 .aq-list-actions { display: inline-flex; gap: 6px; }
@@ -812,7 +813,7 @@ select.aq-form-control { height: var(--aq-input-h); padding-block: 0; }
 .aq-dev-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
 .aq-dev-card {
   display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: center;
-  padding: 16px; background: var(--aq-prop-surface); border: 1px solid var(--aq-prop-border); border-radius: var(--aq-radius-lg);
+  padding: var(--aq-space-4); background: var(--aq-color-surface); border: 1px solid var(--aq-color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-1);
   transition: border-color var(--aq-motion-fast), box-shadow var(--aq-motion-fast), transform var(--aq-motion-fast);
 }
 .aq-dev-card:hover { border-color: var(--aq-prop-green-line); box-shadow: var(--aq-shadow-2); transform: translateY(-1px); }
