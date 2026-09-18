@@ -75,7 +75,8 @@
   const Y = (ypx) => PAGE_HEIGHT - MARGIN - px(ypx);                    // من أعلى القالب (يُحوَّل لنظام PDF)
 
   // ألوان قوالب الإنتاج حرفيًا (= توكنز aqar-tokens.css: --aq-prop-green-deep/-soft/-line/-text/-text-muted/-text-faint/-border/-canvas-2/-accent/--aq-error-fg)
-  const HEX = { greenDeep: '#004C43', soft: '#E4EDEA', line: '#BFD8CF', text: '#16211E', muted: '#6E7573', faint: '#8A908E', border: '#E3E6E5', canvas2: '#E7EDED', accent: '#B4FF6C', red: '#B0271F', white: '#FFFFFF', stAvail: '#1e7145', stReserved: '#c9992e', stSold: '#b3261e' };
+  /* Report 073: ألوان الحالة = ثلاثية الهوية (066)، والتظليلات/الحدود/النص الثانوي على قيم التوكنز الحالية — بدون أي تغيير في التخطيط */
+  const HEX = { greenDeep: '#004C43', soft: '#D9E9E2', line: '#BFD8CF', text: '#16211E', muted: '#5F6866', faint: '#6E7573', border: '#D3D8D7', canvas2: '#E7EDED', accent: '#B4FF6C', red: '#B0271F', white: '#FFFFFF', stAvail: '#1E6E45', stReserved: '#8A6412', stSold: '#B0271F' };
   const STATUS_COLOR = (s) => (s === 'متاح' ? HEX.stAvail : (s === 'محجوز' ? HEX.stReserved : HEX.stSold));
 
   // أحجام الخط بالـ px كما في القوالب (تُحوَّل بنفس K) — Cairo أطول رأسيًا من Segoe فنستخدم line-height صريحًا
