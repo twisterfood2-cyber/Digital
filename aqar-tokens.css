@@ -76,6 +76,13 @@
   --aq-input-h:       44px;
   --aq-input-h-lg:    48px;
   --aq-chip-h:        32px;
+  /* Modal shell (Report 069 — VISUAL STEP 5): درجات عرض مقصودة لا مصفوفة — حسب المحتوى الفعلي */
+  --aq-modal-sm:   440px;   /* تأكيد / اتصال PDF / قصّ صورة / لوحة الإدارة */
+  --aq-modal-md:   560px;   /* إشعارات / مشاركة صور / ملف مطوّر / مستخدم */
+  --aq-modal-lg:   720px;   /* وحدات مشابهة / سعر المتر */
+  --aq-modal-xl:   900px;   /* المقارنة + الافتراضي لـ .modal-box */
+  --aq-modal-full: 1320px;  /* تفاصيل الوحدة / ملف المشروع / نموذج الوحدة */
+  --aq-modal-pad:  var(--aq-space-5);
 
   /* ==================================================================
    * 1) PRIMITIVES — Brand palette (alias → index.html :root canonical)

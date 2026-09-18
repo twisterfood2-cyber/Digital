@@ -119,10 +119,10 @@
 }
 .aq-modal-overlay.aq-open { display: flex; }
 .aq-modal {
-  background: var(--aq-prop-surface); border: 1px solid var(--aq-prop-border);
-  border-radius: var(--aq-radius-lg); box-shadow: var(--aq-prop-shadow-lg);
-  width: 100%; max-width: 560px; max-height: 88vh; overflow-y: auto;
-  padding: var(--aq-space-6); color: var(--aq-text-light);
+  background: var(--aq-color-surface); border: 1px solid var(--aq-color-border);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-3);
+  width: 100%; max-width: var(--aq-modal-md); max-height: 88vh; overflow-y: auto;
+  padding: var(--aq-modal-pad); color: var(--aq-color-text);
 }
 
 /* -------------------------------------------------------------- DROPDOWNS */
@@ -822,11 +822,11 @@ select.aq-form-control { height: var(--aq-input-h); padding-block: 0; }
 .aq-dev-card-year { font-size: var(--aq-fs-caption); color: var(--aq-prop-text-muted); }
 @media (max-width: 640px) { .aq-dev-grid { grid-template-columns: 1fr; } }
 /* ------------------------------------------------------------ CONFIRM */
-.aq-confirm { max-width: 440px; padding: 0; }
+.aq-confirm { max-width: var(--aq-modal-sm); padding: 0; }
 .aq-confirm-body { padding: var(--aq-space-6) var(--aq-space-6) var(--aq-space-4); }
-.aq-confirm-title { margin: 0 0 8px; font-size: var(--aq-fs-card-title); font-weight: 800; color: var(--aq-prop-text); }
+.aq-confirm-title { margin: 0 0 var(--aq-space-2); font-size: var(--aq-fs-title-sm); font-weight: 700; color: var(--aq-color-text); line-height: var(--aq-lh-tight); }
 .aq-confirm-text { margin: 0; font-size: var(--aq-fs-small); color: var(--aq-prop-text-muted); line-height: 1.8; overflow-wrap: anywhere; }
-.aq-confirm-actions { display: flex; gap: 8px; flex-wrap: wrap; padding: var(--aq-space-4) var(--aq-space-6) var(--aq-space-6); }
+.aq-confirm-actions { display: flex; gap: var(--aq-space-2); flex-wrap: wrap; padding: var(--aq-space-4) var(--aq-space-6) var(--aq-space-6); }
 .aq-confirm-actions .is-danger { background: var(--aq-error-fg); border-color: var(--aq-error-fg); color: #fff; }
 .aq-confirm-actions .is-danger:hover { filter: brightness(0.92); }
 @media (max-width: 640px) { .aq-confirm-actions > * { flex: 1 1 100%; } }
