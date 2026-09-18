@@ -100,7 +100,7 @@ body.aq-app-on .aq-header { display: flex; }
 /* زر الخروج — نفس id ونفس المعالج القائم، بشكل أيقوني داخل الهيدر */
 .aq-side-logout {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  padding: 9px 11px; border-radius: var(--aq-radius-sm);
+  width: var(--aq-icon-btn); height: var(--aq-icon-btn); padding: 0; border-radius: var(--aq-radius-sm);
   background: transparent; border: 1px solid var(--aq-prop-border, #E3E6E5);
   color: var(--aq-prop-text-muted, #6E7573); font-family: var(--aq-font);
   font-size: var(--aq-fs-caption); font-weight: var(--aq-fw-bold); cursor: pointer;
@@ -115,13 +115,13 @@ body.aq-app-on .aq-header { display: flex; }
 .aq-phone-cta {
   display: inline-flex; align-items: center; gap: 8px; flex: 0 0 auto;
   padding: 11px 18px; border-radius: var(--aq-radius-pill);
-  background: var(--aq-prop-green-deep, #004C43); color: #fff; text-decoration: none;
-  font-size: var(--aq-fs-button); font-weight: var(--aq-fw-black); letter-spacing: 0.2px;
+  background: var(--aq-color-primary); color: var(--aq-color-on-primary); text-decoration: none;
+  font-size: var(--aq-fs-button); font-weight: var(--aq-fw-bold); letter-spacing: 0.2px;
   white-space: nowrap; direction: ltr;
   transition: background var(--aq-motion-base), transform var(--aq-motion-fast);
-  box-shadow: 0 2px 10px rgba(0,76,67,0.20);
+  box-shadow: none;
 }
-.aq-phone-cta:hover { background: var(--aq-prop-green-ink, #023A3A); transform: translateY(-1px); }
+.aq-phone-cta:hover { background: var(--aq-color-primary-dark); }
 .aq-phone-cta svg { width: 16px; height: 16px; flex: 0 0 auto; }
 
 /* زر القائمة (موبايل) */

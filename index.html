@@ -121,7 +121,7 @@
     :where(button, .top-action-btn, .fav-btn, .pdf-btn, .whatsapp-btn, .edit-btn, .icon-action-btn,
            .ai-extract-btn, .toggle-details-btn, .images-choose-btn, .small-btn, .dash-nav-item,
            .um-primary, .um-add-toggle, .close-panel):disabled,
-    :where(button)[aria-disabled="true"] { opacity: 0.55; cursor: not-allowed; }
+    :where(button)[aria-disabled="true"] { opacity: 0.6; cursor: not-allowed; }
     /* Report 066: حلقة تركيز مرئية واحدة للأزرار/الروابط (لوحة المفاتيح فقط) — :where = خصوصية صفر فأي قاعدة قائمة تغلبها */
     :where(#mainContainer, #loginGate, .aq-header, .modal-overlay, .unit-card-overlay, .aq-modal-overlay, .dash-drawer) :where(button, [role="button"], a[href]):focus-visible { outline: 2px solid var(--aq-color-primary); outline-offset: 2px; }
     /* حقول: أساس مشترك (خط/حجم/زوايا/انتقال) — القواعد القديمة المحددة تغلبه */
@@ -502,7 +502,7 @@
     .unit-id { font-size:  var(--aq-fs-caption); color: var(--text-muted); font-weight: 700; letter-spacing: 0.4px; }
     .unit-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 2px 0 12px; padding: 2px 38px 0 44px; }
     .status-badge {
-      font-size:  var(--aq-fs-caption-sm); padding: 3px 9px; border-radius:  var(--aq-radius-xs); font-weight: 800; letter-spacing: 0; line-height: 1.35;
+      font-size:  var(--aq-fs-caption-sm); padding: 3px 9px; border-radius:  var(--radius-sm); font-weight: 800; letter-spacing: 0; line-height: 1.35;
       background: var(--aq-success-tint); color: var(--aq-success-soft); border: 1px solid var(--aq-success-border);
     }
     .status-badge.محجوز { background: var(--aq-color-warning-bg); color: var(--aq-color-warning); border-color: var(--aq-color-warning-border); }
@@ -1017,13 +1017,13 @@
     #statsView .lock-screen { display: none !important; }
     #statsView #dashboardContent { display: none; }
     #statsView .refresh-btn {
-      background: var(--navy); color: var(--gold-soft);
-      border: 1px solid var(--border-gold); border-radius: var(--radius-sm);
-      padding: 9px 18px; font-size:  var(--aq-fs-small); font-weight: 700; cursor: pointer;
+      background: var(--aq-color-surface); color: var(--aq-color-primary);
+      border: 1px solid var(--aq-color-border); border-radius: var(--radius-sm);
+      min-height: var(--aq-btn-h); padding: 0 18px; font-size:  var(--aq-fs-button); font-weight: 700; cursor: pointer;
       margin-bottom: 12px;
       transition: background-color var(--ease), border-color var(--ease);
     }
-    #statsView .refresh-btn:hover { background: var(--navy-deep); border-color: var(--aq-border-accent-strong); }
+    #statsView .refresh-btn:hover { background: var(--aq-color-surface-accent); border-color: var(--aq-color-primary-line); }
     #statsView .kpi-grid {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(172px, 1fr));
       gap: 12px; margin-bottom: 14px;
@@ -1224,11 +1224,11 @@
       background: var(--aq-prop-surface, #fff); border-color: var(--aq-prop-green-line, #BFD8CF);
     }
     #statsView .stats-month-nav-btn {
-      background: var(--aq-prop-surface, #fff); color: var(--aq-prop-green-ink, #023A3A);
-      border: 1px solid var(--aq-prop-green-line, #BFD8CF); padding: 8px 14px;
+      background: var(--aq-color-surface); color: var(--aq-color-primary);
+      border: 1px solid var(--aq-color-border); min-height: var(--aq-btn-h); padding: 0 14px;
       border-radius: var(--radius-sm); font-weight: 700; cursor: pointer;
     }
-    #statsView .stats-month-nav-btn:hover { background: var(--aq-prop-green-soft, #E4EDEA); }
+    #statsView .stats-month-nav-btn:hover { background: var(--aq-color-surface-accent); border-color: var(--aq-color-primary-line); }
     #statsView .stats-month-nav-label { color: var(--aq-prop-green-ink, #023A3A); font-size: 14px; }
     /* Badge عدد الوحدات في "آخر الأنشطة" — نفس بيانات النص القديم، عرض فقط */
     #statsView .stats-activity-count-badge {
@@ -1706,11 +1706,8 @@
     }
     .um-count { font-size:  var(--aq-fs-small); color: var(--muted); font-weight: 600; }
     .um-count b { color: var(--navy); font-size:  var(--aq-fs-body-lg); }
-    .um-add-toggle {
-      border: 1px solid var(--border-gold); background: var(--navy); color: var(--gold-soft);
-      font-weight: 700; font-size:  var(--aq-fs-caption); padding: 8px 14px; border-radius: var(--radius-sm); cursor: pointer;
-    }
-    .um-add-toggle:hover { background: var(--navy-deep); }
+    /* Report 067: الدور (primary/secondary) بيحدده صنف aq-btn--form-* — هنا الهندسة فقط */
+    .um-add-toggle { font-weight: 700; font-size: var(--aq-fs-button); min-height: var(--aq-btn-h); padding: 0 16px; border-radius: var(--radius-sm); cursor: pointer; }
     .um-addform {
       border: 1px solid var(--border); border-radius: var(--radius-md);
       padding: 14px; margin-bottom: 14px; background: var(--off-white);
@@ -1721,8 +1718,8 @@
       border-radius:  var(--aq-radius-xs); padding: 6px 9px; margin: 8px 0 0; line-height: 1.7;
     }
     .um-primary {
-      width: 100%; margin-top: 12px; padding: 11px; border: none; border-radius:  var(--aq-radius-sm);
-      background: var(--navy); color: var(--gold-soft); font-weight: 700; font-size:  var(--aq-fs-body); cursor: pointer;
+      width: 100%; margin-top: 12px; min-height: var(--aq-btn-h); padding: 0 16px; border: 1px solid var(--aq-color-primary); border-radius:  var(--aq-radius-sm);
+      background: var(--aq-color-primary); color: var(--aq-color-on-primary); font-weight: 700; font-size:  var(--aq-fs-body); cursor: pointer;
     }
     .um-primary:disabled { opacity: .6; cursor: default; }
     .um-msg { font-size:  var(--aq-fs-caption); margin-top: 8px; min-height: 14px; }
@@ -1920,24 +1917,24 @@
     }
     .access-gate-box p { font-size:  var(--aq-fs-small); color: var(--text-muted); line-height: 1.7; margin-bottom: 20px; }
     .access-gate-box input {
-      width: 100%; padding: 11px 14px;
+      width: 100%; height: var(--aq-input-h-lg); padding: 0 14px;
       border: 1px solid var(--aq-border-strong); border-radius: var(--radius-sm);
       background: var(--aq-bg-muted-2); color: var(--text-light);
       font-size:  var(--aq-fs-body); margin-bottom: 10px; text-align: center;
       transition: border-color var(--ease), box-shadow var(--ease), background-color var(--ease);
     }
-    .access-gate-box input::placeholder { color: var(--text-muted); }
+    .access-gate-box input::placeholder { color: var(--aq-color-text-placeholder); }
     .access-gate-box input:focus {
       outline: none; border-color: var(--gold);
       box-shadow: var(--aq-focus-ring);
       background: var(--aq-bg-muted-3);
     }
     .access-gate-box button {
-      width: 100%; padding: 12px; border: 1px solid var(--border-gold); border-radius: var(--radius-sm); background: var(--navy);
-      color: var(--gold-soft); font-weight: 700; font-size:  var(--aq-fs-body); cursor: pointer; margin-top: 4px;
+      width: 100%; min-height: var(--aq-btn-h-lg); padding: 0 16px; border: 1px solid var(--aq-color-primary); border-radius: var(--radius-sm); background: var(--aq-color-primary);
+      color: var(--aq-color-on-primary); font-weight: 700; font-size:  var(--aq-fs-body); cursor: pointer; margin-top: 4px;
       transition: background-color var(--ease), border-color var(--ease), transform var(--ease);
     }
-    .access-gate-box button:hover { background: var(--navy-deep); border-color: var(--aq-border-accent-strong); }
+    .access-gate-box button:hover { background: var(--aq-color-primary-dark); border-color: var(--aq-color-primary-dark); }
     .access-gate-box button:disabled {
       background: var(--aq-border-strong); color: var(--aq-text-disabled);
       border-color: transparent; cursor: not-allowed;
@@ -1969,9 +1966,9 @@
     .modal-title { font-size:  var(--aq-fs-card-title); font-weight: 700; letter-spacing: 0.2px; color: var(--navy); }
     .modal-close {
       background: var(--bg); color: var(--muted); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); width: 30px; height: 30px; font-size:  var(--aq-fs-body-lg); padding: 0;
+      border-radius: var(--radius-sm); width: var(--aq-icon-btn); height: var(--aq-icon-btn); font-size:  var(--aq-fs-body-lg); padding: 0;
     }
-    .modal-close:hover { background: rgba(10,28,47,0.08); }
+    .modal-close:hover { background: var(--aq-color-surface-accent); color: var(--aq-color-primary); }
     .section-title {
       font-size:  var(--aq-fs-caption-sm); font-weight: 800; letter-spacing: 0.6px; color: var(--navy); margin: 14px 0 8px;
       padding-bottom: 5px; border-bottom: 1px solid var(--border-gold); text-transform: uppercase;
@@ -2421,14 +2418,14 @@
       color: var(--aq-prop-text-muted); text-transform: none; letter-spacing: 0;
       font-size: var(--aq-fs-caption); font-weight: 700;
     }
-    body.aq-search-ui .aq-console input,
+    body.aq-search-ui .aq-console input:not([type="checkbox"]):not([type="radio"]),
     body.aq-search-ui .aq-console select {
       background: var(--aq-prop-surface); color: var(--aq-prop-text);
       border: 1px solid var(--aq-prop-border); border-radius: var(--aq-prop-radius-sm);
-      padding: 11px 13px; font-size: var(--aq-fs-small);
+      height: var(--aq-input-h); padding: 0 13px; font-size: var(--aq-fs-small);
     }
     body.aq-search-ui .aq-console select { color-scheme: light; }
-    body.aq-search-ui .aq-console input::placeholder { color: var(--aq-prop-text-faint); }
+    body.aq-search-ui .aq-console input::placeholder { color: var(--aq-color-text-placeholder); }
     body.aq-search-ui .aq-console input:focus,
     body.aq-search-ui .aq-console select:focus {
       border-color: var(--aq-prop-green); box-shadow: var(--aq-focus-ring);
@@ -2442,22 +2439,22 @@
     }
     body.aq-search-ui .aq-console #nlSearchBtn,
     body.aq-search-ui .aq-console #searchBtn {
-      background: var(--aq-prop-green-ink); color: #fff; border: 1px solid var(--aq-prop-green-ink);
-      border-radius: var(--aq-prop-radius-sm); font-weight: 800;
+      background: var(--aq-color-primary); color: var(--aq-color-on-primary); border: 1px solid var(--aq-color-primary);
+      border-radius: var(--radius-sm); font-weight: 700; min-height: var(--aq-btn-h-lg);
     }
     body.aq-search-ui .aq-console #nlSearchBtn:hover,
-    body.aq-search-ui .aq-console #searchBtn:hover { background: var(--aq-prop-green); border-color: var(--aq-prop-green); }
-    body.aq-search-ui .aq-console #searchBtn { flex: 1 1 auto; padding: 12px 26px; }
+    body.aq-search-ui .aq-console #searchBtn:hover { background: var(--aq-color-primary-dark); border-color: var(--aq-color-primary-dark); }
+    body.aq-search-ui .aq-console #searchBtn { flex: 1 1 auto; padding: 0 26px; }
     body.aq-search-ui .aq-console #clearBtn {
-      background: var(--aq-prop-surface); color: var(--aq-prop-text-muted);
-      border: 1px solid var(--aq-prop-border); border-radius: var(--aq-prop-radius-sm);
+      background: var(--aq-color-surface); color: var(--aq-color-primary);
+      border: 1px solid var(--aq-color-border); border-radius: var(--radius-sm); min-height: var(--aq-btn-h-lg); padding: 0 20px;
     }
-    body.aq-search-ui .aq-console #clearBtn:hover { border-color: var(--aq-prop-border-strong); color: var(--aq-prop-text); }
+    body.aq-search-ui .aq-console #clearBtn:hover { background: var(--aq-color-surface-accent); border-color: var(--aq-color-primary-line); }
     body.aq-search-ui .aq-console .toggle-details-btn {
-      background: var(--aq-prop-canvas); border: 1px solid var(--aq-prop-border);
-      color: var(--aq-prop-text-muted); border-radius: var(--aq-prop-radius-sm);
+      background: transparent; border: 1px solid transparent;
+      color: var(--aq-color-text-muted); border-radius: var(--radius-sm); min-height: var(--aq-btn-h); font-weight: 700;
     }
-    body.aq-search-ui .aq-console .toggle-details-btn:hover { border-color: var(--aq-prop-green-line); color: var(--aq-prop-green); }
+    body.aq-search-ui .aq-console .toggle-details-btn:hover { background: var(--aq-color-surface-subtle); color: var(--aq-color-primary); }
     .aq-console-back {
       align-items: center; gap: 6px;
       background: transparent; border: 1px solid var(--aq-prop-border);
@@ -2640,7 +2637,7 @@
        * الذي كان يُلصق المجموعة بحافة الكارت اليمنى تحت RTL). لا تغيير في الحجم/الحدود/الحشو. */
       display: flex; align-items: center; justify-content: center; gap: 7px; min-width: 0;
       background: var(--aq-prop-canvas); color: var(--aq-prop-text);
-      border: 1px solid var(--aq-prop-border); border-radius: 10px;
+      border: 1px solid var(--aq-prop-border); border-radius: var(--radius-sm);
       padding: 5px 8px; box-shadow: none; white-space: nowrap;
     }
     body.aq-search-ui .spec-chip .ico { width: 16px; height: 16px; flex: none; color: var(--aq-prop-green-deep); }
@@ -2729,7 +2726,7 @@
     body.aq-search-ui .unit-extra b { color: var(--aq-prop-text); }
     body.aq-search-ui .card-actions-bottom { border-top: 1px solid var(--aq-prop-border); }
     body.aq-search-ui .icon-action-btn {
-      background: var(--aq-prop-surface); color: var(--aq-prop-text-muted);
+      background: var(--aq-prop-surface); color: var(--aq-color-primary);
       border: 1px solid var(--aq-prop-border); border-radius: var(--aq-prop-radius-sm); font-weight: 700;
     }
     body.aq-search-ui .icon-action-btn:hover {
@@ -2817,13 +2814,13 @@
     .ud-code { display: inline-block; background: var(--aq-prop-surface); border: 1px solid var(--aq-prop-border); border-radius: 9px; padding: 4px 10px; font-size: var(--aq-fs-caption); font-weight: 800; color: var(--aq-prop-text-muted); direction: ltr; unicode-bidi: isolate; }
     .ud-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
     .ud-actions .icon-action-btn {
-      display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 10px;
-      background: var(--aq-prop-surface); color: var(--aq-prop-text); border: 1px solid var(--aq-prop-border);
-      font-size: var(--aq-fs-caption); font-weight: 800; box-shadow: 0 1px 4px rgba(11,40,33,0.06); cursor: pointer;
+      display: inline-flex; align-items: center; gap: 6px; height: auto; min-height: var(--aq-btn-h-compact); padding: 0 12px; border-radius: var(--radius-sm);
+      background: var(--aq-color-surface); color: var(--aq-color-primary); border: 1px solid var(--aq-color-border);
+      font-size: var(--aq-fs-caption); font-weight: 700; box-shadow: none; cursor: pointer;
     }
-    .ud-actions .icon-action-btn .ico { width: 15px; height: 15px; color: var(--aq-prop-green-deep); }
+    .ud-actions .icon-action-btn .ico { width: 15px; height: 15px; color: var(--aq-color-primary); }
     .ud-actions .icon-action-btn:hover { border-color: var(--aq-prop-green-line); background: var(--aq-prop-green-soft); color: var(--aq-prop-green-deep); }
-    .ud-actions .icon-action-btn.ud-act-primary { background: var(--aq-prop-green-deep); color: #fff; border-color: var(--aq-prop-green-deep); }
+    .ud-actions .icon-action-btn.ud-act-primary { background: var(--aq-color-primary); color: var(--aq-color-on-primary); border-color: var(--aq-color-primary); }
     .ud-actions .icon-action-btn.ud-act-primary .ico { color: #fff; }
     .ud-actions .icon-action-btn.ud-act-primary:hover { background: var(--aq-prop-green); border-color: var(--aq-prop-green); color: #fff; }
     .ud-name { font-size: 26px; line-height: 1.25; font-weight: 900; color: var(--aq-prop-text); margin-top: 2px; overflow-wrap: anywhere; }
@@ -2833,7 +2830,7 @@
     .ud-status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .ud-status-row .status-badge { display: inline-flex; align-items: center; gap: 6px; }
     .ud-status-row .status-badge .status-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-    .ud-status-select { flex: none; width: auto; min-width: 120px; padding: 6px 10px; font-size: var(--aq-fs-caption); font-weight: 700; }
+    .ud-status-select { flex: none; width: auto; min-width: 120px; height: var(--aq-btn-h-compact); padding: 0 10px; font-size: var(--aq-fs-caption); font-weight: 700; border-radius: var(--radius-sm); }
     /* ---- الأقسام والبلاطات (Icon + Label + Value) ---- */
     .ud-sec {
       background: var(--aq-prop-surface); border: 1px solid var(--aq-prop-border); border-radius: 14px;
@@ -2896,9 +2893,9 @@
     .ud-map-txt b { font-size: var(--aq-fs-small); color: var(--aq-prop-text); }
     .ud-map-txt span { font-size: var(--aq-fs-caption); color: var(--aq-prop-text-muted); font-weight: 600; }
     .ud-map-btn {
-      display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 8px; padding: 9px 10px;
-      border: 1px solid var(--aq-prop-green-line); border-radius: 10px; background: var(--aq-prop-surface);
-      color: var(--aq-prop-green-deep); font-size: var(--aq-fs-caption); font-weight: 800; text-decoration: none;
+      display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 8px; min-height: var(--aq-btn-h-compact); padding: 0 10px;
+      border: 1px solid var(--aq-color-border); border-radius: var(--radius-sm); background: var(--aq-color-surface);
+      color: var(--aq-color-primary); font-size: var(--aq-fs-caption); font-weight: 700; text-decoration: none;
     }
     .ud-map-btn:hover { background: var(--aq-prop-green-soft); }
     .ud-map-btn .ico { width: 14px; height: 14px; }
@@ -2947,8 +2944,9 @@
       background: var(--aq-prop-green-ink); color: #fff; border-color: var(--aq-prop-green-ink);
     }
     body.aq-search-ui .aq-results-pager button {
-      background: var(--aq-prop-green-ink); color: #fff; border-color: var(--aq-prop-green-ink);
+      background: var(--aq-color-primary); color: var(--aq-color-on-primary); border-color: var(--aq-color-primary); min-height: var(--aq-btn-h); padding: 0 22px;
     }
+    body.aq-search-ui .aq-results-pager button:hover { background: var(--aq-color-primary-dark); border-color: var(--aq-color-primary-dark); }
     body.aq-search-ui .skel-card {
       background: var(--aq-prop-surface); border: 1px solid var(--aq-prop-border);
       border-radius: var(--aq-prop-radius);
@@ -2961,7 +2959,7 @@
     body.aq-search-ui .unit-card-overlay .unit-card { cursor: default; }
     /* زر الإغلاق داخل هيدر نافذة التفاصيل (أعلى يسار) - مربّع ناعم بهوية الأخضر/الأبيض */
     .unit-details-box .unit-card-overlay-close {
-      top: 11px; left: 14px; width: 38px; height: 38px; padding: 0; z-index: 6; border-radius: 11px;
+      top: 11px; left: 14px; width: var(--aq-icon-btn); height: var(--aq-icon-btn); padding: 0; z-index: 6; border-radius: var(--radius-sm);
       display: flex; align-items: center; justify-content: center;
       background: var(--aq-prop-surface); color: var(--aq-prop-text);
       border: 1px solid var(--aq-prop-border); box-shadow: 0 2px 8px rgba(6,28,23,0.10);
@@ -2989,9 +2987,9 @@
      * ذهبيًا فاتحًا — نصّها الآن أبيض. القائمة مستخرجة بالفحص لا بالتخمين.
      * ========================================================================= */
     #nlSearchBtn, #searchBtn, .fav-toggle-btn.active, .edit-btn, .empty-state button,
-    #scrollTopBtn, .compare-table th, #statsView .refresh-btn, .dash-drawer-toggle,
-    #dashboardView .dash-cta, #dashPanel-users .um-chips button.active, .um-add-toggle,
-    .um-primary, .um-chips button.active, .um-avatar, #umUserBody .um-actions button.primary,
+    #scrollTopBtn, .compare-table th, .dash-drawer-toggle,
+    #dashboardView .dash-cta,
+    .um-primary, .um-avatar, #umUserBody .um-actions button.primary,
     #umUserBody .um-inline button, .admin-panel .small-btn, .access-gate-box button,
     #editSaveBtn, .images-choose-btn, #quoteExportBtn, .ai-extract-btn,
     #pdfContactConfirmBtn, #devProfileExportPdfBtn {
@@ -3089,16 +3087,16 @@
     body.app-view-search .aq-console .filters-card > .toggle-details-btn { grid-area: adv; justify-self: start; width: auto; }
     body.app-view-search .aq-console .filters-card > #advancedFiltersBlock { grid-area: advblk; }
     body.app-view-search .aq-console .filters-card > .btn-row { grid-area: actions; }
-    body.app-view-search .aq-console input,
-    body.app-view-search .aq-console select { padding: 12px 14px; }
+    body.app-view-search .aq-console input:not([type="checkbox"]):not([type="radio"]),
+    body.app-view-search .aq-console select { height: var(--aq-input-h-lg); padding: 0 14px; }
     @media (max-width: 480px) {
       body.app-view-search .aq-console .filters-card > .grid { gap: var(--aq-space-3) var(--aq-space-2); }
-      body.app-view-search .aq-console input,
-      body.app-view-search .aq-console select { padding: 11px 8px; font-size: var(--aq-fs-caption); }
+      body.app-view-search .aq-console input:not([type="checkbox"]):not([type="radio"]),
+      body.app-view-search .aq-console select { padding: 0 8px; font-size: var(--aq-fs-caption); }
     }
     /* زر البحث عريض داخل البطاقة (كما في المرجع) ومسح الفلاتر ثانوي بجانبه */
     body.app-view-search .aq-console .btn-row { margin: 0; gap: var(--aq-space-2); justify-content: flex-end; }
-    body.app-view-search .aq-console #searchBtn { flex: 1 1 auto; padding: 14px 28px; font-size: var(--aq-fs-body); }
+    body.app-view-search .aq-console #searchBtn { flex: 1 1 auto; padding: 0 28px; font-size: var(--aq-fs-body); }
     body.app-view-search .aq-console #clearBtn { flex: 0 0 auto; }
 
     /* ---------------- استكشف: شريط بحث مضغوط في صفّين ---------------- */
@@ -3165,7 +3163,7 @@
       direction: ltr; unicode-bidi: isolate; margin-inline-start: 6px;
     }
     #editModal .modal-close {
-      width: 36px; height: 36px; border-radius: 50%;
+      width: var(--aq-icon-btn); height: var(--aq-icon-btn); border-radius: var(--radius-sm);
       background: var(--aq-prop-surface); color: var(--aq-prop-text-muted); border: 1px solid var(--aq-prop-border);
     }
     #editModal .modal-close:hover { background: var(--aq-prop-green-soft); color: var(--aq-prop-green); border-color: var(--aq-prop-green-line); }
@@ -3191,10 +3189,11 @@
     #editModal select, #editModal textarea {
       background: var(--aq-prop-surface); color: var(--aq-prop-text);
       border: 1px solid var(--aq-prop-border); border-radius: var(--aq-prop-radius-sm);
-      padding: 12px 14px; min-height: 46px; font-size: var(--aq-fs-small); line-height: 1.4;
+      padding: 10px 14px; min-height: var(--aq-input-h); font-size: var(--aq-fs-small); line-height: 1.4;
       transition: border-color var(--aq-motion-base), box-shadow var(--aq-motion-base);
     }
-    #editModal input::placeholder, #editModal textarea::placeholder { color: var(--aq-prop-text-faint); }
+    #editModal select { height: var(--aq-input-h); padding-block: 0; }
+    #editModal input::placeholder, #editModal textarea::placeholder { color: var(--aq-color-text-placeholder); }
     #editModal input:hover, #editModal select:hover, #editModal textarea:hover { border-color: var(--aq-prop-border-strong); }
     #editModal input:focus, #editModal select:focus, #editModal textarea:focus {
       outline: none; border-color: var(--aq-prop-green); box-shadow: var(--aq-focus-ring); background: var(--aq-prop-surface);
@@ -3238,7 +3237,7 @@
     .aq-additional-payment-remove:hover { background: rgba(192,57,43,0.12); border-color: var(--error-fg, #c0392b); }
     .aq-additional-payment-remove .ico { width: 14px; height: 14px; }
     #addAdditionalPaymentBtn { margin-top: var(--aq-space-2); }
-    #editForm .aq-inline-action #editFetchLastSimilarBtn { flex: 0 0 auto; margin: 0; min-height: 46px; white-space: nowrap; padding: 10px 14px; font-size: var(--aq-fs-caption); }
+    #editForm .aq-inline-action #editFetchLastSimilarBtn { flex: 0 0 auto; margin: 0; min-height: var(--aq-btn-h); white-space: nowrap; padding: 0 14px; font-size: var(--aq-fs-caption); }
 
     /* معاينة القسط: بطاقة مالية هادئة */
     #editModal .installment-preview {
@@ -3271,8 +3270,8 @@
     #editModal .aq-ai-upload-btn {
       width: 100%; height: 100%; min-height: 48px; box-sizing: border-box; padding: 10px 14px;
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      border: 1.5px dashed var(--aq-prop-green-line); border-radius: var(--aq-prop-radius); background: var(--aq-prop-surface);
-      color: var(--aq-prop-text-muted); font-weight: var(--aq-fw-bold); font-size: var(--aq-fs-caption);
+      border: 1.5px dashed var(--aq-color-primary-line); border-radius: var(--radius-sm); background: var(--aq-color-surface);
+      color: var(--aq-color-primary); font-weight: var(--aq-fw-bold); font-size: var(--aq-fs-caption);
       transition: border-color var(--aq-motion-base), background var(--aq-motion-base);
     }
     #editModal .aq-ai-upload-btn .ico { width: 15px; height: 15px; color: var(--aq-prop-green); flex: 0 0 auto; }
@@ -3307,11 +3306,11 @@
     #editModal .images-zone p { color: var(--aq-prop-text-muted); margin: 0; flex: 1 1 200px; font-size: var(--aq-fs-caption); }
     #editModal .images-zone .images-choose-btn { flex: 0 0 auto; }
     #editModal .images-choose-btn {
-      background: var(--aq-prop-green); color: #fff; border: 1px solid var(--aq-prop-green-ink);
-      border-radius: var(--aq-prop-radius-sm); padding: 10px 18px; font-size: var(--aq-fs-caption);
+      background: var(--aq-color-primary); color: var(--aq-color-on-primary); border: 1px solid var(--aq-color-primary);
+      border-radius: var(--radius-sm); min-height: var(--aq-btn-h); padding: 0 18px; font-size: var(--aq-fs-button); font-weight: 700;
       display: inline-flex; align-items: center; gap: 8px;
     }
-    #editModal .images-choose-btn:hover { background: var(--aq-prop-green-ink); }
+    #editModal .images-choose-btn:hover { background: var(--aq-color-primary-dark); }
     #editModal .image-link-row { margin: 0; gap: var(--aq-space-2); align-items: stretch; }
     #editModal .image-link-row button {
       background: var(--aq-prop-surface); color: var(--aq-prop-green); border: 1px solid var(--aq-prop-green-line);
@@ -3411,7 +3410,7 @@
       border-radius: var(--aq-radius-pill); border: 1px solid transparent; background: transparent; color: var(--aq-prop-text-muted);
     }
     #dashboardView .dash-nav-item:hover { background: var(--aq-prop-green-soft); border-color: transparent; color: var(--aq-prop-green); }
-    #dashboardView .dash-nav-item.is-active { background: var(--aq-prop-green); border-color: var(--aq-prop-green); color: #fff; }
+    #dashboardView .dash-nav-item.is-active { background: var(--aq-color-primary-soft); border-color: var(--aq-color-primary-line); color: var(--aq-color-primary); }
     #dashboardView .dash-nav-item.dash-logout { margin-inline-start: auto; color: var(--aq-error-fg); background: transparent; border-color: transparent; }
     #dashboardView .dash-nav-item.dash-logout:hover { background: var(--aq-danger-tint); }
     #dashboardView .dash-nav-item svg { opacity: 1; }
@@ -3466,12 +3465,13 @@
     #dashPanel-users .um-filters #umSearch { width: 100%; }
     #dashPanel-users .um-chips { display: flex; flex-wrap: wrap; gap: 6px; }
     #dashPanel-users .um-chips button {
-      display: inline-flex; align-items: center; padding: 7px 14px; border-radius: var(--aq-radius-pill);
+      display: inline-flex; align-items: center; min-height: var(--aq-chip-h); padding: 0 14px; border-radius: var(--aq-radius-pill);
       border: 1px solid var(--aq-prop-border); background: var(--aq-prop-surface); color: var(--aq-prop-text-muted);
       font-family: inherit; font-size: var(--aq-fs-caption); font-weight: 700; cursor: pointer; unicode-bidi: isolate;
     }
     #dashPanel-users .um-chips button:hover { border-color: var(--aq-prop-green-line); color: var(--aq-prop-green); }
-    #dashPanel-users .um-chips button.active { background: var(--aq-prop-green); color: #fff; border-color: var(--aq-prop-green); }
+    #dashPanel-users .um-chips button.active { background: var(--aq-color-primary-soft); color: var(--aq-color-primary); border-color: var(--aq-color-primary-line); }
+    #dashPanel-users .um-chips button:focus-visible { outline: 2px solid var(--aq-color-primary); outline-offset: 2px; }
     #dashPanel-users .um-list { display: flex; flex-direction: column; gap: 10px; max-height: none; overflow: visible; padding: 0; }
     #dashPanel-users .um-card {
       display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 12px 14px;
@@ -3597,14 +3597,14 @@
     .pc-preview-label { font-size: var(--aq-fs-caption); color: var(--aq-prop-text-muted); font-weight: 700; }
     .pc-actions { display: flex; gap: 8px; margin-top: var(--aq-space-5); flex-wrap: wrap; }
     .pc-btn {
-      flex: 1 1 auto; min-height: 44px; padding: 10px 14px; border-radius: var(--aq-radius-md);
+      flex: 1 1 auto; min-height: var(--aq-btn-h); padding: 0 14px; border-radius: var(--radius-sm);
       font-family: inherit; font-weight: 700; font-size: var(--aq-fs-small); cursor: pointer;
       border: 1px solid var(--aq-prop-border); background: var(--aq-prop-surface); color: var(--aq-prop-text);
       transition: background var(--ease), border-color var(--ease), color var(--ease);
     }
     .pc-btn:hover { border-color: var(--aq-prop-green-line); }
-    .pc-btn.primary { background: var(--aq-prop-green-deep); color: #fff; border-color: var(--aq-prop-green-deep); }
-    .pc-btn.primary:hover { background: var(--aq-prop-green); border-color: var(--aq-prop-green); }
+    .pc-btn.primary { background: var(--aq-color-primary); color: var(--aq-color-on-primary); border-color: var(--aq-color-primary); }
+    .pc-btn.primary:hover { background: var(--aq-color-primary-dark); border-color: var(--aq-color-primary-dark); }
     .pc-btn:focus-visible { outline: 2px solid var(--aq-prop-green); outline-offset: 2px; }
     @media (max-width: 480px) {
       .pc-actions { flex-direction: column; }
@@ -3675,7 +3675,7 @@
       #umUserBody .um-actions button { flex: 1 1 100%; }
     }
     /* PHASE 4 / STEP 3 (Report 062): جرس الإشعارات + المركز — نفس التوكنات، Cairo، RTL؛ بدون نظام تصميم جديد */
-    .aq-notif-bell { display: none; position: relative; align-items: center; justify-content: center; width: 38px; height: 38px; padding: 0; border-radius: var(--aq-radius-sm, 10px); background: transparent; border: 1px solid var(--aq-prop-border, #E3E6E5); color: var(--aq-prop-text-muted, #6E7573); cursor: pointer; font-family: var(--aq-font); }
+    .aq-notif-bell { display: none; position: relative; align-items: center; justify-content: center; width: var(--aq-icon-btn); height: var(--aq-icon-btn); padding: 0; border-radius: var(--aq-radius-sm, 10px); background: transparent; border: 1px solid var(--aq-prop-border, #E3E6E5); color: var(--aq-prop-text-muted, #6E7573); cursor: pointer; font-family: var(--aq-font); }
     .aq-notif-bell svg { width: 18px; height: 18px; }
     .aq-notif-bell:hover, .aq-notif-bell[aria-expanded="true"] { color: var(--navy); border-color: var(--gold); }
     body.aq-app-on .aq-notif-bell { display: inline-flex; }

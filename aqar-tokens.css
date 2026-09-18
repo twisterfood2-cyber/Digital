@@ -68,6 +68,14 @@
   --aq-overlay:        rgba(4,12,22,0.60);
   --aq-overlay-blur:   3px;
   --aq-overlay-strong: rgba(4,12,22,0.75);
+  /* Component geometry (Report 067 — VISUAL STEP 3): أزرار/حقول/رقائق عائلة واحدة */
+  --aq-btn-h:         44px;   /* زر عادي */
+  --aq-btn-h-lg:      48px;   /* CTA البطل (بحث / دخول) + حقول الكونسول */
+  --aq-btn-h-compact: 40px;   /* شريط أدوات مضغوط (أفعال التفاصيل) */
+  --aq-icon-btn:      36px;   /* زر أيقونة قياسي (إغلاق/جرس/خروج) — 32 فوق الصور، 40 لللايتبوكس */
+  --aq-input-h:       44px;
+  --aq-input-h-lg:    48px;
+  --aq-chip-h:        32px;
 
   /* ==================================================================
    * 1) PRIMITIVES — Brand palette (alias → index.html :root canonical)
@@ -318,7 +326,7 @@
   --aq-prop-shadow-lg:      var(--shadow-3);
   --aq-prop-radius:         var(--radius-lg);     /* بطاقات العقار = 16 */
   --aq-prop-radius-lg:      var(--radius-xl);     /* كونسول البحث/الهيرو = 24 */
-  --aq-prop-radius-sm:      10px;                 /* حقول ورقائق — استثناء موثّق (خطوة المكوّنات لاحقًا) */
+  --aq-prop-radius-sm:      var(--radius-sm);     /* حقول ورقائق وأزرار = 8 (Report 067؛ كان 10) */
 
   /* --- الأسماء الدلالية للهوية العامة (تُستهلك في كل التطبيق) --- */
   --aq-prop-primary:        var(--aq-prop-green);        /* #0E5446 */
