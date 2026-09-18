@@ -10,7 +10,7 @@
 
        og:image = *صورة الغلاف* الفعلية للموقع (#coverImg / .cover-wrap، التي يرفعها
        المالك من الإعدادات وتُحمَّل وقت التشغيل عبر getCoverImageUrl()) — وليست صورة
-       الخلفية (city-bg.png). صورة الغلاف مصدرها ملف على Google Drive برابط
+       الخلفية (city-bg.jpg). صورة الغلاف مصدرها ملف على Google Drive برابط
        drive.google.com/thumbnail?id=…&sz=w2000، وهذا الرابط يردّ 302/application/binary
        لزواحف السوشيال (غير صالح للـ preview). لذلك تُقدَّم *نفس صورة الغلاف بالضبط*
        (نسخة بايت-لبايت من ملف Drive، 1600×538، بلا قص/تحجيم) كملف ثابت og-cover.png
@@ -682,12 +682,12 @@
     .empty-state button:hover { background: var(--navy-deep); }
     /* صفحات النتائج (REPORTS/048) — زر "عرض المزيد" بنفس مظهر زر empty-state (لا خط جديد ولا ألوان جديدة) */
     .aq-results-pager { display: flex; justify-content: center; padding: 18px 0 6px; }
-    .aq-results-pager button {
+    .aq-results-pager button:not(.aq-btn) {
       background: var(--navy); color: var(--gold-soft); border: 1px solid var(--border-gold);
       padding: 10px 22px; border-radius: var(--radius-sm); font-size:  var(--aq-fs-small); font-weight: 700; cursor: pointer;
     }
-    .aq-results-pager button:hover { background: var(--navy-deep); }
-    .aq-results-pager button[disabled] { opacity: .6; cursor: default; }
+    .aq-results-pager button:not(.aq-btn):hover { background: var(--navy-deep); }
+    .aq-results-pager button:not(.aq-btn)[disabled] { opacity: .6; cursor: default; }
 
     /* Toast Notifications */
     .toast-container {
@@ -973,10 +973,8 @@
       margin: 0;
       pointer-events: auto;
     }
-    /* في "عرض السعر" الـ × يبقى ظاهرًا كطريق رجوع واضح لشاشة البحث */
-    body.app-view-quote #editModal .modal-close {
-      display: inline-flex; align-items: center; justify-content: center;
-    }
+    /* Report 075: "عرض السعر" صفحة كاملة (زي #add) — زر × الخاص بالمودال لا يظهر؛ الرجوع عبر التنقّل (Escape/الأوفرلاي بلا تغيير) */
+    body.app-view-quote #editModal .modal-close { display: none; }
 
     /* #priceStatsModal in-flow — عرض "سعر المتر" */
     body.app-view-meter #priceStatsModal {
@@ -999,9 +997,8 @@
       margin: 0;
       pointer-events: auto;
     }
-    body.app-view-meter #priceStatsModal .modal-close {
-      display: inline-flex; align-items: center; justify-content: center;
-    }
+    /* Report 075: "سعر المتر" صفحة كاملة — نفس معاملة #add: بلا × */
+    body.app-view-meter #priceStatsModal .modal-close { display: none; }
 
     /* ---- dashboard styles, all scoped under #statsView so nothing leaks into Search ---- */
     #statsView h1 {
@@ -2900,10 +2897,11 @@
     body.aq-search-ui .empty-state button {
       background: var(--aq-prop-green-ink); color: #fff; border-color: var(--aq-prop-green-ink);
     }
-    body.aq-search-ui .aq-results-pager button {
+    /* Report 075: القاعدة تخص زر "عرض المزيد" الخاص بنتائج البحث (بلا دور صريح) فقط — أزرار الـ pager التي تحمل دور .aq-btn (الإشعارات/الأرشيف) تحتفظ بدورها المعلن */
+    body.aq-search-ui .aq-results-pager button:not(.aq-btn) {
       background: var(--aq-color-primary); color: var(--aq-color-on-primary); border-color: var(--aq-color-primary); min-height: var(--aq-btn-h); padding: 0 22px;
     }
-    body.aq-search-ui .aq-results-pager button:hover { background: var(--aq-color-primary-dark); border-color: var(--aq-color-primary-dark); }
+    body.aq-search-ui .aq-results-pager button:not(.aq-btn):hover { background: var(--aq-color-primary-dark); border-color: var(--aq-color-primary-dark); }
     body.aq-search-ui .skel-card {
       background: var(--aq-prop-surface); border: 1px solid var(--aq-prop-border);
       border-radius: var(--aq-prop-radius);
@@ -3220,13 +3218,13 @@
     /* صفّ الإجراءات الثلاثة: لصق | رفع | استخراج (الأساسي أعرض قليلًا) */
     #editModal .aq-ai-actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.25fr); gap: var(--aq-space-2); align-items: stretch; }
     #editModal .ai-paste-zone {
-      margin: 0; min-height: 48px; padding: 10px 14px; display: flex; align-items: center; justify-content: center;
+      margin: 0; min-height: var(--aq-btn-h); padding: 8px 14px; display: flex; align-items: center; justify-content: center;
       color: var(--aq-prop-text-muted); font-weight: var(--aq-fw-bold); font-size: var(--aq-fs-caption);
     }
     #editModal .ai-paste-zone.is-armed { color: var(--aq-prop-green); }
-    #editModal .aq-ai-upload { position: relative; min-height: 48px; }
+    #editModal .aq-ai-upload { position: relative; min-height: var(--aq-btn-h); }   /* Report 075: 48 → 44 (نفس طبقة أزرار النموذج) */
     #editModal .aq-ai-upload-btn {
-      width: 100%; height: 100%; min-height: 48px; box-sizing: border-box; padding: 10px 14px;
+      width: 100%; height: 100%; min-height: var(--aq-btn-h); box-sizing: border-box; padding: 8px 14px;
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
       border: 1.5px dashed var(--aq-color-primary-line); border-radius: var(--radius-sm); background: var(--aq-color-surface);
       color: var(--aq-color-primary); font-weight: var(--aq-fw-bold); font-size: var(--aq-fs-caption);
@@ -3296,6 +3294,7 @@
     #editModal #editDeleteBtn { width: auto; flex: 0 1 auto; margin: 0; margin-inline-start: auto; padding: 12px 18px; }
     #editModal #quoteActionRow { margin: 0; flex: 1 1 100%; }
     #editModal #quoteActionRow.show { display: flex; gap: var(--aq-space-2); }
+    #editModal #quoteActionRow button { min-height: var(--aq-btn-h); padding: 0 12px; }   /* Report 075: نفس طبقة 44px للأزرار */
     #editModal #quoteExportBtn {
       background: var(--aq-prop-green); color: #fff; border: 1px solid var(--aq-prop-green-ink); border-radius: var(--aq-prop-radius-sm);
     }
@@ -13835,7 +13834,7 @@
       if (diff < 60000) return 'الآن';
       if (diff < 3600000) return 'منذ ' + Math.floor(diff / 60000) + ' دقيقة';
       if (diff < 86400000) return 'منذ ' + Math.floor(diff / 3600000) + ' ساعة';
-      try { return new Date(t).toLocaleString('ar-EG', { timeZone: 'Africa/Cairo', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; }
+      try { return new Date(t).toLocaleString('ar-EG-u-nu-latn', { timeZone: 'Africa/Cairo', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; }   /* Report 075: أرقام لاتينية زي باقي التطبيق (نفس اللغة/التوقيت) */
     }
     var TYPE_ICON = { UNIT_CREATED: ICON.building, PRICE_CHANGED: ICON.tag, UNIT_RESTORED: ICON.clipboard, SYSTEM: ICON.alert };
     function itemHtml_(n) {
