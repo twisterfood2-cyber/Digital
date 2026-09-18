@@ -4489,6 +4489,17 @@
         <div class="dash-panel" id="dashPanel-archive" hidden>
           <div class="dash-page-title">الأرشيف</div>
           <p class="aq-page-intro">الوحدات اللي اتأرشفت (خرجت من البحث النشط) بنفس أرقامها. الاسترجاع بيرجّع الوحدة نفسها لنفس الرقم — وبيترفض تلقائيًا لو فيه وحدة نشطة مطابقة (نفس قواعد كشف التكرار في الإدخال). الأرشفة نفسها ما بتتشغّلش من هنا.</p>
+          <!-- PHASE 4 / STEP 5B (Report 078): تصدير الوحدات — OWNER فقط (الحارس الحقيقي في السيرفر: exportUnits). الملف بيتولّد في السيرفر ويرجع Base64 وينزل هنا كـ Blob — بدون أي رابط عام أو تخزين. -->
+          <section class="aq-admin-card" id="unitExportCard" aria-labelledby="unitExportTitle">
+            <div class="aq-admin-card-head"><div><h3 class="aq-admin-card-title" id="unitExportTitle">تصدير الوحدات</h3><p class="aq-admin-card-sub">ملف XLSX أو CSV بترتيب الشيت الأصلي — بدون بيانات اتصال المالك/الوكيل، الصور كروابط. الحد الأقصى 5,000 وحدة في الملف.</p></div></div>
+            <form class="aq-form-grid aq-form-grid--2" id="unitExportForm" autocomplete="off">
+              <div class="aq-form-field"><label class="aq-form-label" for="uxScope">النطاق</label><select class="aq-form-control" id="uxScope"><option value="active" selected>الوحدات النشطة</option><option value="archived">الوحدات المؤرشفة</option><option value="all">الكل (نشطة + مؤرشفة)</option></select></div>
+              <div class="aq-form-field"><label class="aq-form-label" for="uxFormat">الصيغة</label><select class="aq-form-control" id="uxFormat"><option value="xlsx" selected>Excel (XLSX)</option><option value="csv">CSV</option></select></div>
+              <div class="aq-form-field"><label class="aq-check"><input type="checkbox" id="uxUseFilters"> <span>استخدام فلاتر البحث الحالية</span></label><p class="aq-form-help" id="uxFiltersHint">بدون تحديد = كل الوحدات في النطاق المختار.</p></div>
+              <div class="aq-form-field"><label class="aq-check"><input type="checkbox" id="uxIncludeResale"> <span>تضمين وحدات الريسيل</span></label><p class="aq-form-help">البحث بيخفي الريسيل افتراضيًا — التصدير بيتبع نفس القاعدة إلا لو فعّلت الخيار ده.</p></div>
+              <div class="aq-form-field aq-form-actions"><button type="submit" class="aq-btn aq-btn--primary" id="uxExportBtn">تصدير</button> <span class="aq-form-help" id="uxStatus" aria-live="polite"></span></div>
+            </form>
+          </section>
           <section class="aq-admin-card" id="archiveFilterCard" aria-labelledby="archiveFilterTitle">
             <div class="aq-admin-card-head"><div><h3 class="aq-admin-card-title" id="archiveFilterTitle">بحث في الأرشيف</h3><p class="aq-admin-card-sub">الأحدث أرشفةً أولًا</p></div></div>
             <form class="aq-form-grid aq-form-grid--2" id="archiveFilterForm" autocomplete="off">
@@ -13632,6 +13643,82 @@
     document.getElementById('activityNextMonth').addEventListener('click', function() {
       activityViewDate.setMonth(activityViewDate.getMonth() + 1);
       renderActivityReport();
+    });
+  })();
+
+  /* ============================================================================
+   * PHASE 4 / STEP 5B (Report 078) — تصدير الوحدات (M-11): زر "تصدير الوحدات" في لوحة الأرشيف (OWNER فقط — الحارس الحقيقي في السيرفر).
+   * ----------------------------------------------------------------------------
+   * - exportUnits(options, auth) على نفس البوابة → الرد فيه fileBase64 + filename + contentType → Blob → <a download> (نفس أسلوب تنزيل PDF).
+   * - الفلاتر = نفس collectFilters() بتاعة البحث (اختياريًا) — مفيش محرّك فلاتر تاني؛ includeResale خيار تصدير فقط.
+   * - منع النقر المزدوج (disabled أثناء التوليد)، رسائل عربية لكل كود (NO_RESULTS / EXPORT_TOO_LARGE / FORBIDDEN / AUTH_REQUIRED)،
+   *   بدون عرض Base64 أو تفاصيل داخلية، وكل نص ديناميكي بيتحط بـ textContent.
+   * ========================================================================== */
+  (function unitExportModule_() {
+    var form = document.getElementById('unitExportForm');
+    var btn = document.getElementById('uxExportBtn');
+    var status = document.getElementById('uxStatus');
+    if (!form || !btn) return;
+    var busy = false;
+    var MSG = {
+      NO_RESULTS: 'لا توجد وحدات مطابقة للتصدير — عدّل الفلاتر أو النطاق وحاول تاني',
+      EXPORT_TOO_LARGE: 'عدد الوحدات أكبر من الحد المسموح (5,000) — ضيّق الفلاتر أو اختر نطاقًا أصغر',
+      FORBIDDEN: 'التصدير متاح للمالك فقط',
+      VALIDATION_ERROR: 'خيارات التصدير غير صالحة',
+      RATE_LIMITED: 'عدد محاولات التصدير كبير — استنّى شوية وحاول تاني'
+    };
+    function setStatus_(text) { if (status) status.textContent = text || ''; }
+    function download_(res) {
+      var bin = atob(res.fileBase64);
+      var bytes = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      var blob = new Blob([bytes], { type: res.contentType || 'application/octet-stream' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = String(res.filename || 'AqaR_Units.xlsx').replace(/[\\/:*?"<>|]/g, '');   // نفس حماية اسم ملف الـ PDF
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+    }
+    function options_() {
+      var o = {
+        scope: document.getElementById('uxScope').value,
+        format: document.getElementById('uxFormat').value,
+        includeResale: !!document.getElementById('uxIncludeResale').checked
+      };
+      if (document.getElementById('uxUseFilters').checked && typeof collectFilters === 'function') o.filters = collectFilters();
+      return o;
+    }
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (busy) return;
+      busy = true; btn.disabled = true; btn.setAttribute('aria-busy', 'true');
+      setStatus_('جاري إنشاء الملف…');
+      var opts = options_();
+      AqarDataService.get('exportUnits', [opts, getAuthCreds()]).then(function (res) {
+        download_(res);
+        setStatus_('تم تصدير ' + fmtNum(res.rowCount) + ' وحدة');
+        showToast('تم تصدير ' + fmtNum(res.rowCount) + ' وحدة — ' + String(res.filename || ''), 'success');   // showToast بتستخدم textContent
+      }).catch(function (err) {
+        var raw = err && err.raw;
+        var code = raw && raw.code;
+        var msg = (code && MSG[code]) || (raw && raw.error === 'RATE_LIMITED' && MSG.RATE_LIMITED) || (err && err.code === 'AUTH' ? (err.message || 'انتهت الجلسة') : (raw && raw.message) || 'تعذّر إنشاء ملف التصدير');
+        if (code === 'EXPORT_TOO_LARGE' && raw && raw.totalCount) msg += ' (العدد الحالي: ' + fmtNum(raw.totalCount) + ')';
+        setStatus_(msg);
+        showToast(msg, 'error');
+      }).finally(function () {
+        busy = false; btn.disabled = false; btn.removeAttribute('aria-busy');
+      });
+    });
+    document.getElementById('uxUseFilters').addEventListener('change', function () {
+      var hint = document.getElementById('uxFiltersHint');
+      if (!hint) return;
+      if (!this.checked) { hint.textContent = 'بدون تحديد = كل الوحدات في النطاق المختار.'; return; }
+      var f = (typeof collectFilters === 'function') ? collectFilters() : {};
+      var active = Object.keys(f).filter(function (k) { return f[k] !== '' && f[k] != null; });
+      hint.textContent = active.length ? ('فلاتر البحث الحالية: ' + active.length + ' (' + active.join('، ') + ')') : 'مفيش فلاتر مفعّلة في البحث حاليًا — هيتصدّر كل الوحدات في النطاق.';
     });
   })();
 
