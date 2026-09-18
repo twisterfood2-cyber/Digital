@@ -40,7 +40,7 @@
   --aq-color-text:             #16211E;
   --aq-color-text-secondary:   rgba(22,33,30,0.78);
   --aq-color-text-muted:       #5F6866;   /* كان #6E7573 (4.4:1 على الكانفس) → 5.9:1 أبيض / 5.5:1 كانفس */
-  --aq-color-text-placeholder: #7A817F;   /* كان #8A908E (3.25:1) → 4.5:1 */
+  --aq-color-text-placeholder: #6E7573;   /* كان #8A908E (3.25:1) → 4.71:1 على الأبيض (القيمة القديمة للـ muted، نزلت درجة) */
   --aq-color-text-disabled:    rgba(22,33,30,0.42);
   /* Borders — دوران فقط */
   --aq-color-border:         #D3D8D7;   /* الحدّ الافتراضي (كان #E3E6E5 عند 1.26:1 → 1.44:1) */
