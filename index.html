@@ -2527,7 +2527,7 @@
     /* حدّ أدنى أضيق للمسار (264px بدل 300px) → 3 أعمدة عند 1280 و4 عند الشاشات
        الأعرض، بكثافة أقرب لشبكة المرجع بلا أي تغيير في بناء البطاقة. */
     body.aq-search-ui .results-grid {
-      gap: 20px;
+      gap: var(--aq-space-5);
       grid-template-columns: repeat(auto-fill, minmax(min(100%, 264px), 1fr));
     }
     /* =========================================================================
@@ -2535,23 +2535,24 @@
      * الحالة + رقم الوحدة فوق الجزء السفلي من الصورة (بلا صف مستقل)، صفّان من المواصفات،
      * لوحة سعر Premium، المطور، وسطر "أضيفت • آخر تعديل" - كله بأقل ارتفاع ممكن.
      * ========================================================================= */
+    /* Report 068: الحاوية على توكنز 066 — سطح/حدّ/زوايا/ظل واحد؛ hover = رفع خفيف + الدرجة الأعلى من الظل */
     body.aq-search-ui .unit-card {
-      background: var(--aq-prop-surface); color: var(--aq-prop-text);
-      border: 1px solid var(--aq-prop-border); border-right: 1px solid var(--aq-prop-border);
-      border-radius: var(--aq-prop-radius); box-shadow: var(--aq-prop-shadow);
+      background: var(--aq-color-surface); color: var(--aq-color-text);
+      border: 1px solid var(--aq-color-border); border-right: 1px solid var(--aq-color-border);
+      border-radius: var(--radius-lg); box-shadow: var(--shadow-2);
       -webkit-backdrop-filter: none; backdrop-filter: none;
-      padding: 12px; overflow: hidden; display: flex; flex-direction: column;
+      padding: var(--aq-space-3); overflow: hidden; display: flex; flex-direction: column;
       transition: transform var(--ease), box-shadow var(--ease), border-color var(--ease);
       cursor: pointer;
     }
     body.aq-search-ui .unit-card:hover {
-      background: var(--aq-prop-surface); transform: translateY(-3px);
-      border-color: var(--aq-prop-green-line); box-shadow: 0 16px 40px rgba(11,40,33,0.16);
+      background: var(--aq-color-surface); transform: translateY(-2px);
+      border-color: var(--aq-color-primary-line); box-shadow: var(--shadow-3);
     }
     body.aq-search-ui .unit-card:focus-visible { outline: 2px solid var(--aq-prop-green); outline-offset: 2px; }
     /* الصورة: الحاوية تحدد المساحة (نسبة ثابتة) والصورة تملؤها بقصّ مركزي - لا تتحكم أبعاد الصورة في الكارت */
     body.aq-search-ui .unit-cover {
-      position: relative; margin: -12px -12px 10px; border-radius: 0; width: auto; height: auto;
+      position: relative; margin: calc(-1 * var(--aq-space-3)) calc(-1 * var(--aq-space-3)) var(--aq-space-3); border-radius: 0; width: auto; height: auto;
       aspect-ratio: 4 / 3; overflow: hidden; background: var(--aq-prop-canvas-2);
     }
     body.aq-search-ui .unit-cover img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; transition: transform 320ms ease; }
@@ -2570,8 +2571,8 @@
     body.aq-search-ui .unit-cover-strip .status-badge {
       display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
       background: var(--aq-color-primary-deep); color: var(--aq-color-on-solid); border: 1px solid rgba(255,255,255,0.18);
-      border-radius: var(--aq-radius-pill); padding: 4px 11px; font-size: var(--aq-fs-caption); font-weight: 800;
-      box-shadow: 0 2px 8px rgba(2,20,16,0.28);
+      border-radius: var(--aq-radius-pill); padding: 4px 11px; font-size: var(--aq-fs-caption); font-weight: 700;
+      box-shadow: var(--shadow-1);
     }
     body.aq-search-ui .unit-cover-strip .status-badge .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #B4FF6C; flex: none; }
     body.aq-search-ui .unit-cover-strip .status-badge.محجوز { background: var(--aq-color-warning-solid); color: var(--aq-color-on-solid); } /* Report 066: color صريح — كان يُغلب بقاعدة الشارة الفاتحة (نفس الخصوصية) فيختفي النص */
@@ -2593,82 +2594,89 @@
     }
     body.aq-search-ui .unit-cover-strip .img-count-badge .ico { width: 12px; height: 12px; }
     /* المفضلة / المقارنة - نفس العناصر والوظائف، هوية خضراء فاتحة فوق الصورة */
+    /* Report 068: المفضلة دائرة 32 (كانت 42×32 بسبب padding الزر العام) والمقارنة مربّع 32 (كان 26، والمربع الداخلي 24×20 بسبب padding الحقول) */
     body.aq-search-ui .fav-btn {
-      background: rgba(255,255,255,0.92); border: 1px solid var(--aq-prop-green-line);
-      color: var(--aq-prop-green-deep); box-shadow: 0 2px 8px rgba(6,28,23,0.18);
+      width: 32px; height: 32px; padding: 0;
+      background: rgba(255,255,255,0.92); border: 1px solid var(--aq-color-primary-line);
+      color: var(--aq-color-primary); box-shadow: var(--shadow-1);
     }
-    body.aq-search-ui .fav-btn:hover { background: #fff; border-color: var(--aq-prop-green-deep); }
+    body.aq-search-ui .fav-btn:hover { background: var(--aq-color-surface); border-color: var(--aq-color-primary); }
+    body.aq-search-ui .fav-btn.active { color: var(--aq-color-primary); border-color: var(--aq-color-primary); }
     body.aq-search-ui .fav-btn.active .ico { fill: currentColor; stroke: none; }
     body.aq-search-ui .compare-checkbox {
-      background: rgba(255,255,255,0.92); border-radius: 8px; border: 1px solid var(--aq-prop-green-line);
-      box-shadow: 0 2px 8px rgba(6,28,23,0.18);
+      width: 32px; height: 32px; padding: 0;
+      background: rgba(255,255,255,0.92); border-radius: var(--radius-sm); border: 1px solid var(--aq-color-primary-line);
+      box-shadow: var(--shadow-1);
     }
-    body.aq-search-ui .compare-checkbox:hover { background: #fff; border-color: var(--aq-prop-green-deep); }
+    body.aq-search-ui .compare-checkbox:hover { background: var(--aq-color-surface); border-color: var(--aq-color-primary); }
+    body.aq-search-ui .compare-checkbox:focus-within { outline: 2px solid var(--aq-color-primary); outline-offset: 2px; }
     body.aq-search-ui .compare-checkbox input {
-      appearance: none; -webkit-appearance: none; margin: 0; display: block;
-      width: 16px; height: 16px; border-radius: 4px;
-      border: 1.5px solid var(--aq-prop-green-line); background: #fff;
+      appearance: none; -webkit-appearance: none; margin: 0; padding: 0; display: block;
+      width: 18px; height: 18px; border-radius: 4px;
+      border: 1.5px solid var(--aq-color-primary-line); background: var(--aq-color-surface);
       transition: background var(--ease), border-color var(--ease);
     }
     body.aq-search-ui .compare-checkbox input:checked {
-      background-color: var(--aq-prop-green-deep); border-color: var(--aq-prop-green-deep);
+      background-color: var(--aq-color-primary); border-color: var(--aq-color-primary);
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
-      background-repeat: no-repeat; background-position: center; background-size: 11px 11px;
+      background-repeat: no-repeat; background-position: center; background-size: 12px 12px;
     }
     /* الاسم / النوع / الموقع */
     body.aq-search-ui .unit-card .unit-info-block { min-height: 0; }
-    body.aq-search-ui .unit-title { color: var(--aq-prop-text); font-size: var(--aq-fs-body-lg); font-weight: 800; }
-    body.aq-search-ui .unit-loc { color: var(--aq-prop-text-muted); font-weight: 600; }
-    body.aq-search-ui .unit-card .unit-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 2px; line-height: 1.45; }
+    /* Report 068: المستوى 2 — العنوان 16/700 (كان 15/800)، النوع لاحقة أهدأ، الموقع 12 muted */
+    body.aq-search-ui .unit-title { color: var(--aq-color-text); font-size: var(--aq-fs-card-title); font-weight: 700; }
+    body.aq-search-ui .unit-loc { color: var(--aq-color-text-muted); font-weight: 600; }
+    body.aq-search-ui .unit-card .unit-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: var(--aq-space-1); line-height: var(--aq-lh-tight); }
     /* اسم الوحدة (بارز) + نوع العقار كلاحقة أهدأ - نفس الـhierarchy في الصورة المرجعية */
-    body.aq-search-ui .unit-card .unit-title-name { color: var(--aq-prop-text); font-weight: 800; }
-    body.aq-search-ui .unit-card .unit-title-type { color: var(--aq-prop-text-muted); font-weight: 600; font-size: var(--aq-fs-caption); }
-    body.aq-search-ui .unit-card .unit-loc { margin-bottom: 8px; font-size: var(--aq-fs-caption); }
-    body.aq-search-ui .unit-card .unit-loc .ico { color: var(--aq-prop-green-deep); }
+    body.aq-search-ui .unit-card .unit-title-name { color: var(--aq-color-text); font-weight: 700; }
+    body.aq-search-ui .unit-card .unit-title-type { color: var(--aq-color-text-muted); font-weight: 600; font-size: var(--aq-fs-caption); }
+    body.aq-search-ui .unit-card .unit-loc { margin-bottom: var(--aq-space-2); font-size: var(--aq-fs-caption); }
+    body.aq-search-ui .unit-card .unit-loc .ico { color: var(--aq-color-primary); }
     /* المواصفات: صفّان بثلاث شرائح (سطر واحد لكل شريحة) */
     body.aq-search-ui .unit-card .unit-specs {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 6px;
-      margin: 0 0 6px; min-height: 0; overflow: visible;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: var(--aq-space-2);
+      margin: 0 0 var(--aq-space-2); min-height: 0; overflow: visible;
       direction: rtl;   /* ترتيب بصري حتمي: أول شريحة في DOM = أقصى اليمين، لا يتأثر بأي وراثة/استجابة */
     }
     body.aq-search-ui .spec-chip {
       /* توسيط حقيقي لمجموعة (أيقونة + قيمة/تسمية) داخل الكارت: justify-content:center يوسّط
        * المجموعة على المحور الرئيسي بصرف النظر عن اتجاه RTL (بخلاف flex-start الافتراضي
        * الذي كان يُلصق المجموعة بحافة الكارت اليمنى تحت RTL). لا تغيير في الحجم/الحدود/الحشو. */
-      display: flex; align-items: center; justify-content: center; gap: 7px; min-width: 0;
-      background: var(--aq-prop-canvas); color: var(--aq-prop-text);
-      border: 1px solid var(--aq-prop-border); border-radius: var(--radius-sm);
-      padding: 5px 8px; box-shadow: none; white-space: nowrap;
+      display: flex; align-items: center; justify-content: center; gap: var(--aq-space-2); min-width: 0;
+      background: var(--aq-color-surface-subtle); color: var(--aq-color-text);
+      border: 1px solid var(--aq-color-border); border-radius: var(--radius-sm);
+      padding: var(--aq-space-1) var(--aq-space-2); box-shadow: none; white-space: nowrap;
     }
-    body.aq-search-ui .spec-chip .ico { width: 16px; height: 16px; flex: none; color: var(--aq-prop-green-deep); }
+    body.aq-search-ui .spec-chip .ico { width: 16px; height: 16px; flex: none; color: var(--aq-color-primary); }
     /* align-items:center يوسّط كل سطر (القيمة والتسمية) بالنسبة للآخر عند اختلاف طولهما،
      * بدل ترك الافتراضي (stretch) يمدّد السطرين لعرض واحد فيظهر السطر الأقصر ملتصقًا
      * بحافة تبعًا لاتجاه RTL رغم توسيط المجموعة الخارجية. */
     body.aq-search-ui .spec-chip .spec-txt { display: flex; flex-direction: column; align-items: center; min-width: 0; line-height: 1.2; }
     /* max-width:100% يُبقي القيمة/التسمية داخل عرض الشريحة (فيعمل الـ ellipsis) مع بقائهما متمركزتين */
-    body.aq-search-ui .spec-chip .spec-txt b { font-size: var(--aq-fs-caption); font-weight: 800; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
-    body.aq-search-ui .spec-chip .spec-txt small { font-size: var(--aq-fs-micro); color: var(--aq-prop-text-muted); font-weight: 600; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+    body.aq-search-ui .spec-chip .spec-txt b { font-size: var(--aq-fs-caption); font-weight: 700; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+    body.aq-search-ui .spec-chip .spec-txt small { font-size: var(--aq-fs-caption-sm); color: var(--aq-color-text-muted); font-weight: 600; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
     /* كروت ضيقة (شبكة 5-6 أعمدة): إخفاء أيقونة الشريحة وتقليص الحشو حتى تبقى القيمة والتسمية مقروءتين */
     body.aq-search-ui .unit-card { container-type: inline-size; }
     @container (max-width: 250px) {
-      body.aq-search-ui .spec-chip { gap: 4px; padding: 4px 6px; }
+      body.aq-search-ui .spec-chip { gap: var(--aq-space-1); padding: var(--aq-space-1) 6px; }
       body.aq-search-ui .spec-chip > .ico { display: none; }
-      body.aq-search-ui .unit-card .unit-price-box { padding: 8px 10px; }
+      body.aq-search-ui .unit-card .unit-price-box { padding: var(--aq-space-2) 10px; }
       body.aq-search-ui .unit-card .final-price { font-size: var(--aq-fs-body-lg); }
     }
     /* لوحة السعر Premium: عمق + حدّ + ظل ناعم، بلا زيادة مبالغ فيها في الارتفاع */
-    body.aq-search-ui .unit-card-footer { margin-top: auto; padding-top: 2px; }
+    body.aq-search-ui .unit-card-footer { margin-top: auto; padding-top: 0; }
     /* لوحة السعر: عمود رأسي (flex-column, align-items:center) - السعر النهائي وسعر المتر
      * (.price-center) يتمركزان تلقائيًا بالنسبة لعرض المستطيل بالكامل لأن align-items:center
      * يُوسّط كل عنصر بحسب عرض محتواه هو، بصرف النظر عمّا يعلوه من عناصر (.price-top). فوقه،
      * صفّ السعر قبل الخصم + Badge الخصم (عند وجود خصم) يُثبَّت على جانب البداية (يمين RTL)
      * عبر align-self:flex-start - نفس توزيع الصورة المرجعية (كليهما مجموعة واحدة أعلى يمين
      * اللوحة، والسعر النهائي بارز ومتمركز تمامًا أسفلهما). */
+    /* Report 068: المستوى 1 — لوحة السعر سطح مُبرَز مسطّح (بلا تدرّج/ظل) والسعر 20/800 بالأخضر الأساسي الواحد */
     body.aq-search-ui .unit-card .unit-price-box {
-      display: flex; flex-direction: column; align-items: center; gap: 3px;
-      background: linear-gradient(180deg, #FFFFFF 0%, var(--aq-prop-green-soft) 100%);
-      border: 1px solid var(--aq-prop-green-line); border-radius: 12px; padding: 9px 12px; margin-top: 6px;
-      box-shadow: 0 4px 14px rgba(11,40,33,0.08), inset 0 1px 0 #fff;
+      display: flex; flex-direction: column; align-items: center; gap: var(--aq-space-1);
+      background: var(--aq-color-surface-accent);
+      border: 1px solid var(--aq-color-primary-line); border-radius: var(--radius-md); padding: var(--aq-space-2) var(--aq-space-3); margin-top: var(--aq-space-2);
+      box-shadow: none;
     }
     body.aq-search-ui .unit-card .price-top {
       align-self: flex-start; display: flex; align-items: center; gap: 8px; max-width: 100%; min-width: 0;
@@ -2677,29 +2685,29 @@
     body.aq-search-ui .unit-card .price-center {
       display: flex; flex-direction: column; align-items: center; gap: 1px; min-width: 0; text-align: center;
     }
-    body.aq-search-ui .unit-card .price-old-label { font-size: var(--aq-fs-micro); color: var(--aq-prop-text-faint); font-weight: 600; white-space: nowrap; }
-    body.aq-search-ui .unit-card .old-price { font-size: var(--aq-fs-caption); color: var(--aq-prop-text-faint); font-weight: 700; text-decoration: line-through; white-space: nowrap; }
-    body.aq-search-ui .unit-card .final-price { font-size: var(--aq-fs-title-sm); line-height: 1.25; color: var(--aq-prop-green-deep); font-weight: 900; margin: 0; white-space: nowrap; }
-    body.aq-search-ui .unit-card .final-price .cur { font-size: var(--aq-fs-caption); font-weight: 800; }
-    body.aq-search-ui .unit-card .per-meter { display: inline-flex; align-items: center; gap: 4px; font-size: var(--aq-fs-micro); color: var(--aq-prop-text-muted); font-weight: 600; margin: 0; }
-    body.aq-search-ui .unit-card .per-meter .ico { width: 12px; height: 12px; color: var(--aq-prop-green-deep); }
+    body.aq-search-ui .unit-card .price-old-label { font-size: var(--aq-fs-caption-sm); color: var(--aq-color-text-muted); font-weight: 600; white-space: nowrap; }
+    body.aq-search-ui .unit-card .old-price { font-size: var(--aq-fs-caption); color: var(--aq-color-text-muted); font-weight: 600; text-decoration: line-through; white-space: nowrap; }
+    body.aq-search-ui .unit-card .final-price { font-size: var(--aq-fs-section-title); line-height: var(--aq-lh-tight); color: var(--aq-color-primary); font-weight: 800; margin: 0; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    body.aq-search-ui .unit-card .final-price .cur { font-size: var(--aq-fs-caption); font-weight: 700; }
+    body.aq-search-ui .unit-card .per-meter { display: inline-flex; align-items: center; gap: var(--aq-space-1); font-size: var(--aq-fs-caption-sm); color: var(--aq-color-text-muted); font-weight: 600; margin: 0; }
+    body.aq-search-ui .unit-card .per-meter .ico { width: 12px; height: 12px; color: var(--aq-color-primary); }
     body.aq-search-ui .discount-tag {
       display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; flex: none;
-      background: #FFF4D6; color: #8A5A00; border: 1px solid #F1DFAE; border-radius: var(--aq-radius-pill);
-      padding: 4px 10px; font-size: var(--aq-fs-caption-sm); font-weight: 800; box-shadow: 0 1px 4px rgba(138,90,0,0.12);
+      background: var(--aq-color-warning-bg); color: var(--aq-color-warning); border: 1px solid var(--aq-color-warning-border); border-radius: var(--aq-radius-pill);
+      padding: 4px 10px; font-size: var(--aq-fs-caption-sm); font-weight: 700; box-shadow: none;
     }
     body.aq-search-ui .discount-tag .ico { width: 12px; height: 12px; }
     /* المطور + سطر التواريخ (بلا صناديق - أقل مساحة رأسية) */
     body.aq-search-ui .unit-dev-row {
-      display: flex; align-items: center; gap: 6px; min-width: 0;
-      font-size: var(--aq-fs-caption); color: var(--aq-prop-text-faint); font-weight: 600;
-      margin-top: 8px; overflow: hidden;
+      display: flex; align-items: center; gap: var(--aq-space-2); min-width: 0;
+      font-size: var(--aq-fs-caption); color: var(--aq-color-text-muted); font-weight: 600;
+      margin-top: var(--aq-space-2); overflow: hidden;
     }
-    body.aq-search-ui .unit-dev-row .ico { flex-shrink: 0; color: var(--aq-prop-green-deep); }
-    body.aq-search-ui .unit-dev-row .dev-name { color: var(--aq-prop-text); font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+    body.aq-search-ui .unit-dev-row .ico { flex-shrink: 0; color: var(--aq-color-primary); }
+    body.aq-search-ui .unit-dev-row .dev-name { color: var(--aq-color-text); font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
     body.aq-search-ui .unit-meta-line {
-      display: flex; align-items: center; gap: 6px; min-width: 0; margin-top: 4px;
-      font-size: var(--aq-fs-micro); color: var(--aq-prop-text-faint); font-weight: 600;
+      display: flex; align-items: center; gap: var(--aq-space-2); min-width: 0; margin-top: var(--aq-space-1);
+      font-size: var(--aq-fs-caption-sm); color: var(--aq-color-text-muted); font-weight: 600;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     body.aq-search-ui .unit-meta-line .ico { width: 12px; height: 12px; flex: none; }
@@ -2973,7 +2981,7 @@
       body.app-view-explore .aq-hero { position: static; }
     }
     @media (max-width: 640px) {
-      body.aq-search-ui .unit-card { padding: 12px; }
+      body.aq-search-ui .unit-card { padding: var(--aq-space-3); }
       body.aq-search-ui .aq-sort-field { width: 100%; }
       body.aq-search-ui .aq-sort-field select { flex: 1 1 auto; min-width: 0; }
       body.app-view-explore .aq-hero { padding: 10px; }
