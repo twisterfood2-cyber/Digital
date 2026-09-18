@@ -13,67 +13,122 @@
  * ==========================================================================*/
 :root {
   /* ==================================================================
+   * 0) SEMANTIC FOUNDATION (Report 066 — VISUAL STEP 2) — المصدر الوحيد للقيم.
+   *    الهوية نفسها (أخضر عميق + أبيض + كانفس فاتح): مفيش درجة لونية جديدة —
+   *    تنظيم الأدوار + تباين أوضح. كل التوكنز الأقدم أدناه (primitives / --aq-prop-* /
+   *    --navy / --gold في index.html) بقت aliases لهذه الأدوار.
+   * ================================================================== */
+  /* Brand green — دور أساسي واحد + حالات تفاعل واضحة */
+  --aq-color-primary:        #0E5446;   /* الأساسي: أزرار، أسعار، تنقّل نشط، أيقونات */
+  --aq-color-primary-deep:   #004C43;   /* عميق: شرائط/بانرات، شارة "متاح" على الصور */
+  --aq-color-primary-dark:   #023A3A;   /* داكن: hover/pressed للأساسي + الـ CTA البطل (بحث/دخول) */
+  --aq-color-primary-soft:   #D9E9E2;   /* تظليل نشط (كان #E4EDEA — قريب جدًا من الأبيض) */
+  --aq-color-primary-line:   #BFD8CF;   /* حدّ أخضر باهت (رقائق/شارات) */
+  --aq-color-primary-tint-1: rgba(14,84,70,0.06);
+  --aq-color-primary-tint-2: rgba(14,84,70,0.10);
+  --aq-color-primary-tint-3: rgba(14,84,70,0.16);
+  --aq-color-primary-tint-4: rgba(14,84,70,0.28);
+  --aq-color-accent:         #B4FF6C;   /* مؤشر صغير فقط (نقاط) — ممنوع كنص/خلفية كبيرة */
+  --aq-color-on-primary:     #FFFFFF;
+  /* Surfaces — 4 أدوار بدل ~10 درجات متقاربة */
+  --aq-color-canvas:         #F7F7F7;   /* خلفية الصفحة */
+  --aq-color-surface:        #FFFFFF;   /* كروت/هيدر/مودالات/حقول */
+  --aq-color-surface-subtle: #F5F7F6;   /* بلاطات/صفوف/أزرار إغلاق/هياكل (يجمع FAFAFA/F1F4F3/F5F7F6/ECEFEE) */
+  --aq-color-surface-muted:  #E7EDED;   /* أقسام فاتحة ثانوية (يجمع E7EDED/DCE7E3/EBF2EF) */
+  --aq-color-surface-accent: #EEF4F1;   /* سطح مُبرَز خفيف (صندوق السعر، عنصر إشعار غير مقروء) */
+  /* Text — تدرّج واضح ومتوافق AA على الأبيض والكانفس والتظليل */
+  --aq-color-text:             #16211E;
+  --aq-color-text-secondary:   rgba(22,33,30,0.78);
+  --aq-color-text-muted:       #5F6866;   /* كان #6E7573 (4.4:1 على الكانفس) → 5.9:1 أبيض / 5.5:1 كانفس */
+  --aq-color-text-placeholder: #7A817F;   /* كان #8A908E (3.25:1) → 4.5:1 */
+  --aq-color-text-disabled:    rgba(22,33,30,0.42);
+  /* Borders — دوران فقط */
+  --aq-color-border:         #D3D8D7;   /* الحدّ الافتراضي (كان #E3E6E5 عند 1.26:1 → 1.44:1) */
+  --aq-color-border-strong:  #C3CBC8;   /* حدّ أوضح (حقول نشطة/فواصل بارزة) ≈ 1.7:1 */
+  --aq-color-border-subtle:  rgba(16,33,30,0.10); /* hairline داخلي (فواصل صفوف) */
+  /* Status triad — bg / border / fg / solid لكل حالة، تُستخدم على الكارت والشارة والمؤشر والتوست */
+  --aq-color-success:        #1E6E45;  --aq-color-success-bg: #E4F1E9;  --aq-color-success-border: #BFD8CF;  --aq-color-success-solid: #1E6E45;
+  --aq-color-warning:        #8A6412;  --aq-color-warning-bg: #FDF3DC;  --aq-color-warning-border: #EBDCB4;  --aq-color-warning-solid: #8A6412;
+  --aq-color-danger:         #B0271F;  --aq-color-danger-bg:  #FBE9E7;  --aq-color-danger-border:  #F0CFCB;  --aq-color-danger-solid:  #B0271F;
+  --aq-color-info:           #1C4A75;  --aq-color-info-bg:    #DBE7F3;  --aq-color-info-border:    rgba(28,74,117,0.30);
+  --aq-color-on-solid:       #FFFFFF;  /* نص فوق الألوان الصلبة (شارات الغلاف) */
+  /* Radius — سُلّم واحد (الكروت تبقى 16) */
+  --radius-sm:   8px;
+  --radius-md:   12px;    /* كان 13px */
+  --radius-lg:   16px;
+  --radius-xl:   24px;
+  --radius-pill: 999px;
+  /* Elevation — 4 درجات بلون ظل واحد (rgba(11,40,33)) */
+  --shadow-0: none;
+  --shadow-1: 0 1px 3px rgba(11,40,33,0.08);
+  --shadow-2: 0 6px 18px rgba(11,40,33,0.10);
+  --shadow-3: 0 18px 44px rgba(11,40,33,0.18);
+  --aq-focus-ring: 0 0 0 3px rgba(14,84,70,0.18);
+  /* Overlay — خلفية واحدة لكل المودالات (اللايتبوكس مستثنى عمدًا: أغمق بلا blur) */
+  --aq-overlay:        rgba(4,12,22,0.60);
+  --aq-overlay-blur:   3px;
+  --aq-overlay-strong: rgba(4,12,22,0.75);
+
+  /* ==================================================================
    * 1) PRIMITIVES — Brand palette (alias → index.html :root canonical)
    * ================================================================== */
-  --aq-navy:        var(--navy,        #0A1C2F);
-  --aq-navy-deep:   var(--navy-deep,   #061321);
-  --aq-navy-dark:   var(--navy-dark,   #081727);
-  --aq-navy-soft:   var(--navy-soft,   #14344F);
-  --aq-gold:        var(--gold,        #C99A2E);
-  --aq-gold-soft:   var(--gold-soft,   #E6C978);
-  --aq-gold-dark:   var(--gold-dark,   #A77A18);
-  --aq-white:       var(--white,       #FFFFFF);
-  --aq-surface:     var(--off-white,   #F7F6F2);
-  --aq-surface-2:   var(--bg,          #F1EFE8);
-  --aq-text:        var(--text,        #10253A);
-  --aq-text-light:  var(--text-light,  #EAF0F6);
-  --aq-text-muted-d:var(--text-muted,  #AEB9C6);  /* muted على الداكن */
-  --aq-text-muted:  var(--muted,       #5E6B7A);  /* muted على الفاتح */
-  --aq-border:      var(--border,      rgba(16,37,58,0.14));
-  --aq-border-gold: var(--border-gold, rgba(201,154,46,0.28));
-  --aq-line-dark:   var(--line-dark,   rgba(255,255,255,0.10));
-  --aq-success-bg:  var(--success-bg,  #E4F1E9);
-  --aq-success-fg:  var(--success-fg,  #1E6E45);
-  --aq-warn-bg:     var(--warn-bg,     #F7EED9);
-  --aq-warn-fg:     var(--warn-fg,     #7A5600);
-  --aq-error-bg:    var(--error-bg,    #F7E4E4);
-  --aq-error-fg:    var(--error-fg,    #B0271F);
+  --aq-navy:        var(--aq-color-primary);       /* الأسماء القديمة navy/gold = عائلة الأخضر (Report 066) */
+  --aq-navy-deep:   var(--aq-color-primary-dark);
+  --aq-navy-dark:   var(--aq-color-primary-deep);
+  --aq-navy-soft:   var(--navy-soft, #0F6152);
+  --aq-gold:        var(--aq-color-primary);
+  --aq-gold-soft:   var(--aq-color-primary);
+  --aq-gold-dark:   var(--aq-color-primary-dark);
+  --aq-white:       #FFFFFF;
+  --aq-surface:     var(--aq-color-surface);
+  --aq-surface-2:   var(--aq-color-surface-subtle);
+  --aq-text:        var(--aq-color-text);
+  --aq-text-light:  var(--aq-color-text);          /* اسم قديم: بقى النص الأساسي الداكن (الأسطح فاتحة) */
+  --aq-text-muted-d:var(--aq-color-text-muted);    /* اسم قديم: نفس الـ muted على الفاتح */
+  --aq-text-muted:  var(--aq-color-text-muted);
+  --aq-border:      var(--aq-color-border-subtle);
+  --aq-border-gold: rgba(14,84,70,0.22);           /* hairline أخضر هادئ (كان يشير لتظليل ذهبي قديم) */
+  --aq-line-dark:   var(--aq-color-border-subtle); /* اسم قديم: hairline فاتح */
+  --aq-success-bg:  var(--aq-color-success-bg);
+  --aq-success-fg:  var(--aq-color-success);
+  --aq-warn-bg:     var(--aq-color-warning-bg);
+  --aq-warn-fg:     var(--aq-color-warning);
+  --aq-error-bg:    var(--aq-color-danger-bg);
+  --aq-error-fg:    var(--aq-color-danger);
 
   /* ==================================================================
    * 2) SEMANTIC — Backgrounds & surfaces (المنصة داكنة أساسًا)
    * ================================================================== */
-  --aq-bg-page:              var(--page-bg,     #0D2438);              /* خلفية الصفحة */
-  --aq-bg-surface:           var(--glass-panel, rgba(19,42,63,0.72));  /* سطح قياسي (ألواح/فلاتر) */
-  --aq-bg-surface-elevated:  var(--glass-card,  rgba(20,43,67,0.74));  /* سطح مرتفع (كروت الوحدات) */
-  --aq-bg-surface-deep:      var(--glass-strong,rgba(6,19,33,0.76));   /* سطح عميق (AI console / مودالات) */
-  --aq-bg-surface-nav:       var(--glass,       rgba(10,28,47,0.55));  /* أسطح التنقل الشفافة */
-  --aq-bg-surface-light:     var(--off-white,   #F7F6F2);              /* سطح فاتح (لوحات فاتحة/طباعة) */
-  --aq-bg-input:             var(--input-dark,  rgba(27,52,74,0.6));   /* خلفية الحقول على الداكن */
+  --aq-bg-page:              var(--aq-color-canvas);
+  --aq-bg-surface:           var(--aq-color-surface);
+  --aq-bg-surface-elevated:  var(--aq-color-surface);
+  --aq-bg-surface-deep:      var(--aq-color-surface);
+  --aq-bg-surface-nav:       var(--aq-color-surface);
+  --aq-bg-surface-light:     var(--aq-color-surface-subtle);
+  --aq-bg-input:             var(--aq-color-surface);
   --aq-bg-input-focus:       var(--aq-prop-surface, #FFFFFF);
   /* هوية فاتحة: التظليلات صارت داكنة-على-فاتح بدل بيضاء-على-داكن */
   --aq-bg-muted-1:           rgba(16,33,30,0.035);                     /* أخف تظليل (صفوف/شرائط) */
   --aq-bg-muted-2:           rgba(16,33,30,0.055);                     /* hover خفيف */
   --aq-bg-muted-3:           rgba(16,33,30,0.075);                     /* شارات محايدة */
-  --aq-bg-muted-4:           rgba(255,255,255,0.15);                   /* أزرار عائمة فوق الصور */
-  --aq-overlay:              rgba(4,12,22,0.55);                       /* خلفية drawer / مودال */
-  --aq-overlay-strong:       rgba(4,12,22,0.75);
+  --aq-bg-muted-4:           rgba(255,255,255,0.18);                   /* أزرار عائمة فوق الصور */
 
   /* ------------------------------------------------ Borders */
   --aq-border-dark:          var(--aq-line-dark);                      /* hairline على الداكن */
-  --aq-border-strong:        rgba(16,33,30,0.16);                      /* حد أوضح (حقول/كروت) */
+  --aq-border-strong:        var(--aq-color-border-strong);
   --aq-border-light:         var(--aq-border);                         /* hairline على الفاتح */
   --aq-border-accent:        var(--aq-border-gold);                    /* حد ذهبي هادئ */
   --aq-border-accent-strong: rgba(14,84,70,0.45);                      /* حد أخضر واضح */
 
   /* ------------------------------------------------ Text */
   --aq-text-primary:         var(--aq-text-light);                     /* نص أساسي على الداكن */
-  --aq-text-secondary:       rgba(22,33,30,0.78);                      /* نص ثانوي على الفاتح */
-  --aq-text-tertiary:        rgba(22,33,30,0.62);                      /* نص خافت على الفاتح */
-  --aq-text-disabled:        rgba(22,33,30,0.42);
+  --aq-text-secondary:       var(--aq-color-text-secondary);
+  --aq-text-tertiary:        var(--aq-color-text-muted);
+  --aq-text-disabled:        var(--aq-color-text-disabled);
   --aq-text-inverse:         var(--aq-text);                           /* نص داكن على الفاتح */
   --aq-text-inverse-muted:   var(--aq-text-muted);
   --aq-text-on-accent:       #FFFFFF;                                  /* نص فوق الأخضر */
-  --aq-text-placeholder:     #8A908E;
+  --aq-text-placeholder:     var(--aq-color-text-placeholder);
 
   /* ------------------------------------------------ Brand / accent */
   --aq-brand-navy:           var(--aq-navy);
@@ -81,42 +136,41 @@
   --aq-accent:               var(--aq-gold);
   --aq-accent-soft:          var(--aq-gold-soft);
   --aq-accent-strong:        var(--aq-gold-dark);
-  --aq-accent-tint-1:        rgba(14,84,70,0.06);                      /* تظليل أخضر شبه معدوم */
-  --aq-accent-tint-2:        rgba(14,84,70,0.10);                      /* تظليل أخضر خفيف (active) */
-  --aq-accent-tint-3:        rgba(14,84,70,0.20);                      /* حد/تظليل أخضر أوضح */
-  --aq-accent-tint-4:        rgba(14,84,70,0.30);                      /* hover على active */
-  --aq-focus-ring:           0 0 0 3px rgba(14,84,70,0.16);            /* حلقة التركيز الموحدة */
+  --aq-accent-tint-1:        var(--aq-color-primary-tint-1);
+  --aq-accent-tint-2:        var(--aq-color-primary-tint-2);
+  --aq-accent-tint-3:        var(--aq-color-primary-tint-3);
+  --aq-accent-tint-4:        var(--aq-color-primary-tint-4);
   --aq-focus-outline:        2px solid var(--aq-gold);
 
   /* ------------------------------------------------ Status (على الداكن: *-soft / على الفاتح: *-fg + *-bg) */
-  --aq-success:              #4FA579;
-  --aq-success-strong:       #46946C;
-  --aq-success-soft:         #1E7145;
-  --aq-success-tint:         rgba(30,110,69,0.10);
-  --aq-success-border:       rgba(30,110,69,0.32);
-  --aq-success-solid-bg:     rgba(30,110,69,0.92);
-  --aq-success-solid-fg:     #EAF7EF;
-  --aq-success-dot:          #1E7145;
+  --aq-success:              var(--aq-color-success);
+  --aq-success-strong:       var(--aq-color-success);
+  --aq-success-soft:         var(--aq-color-success);
+  --aq-success-tint:         var(--aq-color-success-bg);
+  --aq-success-border:       var(--aq-color-success-border);
+  --aq-success-solid-bg:     var(--aq-color-success-solid);
+  --aq-success-solid-fg:     var(--aq-color-on-solid);
+  --aq-success-dot:          var(--aq-color-success);
 
-  --aq-danger:               var(--aq-error-fg);
-  --aq-danger-soft:          #B0271F;
-  --aq-danger-tint:          rgba(176,39,31,0.08);
-  --aq-danger-border:        rgba(176,39,31,0.35);
+  --aq-danger:               var(--aq-color-danger);
+  --aq-danger-soft:          var(--aq-color-danger);
+  --aq-danger-tint:          var(--aq-color-danger-bg);
+  --aq-danger-border:        var(--aq-color-danger-border);
   --aq-danger-border-strong: rgba(176,39,31,0.6);
-  --aq-danger-solid-bg:      rgba(176,39,31,0.92);
-  --aq-danger-solid-fg:      #FBEAEA;
-  --aq-danger-bg-light:      #FFF8F7;
+  --aq-danger-solid-bg:      var(--aq-color-danger-solid);
+  --aq-danger-solid-fg:      var(--aq-color-on-solid);
+  --aq-danger-bg-light:      var(--aq-color-danger-bg);
 
-  --aq-warning:              var(--aq-warn-fg);
-  --aq-warning-soft:         #8A6412;
-  --aq-warning-tint:         rgba(201,154,46,0.14);
-  --aq-warning-border:       rgba(201,154,46,0.4);
+  --aq-warning:              var(--aq-color-warning);
+  --aq-warning-soft:         var(--aq-color-warning);
+  --aq-warning-tint:         var(--aq-color-warning-bg);
+  --aq-warning-border:       var(--aq-color-warning-border);
 
-  --aq-info:                 #1C4A75;
-  --aq-info-soft:            #1C4A75;
+  --aq-info:                 var(--aq-color-info);
+  --aq-info-soft:            var(--aq-color-info);
   --aq-info-tint:            rgba(28,74,117,0.10);
-  --aq-info-border:          rgba(143,193,234,0.35);
-  --aq-info-bg-light:        #DBE7F3;
+  --aq-info-border:          var(--aq-color-info-border);
+  --aq-info-bg-light:        var(--aq-color-info-bg);
 
   --aq-neutral-disabled:     #9AA4AE;
 
@@ -125,7 +179,7 @@
   --aq-role-owner-fg:        var(--aq-prop-green-ink, #023A3A);
   --aq-role-manager-bg:      var(--aq-info-bg-light);
   --aq-role-manager-fg:      var(--aq-info);
-  --aq-role-sales-bg:        #E6EFE9;
+  --aq-role-sales-bg:        var(--aq-color-success-bg);
   --aq-role-sales-fg:        var(--aq-success-fg);
   --aq-role-entry-bg:        #EFE7F5;
   --aq-role-entry-fg:        #5A3A86;
@@ -181,20 +235,20 @@
    * RADIUS / SHADOWS / MOTION — Premium = ارتفاع خفيف وحدود مصقولة.
    * ================================================================== */
   --aq-radius-xs:   6px;
-  --aq-radius-sm:   var(--radius-sm, 8px);
-  --aq-radius-md:   var(--radius-md, 13px);
-  --aq-radius-lg:   var(--radius-lg, 16px);
-  --aq-radius-card: var(--aq-radius-md);
-  --aq-radius-pill: 999px;
+  --aq-radius-sm:   var(--radius-sm);
+  --aq-radius-md:   var(--radius-md);
+  --aq-radius-lg:   var(--radius-lg);
+  --aq-radius-card: var(--radius-lg);
+  --aq-radius-pill: var(--radius-pill);
 
-  --aq-shadow-subtle:   0 1px 3px rgba(4,12,22,0.10);
-  --aq-shadow-card:     var(--shadow-card, 0 6px 20px rgba(4,12,22,0.26));
-  --aq-shadow-elevated: var(--shadow-soft, 0 10px 30px rgba(0,0,0,0.18));
-  --aq-shadow-overlay:  0 -8px 28px rgba(0,0,0,0.28);
+  --aq-shadow-subtle:   var(--shadow-1);
+  --aq-shadow-card:     var(--shadow-2);
+  --aq-shadow-elevated: var(--shadow-3);
+  --aq-shadow-overlay:  0 -8px 28px rgba(11,40,33,0.18);
   /* أسماء 2A (تبقى صالحة) */
-  --aq-shadow-1: var(--aq-shadow-subtle);
-  --aq-shadow-2: 0 4px 14px rgba(4,12,22,0.16);
-  --aq-shadow-3: var(--aq-shadow-elevated);
+  --aq-shadow-1: var(--shadow-1);
+  --aq-shadow-2: var(--shadow-2);
+  --aq-shadow-3: var(--shadow-3);
 
   --aq-ease: var(--ease, 180ms ease);
   --aq-motion-fast: 150ms;
@@ -244,26 +298,27 @@
    * تُستهلك حصريًا داخل تجربة البحث/النتائج/overlay الوحدة — لا تمسّ هوية
    * الشل (navy/gold) ولا بقية الشاشات.
    * ================================================================== */
-  --aq-prop-green:          #0E5446;   /* الأساسي — أزرار، أسعار، حالات نشطة */
-  --aq-prop-green-deep:     #004C43;   /* أعمق — شرائط، تدرّج الهيرو */
-  --aq-prop-green-ink:      #023A3A;   /* أغمق — زر البحث الأساسي/hover */
-  --aq-prop-green-soft:     #E4EDEA;   /* تظليل فاتح — رقاقة نشطة، خلفيات لطيفة */
-  --aq-prop-green-line:     #BFD8CF;   /* حدّ أخضر باهت */
-  --aq-prop-accent:         #B4FF6C;   /* أكسنت ليموني — شارات محدودة الاستخدام */
-  --aq-prop-canvas:         #F7F7F7;   /* خلفية صفحة النتائج */
-  --aq-prop-canvas-2:       #E7EDED;   /* قسم فاتح ثانوي */
-  --aq-prop-surface:        #FFFFFF;   /* سطح البطاقة/الكونسول */
-  --aq-prop-surface-2:      #FAFAFA;   /* سطح ثانوي داخل البطاقة */
-  --aq-prop-border:         #E3E6E5;   /* حدّ فاتح محايد */
-  --aq-prop-border-strong:  #D3D8D7;
-  --aq-prop-text:           #16211E;   /* نص أساسي على الأسطح الفاتحة */
-  --aq-prop-text-muted:     #6E7573;   /* نص ثانوي (مشتق من #898989 لتباين أعلى) */
-  --aq-prop-text-faint:     #8A908E;
-  --aq-prop-shadow:         0 10px 30px rgba(11,40,33,0.10);
-  --aq-prop-shadow-lg:      0 24px 60px rgba(6,28,23,0.24);
-  --aq-prop-radius:         16px;      /* بطاقات العقار */
-  --aq-prop-radius-lg:      24px;      /* كونسول البحث/الهيرو */
-  --aq-prop-radius-sm:      10px;      /* حقول ورقائق */
+  /* (Report 066) الأسماء دي بقت aliases للطبقة الدلالية أعلاه — القيم نفسها إلا ما وُثّق في 066 §6 */
+  --aq-prop-green:          var(--aq-color-primary);
+  --aq-prop-green-deep:     var(--aq-color-primary-deep);
+  --aq-prop-green-ink:      var(--aq-color-primary-dark);
+  --aq-prop-green-soft:     var(--aq-color-primary-soft);
+  --aq-prop-green-line:     var(--aq-color-primary-line);
+  --aq-prop-accent:         var(--aq-color-accent);
+  --aq-prop-canvas:         var(--aq-color-canvas);
+  --aq-prop-canvas-2:       var(--aq-color-surface-muted);
+  --aq-prop-surface:        var(--aq-color-surface);
+  --aq-prop-surface-2:      var(--aq-color-surface-subtle);
+  --aq-prop-border:         var(--aq-color-border);
+  --aq-prop-border-strong:  var(--aq-color-border-strong);
+  --aq-prop-text:           var(--aq-color-text);
+  --aq-prop-text-muted:     var(--aq-color-text-muted);
+  --aq-prop-text-faint:     var(--aq-color-text-placeholder);
+  --aq-prop-shadow:         var(--shadow-2);      /* كان 0 10px 30px .10 — أخف على 60 كارت */
+  --aq-prop-shadow-lg:      var(--shadow-3);
+  --aq-prop-radius:         var(--radius-lg);     /* بطاقات العقار = 16 */
+  --aq-prop-radius-lg:      var(--radius-xl);     /* كونسول البحث/الهيرو = 24 */
+  --aq-prop-radius-sm:      10px;                 /* حقول ورقائق — استثناء موثّق (خطوة المكوّنات لاحقًا) */
 
   /* --- الأسماء الدلالية للهوية العامة (تُستهلك في كل التطبيق) --- */
   --aq-prop-primary:        var(--aq-prop-green);        /* #0E5446 */

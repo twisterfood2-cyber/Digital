@@ -90,7 +90,7 @@
 }
 .aq-badge--neutral { background: var(--aq-bg-muted-3); color: var(--aq-text-muted-d); border-color: var(--aq-line-dark); }
 .aq-badge--success { background: var(--aq-success-tint); color: var(--aq-success-soft); border-color: rgba(30,110,69,0.4); }
-.aq-badge--warning { background: var(--aq-warning-tint); color: var(--aq-warning-soft); border-color: rgba(201,154,46,0.35); }
+.aq-badge--warning { background: var(--aq-warning-tint); color: var(--aq-warning-soft); border-color: var(--aq-color-warning-border); }
 .aq-badge--error   { background: var(--aq-danger-tint); color: var(--aq-danger-soft); border-color: rgba(176,39,31,0.4); }
 .aq-badge--role    { background: var(--aq-accent-tint-2); color: var(--aq-gold-soft); border-color: var(--aq-border-gold); }
 .aq-badge--status  { background: var(--aq-bg-muted-2); color: var(--aq-text-light); border-color: var(--aq-line-dark); }
@@ -113,7 +113,7 @@
  * أساس لمودالات المراحل القادمة — المودالات القائمة (.modal-overlay) لا تُمس. */
 .aq-modal-overlay {
   position: fixed; inset: 0; z-index: var(--aq-z-modal);
-  background: rgba(4,12,22,0.72); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  background: var(--aq-overlay); -webkit-backdrop-filter: blur(var(--aq-overlay-blur)); backdrop-filter: blur(var(--aq-overlay-blur));
   display: none; align-items: center; justify-content: center; padding: var(--aq-space-5);
 }
 .aq-modal-overlay.aq-open { display: flex; }
@@ -606,7 +606,7 @@
 .aq-form-control::placeholder { color: var(--aq-prop-text-faint); }
 .aq-form-control:hover { border-color: var(--aq-prop-border-strong); }
 .aq-form-control:focus {
-  outline: none; border-color: var(--aq-prop-green); box-shadow: 0 0 0 3px rgba(14,84,70,0.14);
+  outline: none; border-color: var(--aq-prop-green); box-shadow: var(--aq-focus-ring);
 }
 .aq-form-control:disabled { opacity: 0.6; cursor: not-allowed; }
 .aq-form-hint { margin-top: 6px; font-size: var(--aq-fs-caption); color: var(--aq-prop-text-muted); }

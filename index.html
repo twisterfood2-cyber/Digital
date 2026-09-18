@@ -68,45 +68,43 @@
        *   gold*  = الأكسنت (صار أخضر أساسي مقروءًا على الأسطح الفاتحة)
        *   glass* = الأسطح (صارت بيضاء)
        * ============================================================ */
+      /* (Report 066) كل الأسماء القديمة هنا aliases للطبقة الدلالية في aqar-tokens.css — بدون قيم مكرّرة */
       /* deep-green family (was navy) — dark surfaces & primary buttons */
-      --navy: var(--aq-prop-green, #0E5446);
-      --navy-deep: var(--aq-prop-green-ink, #023A3A);
-      --navy-dark: var(--aq-prop-green-deep, #004C43);
+      --navy: var(--aq-color-primary);
+      --navy-deep: var(--aq-color-primary-dark);
+      --navy-dark: var(--aq-color-primary-deep);
       --navy-soft: #0F6152;
       /* accent family (was gold) — primary green, readable on light surfaces */
-      --gold: var(--aq-prop-green, #0E5446);
-      --gold-soft: var(--aq-prop-green, #0E5446);
-      --gold-dark: var(--aq-prop-green-ink, #023A3A);
+      --gold: var(--aq-color-primary);
+      --gold-soft: var(--aq-color-primary);
+      --gold-dark: var(--aq-color-primary-dark);
       /* neutrals & text */
-      --white: #FFFFFF;
-      --off-white: var(--aq-prop-surface-2, #FAFAFA);
-      --bg: #F1F4F3;               /* light working-surface base */
-      --text: var(--aq-prop-text, #16211E);            /* dark text on light surfaces */
-      --text-light: var(--aq-prop-text, #16211E);      /* الأسطح صارت فاتحة → النص الأساسي داكن */
-      --text-muted: var(--aq-prop-text-muted, #6E7573);/* نص ثانوي على الأسطح الفاتحة */
-      --muted: var(--aq-prop-text-muted, #6E7573);     /* muted text on light surfaces */
+      --white: var(--aq-color-surface);
+      --off-white: var(--aq-color-surface);          /* كان #FAFAFA (صناديق المودالات) → أبيض نظيف */
+      --bg: var(--aq-color-surface-subtle);          /* كان #F1F4F3 */
+      --text: var(--aq-color-text);
+      --text-light: var(--aq-color-text);            /* الأسطح فاتحة → النص الأساسي داكن */
+      --text-muted: var(--aq-color-text-muted);
+      --muted: var(--aq-color-text-muted);
       /* lines & borders */
-      --border: rgba(16,33,30,0.12);        /* hairline on light */
-      --border-gold: rgba(14,84,70,0.22);   /* subtle green hairline */
-      --line-dark: rgba(16,33,30,0.10);     /* hairline on light surfaces */
+      --border: var(--aq-color-border-subtle);
+      --border-gold: rgba(14,84,70,0.22);            /* subtle green hairline */
+      --line-dark: var(--aq-color-border-subtle);
       /* environment */
-      --page-bg: var(--aq-prop-canvas, #F7F7F7);   /* لوحة الصفحة الفاتحة */
+      --page-bg: var(--aq-color-canvas);
       /* surfaces (كانت زجاجًا داكنًا — صارت أسطحًا بيضاء) */
-      --glass: #FFFFFF;
-      --glass-card: #FFFFFF;
-      --glass-strong: #FFFFFF;
-      --glass-panel: #FFFFFF;
-      --input-dark: #FFFFFF;                 /* حقول على الأسطح الفاتحة */
-      /* status */
-      --success-bg: #E4F1E9; --success-fg: #1E6E45;
-      --warn-bg: #F7EED9; --warn-fg: #7A5600;
-      --error-bg: #F7E4E4; --error-fg: #B0271F;
-      /* system scale */
-      --radius-sm: 8px;
-      --radius-md: 13px;
-      --radius-lg: 16px;
-      --shadow-soft: 0 10px 30px rgba(11,40,33,0.10);
-      --shadow-card: 0 6px 20px rgba(11,40,33,0.08);
+      --glass: var(--aq-color-surface);
+      --glass-card: var(--aq-color-surface);
+      --glass-strong: var(--aq-color-surface);
+      --glass-panel: var(--aq-color-surface);
+      --input-dark: var(--aq-color-surface);
+      /* status → الثلاثية الدلالية */
+      --success-bg: var(--aq-color-success-bg); --success-fg: var(--aq-color-success);
+      --warn-bg: var(--aq-color-warning-bg); --warn-fg: var(--aq-color-warning);
+      --error-bg: var(--aq-color-danger-bg); --error-fg: var(--aq-color-danger);
+      /* system scale → السُلّم الموحّد (radius-sm/md/lg في aqar-tokens.css) */
+      --shadow-soft: var(--shadow-3);
+      --shadow-card: var(--shadow-2);
       --ease: 180ms ease;
       /* عرض حاوية التطبيق الموحّد — كل الأقسام الرئيسية (الغلاف / التنقّل / البحث /
          النتائج / الإحصائيات / لوحة التحكم) بتتحاذى عليه. سقف معقول لتجنّب أسطر نص
@@ -124,6 +122,8 @@
            .ai-extract-btn, .toggle-details-btn, .images-choose-btn, .small-btn, .dash-nav-item,
            .um-primary, .um-add-toggle, .close-panel):disabled,
     :where(button)[aria-disabled="true"] { opacity: 0.55; cursor: not-allowed; }
+    /* Report 066: حلقة تركيز مرئية واحدة للأزرار/الروابط (لوحة المفاتيح فقط) — :where = خصوصية صفر فأي قاعدة قائمة تغلبها */
+    :where(#mainContainer, #loginGate, .aq-header, .modal-overlay, .unit-card-overlay, .aq-modal-overlay, .dash-drawer) :where(button, [role="button"], a[href]):focus-visible { outline: 2px solid var(--aq-color-primary); outline-offset: 2px; }
     /* حقول: أساس مشترك (خط/حجم/زوايا/انتقال) — القواعد القديمة المحددة تغلبه */
     :where(#mainContainer, #loginGate) :where(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]), select, textarea) {
       font-family: inherit; font-size: var(--aq-fs-input); border-radius: var(--aq-radius-sm);
@@ -348,7 +348,7 @@
     #clearBtn { background: var(--aq-bg-muted-2); color: var(--text-light); border: 1px solid var(--aq-border-strong); }
     #clearBtn:hover { background: var(--aq-border-dark); }
     .fav-toggle-btn { background: transparent; color: var(--gold-soft); border: 1px solid var(--border-gold); }
-    .fav-toggle-btn:hover { background: rgba(201,154,46,0.12); }
+    .fav-toggle-btn:hover { background: var(--aq-color-primary-tint-2); }
     .fav-toggle-btn.active { background: var(--navy); color: var(--gold-soft); border-color: var(--gold); }
     #resultsCount { font-size:  var(--aq-fs-body); color: var(--aq-text-light); margin: 10px 2px; font-weight: 700; letter-spacing: 0.3px; }
     .results-grid {
@@ -505,7 +505,7 @@
       font-size:  var(--aq-fs-caption-sm); padding: 3px 9px; border-radius:  var(--aq-radius-xs); font-weight: 800; letter-spacing: 0; line-height: 1.35;
       background: var(--aq-success-tint); color: var(--aq-success-soft); border: 1px solid var(--aq-success-border);
     }
-    .status-badge.محجوز { background: rgba(201,154,46,0.16); color: var(--gold-soft); border-color: var(--aq-accent-tint-4); }
+    .status-badge.محجوز { background: var(--aq-color-warning-bg); color: var(--aq-color-warning); border-color: var(--aq-color-warning-border); }
     .status-badge.مباع { background: var(--aq-danger-tint); color: var(--aq-danger-soft); border-color: var(--aq-danger-border); }
     .unit-title { font-size: var(--aq-fs-card-title); font-weight: 700; letter-spacing: 0; line-height: 1.4; margin-bottom: 5px; color: var(--text-light); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .unit-loc { font-size:  var(--aq-fs-caption); color: rgba(234,240,246,0.9); font-weight: 600; line-height: 1.5; margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -514,7 +514,7 @@
     .unit-specs { display: flex; flex-wrap: wrap; gap: 7px; font-size:  var(--aq-fs-caption); margin-bottom: 12px; min-height: 58px; align-content: flex-start; }
     .spec-chip {
       display: inline-flex; align-items: center;
-      background: rgba(201,154,46,0.12); color: var(--gold-soft);
+      background: var(--aq-color-primary-tint-2); color: var(--gold-soft);
       border: 1px solid var(--aq-accent-tint-3);
       padding: 4px 9px; border-radius:  var(--aq-radius-xs); font-weight: 600; font-size:  var(--aq-fs-caption-sm);
     }
@@ -836,14 +836,14 @@
     .top-action-btn svg { width: 16px; height: 16px; flex: none; display: block; }
     .top-action-btn:hover {
       background: rgba(6,19,33,0.82);
-      border-color: rgba(201,154,46,0.45);
+      border-color: var(--aq-color-primary-tint-4);
       color: var(--gold);
       transform: translateY(-1px);
     }
     .top-action-btn:active { transform: translateY(0); background: var(--navy-deep); }
     .top-action-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
     .top-action-btn.is-active {
-      border-color: rgba(201,154,46,0.55);
+      border-color: var(--aq-color-primary-tint-4);
       color: var(--gold);
       box-shadow: inset 0 -2px 0 0 var(--gold);
     }
@@ -1456,7 +1456,7 @@
     .dash-avatar {
       width: 72px; height: 72px; border-radius: 50%; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
-      background: rgba(201,154,46,0.16); border: 2px solid var(--border-gold);
+      background: var(--aq-color-primary-tint-3); border: 2px solid var(--border-gold);
       color: var(--gold-soft); font-size:  var(--aq-fs-page-title); font-weight: 800; overflow: hidden;
     }
     .dash-avatar img { width: 100%; height: 100%; object-fit: cover; }
@@ -1464,7 +1464,7 @@
     .dash-profile-head .who .rl { font-size:  var(--aq-fs-caption); color: var(--text-muted); margin-top: 2px; }
     .dash-role-badge {
       display: inline-block; margin-top: 6px; padding: 3px 10px; border-radius:  var(--aq-radius-pill);
-      background: rgba(201,154,46,0.16); border: 1px solid var(--border-gold);
+      background: var(--aq-color-primary-tint-3); border: 1px solid var(--border-gold);
       color: var(--gold-soft); font-size:  var(--aq-fs-caption-sm); font-weight: 800;
     }
     .dash-field-row {
@@ -1589,7 +1589,7 @@
       background: var(--aq-bg-muted-1); border-color: var(--aq-border-strong);
     }
     #dashPanel-users .um-card:hover { border-color: var(--border-gold); }
-    #dashPanel-users .um-card.is-owner { background: rgba(201,154,46,0.10); border-color: var(--gold); }
+    #dashPanel-users .um-card.is-owner { background: var(--aq-color-primary-tint-2); border-color: var(--gold); }
     #dashPanel-users .um-name { color: var(--text-light); }
     /* تصحيح تباين: .um-sub كان بلون رمادي للأسطح الفاتحة (--muted) فوق لوح داكن → غير مقروء */
     #dashPanel-users .um-sub { color: var(--aq-text-tertiary); }
@@ -1676,7 +1676,7 @@
     }
     .admin-panel.open { display: block; }
     .admin-panel-overlay {
-      position: fixed; inset: 0; background: rgba(4,12,22,0.6); z-index: 1499; display: none;
+      position: fixed; inset: 0; background: var(--aq-overlay); z-index: 1499; display: none;
     }
     .admin-panel-overlay.open { display: block; }
     .access-req-item {
@@ -1952,7 +1952,7 @@
 
     /* Modal */
     .modal-overlay {
-      display: none; position: fixed; inset: 0; background: rgba(4,12,22,0.66);
+      display: none; position: fixed; inset: 0; background: var(--aq-overlay);
       -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
       z-index: 1600; align-items: flex-start; justify-content: center; padding: 40px 16px; overflow-y: auto;
     }
@@ -2035,7 +2035,7 @@
     }
     #calcModal .calc-result-row { border-bottom-color: var(--line-dark); color: var(--text-light); }
     #calcModal .calc-result-row b { color: var(--gold-soft); }
-    #calcModal .calc-result-row.highlight { background: rgba(201,154,46,0.16); }
+    #calcModal .calc-result-row.highlight { background: var(--aq-color-primary-tint-3); }
     #calcModal .calc-result-row.highlight b { color: var(--gold-soft); }
     /* AI auto-fill panel + image/paste zones inside the calculator (matches #editModal #unitAddAiSection) */
     #calcModal .ai-fill-panel { background: var(--glass-strong); border-color: var(--border-gold); }
@@ -2188,7 +2188,7 @@
 
     /* ===== AI auto-fill panel — navy/gold, replaces the old purple accent ===== */
     .ai-fill-panel {
-      background: rgba(201,154,46,0.06);
+      background: var(--aq-color-primary-tint-1);
       border: 1px solid var(--border-gold);
       border-radius: var(--radius-sm);
       padding: 14px; margin-bottom: 16px;
@@ -2201,7 +2201,7 @@
       transition: border-color var(--ease), background-color var(--ease);
     }
     .ai-paste-zone:hover, .ai-paste-zone:focus { border-color: var(--gold); background: var(--aq-accent-tint-1); }
-    .ai-paste-zone.is-armed { border-color: var(--gold); background: rgba(201,154,46,0.1); color: var(--gold-dark); }
+    .ai-paste-zone.is-armed { border-color: var(--gold); background: var(--aq-color-primary-tint-2); color: var(--gold-dark); }
     .ai-extract-btn {
       width: 100%; margin-top: 10px; padding: 11px;
       border: 1px solid var(--border-gold); border-radius: var(--radius-sm);
@@ -2355,7 +2355,7 @@
       height: 52px;
       border-radius: 50%;
       border: 1px solid var(--border-gold);
-      background: rgba(201,154,46,0.08);
+      background: var(--aq-color-primary-tint-2);
       color: var(--gold-soft);
       margin-bottom: 16px;
     }
@@ -2431,7 +2431,7 @@
     body.aq-search-ui .aq-console input::placeholder { color: var(--aq-prop-text-faint); }
     body.aq-search-ui .aq-console input:focus,
     body.aq-search-ui .aq-console select:focus {
-      border-color: var(--aq-prop-green); box-shadow: 0 0 0 3px rgba(14,84,70,0.14);
+      border-color: var(--aq-prop-green); box-shadow: var(--aq-focus-ring);
       background: var(--aq-prop-surface);
     }
     body.aq-search-ui .aq-console .ai-search-head span { color: var(--aq-prop-text); }
@@ -2518,7 +2518,7 @@
       padding: 8px 14px; font-size: var(--aq-fs-small); font-weight: 700; color-scheme: light;
     }
     body.aq-search-ui .aq-sort-field select:focus {
-      border-color: var(--aq-prop-green); box-shadow: 0 0 0 3px rgba(14,84,70,0.14);
+      border-color: var(--aq-prop-green); box-shadow: var(--aq-focus-ring);
     }
     body.aq-search-ui #resultsCount { font-size: var(--aq-fs-small); color: inherit; margin: 0; font-weight: 800; }
     body.aq-search-ui .fav-toggle-btn.aq-chip.active {
@@ -2564,7 +2564,7 @@
       background: linear-gradient(to top, rgba(2,32,26,0.62), rgba(2,32,26,0));
       pointer-events: none;
     }
-    body.aq-search-ui .unit-cover-empty { background: linear-gradient(135deg, #E7EDED, #DCE7E3); }
+    body.aq-search-ui .unit-cover-empty { background: linear-gradient(135deg, var(--aq-color-surface-muted), var(--aq-color-primary-soft)); }
     /* شريط الحالة + رقم الوحدة (+ عدّاد الصور) فوق أسفل الصورة */
     body.aq-search-ui .unit-cover-strip {
       position: absolute; z-index: 3; bottom: 10px; right: 10px; left: 10px;
@@ -2572,14 +2572,14 @@
     }
     body.aq-search-ui .unit-cover-strip .status-badge {
       display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
-      background: rgba(0,76,67,0.92); color: #fff; border: 1px solid rgba(255,255,255,0.18);
+      background: var(--aq-color-primary-deep); color: var(--aq-color-on-solid); border: 1px solid rgba(255,255,255,0.18);
       border-radius: var(--aq-radius-pill); padding: 4px 11px; font-size: var(--aq-fs-caption); font-weight: 800;
       box-shadow: 0 2px 8px rgba(2,20,16,0.28);
     }
     body.aq-search-ui .unit-cover-strip .status-badge .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #B4FF6C; flex: none; }
-    body.aq-search-ui .unit-cover-strip .status-badge.محجوز { background: rgba(138,100,18,0.92); }
+    body.aq-search-ui .unit-cover-strip .status-badge.محجوز { background: var(--aq-color-warning-solid); color: var(--aq-color-on-solid); } /* Report 066: color صريح — كان يُغلب بقاعدة الشارة الفاتحة (نفس الخصوصية) فيختفي النص */
     body.aq-search-ui .unit-cover-strip .status-badge.محجوز .status-dot { background: #FFD97A; }
-    body.aq-search-ui .unit-cover-strip .status-badge.مباع { background: rgba(176,57,47,0.92); }
+    body.aq-search-ui .unit-cover-strip .status-badge.مباع { background: var(--aq-color-danger-solid); color: var(--aq-color-on-solid); }
     body.aq-search-ui .unit-cover-strip .status-badge.مباع .status-dot { background: #FFB4AC; }
     body.aq-search-ui .unit-cover-strip .unit-id {
       color: #fff; font-size: var(--aq-fs-body); font-weight: 800; letter-spacing: 0.6px;
@@ -2742,17 +2742,17 @@
     body.aq-search-ui .card-provenance { color: var(--aq-prop-text-faint); border-top-color: var(--aq-prop-border); }
     body.aq-search-ui .card-provenance a { color: var(--aq-prop-green); }
     body.aq-search-ui .status-badge { background: var(--aq-prop-green-soft); color: var(--aq-prop-green-deep); border-color: var(--aq-prop-green-line); }
-    body.aq-search-ui .status-badge.محجوز { background: #FDF3DC; color: #8A6412; border-color: #EBDCB4; }
-    body.aq-search-ui .status-badge.مباع { background: #FBE9E7; color: #B0392F; border-color: #F0CFCB; }
+    body.aq-search-ui .status-badge.محجوز { background: var(--aq-color-warning-bg); color: var(--aq-color-warning); border-color: var(--aq-color-warning-border); }
+    body.aq-search-ui .status-badge.مباع { background: var(--aq-color-danger-bg); color: var(--aq-color-danger); border-color: var(--aq-color-danger-border); }
 
     /* =========================================================================
      * نافذة تفاصيل الوحدة (Unit Detail View) — Modal عريض أفقي (مرجع: unit details.png)
      * يعيد استخدام #unitCardOverlay القائم. حاوية تمرير واحدة (.ud-modal-body).
      * ========================================================================= */
-    body.aq-search-ui .unit-card-overlay { background: rgba(6,28,23,0.42); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+    body.aq-search-ui .unit-card-overlay { background: var(--aq-overlay); -webkit-backdrop-filter: blur(var(--aq-overlay-blur)); backdrop-filter: blur(var(--aq-overlay-blur)); }
     body.aq-search-ui .unit-details-box { max-width: min(1320px, 96vw); }
     .ud-modal-body {
-      position: relative; background: var(--aq-prop-canvas, #F5F7F6); border-radius: 18px;
+      position: relative; background: var(--aq-prop-canvas); border-radius: 18px;
       border: 1px solid var(--aq-prop-green-line);
       overflow-y: auto; overflow-x: hidden; max-height: calc(100vh - 48px);
       box-shadow: 0 24px 64px rgba(2,20,16,0.28);
@@ -2780,7 +2780,7 @@
     .ud-media-empty .ico { width: 34px; height: 34px; }
     .ud-media-status {
       position: absolute; top: 12px; right: 12px; z-index: 2; display: inline-flex; align-items: center; gap: 6px;
-      background: rgba(0,76,67,0.92); color: #fff; border: 1px solid rgba(255,255,255,0.18);
+      background: var(--aq-color-primary-deep); color: var(--aq-color-on-solid); border: 1px solid rgba(255,255,255,0.18);
       border-radius: var(--aq-radius-pill); padding: 4px 11px; font-size: var(--aq-fs-caption); font-weight: 800;
     }
     .ud-media-status .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #B4FF6C; }
@@ -2851,7 +2851,7 @@
     .ud-tiles-1 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .ud-tile {
       display: flex; align-items: center; gap: 10px; min-width: 0;
-      background: var(--aq-prop-canvas, #F5F7F6); border: 1px solid var(--aq-prop-border); border-radius: 12px; padding: 8px 10px;
+      background: var(--aq-prop-canvas); border: 1px solid var(--aq-prop-border); border-radius: 12px; padding: 8px 10px;
     }
     .ud-tile > .ico { width: 20px; height: 20px; flex: none; color: var(--aq-prop-green-deep); }
     .ud-tile-txt { display: flex; flex-direction: column; gap: 1px; min-width: 0; line-height: 1.3; }
@@ -2887,7 +2887,7 @@
     .ud-map {
       display: flex; align-items: center; justify-content: center; gap: 12px; height: 96px; border-radius: 12px;
       border: 1px solid var(--aq-prop-border);
-      background-color: #EEF4F1;
+      background-color: var(--aq-color-surface-accent);
       background-image: linear-gradient(rgba(0,76,67,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(0,76,67,0.08) 1px, transparent 1px);
       background-size: 22px 22px;
     }
@@ -2953,7 +2953,7 @@
       background: var(--aq-prop-surface); border: 1px solid var(--aq-prop-border);
       border-radius: var(--aq-prop-radius);
     }
-    body.aq-search-ui .skel { background: linear-gradient(90deg, #ECEFEE 25%, #F5F7F6 37%, #ECEFEE 63%); }
+    body.aq-search-ui .skel { background: linear-gradient(90deg, var(--aq-color-surface-muted) 25%, var(--aq-color-surface-subtle) 37%, var(--aq-color-surface-muted) 63%); }
 
     /* ---- 8) overlay تفاصيل الوحدة (يعيد استخدام #unitCardOverlay القائم) ---- */
     .unit-card-overlay { align-items: flex-start; padding: 24px 16px 40px; }
@@ -3143,7 +3143,7 @@
     /* الصدفة والعرض — في الوضعين: مودال فوق الاستكشاف، أو صفحة داخل المحتوى */
     /* خلفية خضراء فاتحة جدًا من نفس عائلة الهوية (green-soft ممزوجة بالأبيض) — الحقول والأزرار الثانوية تبقى بيضاء فتبرز فوقها */
     #editModal .modal-box {
-      --aq-form-bg: #EBF2EF;
+      --aq-form-bg: var(--aq-color-surface-accent);
       --aq-form-bg: color-mix(in srgb, var(--aq-prop-green-soft) 72%, #fff);
       background: var(--aq-form-bg); color: var(--aq-prop-text);
       border: 1px solid var(--aq-prop-green-line); border-top: 1px solid var(--aq-prop-green-line);
@@ -3197,7 +3197,7 @@
     #editModal input::placeholder, #editModal textarea::placeholder { color: var(--aq-prop-text-faint); }
     #editModal input:hover, #editModal select:hover, #editModal textarea:hover { border-color: var(--aq-prop-border-strong); }
     #editModal input:focus, #editModal select:focus, #editModal textarea:focus {
-      outline: none; border-color: var(--aq-prop-green); box-shadow: 0 0 0 3px rgba(14,84,70,0.14); background: var(--aq-prop-surface);
+      outline: none; border-color: var(--aq-prop-green); box-shadow: var(--aq-focus-ring); background: var(--aq-prop-surface);
     }
     #editModal select { color-scheme: light; }
     #editModal textarea { min-height: 110px; resize: vertical; }
@@ -3687,7 +3687,7 @@
     .notif-list { display: flex; flex-direction: column; gap: 8px; min-height: 120px; }
     .notif-item { display: grid; grid-template-columns: 10px 1fr auto; gap: 10px; align-items: start; width: 100%; text-align: start; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm, 10px); background: var(--bg); color: var(--text); font-family: var(--aq-font); cursor: pointer; }
     .notif-item:hover { border-color: var(--border-gold); }
-    .notif-item.is-unread { background: rgba(201,154,46,0.08); border-color: rgba(201,154,46,0.35); }
+    .notif-item.is-unread { background: var(--aq-color-surface-accent); border-color: var(--aq-color-primary-line); }
     .notif-dot { width: 8px; height: 8px; margin-top: 7px; border-radius: 50%; background: transparent; }
     .notif-item.is-unread .notif-dot { background: var(--gold); }
     .notif-title { font-weight: 700; font-size: var(--aq-fs-body); }
@@ -3705,7 +3705,7 @@
     .arc-card .aq-logo-tile img { width: 100%; height: 100%; object-fit: cover; }
     .arc-card-specs { color: var(--text-muted); font-size: var(--aq-fs-small); }
     .arc-card-archived { color: var(--text-muted); font-size: var(--aq-fs-label); }
-    .ud-archived-banner { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 12px; padding: 12px 14px; border-radius: 12px; background: rgba(201,154,46,0.12); border: 1px solid rgba(201,154,46,0.45); }
+    .ud-archived-banner { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 12px; padding: 12px 14px; border-radius: 12px; background: var(--aq-color-warning-bg); border: 1px solid var(--aq-color-warning-border); }
     .ud-archived-banner b { font-weight: 800; }
     .ud-archived-banner .ud-archived-meta { flex: 1 1 240px; font-size: var(--aq-fs-small); color: var(--text-muted); }
     .ud-archived-banner .ud-archived-warn { flex-basis: 100%; font-size: var(--aq-fs-small); color: var(--danger, #b91c1c); }
