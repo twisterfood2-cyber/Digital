@@ -2005,6 +2005,80 @@
     #calcModal .image-link-row button {
       background: var(--aq-bg-muted-2); color: var(--text-light); border-color: var(--aq-border-strong);
     }
+    /* ===== [082 local prototype] "سعر المتر" كصفحة: بطاقات مناطق (Cards Grid) — CSS فقط + renderer؛ نفس البيانات ونفس البحث ===== */
+    body.app-view-meter #priceStatsModal .modal-header { display: none; }              /* العنوان/العنوان الفرعي موجودان في رأس الصفحة (aqPageHeader) */
+    body.app-view-meter #priceStatsModal .modal-box { padding: var(--aq-space-5); }
+    body.app-view-meter #priceStatsContent { max-height: none !important; overflow: visible !important; }
+    #priceStatsModal .ps-toolbar { display: flex; align-items: center; gap: var(--aq-space-3); flex-wrap: wrap; margin-bottom: var(--aq-space-5); }
+    #priceStatsModal .ps-search-wrap { position: relative; flex: 1 1 320px; display: block; }
+    #priceStatsModal .ps-search-wrap .ico { position: absolute; inset-inline-start: 14px; top: 50%; width: 18px; height: 18px; transform: translateY(-50%); color: var(--aq-color-primary); pointer-events: none; }
+    #priceStatsModal .ps-search-wrap .price-stats-search {
+      width: 100%; min-height: var(--aq-input-h-lg); margin: 0; padding: 0 16px; padding-inline-start: 42px; box-sizing: border-box;
+      background: var(--aq-color-surface); color: var(--aq-color-text); border: 1px solid var(--aq-color-border); border-radius: var(--radius-md);
+      font-size: var(--aq-fs-body); box-shadow: var(--shadow-1);
+    }
+    #priceStatsModal .ps-search-wrap .price-stats-search::placeholder { color: var(--aq-color-text-placeholder); }
+    #priceStatsModal .ps-search-wrap .price-stats-search:focus { outline: none; border-color: var(--aq-color-primary); box-shadow: var(--aq-focus-ring); }
+    #priceStatsModal .ps-summary { display: flex; gap: var(--aq-space-2); flex-wrap: wrap; }
+    #priceStatsModal .ps-summary span { display: inline-flex; align-items: center; gap: 6px; min-height: var(--aq-chip-h); padding: 0 12px; border-radius: var(--radius-pill); background: var(--aq-color-primary-soft); color: var(--aq-color-primary); font-size: var(--aq-fs-caption); font-weight: var(--aq-fw-bold); }
+    /* [083] مجموعة لكل منطقة: رأس واحد بعرض الصفحة + شبكة كروت أنواع العقار */
+    #priceStatsModal .ps-groups { display: flex; flex-direction: column; gap: var(--aq-space-6, 28px); }
+    #priceStatsModal .ps-group-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--aq-space-3); flex-wrap: wrap; padding-bottom: var(--aq-space-2); margin-bottom: var(--aq-space-4); border-bottom: 1px solid var(--aq-color-border); }
+    #priceStatsModal .ps-group-title { display: inline-flex; align-items: center; gap: 8px; font-size: var(--aq-fs-section-title); font-weight: var(--aq-fw-black); color: var(--aq-color-text); margin: 0; }
+    #priceStatsModal .ps-group-title .ico { width: 20px; height: 20px; color: var(--aq-color-primary); }
+    #priceStatsModal .ps-group-sub { font-size: var(--aq-fs-caption); color: var(--aq-color-text-muted); font-weight: var(--aq-fw-bold); }
+    /* Report 085: عدد الأعمدة = عدد أنواع العقار في المنطقة (--ps-n من البيانات، مش ثابت) — كارت واحد = 100%، اثنان = 50/50، ثلاثة = 33.3% … */
+    #priceStatsModal .ps-grid { display: grid; grid-template-columns: repeat(var(--ps-n, 1), minmax(0, 1fr)); gap: var(--aq-space-5); }
+    #priceStatsModal .ps-grid.ps-grid--dense .ps-panel { padding: 10px 10px 12px; gap: 8px; }          /* 5 أنواع فأكثر: مسافات أضيق قليلًا عشان الأعمدة الضيقة */
+    #priceStatsModal .ps-grid.ps-grid--dense .ps-price { font-size: var(--aq-fs-title-sm); }
+    #priceStatsModal .ps-grid.ps-grid--dense .ps-icon { width: 32px; height: 32px; }
+    #priceStatsModal .ps-grid.ps-grid--dense .ps-icon .ico { width: 16px; height: 16px; }
+    #priceStatsModal .ps-grid.ps-grid--dense .ps-price-row { gap: 8px; }
+    #priceStatsModal .ps-grid.ps-grid--dense .ps-view { width: 100%; justify-content: center; padding: 0 8px; }
+    #priceStatsModal .ps-card {
+      display: flex; flex-direction: column; min-width: 0; background: var(--aq-color-surface); border: 1px solid var(--aq-color-border);
+      border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-1);
+      transition: box-shadow var(--aq-motion-base), transform var(--aq-motion-base), border-color var(--aq-motion-base);
+    }
+    @media (hover: hover) { #priceStatsModal .ps-card:hover { box-shadow: var(--shadow-2); transform: translateY(-2px); border-color: var(--aq-color-primary-line); } }
+    #priceStatsModal .ps-media {   /* خلفية زخرفية فقط (city-bg.jpg — أصل الموقع) — لا تمثّل نوع العقار */
+      position: relative; aspect-ratio: 16 / 7; max-height: 200px; min-height: 96px; background: var(--aq-color-primary-deep) url('city-bg.jpg') center / cover no-repeat; color: var(--aq-color-on-primary);
+    }   /* الارتفاع بيتبع العرض لحدّ 200px — الكارت العريض (نوع واحد = 100%) ما يبقاش شريط ضخم */
+    #priceStatsModal .ps-media::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,76,67,0.42) 0%, rgba(0,76,67,0.28) 55%, rgba(0,76,67,0.62) 100%); }   /* نفس درجة --aq-color-primary-deep (#004C43) بشفافية */
+    #priceStatsModal .ps-card:nth-child(3n+2) .ps-media { background-position: center top; }
+    #priceStatsModal .ps-card:nth-child(3n) .ps-media { background-position: center bottom; }
+    #priceStatsModal .ps-media-text { position: absolute; inset: auto 0 0 0; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+    #priceStatsModal .ps-area { font-size: var(--aq-fs-title-sm); font-weight: var(--aq-fw-black); line-height: 1.3; text-shadow: 0 1px 2px rgba(4,12,22,0.35); }
+    #priceStatsModal .ps-count { display: inline-flex; align-items: center; gap: 6px; width: fit-content; font-size: var(--aq-fs-caption); font-weight: var(--aq-fw-bold); background: rgba(255,255,255,0.92); color: var(--aq-color-primary-deep); border-radius: var(--radius-pill); padding: 3px 10px; }
+    #priceStatsModal .ps-counts { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: var(--aq-fs-caption); color: var(--aq-color-text-muted); font-weight: var(--aq-fw-bold); }
+    #priceStatsModal .ps-counts b { color: var(--aq-color-text); font-weight: var(--aq-fw-black); }
+    #priceStatsModal .ps-counts .is-calc { color: var(--aq-color-primary); }
+    #priceStatsModal .ps-count .ico { width: 13px; height: 13px; }
+    #priceStatsModal .ps-panel { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 10px; }
+    #priceStatsModal .ps-price-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    #priceStatsModal .ps-price-label { font-size: var(--aq-fs-caption); color: var(--aq-color-text-muted); font-weight: var(--aq-fw-bold); margin-bottom: 2px; }
+    #priceStatsModal .ps-price { font-size: var(--aq-fs-title-lg); font-weight: var(--aq-fw-black); color: var(--aq-color-primary); line-height: 1.2; letter-spacing: -0.2px; white-space: nowrap; }
+    #priceStatsModal .ps-price small { font-size: var(--aq-fs-caption); font-weight: var(--aq-fw-bold); color: var(--aq-color-text-muted); margin-inline-start: 4px; }
+    #priceStatsModal .ps-type { font-size: var(--aq-fs-caption); color: var(--aq-color-text-muted); margin-top: 2px; }
+    #priceStatsModal .ps-icon { flex: 0 0 auto; width: 40px; height: 40px; border-radius: var(--radius-md); background: var(--aq-color-primary-soft); color: var(--aq-color-primary); display: inline-flex; align-items: center; justify-content: center; }
+    #priceStatsModal .ps-icon .ico { width: 20px; height: 20px; }
+    #priceStatsModal .ps-types { display: flex; flex-direction: column; border-top: 1px solid var(--aq-color-border-subtle); padding-top: 8px; gap: 6px; }
+    #priceStatsModal .ps-type-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: var(--aq-fs-caption); }
+    #priceStatsModal .ps-type-row b { color: var(--aq-color-text); font-weight: var(--aq-fw-bold); }
+    #priceStatsModal .ps-type-row span { color: var(--aq-color-text-muted); }
+    #priceStatsModal .ps-type-row strong { color: var(--aq-color-primary); font-weight: var(--aq-fw-black); white-space: nowrap; }
+    #priceStatsModal .ps-view { margin-top: auto; align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; }
+    #priceStatsModal .ps-view .ico { width: 16px; height: 16px; }
+    #priceStatsModal .ps-empty { text-align: center; color: var(--aq-color-text-muted); padding: 32px 16px; font-size: var(--aq-fs-body); background: var(--aq-color-surface-subtle); border: 1px dashed var(--aq-color-border); border-radius: var(--radius-lg); }
+    /* تابلت: نفس منطق العدد لكن بسقف (--ps-n-lg ≤ 3 عند ≤1024، --ps-n-md ≤ 2 عند ≤768) عشان الكروت ما تضيقش — نفس الترتيب، الصف ممكن يلتف */
+    @media (max-width: 1024px) { #priceStatsModal .ps-grid { grid-template-columns: repeat(var(--ps-n-lg, 1), minmax(0, 1fr)); gap: var(--aq-space-4); } }
+    @media (max-width: 768px) { #priceStatsModal .ps-grid { grid-template-columns: repeat(var(--ps-n-md, 1), minmax(0, 1fr)); } }
+    @media (max-width: 640px) {
+      #priceStatsModal .ps-grid { grid-template-columns: minmax(0, 1fr); }   /* موبايل: عمود واحد دايمًا */
+      body.app-view-meter #priceStatsModal .modal-box { padding: var(--aq-space-4); }
+      #priceStatsModal .ps-search-wrap { flex-basis: 100%; }
+      #priceStatsModal .ps-media { aspect-ratio: 16 / 6; }
+    }
     /* "سعر المتر" search box + district cards (cards are built in renderPriceStatsTable) */
     #priceStatsModal .price-stats-search {
       background: var(--input-dark); color: var(--text-light);
@@ -4766,7 +4840,11 @@
       <div class="modal-title"><svg class="ico" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>متوسط سعر المتر لكل منطقة</div>
       <button class="modal-close" id="priceStatsCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
-    <input type="text" class="price-stats-search" id="priceStatsSearchInput" placeholder="دوّر على منطقة...">
+    <!-- [082 local prototype] شريط البحث + ملخّص — نفس الحقل ونفس المعالج (id ثابت) -->
+    <div class="ps-toolbar">
+      <label class="ps-search-wrap" for="priceStatsSearchInput"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="text" class="price-stats-search" id="priceStatsSearchInput" placeholder="إبحث عن منطقة..." aria-label="ابحث عن منطقة"></label>
+      <div class="ps-summary" id="priceStatsSummary" aria-live="polite"></div>
+    </div>
     <div id="priceStatsContent" style="max-height:65vh; overflow-y:auto;"></div>
   </div>
 </div>
@@ -5594,19 +5672,50 @@
   const priceStatsSearchInput = document.getElementById('priceStatsSearchInput');
   let lastPriceStats = [];
 
+  /* [082/083 local prototype] "سعر المتر": رأس واحد لكل منطقة + كارت لكل نوع عقار داخلها.
+   * البيانات من getDistrictPriceStats (083): name / propertyType / totalUnits / calculatedUnits / avgPricePerMeter (= SUM(Price)/SUM(Area)) / avgPrice (قديم).
+   * نفس التجميع حسب المنطقة ونفس ترتيب السيرفر ونفس نص القيمة — بلا أي حساب في الواجهة (الملخّص = جمع أعداد الـ API فقط). */
+  const PS_ICON_CHART = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>';
+  const PS_ICON_PIN = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.5-6-10a6 6 0 0 1 12 0c0 4.5-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg>';
+  const PS_ICON_ARROW = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>';
+  function psValueLabel_(t) {
+    return t.avgPricePerMeter !== null ? fmtNum(t.avgPricePerMeter) + ' ج/م²' : (t.avgPrice !== null ? fmtNum(t.avgPrice) + ' ج (إجمالي)' : '-');
+  }
+  function psPlural_(n, one, few) { return fmtNum(n) + ' ' + (n >= 3 && n <= 10 ? few : one); }
+  /* "عرض الوحدات": نفس مسار الاستكشاف القائم (requestSearchPage_ → __aqarGoExplore) بفلتري district + propertyType الموجودين أصلًا في البحث؛
+     يملأ حقول الفورم (المدينة لو المنطقة تخص مدينة واحدة في CITY_DISTRICTS، المنطقة، نوع العقار لو موجود في القائمة) — بلا أي endpoint جديد. */
+  function meterGoExplore_(district, propertyType) {
+    if (typeof requestSearchPage_ !== 'function') return;
+    var cities = Object.keys(CITY_DISTRICTS).filter(function (c) { return CITY_DISTRICTS[c].indexOf(district) !== -1; });
+    var city = cities.length === 1 ? cities[0] : '';
+    try {
+      if (city) { fCity.value = city; populateDistrictSelect(fDistrict, city, true, district); }
+      else { fCity.value = ''; populateDistrictSelect(fDistrict, '', true); }
+      var ft = document.getElementById('f_propertyType');
+      if (ft) { ft.value = propertyType || ''; if (ft.value !== (propertyType || '')) ft.value = ''; }
+    } catch (e) {}
+    var payload = { keyword: '', category: '', propertyType: propertyType || '', city: city, district: district, developer: '', finishing: '', rooms: '', minPrice: '', maxPrice: '', minArea: '', maxArea: '', exactArea: '', listingType: '' };
+    lastSearchBase_ = payload;
+    requestSearchPage_(payload, 1, false).then(function (ok) {
+      if (!ok) return;
+      if (typeof window.__aqarGoExplore === 'function') window.__aqarGoExplore(); else location.hash = 'explore';
+    });
+  }
   function renderPriceStatsTable(rows) {
     const content = document.getElementById('priceStatsContent');
+    const summary = document.getElementById('priceStatsSummary');
     content.innerHTML = '';
 
     if (!rows.length) {
       const empty = document.createElement('div');
-      empty.style.cssText = 'text-align:center; color:var(--text-muted); padding:24px; font-size:13px;';
+      empty.className = 'ps-empty';
       empty.textContent = 'مفيش بيانات مطابقة';
       content.appendChild(empty);
+      if (summary) summary.innerHTML = '';
       return;
     }
 
-    // تجميع الصفوف حسب المنطقة - كل منطقة بقى ليها كارت مستقل فيه كل أنواع العقار
+    // تجميع الصفوف حسب المنطقة (نفس التجميع القديم بالحرف) — رأس واحد للمنطقة ثم كارت لكل نوع عقار
     const byDistrict = {};
     const districtOrder = [];
     rows.forEach(d => {
@@ -5614,60 +5723,51 @@
       byDistrict[d.name].push(d);
     });
 
-    const grid = document.createElement('div');
-    grid.style.cssText = 'display:grid; grid-template-columns:1fr; gap:14px;';
+    let totalUnits = 0, calcUnits = 0;
+    const groups = document.createElement('div');
+    groups.className = 'ps-groups';
 
     districtOrder.forEach(district => {
-      const card = document.createElement('div');
-      card.style.cssText = 'background:var(--glass-card); border:1px solid var(--border-gold); border-radius:14px; overflow:hidden; box-shadow:var(--shadow-card);';
+      const types = byDistrict[district];
+      const gTotal = types.reduce(function (n, t) { return n + (Number(t.totalUnits) || 0); }, 0);
+      const gCalc = types.reduce(function (n, t) { return n + (Number(t.calculatedUnits) || 0); }, 0);
+      totalUnits += gTotal; calcUnits += gCalc;
 
-      const header = document.createElement('div');
-      header.style.cssText = 'background:var(--navy); padding:12px 16px; border-right:3px solid var(--gold);';
-      header.textContent = district;
-      header.style.color = '#fff';   /* عنوان المنطقة على شريط أخضر داكن — كان أخضر على أخضر (غير مقروء) */
-      header.style.fontWeight = '800';
-      header.style.fontSize = '14px';
-      card.appendChild(header);
-
-      const body = document.createElement('div');
-      body.style.cssText = 'padding:6px 16px;';
-
-      byDistrict[district].forEach(t => {
-        const valueLabel = t.avgPricePerMeter !== null
-          ? fmtNum(t.avgPricePerMeter) + ' ج/م²'
-          : (t.avgPrice !== null ? fmtNum(t.avgPrice) + ' ج (إجمالي)' : '-');
-
-        const row = document.createElement('div');
-        row.style.cssText = 'display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--line-dark);';
-
-        const left = document.createElement('div');
-        const typeSpan = document.createElement('span');
-        typeSpan.textContent = t.propertyType;
-        typeSpan.style.cssText = 'font-size:13px; color:var(--text-light); font-weight:700;';
-        const countSpan = document.createElement('span');
-        countSpan.textContent = ' (' + t.count + ' وحدة)';
-        countSpan.style.cssText = 'font-size:11px; color:var(--text-muted); font-weight:400;';
-        left.appendChild(typeSpan);
-        left.appendChild(countSpan);
-
-        const right = document.createElement('span');
-        right.textContent = valueLabel;
-        right.style.cssText = 'font-size:14px; font-weight:800; color:var(--gold-soft); white-space:nowrap;';
-
-        row.appendChild(left);
-        row.appendChild(right);
-        body.appendChild(row);
-      });
-
-      // آخر صف مايكونش عليه خط تحتي
-      if (body.lastElementChild) body.lastElementChild.style.borderBottom = 'none';
-
-      card.appendChild(body);
-      grid.appendChild(card);
+      const section = document.createElement('section');
+      section.className = 'ps-group';
+      section.innerHTML =
+        '<div class="ps-group-head">' +
+          '<h3 class="ps-group-title">' + PS_ICON_PIN + escHtml_(district) + '</h3>' +
+          '<span class="ps-group-sub">' + escHtml_(psPlural_(types.length, 'نوع عقار', 'أنواع عقار')) + ' · ' + escHtml_(fmtNum(gTotal)) + ' وحدة · ' + escHtml_(fmtNum(gCalc)) + ' محسوبة</span>' +
+        '</div>' +
+        '<div class="ps-grid' + (types.length >= 5 ? ' ps-grid--dense' : '') + '" style="--ps-n:' + types.length + ';--ps-n-lg:' + Math.min(types.length, 3) + ';--ps-n-md:' + Math.min(types.length, 2) + '">' + types.map(function (t) {
+          return '<article class="ps-card">' +
+            '<div class="ps-media" aria-hidden="true"><div class="ps-media-text"><div class="ps-area">' + escHtml_(t.propertyType) + '</div></div></div>' +
+            '<div class="ps-panel">' +
+              '<div class="ps-price-row">' +
+                '<div>' +
+                  '<div class="ps-price-label">متوسط سعر المتر</div>' +
+                  '<div class="ps-price">' + escHtml_(psValueLabel_(t)) + '</div>' +
+                '</div>' +
+                '<span class="ps-icon">' + PS_ICON_CHART + '</span>' +
+              '</div>' +
+              '<div class="ps-counts"><span><b>' + escHtml_(fmtNum(t.totalUnits)) + '</b> وحدة</span><span class="is-calc"><b>' + escHtml_(fmtNum(t.calculatedUnits)) + '</b> وحدة محسوبة</span></div>' +
+              '<button type="button" class="aq-btn aq-btn--secondary ps-view" data-district="' + escHtml_(district) + '" data-type="' + escHtml_(t.propertyType) + '" aria-label="عرض وحدات ' + escHtml_(t.propertyType) + ' في ' + escHtml_(district) + '">عرض الوحدات' + PS_ICON_ARROW + '</button>' +
+            '</div>' +
+          '</article>';
+        }).join('') + '</div>';
+      groups.appendChild(section);
     });
 
-    content.appendChild(grid);
+    content.appendChild(groups);
+    if (summary) {
+      summary.innerHTML = '<span>' + PS_ICON_PIN + escHtml_(psPlural_(districtOrder.length, 'منطقة', 'مناطق')) + '</span><span>' + PS_ICON_CHART + escHtml_(fmtNum(totalUnits)) + ' وحدة · ' + escHtml_(fmtNum(calcUnits)) + ' محسوبة</span>';
+    }
   }
+  document.getElementById('priceStatsContent').addEventListener('click', function (e) {
+    var btn = e.target.closest('.ps-view');
+    if (btn && btn.dataset.district) meterGoExplore_(btn.dataset.district, btn.dataset.type || '');
+  });
 
   // تحميل متوسط سعر المتر — نفس نداء getDistrictPriceStats ونفس العرض بالظبط.
   // منقول لدالة جسر عشان showMeterView (SPA view) يستدعيها عند الفتح المباشر بالـ hash.
