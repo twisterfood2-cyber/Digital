@@ -3726,6 +3726,21 @@
       .pc-actions { flex-direction: column; }
       .pc-btn { width: 100%; }
     }
+    /* Report 090: محرّر لوجو المطوّر — يعيد استخدام أصناف .pc-* + بلاطة اللوجو نفسها للمعاينة */
+    #devLogoCropModal .modal-box.dl-box { max-width: var(--aq-modal-md); background: var(--aq-color-surface); color: var(--aq-color-text); border: 1px solid var(--aq-color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-3); padding: var(--aq-modal-pad); }
+    #devLogoCropModal .modal-header { display: flex; align-items: center; justify-content: space-between; gap: var(--aq-space-3); margin-bottom: var(--aq-space-4); }
+    #devLogoCropModal .modal-title { font-size: var(--aq-fs-title-sm); font-weight: 700; color: var(--aq-color-text); }
+    #devLogoCropModal .modal-close { width: var(--aq-icon-btn); height: var(--aq-icon-btn); border-radius: var(--radius-sm); border: 1px solid var(--aq-color-border); background: var(--aq-color-surface); color: var(--aq-prop-text-muted); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+    #devLogoCropModal .modal-close:hover { background: var(--aq-prop-green-soft); color: var(--aq-prop-green); border-color: var(--aq-prop-green-line); }
+    .dl-modes { display: flex; gap: 8px; margin-bottom: var(--aq-space-3); flex-wrap: wrap; }
+    .dl-modes .pc-btn { flex: 1 1 160px; min-height: var(--aq-btn-h-compact); font-size: var(--aq-fs-caption); }
+    .dl-modes .pc-btn.is-active { background: var(--aq-color-primary-soft); color: var(--aq-color-primary); border-color: var(--aq-color-primary-line); }
+    .dl-stage { width: min(360px, 100%); background-color: var(--aq-prop-canvas-2); background-image: linear-gradient(45deg, rgba(16,33,30,0.06) 25%, transparent 25%, transparent 75%, rgba(16,33,30,0.06) 75%), linear-gradient(45deg, rgba(16,33,30,0.06) 25%, transparent 25%, transparent 75%, rgba(16,33,30,0.06) 75%); background-size: 16px 16px; background-position: 0 0, 8px 8px; }   /* رقعة خفيفة لإظهار حدود الشفافية في المعاينة فقط */
+    .dl-frame { inset: auto; border-radius: 4px; }
+    .dl-preview-tile { --tile: 84px; }
+    .dl-preview-tile canvas { width: 100%; height: 100%; display: block; }
+    .dl-preview-note { margin-top: 2px; font-weight: 500; }
+    @media (max-width: 480px) { .dl-modes .pc-btn { flex-basis: 100%; } #devLogoCropModal .pc-actions { display: grid; grid-template-columns: 1fr 1fr; } #devLogoCropModal .pc-actions .pc-btn { width: auto; } }   /* أربعة أزرار → شبكة 2×2 على الموبايل */
 
     /* ---- الإعدادات ---- */
     .aq-settings-cover { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: var(--aq-space-5); align-items: start; }
@@ -5121,6 +5136,43 @@
       <button type="button" class="pc-btn secondary" id="pcCancelBtn">إلغاء</button>
       <button type="button" class="pc-btn secondary" id="pcResetBtn">إعادة ضبط</button>
       <button type="button" class="pc-btn primary" id="pcConfirmBtn">استخدام الصورة</button>
+    </div>
+  </div>
+</div>
+
+<!-- Report 090: محرّر لوجو المطوّر — نفس صدفة المودال ونفس أصناف .pc-* (مظهر موحّد مع محرّر صورة الملف الشخصي) لكن بمنطق مختلف:
+     الافتراضي "اللوجو بالكامل" (نسبة الصورة، بلا قصّ)، وقصّ مربّع 1:1 اختياري (= بلاطة بطاقة المطوّر)، والناتج يحافظ على الشفافية. -->
+<div class="modal-overlay" id="devLogoCropModal" role="dialog" aria-modal="true" aria-labelledby="dlTitle">
+  <div class="modal-box pc-box dl-box">
+    <div class="modal-header">
+      <div class="modal-title" id="dlTitle">تعديل صورة لوجو المطوّر</div>
+      <button class="modal-close" id="dlCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="pc-error" id="dlError" hidden></div>
+    <div class="pc-notice" id="dlNotice" hidden></div>
+    <div class="dl-modes" role="group" aria-label="نمط اللوجو">
+      <button type="button" class="pc-btn dl-mode is-active" id="dlModeFull" data-mode="full" aria-pressed="true">اللوجو بالكامل (نسبة الصورة)</button>
+      <button type="button" class="pc-btn dl-mode" id="dlModeSquare" data-mode="square" aria-pressed="false">قصّ مربّع 1:1 (بطاقة المطوّر)</button>
+    </div>
+    <div class="pc-stage dl-stage" id="dlStage" aria-label="منطقة تعديل اللوجو — اسحب لتحريك الصورة">
+      <div class="pc-imgwrap" id="dlImgWrap"><img id="dlImage" alt="" draggable="false"></div>
+      <div class="pc-frame dl-frame" id="dlFrame" aria-hidden="true"></div>
+    </div>
+    <p class="pc-hint" id="dlHint">الافتراضي يعرض اللوجو كاملًا بلا قصّ. كبّر أو اسحب فقط لو أردت قصّ جزء منه — الجزء داخل الإطار هو ما سيُحفظ.</p>
+    <div class="pc-zoom-row">
+      <button type="button" class="pc-zoom-btn" id="dlZoomOutBtn" aria-label="تصغير"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
+      <input type="range" id="dlZoomSlider" class="pc-zoom-slider" min="0" max="100" value="0" aria-label="مستوى التكبير">
+      <button type="button" class="pc-zoom-btn" id="dlZoomInBtn" aria-label="تكبير"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+    </div>
+    <div class="pc-preview-row">
+      <div class="aq-logo-tile aq-logo-tile--lg dl-preview-tile"><canvas id="dlPreviewCanvas" width="168" height="168"></canvas></div>
+      <div><div class="pc-preview-label">المعاينة كما ستظهر في بطاقة المطوّر</div><div class="pc-preview-label dl-preview-note" id="dlPreviewNote"></div></div>
+    </div>
+    <div class="pc-actions">
+      <button type="button" class="pc-btn secondary" id="dlCancelBtn">إلغاء</button>
+      <button type="button" class="pc-btn secondary" id="dlFitBtn">إظهار اللوجو بالكامل</button>
+      <button type="button" class="pc-btn secondary" id="dlResetBtn">إعادة ضبط</button>
+      <button type="button" class="pc-btn primary" id="dlConfirmBtn">استخدام الصورة</button>
     </div>
   </div>
 </div>
@@ -8782,6 +8834,8 @@
        * مودال آخر لأنه غالبًا الأعلى ظهورًا لو فُتح. */
       var pcm = document.getElementById('photoCropModal');
       if (pcm && pcm.classList.contains('open')) { e.preventDefault(); if (typeof window.__aqarPhotoCropClose === 'function') window.__aqarPhotoCropClose(); else pcm.classList.remove('open'); return; }
+      var dlm = document.getElementById('devLogoCropModal');   /* Report 090: محرّر اللوجو فوق مودال المطوّر */
+      if (dlm && dlm.classList.contains('open')) { e.preventDefault(); if (typeof window.__aqarDevLogoCropClose === 'function') window.__aqarDevLogoCropClose(); else dlm.classList.remove('open'); return; }
       var ov = document.getElementById('unitCardOverlay');
       if (ov && ov.classList.contains('open')) { ov.classList.remove('open'); return; }
       /* Phase 2B: مودال التأكيد (aqConfirm) يعالج Escape بنفسه؛ معرض الصور له × فقط (كما هو). */
@@ -11110,16 +11164,143 @@
     if (!file) return;
     if (!DEV_LOGO_TYPES[String(file.type).toLowerCase()]) { devLogoStatus_('صيغة غير مدعومة — المسموح PNG أو JPG أو WebP', 'err'); return; }
     if (file.size > DEV_LOGO_MAX) { devLogoStatus_('الملف كبير جدًا — الحد 2 ميجابايت', 'err'); return; }
-    var reader = new FileReader();
-    reader.onload = function () {
-      var dataUrl = String(reader.result);
-      devLogoPending = { base64: dataUrl.split(',')[1], mime: file.type, dataUrl: dataUrl, name: file.name };
-      devLogoStatus_('تم اختيار «' + file.name + '» — سيُرفع عند الضغط على «حفظ بيانات المطور»', 'ok');
+    // Report 090: الملف يمرّ أولًا على محرّر اللوجو (كامل/قصّ/تكبير/سحب) — الاعتماد مؤقت والرفع عند "حفظ بيانات المطور" كما كان
+    devLogoStatus_('');
+    devLogoEditorOpen_(file, function (result) {
+      devLogoPending = { base64: result.base64, mime: result.mime, dataUrl: result.dataUrl, name: file.name, edited: result.edited };
+      devLogoStatus_((result.edited ? 'تم ضبط «' : 'تم اختيار «') + file.name + '» — سيُرفع عند الضغط على «حفظ بيانات المطور»', 'ok');
       devLogoRender_();
-    };
-    reader.onerror = function () { devLogoStatus_('تعذّر قراءة الملف', 'err'); };
-    reader.readAsDataURL(file);
+    });
   }
+
+  /* ============================================================
+   * Report 090 — محرّر لوجو المطوّر (بلا مكتبة): نفس نموذج التفاعل (سحب/قرص/تكبير مثبّت/إعادة ضبط/معاينة) مع فروق اللوجو:
+   *   - النمط الافتراضي "full": الإطار بنسبة الصورة نفسها = اللوجو كاملًا بلا قصّ (Fit/Contain)؛ التكبير/السحب اختياريان لقصّ داخل نفس النسبة.
+   *   - النمط "square": إطار 1:1 (= بلاطة بطاقة المطوّر .aq-logo-tile التي تعرض اللوجو contain) — الصورة تغطي الإطار دائمًا.
+   *   - الناتج: لو لم يُعدَّل شيء في "full" → ملف المطوّر الأصلي بايت-بايت (أفضل جودة + شفافية)؛ غير ذلك canvas بلا خلفية
+   *     (PNG يحفظ الشفافية لمصادر PNG/WebP، JPEG للمصادر JPEG) بحدّ 800px على الضلع الأطول (سقف pipeline اللوجو) وبلا تكبير.
+   *   - المعاينة = نفس بلاطة البطاقة (84px، contain، خلفية بيضاء وحافة 6px).
+   * ============================================================ */
+  var devLogoEditorOpen_ = (function () {
+    var modal = document.getElementById('devLogoCropModal'); if (!modal) return function () {};
+    var img = document.getElementById('dlImage'), wrap = document.getElementById('dlImgWrap'), stage = document.getElementById('dlStage'), frame = document.getElementById('dlFrame');
+    var slider = document.getElementById('dlZoomSlider'), preview = document.getElementById('dlPreviewCanvas'), errEl = document.getElementById('dlError'), noticeEl = document.getElementById('dlNotice'), noteEl = document.getElementById('dlPreviewNote');
+    var MAX_FACTOR = 3, OUT_MAX = 800, FRAME_PCT = 0.82;
+    var nW = 0, nH = 0, scale = 1, minScale = 1, tx = 0, ty = 0, fr = { left: 0, top: 0, width: 0, height: 0 }, mode = 'full', onConfirm = null, srcFile = null, srcDataUrl = '';
+    function showErr(m) { errEl.textContent = m; errEl.hidden = false; }
+    function layoutFrame() {
+      var sw = stage.clientWidth, sh = stage.clientHeight, w, h;
+      if (mode === 'square') { w = h = Math.round(Math.min(sw, sh) * FRAME_PCT); }
+      else { var box = Math.min(sw, sh) * FRAME_PCT; var r = nW / nH; if (r >= 1) { w = box; h = box / r; } else { h = box; w = box * r; } w = Math.round(w); h = Math.round(h); }
+      frame.style.width = w + 'px'; frame.style.height = h + 'px'; frame.style.left = Math.round((sw - w) / 2) + 'px'; frame.style.top = Math.round((sh - h) / 2) + 'px';
+      fr = { left: Math.round((sw - w) / 2), top: Math.round((sh - h) / 2), width: w, height: h };
+      minScale = Math.max(fr.width / nW, fr.height / nH);
+    }
+    function clamp(x, y, sc) {
+      var iw = nW * sc, ih = nH * sc;
+      return { tx: Math.min(fr.left, Math.max(fr.left + fr.width - iw, x)), ty: Math.min(fr.top, Math.max(fr.top + fr.height - ih, y)) };
+    }
+    function srcRect() { return { sx: (fr.left - tx) / scale, sy: (fr.top - ty) / scale, sw: fr.width / scale, sh: fr.height / scale }; }
+    function isUntouched() { return mode === 'full' && Math.abs(scale - minScale) < 1e-6 && Math.abs(tx - (fr.left + fr.width / 2 - nW * scale / 2)) < 1 && Math.abs(ty - (fr.top + fr.height / 2 - nH * scale / 2)) < 1; }
+    function paintPreview() {
+      var ctx = preview.getContext('2d'), w = preview.width, h = preview.height, pad = Math.round(w * 6 / 84);
+      ctx.clearRect(0, 0, w, h); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h);
+      var r = srcRect(); var ar = r.sw / r.sh; var dw = w - pad * 2, dh = h - pad * 2;
+      if (ar >= 1) { dh = dw / ar; } else { dw = dh * ar; }
+      ctx.drawImage(img, r.sx, r.sy, r.sw, r.sh, (w - dw) / 2, (h - dh) / 2, dw, dh);
+      noteEl.textContent = isUntouched() ? 'اللوجو كاملًا بلا قصّ' : (mode === 'square' ? 'قصّ مربّع 1:1' : 'قصّ ضمن نسبة الصورة');
+    }
+    function render() {
+      wrap.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + scale + ')';
+      slider.value = Math.round(((scale / minScale - 1) / (MAX_FACTOR - 1)) * 100);
+      paintPreview();
+    }
+    function setScale(ns) {
+      ns = Math.min(minScale * MAX_FACTOR, Math.max(minScale, ns));
+      var cx = fr.left + fr.width / 2, cy = fr.top + fr.height / 2, px = (cx - tx) / scale, py = (cy - ty) / scale;
+      scale = ns; tx = cx - px * scale; ty = cy - py * scale;
+      var c = clamp(tx, ty, scale); tx = c.tx; ty = c.ty; render();
+    }
+    function reset() {
+      layoutFrame(); scale = minScale;
+      tx = fr.left + fr.width / 2 - nW * scale / 2; ty = fr.top + fr.height / 2 - nH * scale / 2;
+      var c = clamp(tx, ty, scale); tx = c.tx; ty = c.ty; render();
+    }
+    function setMode(m) {
+      mode = m;
+      document.querySelectorAll('#devLogoCropModal .dl-mode').forEach(function (b) { var on = b.getAttribute('data-mode') === m; b.classList.toggle('is-active', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+      reset();
+    }
+    // سحب/قرص عبر Pointer Events (فأرة/لمس/قلم)
+    var pointers = {}, dragging = false, lastX = 0, lastY = 0, pinchDist = null, pinchScale = null;
+    function dist() { var ids = Object.keys(pointers); if (ids.length < 2) return null; var a = pointers[ids[0]], b = pointers[ids[1]]; return Math.hypot(a.x - b.x, a.y - b.y); }
+    stage.addEventListener('pointerdown', function (e) {
+      try { stage.setPointerCapture(e.pointerId); } catch (err) { /* مؤشر غير نشط */ }
+      pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
+      if (Object.keys(pointers).length >= 2) { dragging = false; pinchDist = dist(); pinchScale = scale; } else { dragging = true; lastX = e.clientX; lastY = e.clientY; }
+    });
+    stage.addEventListener('pointermove', function (e) {
+      if (!(e.pointerId in pointers)) return;
+      pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
+      if (Object.keys(pointers).length >= 2) { var d = dist(); if (d && pinchDist) setScale(pinchScale * (d / pinchDist)); return; }
+      if (!dragging) return;
+      var dx = e.clientX - lastX, dy = e.clientY - lastY; lastX = e.clientX; lastY = e.clientY;
+      var c = clamp(tx + dx, ty + dy, scale); tx = c.tx; ty = c.ty; render();
+    });
+    function release(e) { delete pointers[e.pointerId]; var ids = Object.keys(pointers); pinchDist = null; if (ids.length === 1) { var p = pointers[ids[0]]; dragging = true; lastX = p.x; lastY = p.y; } else if (!ids.length) dragging = false; }
+    stage.addEventListener('pointerup', release); stage.addEventListener('pointercancel', release);
+    slider.addEventListener('input', function () { setScale(minScale * (1 + (Number(slider.value) / 100) * (MAX_FACTOR - 1))); });
+    document.getElementById('dlZoomInBtn').addEventListener('click', function () { setScale(scale * 1.15); });
+    document.getElementById('dlZoomOutBtn').addEventListener('click', function () { setScale(scale / 1.15); });
+    document.getElementById('dlResetBtn').addEventListener('click', function () { setMode('full'); });
+    document.getElementById('dlFitBtn').addEventListener('click', function () { setMode('full'); });
+    document.querySelectorAll('#devLogoCropModal .dl-mode').forEach(function (b) { b.addEventListener('click', function () { setMode(b.getAttribute('data-mode')); }); });
+    function close() {
+      modal.classList.remove('open'); onConfirm = null; srcFile = null; srcDataUrl = ''; img.src = ''; nW = nH = 0; errEl.hidden = true; noticeEl.hidden = true;   // تحرير الذاكرة
+      var fi = document.getElementById('devLogoFileInput'); if (fi) fi.value = '';
+    }
+    window.__aqarDevLogoCropClose = close;
+    document.getElementById('dlCancelBtn').addEventListener('click', close);
+    document.getElementById('dlCloseBtn').addEventListener('click', close);
+    document.getElementById('dlConfirmBtn').addEventListener('click', function () {
+      if (!nW || typeof onConfirm !== 'function') { close(); return; }
+      var cb = onConfirm, result;
+      if (isUntouched()) {
+        result = { base64: srcDataUrl.split(',')[1], mime: srcFile.type, dataUrl: srcDataUrl, edited: false };   // الملف الأصلي كما هو
+      } else {
+        var r = srcRect(); var k = Math.min(1, OUT_MAX / Math.max(r.sw, r.sh));   // بلا تكبير — تصغير فقط لو أكبر من سقف الـ pipeline
+        var cw = Math.max(1, Math.round(r.sw * k)), ch = Math.max(1, Math.round(r.sh * k));
+        var canvas = document.createElement('canvas'); canvas.width = cw; canvas.height = ch;
+        var ctx = canvas.getContext('2d'); ctx.drawImage(img, r.sx, r.sy, r.sw, r.sh, 0, 0, cw, ch);   // بدون خلفية — الشفافية محفوظة
+        var outMime = srcFile.type === 'image/jpeg' ? 'image/jpeg' : 'image/png';
+        var dataUrl = outMime === 'image/jpeg' ? canvas.toDataURL('image/jpeg', 0.92) : canvas.toDataURL('image/png');
+        result = { base64: dataUrl.split(',')[1], mime: outMime, dataUrl: dataUrl, edited: true };
+        canvas.width = canvas.height = 0;
+      }
+      close(); cb(result);
+    });
+    window.addEventListener('resize', function () { if (modal.classList.contains('open') && nW) { layoutFrame(); var c = clamp(tx, ty, Math.max(scale, minScale)); scale = Math.max(scale, minScale); tx = c.tx; ty = c.ty; render(); } }, { passive: true });
+    return function open(file, cb) {
+      onConfirm = cb; srcFile = file; errEl.hidden = true; noticeEl.hidden = true;
+      nW = nH = 0; noteEl.textContent = ''; slider.value = 0; wrap.style.transform = '';   // حالة نظيفة حتى تُحمَّل الصورة الجديدة
+      var reader = new FileReader();
+      reader.onload = function () {
+        srcDataUrl = String(reader.result);
+        img.onload = function () {
+          nW = img.naturalWidth; nH = img.naturalHeight;
+          if (!nW || !nH) { showErr('تعذّر قراءة هذه الصورة — جرّب صورة أخرى.'); return; }
+          img.style.width = nW + 'px'; img.style.height = nH + 'px';
+          var low = Math.min(nW, nH) < 120; noticeEl.textContent = low ? 'الصورة منخفضة الدقة وقد تظهر بجودة أقل.' : ''; noticeEl.hidden = !low;
+          requestAnimationFrame(function () { setMode('full'); });
+        };
+        img.onerror = function () { showErr('تعذّر فتح هذا الملف — تأكد أنه صورة صالحة (PNG/JPG/WebP).'); };
+        img.src = srcDataUrl;
+        modal.classList.add('open');
+      };
+      reader.onerror = function () { showErr('تعذّر قراءة الملف من جهازك.'); modal.classList.add('open'); };
+      reader.readAsDataURL(file);
+    };
+  })();
   function devSetFormMode_(name) {
     var b = document.getElementById('devFormModeBadge'); if (!b) return;
     if (name) { b.textContent = 'وضع التعديل: ' + name; b.hidden = false; } else { b.textContent = ''; b.hidden = true; }
@@ -11165,6 +11346,7 @@
     document.addEventListener('keydown', function (e) {
       var m = el(); if (e.key !== 'Escape' || e.defaultPrevented || !m || !m.classList.contains('open')) return;   // defaultPrevented = مودال أعلى (القصّ) استهلك Escape
       var pcm = document.getElementById('photoCropModal'); if (pcm && pcm.classList.contains('open')) return;
+      var dlm = document.getElementById('devLogoCropModal'); if (dlm && dlm.classList.contains('open')) return;
       e.preventDefault(); close();
     });
     return { open: open, close: close, isOpen: function () { var m = el(); return !!(m && m.classList.contains('open')); } };
@@ -11183,7 +11365,7 @@
     });
     if (closeBtn) closeBtn.addEventListener('click', devFormClose_);
     if (cancel) cancel.addEventListener('click', devFormClose_);
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && m.classList.contains('open')) { e.preventDefault(); devFormClose_(); } });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !e.defaultPrevented && m.classList.contains('open')) { e.preventDefault(); devFormClose_(); } });   // Report 090: defaultPrevented = محرّر اللوجو استهلك Escape
   })();
   // الرفع يسبق الحفظ. بلا لوجو مختار → الحفظ يكمل فورًا (السلوك الأصلي كما هو).
   function devLogoUploadThen_(btn, msg, developerName, proceed) {
