@@ -3477,6 +3477,17 @@
     #dashPanel-developers .aq-list-actions .aq-btn--ghost:hover { background: var(--aq-prop-green-soft); border-color: var(--aq-prop-green-line); }
     #dashPanel-users #addUserBtn { flex: 0 1 auto; min-width: 240px; }
     #dashPanel-developers .aq-dev-grid .aq-skeleton--card { min-height: 116px; }
+    /* Report 086: زر "إضافة مطوّر" + مودال النموذج (نفس صدفة المودال الموحّدة Report 069) */
+    #dashPanel-developers .dev-page-actions { display: flex; justify-content: flex-start; margin: 0 0 var(--aq-space-5); }
+    #dashPanel-developers .dev-page-actions .aq-btn .ico { width: 16px; height: 16px; }
+    #devFormModal .modal-box.dev-form-box { max-width: var(--aq-modal-xl); max-height: calc(100vh - 80px); overflow-y: auto; }
+    #devFormModal .aq-admin-card { box-shadow: none; margin-bottom: var(--aq-space-4); }
+    #devFormModal #devFormCard { border: 0; padding: 0; margin-bottom: 0; }
+    #devFormModal #devFormCard > .aq-admin-card-head > div { display: none; }   /* العنوان في رأس المودال — يبقى شارة وضع التعديل فقط */
+    #devFormModal #devFormCard > .aq-admin-card-head { margin-bottom: 0; min-height: 0; }
+    #devFormModal #devFormCard > .aq-admin-card-head[hidden] { display: none; }
+    #devFormModal .dev-actions { padding-top: var(--aq-space-3); border-top: 1px solid var(--aq-color-border-subtle); }
+    #devFormModal #devFormCancelBtn { flex: 0 1 140px; }
     #dashPanel-developers .aq-empty { padding: var(--aq-space-8) var(--aq-space-4); }
 
     /* ---- المستخدمون ---- */
@@ -3701,6 +3712,8 @@
       #dashPanel-users .um-card { grid-template-columns: auto minmax(0, 1fr); }
       #dashPanel-users .um-right { grid-column: 2; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: flex-start; }
       #dashPanel-users .um-toolbar .aq-admin-card-actions, #dashPanel-users .um-toolbar .aq-admin-card-actions > * { width: 100%; }
+      #devFormModal .modal-box.dev-form-box { max-height: calc(100vh - 24px); }
+      #devFormModal .dev-actions button { flex: 1 1 100%; }
       #dashPanel-developers .aq-form-grid--3, #dashPanel-developers .aq-form-grid--2, #dashPanel-users .aq-form-grid--3,
       #dashPanel-projects .aq-form-grid--3, #dashPanel-projects .aq-form-grid--2 { grid-template-columns: 1fr; }
       #umUserModal .modal-box.um-user-box { padding: var(--aq-space-5) var(--aq-space-4) 0; }
@@ -4295,6 +4308,17 @@
         <div class="dash-panel" id="dashPanel-developers" hidden>
           <div class="dash-page-title">إدارة بيانات المطوّرين</div>
           <p class="aq-page-intro">ملفات المطوّرين العقاريين المسجّلين في النظام: اللوجو، نبذة الشركة، صاحبها وسنة التأسيس. ما تحفظه هنا يظهر في بطاقات المطوّرين وصفحاتهم داخل المنصّة.</p>
+          <!-- Report 086: نموذج الإضافة/التعديل انتقل إلى مودال (#devFormModal) — نفس الحقول والـ ids والمعالجات؛ الصفحة بقت للكروت -->
+          <div class="dev-page-actions">
+            <button type="button" class="aq-btn aq-btn--primary" id="devAddBtn" aria-haspopup="dialog" aria-controls="devFormModal"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>إضافة مطوّر</button>
+          </div>
+
+          <div class="modal-overlay" id="devFormModal" role="dialog" aria-modal="true" aria-labelledby="devFormModalTitle">
+          <div class="modal-box dev-form-box">
+            <div class="modal-header">
+              <div class="modal-title" id="devFormModalTitle">إضافة مطوّر</div>
+              <button class="modal-close" id="devFormCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+            </div>
 
           <section class="aq-admin-card aq-form-assist ai-fill-panel" id="devAiPanel" aria-labelledby="devAiTitle">
             <div class="aq-admin-card-head">
@@ -4385,9 +4409,12 @@
             <div class="aq-form-actions dev-actions">
               <button type="button" id="saveDevProfileBtn" class="aq-btn--form-primary">حفظ بيانات المطور</button>
               <button type="button" id="clearDevProfileFormBtn" class="aq-btn--form-secondary">تفريغ النموذج</button>
+              <button type="button" id="devFormCancelBtn" class="aq-btn--form-secondary">إلغاء</button>
               <div id="saveDevProfileMsg" class="aq-form-msg aq-form-hint"></div>
             </div>
           </section>
+          </div><!-- /.modal-box -->
+          </div><!-- /#devFormModal -->
 
           <section class="aq-admin-card" id="devListCard" aria-labelledby="devListTitle">
             <div class="aq-admin-card-head">
@@ -10949,7 +10976,43 @@
   function devSetFormMode_(name) {
     var b = document.getElementById('devFormModeBadge'); if (!b) return;
     if (name) { b.textContent = 'وضع التعديل: ' + name; b.hidden = false; } else { b.textContent = ''; b.hidden = true; }
+    var t = document.getElementById('devFormModalTitle'); if (t) t.textContent = name ? 'تعديل بيانات المطوّر' : 'إضافة مطوّر';
+    var head = document.querySelector('#devFormCard > .aq-admin-card-head'); if (head) head.hidden = !name;
   }
+  /* Report 086: مودال نموذج المطوّر — نفس الحقول/المعالجات؛ الفتح/الإغلاق فقط. التركيز يدخل المودال ويرجع للزر الفاتح عند الإغلاق. */
+  var devFormOpener_ = null;
+  function devFormOpen_(opener) {
+    var m = document.getElementById('devFormModal'); if (!m) return;
+    devFormOpener_ = opener || document.activeElement;
+    m.classList.add('open');
+    m.scrollTop = 0;
+    var box = m.querySelector('.modal-box'); if (box) box.scrollTop = 0;
+    var first = document.getElementById('devProfileNameInput');
+    setTimeout(function () { try { (first || m.querySelector('.modal-close')).focus({ preventScroll: true }); } catch (e) {} }, 30);
+  }
+  function devFormClose_() {
+    var m = document.getElementById('devFormModal'); if (!m || !m.classList.contains('open')) return;
+    m.classList.remove('open');
+    var back = devFormOpener_; devFormOpener_ = null;
+    if (back && document.contains(back)) { try { back.focus({ preventScroll: true }); } catch (e) {} }
+    else { var add = document.getElementById('devAddBtn'); if (add) { try { add.focus({ preventScroll: true }); } catch (e) {} } }
+  }
+  window.__aqarDevFormOpen = devFormOpen_; window.__aqarDevFormClose = devFormClose_;
+  (function wireDevFormModal() {
+    var add = document.getElementById('devAddBtn'), closeBtn = document.getElementById('devFormCloseBtn'), cancel = document.getElementById('devFormCancelBtn'), m = document.getElementById('devFormModal');
+    if (!add || !m) return;
+    devSetFormMode_(null);   // الحالة الابتدائية: عنوان "إضافة" ورأس النموذج الداخلي مخفي
+    add.addEventListener('click', function () {
+      // لو النموذج كان في وضع تعديل مطوّر تاني → يتفرّغ؛ مسودة إضافة غير محفوظة تفضل كما هي
+      var badge = document.getElementById('devFormModeBadge');
+      if (badge && !badge.hidden) document.getElementById('clearDevProfileFormBtn').click();
+      devSetFormMode_(null);
+      devFormOpen_(add);
+    });
+    if (closeBtn) closeBtn.addEventListener('click', devFormClose_);
+    if (cancel) cancel.addEventListener('click', devFormClose_);
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && m.classList.contains('open')) { e.preventDefault(); devFormClose_(); } });
+  })();
   // الرفع يسبق الحفظ. بلا لوجو مختار → الحفظ يكمل فورًا (السلوك الأصلي كما هو).
   function devLogoUploadThen_(btn, msg, developerName, proceed) {
     if (!devLogoPending) { proceed(); return; }
@@ -11111,9 +11174,9 @@
   function renderDevProfilesList(profiles) {
     const content = document.getElementById('devProfilesListContent');
     const countEl = document.getElementById('devListCount');
-    if (countEl) countEl.textContent = profiles.length ? (profiles.length + ' مطوّر مسجّل — اضغط "تعديل" لتحميل البيانات في النموذج') : '';
+    if (countEl) countEl.textContent = profiles.length ? (profiles.length + ' مطوّر مسجّل — اضغط "تعديل" لفتح بيانات المطوّر') : '';
     if (!profiles.length) {
-      content.innerHTML = '<div class="aq-empty" style="grid-column:1/-1"><h3>لا يوجد مطوّرون مسجّلون بعد</h3><p>أضف أول ملف مطوّر من النموذج أعلاه.</p></div>';
+      content.innerHTML = '<div class="aq-empty" style="grid-column:1/-1"><h3>لا يوجد مطوّرون مسجّلون بعد</h3><p>أضف أول ملف مطوّر من زر «إضافة مطوّر».</p></div>';
       return;
     }
     content.innerHTML = profiles.map(p => {
@@ -11148,8 +11211,8 @@
     devSetFormMode_(p.developerName || '');
     document.getElementById('devProfileDescInput').value = p.description || '';
     document.getElementById('devProfileWorksInput').value = p.previousWorks || '';
-    var _card = document.getElementById('devFormCard');
-    if (_card && _card.scrollIntoView) _card.scrollIntoView({ behavior: 'smooth', block: 'start' }); else window.scrollTo(0, 0);
+    document.getElementById('saveDevProfileMsg').textContent = '';
+    devFormOpen_(document.activeElement);   // Report 086: نفس النموذج داخل المودال بعنوان "تعديل بيانات المطوّر"
   }
   window.editDevProfile = editDevProfile;
 
@@ -11193,6 +11256,8 @@
           document.getElementById('devAiPasteText').value = '';
           document.getElementById('devAiFileInput').value = '';
           document.getElementById('devAiExtractMsg').style.display = 'none';
+          if (typeof showToast === 'function') showToast(res.message || 'تم حفظ بيانات المطور', 'success');
+          devFormClose_();   // Report 086: الإغلاق بعد الحفظ — الكارت يتحدّث في القائمة
           loadDevProfilesList();
         }
       })
