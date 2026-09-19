@@ -3663,6 +3663,11 @@
     }
     .pc-notice { margin-bottom: var(--aq-space-4); padding: 8px 12px; border-radius: var(--aq-radius-sm); background: var(--aq-warning-tint); color: var(--aq-warning-soft); font-size: var(--aq-fs-caption); font-weight: 700; }   /* Report 089: تنبيه الدقة المنخفضة (غير مانع) */
     .pc-hint { margin: var(--aq-space-2) 0 0; font-size: var(--aq-fs-caption); color: var(--aq-prop-text-muted); text-align: center; }
+    /* Report 091: صفّ أزرار «لصق صورة» + «من الجهاز» — نفس الأزرار القائمة، تغليف فقط (يلتفّ على الموبايل بلا overflow) */
+    .aq-upload-actions { display: inline-flex; gap: 8px; flex-wrap: wrap; justify-content: center; align-items: center; max-width: 100%; }
+    .aq-upload-actions--inline { display: flex; justify-content: flex-start; }
+    .aq-upload-actions--inline .aq-file-input { flex: 1 1 200px; min-width: 0; width: auto; }
+    .aq-upload-actions--inline .aq-btn--form-secondary { flex: 0 0 auto; }
     /* Report 089: صورة معتمدة بانتظار "حفظ التعديلات" داخل مودال الملف الشخصي */
     #profEditModal .prof-photo-pending { display: none; margin: 4px 0 0; font-size: var(--aq-fs-caption); font-weight: 700; color: var(--aq-color-primary); }
     #profEditModal .prof-photo-pending.is-on { display: inline-flex; align-items: center; gap: 6px; }
@@ -4453,6 +4458,7 @@
                   <p class="aq-logo-upload-hint">الصيغ المقبولة: PNG أو JPG أو WebP · الحد الأقصى 2 ميجابايت · يُعرض اللوجو داخل إطار ثابت في المنتصف دون قصّ أو تشويه.</p>
                   <div class="aq-logo-upload-actions">
                     <button type="button" class="aq-btn--form-primary" id="devLogoChooseBtn">رفع اللوجو</button>
+                    <button type="button" class="aq-btn--form-secondary" id="devLogoPasteBtn">لصق صورة</button>
                     <button type="button" class="aq-btn--form-secondary" id="devLogoReplaceBtn" hidden>تغيير اللوجو</button>
                     <button type="button" class="aq-btn--form-danger" id="devLogoRemoveBtn" hidden>إزالة</button>
                   </div>
@@ -4799,7 +4805,7 @@
                   </div>
                   <div class="aq-form-field">
                     <label class="aq-form-label" for="newUserPhoto">صورة المستخدم (اختياري)</label>
-                    <input type="file" id="newUserPhoto" class="aq-file-input" accept="image/*">
+                    <div class="aq-upload-actions aq-upload-actions--inline"><input type="file" id="newUserPhoto" class="aq-file-input" accept="image/*"><button type="button" class="aq-btn--form-secondary" id="newUserPhotoPasteBtn">لصق صورة</button></div>
                   </div>
                 </div>
                 <div class="um-hint aq-form-hint" id="umOwnerHint" hidden>إنشاء حساب "مالك" يتطلب تسجيل دخولك أنت بحساب مالك.</div>
@@ -4857,7 +4863,8 @@
               <div class="prof-edit-photo-body">
                 <div class="aq-form-label">الصورة الشخصية</div>
                 <p class="aq-form-help">صورة مربّعة واضحة — يتم قصّها قبل الرفع. الحد الأقصى 5 ميجابايت.</p>
-                <button type="button" class="aq-btn aq-btn--secondary" id="dashProfPhotoBtn">تغيير الصورة</button>
+                <div class="aq-upload-actions"><button type="button" class="aq-btn aq-btn--secondary" id="dashProfPhotoBtn">تغيير الصورة</button>
+                <button type="button" class="aq-btn aq-btn--secondary" id="dashProfPhotoPasteBtn">لصق صورة</button></div>
                 <input type="file" id="dashProfPhotoInput" accept="image/png,image/jpeg,image/webp" hidden>
                 <span class="prof-photo-pending" id="dashProfPhotoPending"><span>صورة جديدة جاهزة — تُحفظ عند «حفظ التعديلات»</span><button type="button" class="aq-btn aq-btn--ghost" id="dashProfPhotoUndoBtn">تراجع</button></span>
               </div>
@@ -5072,6 +5079,7 @@
   <div id="liveEmailsList" style="font-size:11px; color:var(--muted); margin:-6px 0 14px; line-height:1.9;"></div>
   <label>تغيير صورة غلاف الصفحة</label>
   <input type="file" id="coverFileInput" class="aq-file-input" accept="image/*">
+  <button type="button" class="small-btn aq-btn--form-secondary" id="coverPasteBtn">لصق صورة</button>
   <button class="small-btn aq-btn--form-primary" id="coverUploadBtn">رفع الصورة</button>
   <div id="coverMsg" class="aq-form-hint"></div>
 
@@ -5563,7 +5571,10 @@
         <div class="images-zone aq-upload-zone" id="editImagesZone" tabindex="0">
           <p>الصق صورة (Ctrl+V) هنا، أو اسحب صورة، أو اختار من جهازك</p>
           <input type="file" id="editImagesFileInput" accept="image/*" multiple style="display:none;">
-          <button type="button" class="images-choose-btn" id="editImagesChooseBtn"><svg class="ico" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg> اختيار صور من الجهاز</button>
+          <div class="aq-upload-actions">
+            <button type="button" class="images-choose-btn" id="editImagesPasteBtn"><svg class="ico" viewBox="0 0 24 24"><path d="M9 2a1 1 0 0 0-1 1v1H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2V3a1 1 0 0 0-1-1H9Zm1 2h4v2h-4V4ZM8 11h8v2H8v-2Zm0 4h8v2H8v-2Z"/></svg> لصق صورة</button>
+            <button type="button" class="images-choose-btn" id="editImagesChooseBtn"><svg class="ico" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg> اختيار صور من الجهاز</button>
+          </div>
         </div>
         <div class="image-link-row">
           <input type="text" id="editImageLinkInput" placeholder="أو الصق رابط صورة هنا (URL)">
@@ -5703,6 +5714,7 @@
   function attrJson_(o) { return escHtml_(JSON.stringify(o)); }
   // نسخة من كائن الوحدة كل قيمه النصية مهرَّبة — للقوالب الكبيرة (PDF) اللي بتعرض عشرات الحقول كنص فقط
   function escUnitFields_(u) { var out = {}; if (u && typeof u === 'object') { for (var k in u) { if (Object.prototype.hasOwnProperty.call(u, k)) out[k] = (typeof u[k] === 'string') ? escHtml_(u[k]) : u[k]; } } return out; }
+
   function thumbFallback_(img) {
     if (!img || img.getAttribute('data-full-tried') === '1') return false;
     var s = img.getAttribute('src') || '';
@@ -6216,36 +6228,121 @@
     shareOnWhatsApp(buildQuoteUnitObject());   // نفس buildUnitShareText — لا بيانات ناقصة
   });
 
+  /* ============================================================
+   * Report 091 — لصق صورة من الحافظة: أداة مشتركة واحدة لكل مواضع رفع الصور في التطبيق.
+   *   الفكرة: المصدر الوحيد المختلف هو "الحافظة" بدل "الجهاز"؛ بعدها الملف يُسلَّم لنفس <input type="file"> القائم
+   *   (input.files عبر DataTransfer + حدث change) فيمرّ حرفيًا بنفس التحقق/المعالجة/الرفع الحالية لكل موضع —
+   *   بلا مسار رفع ثانٍ ولا تحقق مكرر ولا R2/معالجة مختلفة. لو لم يمكن تسليم الملف للـ input (متصفح قديم) يُستدعى
+   *   onFiles نفسه الذي يستدعيه الـ input.
+   *   الزر «لصق صورة» = navigator.clipboard.read() (Chrome/Edge/Safari 13.1+ بسياق آمن)؛ Ctrl+V / ⌘V داخل المنطقة
+   *   = حدث paste (كل المتصفحات). كل فشل طبيعي (لا صورة/رفض إذن/غير مدعوم) = رسالة واضحة بلا أي خطأ في الكونسول.
+   * ============================================================ */
+  var aqPasteImage_ = (function () {
+    var MSG = {
+      NO_IMAGE: 'لا توجد صورة في الحافظة — انسخ صورة أولًا ثم حاول مرة أخرى.',
+      UNSUPPORTED: 'المتصفح لا يدعم قراءة الحافظة بضغطة واحدة — اضغط داخل المنطقة ثم Ctrl+V (أو ⌘V)، أو ارفع الصورة من الجهاز.',
+      DENIED: 'لم يُسمح بالوصول إلى الحافظة — اسمح بالإذن من المتصفح، أو استخدم Ctrl+V، أو ارفع الصورة من الجهاز.',
+      FAILED: 'تعذّر تجهيز الصورة من الحافظة، حاول مرة أخرى أو ارفعها من الجهاز.'
+    };
+    function canRead() { return !!(navigator.clipboard && typeof navigator.clipboard.read === 'function'); }
+    function ext_(type) { return (String(type || '').split('/')[1] || 'png').replace('jpeg', 'jpg').replace(/[^a-z0-9]/gi, ''); }
+    function toFile(blob, idx) {
+      // Blob الحافظة بلا اسم — نغلّفه بـ File باسم افتراضي فقط حتى تعمل الرسائل/التحقق القائمة (file.name / file.type / file.size)
+      if (blob instanceof File && blob.name) return blob;
+      try { return new File([blob], 'pasted-image' + (idx ? '-' + (idx + 1) : '') + '.' + ext_(blob.type), { type: blob.type, lastModified: Date.now() }); }
+      catch (e) { return blob; }
+    }
+    function fail_(code) { var err = new Error(code); err.code = code; return err; }
+    // Promise<File[]> — صور الحافظة فقط؛ الرفض دائمًا Error بحقل code من MSG (لا استثناء يخرج للكونسول)
+    function readImages() {
+      if (!canRead()) return Promise.reject(fail_('UNSUPPORTED'));
+      return navigator.clipboard.read().then(function (items) {
+        var jobs = [];
+        for (var i = 0; i < items.length; i++) {
+          var t = (items[i].types || []).filter(function (x) { return x.indexOf('image/') === 0; })[0];
+          if (t) jobs.push(items[i].getType(t));
+        }
+        if (!jobs.length) throw fail_('NO_IMAGE');
+        return Promise.all(jobs).then(function (blobs) { return blobs.map(toFile); }, function () { throw fail_('FAILED'); });
+      }, function (e) { throw fail_(e && e.name === 'NotAllowedError' ? 'DENIED' : 'FAILED'); });
+    }
+    // صور حدث paste (Ctrl+V / ⌘V) — نفس الشكل: File[]
+    function fromEvent(e) {
+      var items = (e.clipboardData || window.clipboardData || {}).items || [], out = [];
+      for (var i = 0; i < items.length; i++) { if (items[i].kind === 'file' && items[i].type.indexOf('image/') === 0) { var f = items[i].getAsFile(); if (f) out.push(toFile(f, out.length)); } }
+      return out;
+    }
+    // تسليم الملفات لنفس مسار الجهاز: input.files + change → المعالج القائم؛ وإلا onFiles مباشرة
+    function deliver(input, files, onFiles) {
+      if (input) {
+        try {
+          var dt = new DataTransfer(); files.forEach(function (f) { dt.items.add(f); });
+          input.files = dt.files;
+          if (input.files && input.files.length === files.length) { input.dispatchEvent(new Event('change', { bubbles: true })); return true; }
+        } catch (e) { /* متصفح لا يدعم إسناد files — نكمل بالبديل */ }
+      }
+      if (typeof onFiles === 'function') { onFiles(files); return true; }
+      return false;
+    }
+    /* wire({ button, zone, input, onFiles, multiple, message(text, tone) })
+     *   button: زر «لصق صورة» (اختياري) · zone: عنصر يستقبل Ctrl+V عند تركيزه (اختياري) · input: حقل الملف القائم
+     *   onFiles(File[]): بديل التسليم لو لا input · multiple: قبول أكثر من صورة · message: عرض الرسائل بنفس عنصر الحالة القائم */
+    function wire(o) {
+      var say = typeof o.message === 'function' ? o.message : function () {};
+      function handle(files) {
+        if (!files || !files.length) { say(MSG.NO_IMAGE, 'err'); return; }
+        if (!o.multiple) files = files.slice(0, 1);
+        if (!deliver(o.input, files, o.onFiles)) say(MSG.FAILED, 'err');
+      }
+      function focusZone() { if (o.zone && typeof o.zone.focus === 'function') { try { o.zone.focus({ preventScroll: true }); } catch (e) {} } }
+      if (o.button) o.button.addEventListener('click', function () {
+        say('', '');
+        if (!canRead()) { say(MSG.UNSUPPORTED, 'err'); focusZone(); return; }
+        readImages().then(handle, function (err) { say(MSG[err && err.code] || MSG.FAILED, 'err'); focusZone(); });
+      });
+      if (o.zone) o.zone.addEventListener('paste', function (e) {
+        if (e.target && e.target !== o.zone && /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;   // لصق نص داخل حقل نصي بالمنطقة يبقى كما هو
+        var files = fromEvent(e);
+        if (files.length) { e.preventDefault(); say('', ''); handle(files); } else say(MSG.NO_IMAGE, 'err');
+      });
+    }
+    return { wire: wire, readImages: readImages, fromEvent: fromEvent, canRead: canRead, MSG: MSG };
+  })();
+  window.__aqarPasteImage = aqPasteImage_;   // للاختبارات فقط
+
   /* ---------- استخراج بيانات الوحدة بالذكاء الاصطناعي داخل نافذة الإضافة ---------- */
   let unitAddAiPastedImageBase64 = null;
   let unitAddAiPastedImageMime = null;
 
+  // Report 091: المنطقة نفسها صارت زر «لصق صورة» بضغطة واحدة (navigator.clipboard.read) مع بقاء Ctrl+V/⌘V — نفس المعالجة للحالتين
+  var unitAddAiOneClick_ = aqPasteImage_.canRead();
   document.getElementById('unitAddAiImagePasteZone').addEventListener('focus', function() {
     this.classList.add('is-armed');
-    this.textContent = 'جاهز - الصق الصورة دلوقتي (Ctrl+V)';
+    this.textContent = unitAddAiOneClick_ ? 'اضغط للصق صورة من الحافظة (أو Ctrl+V)' : 'جاهز - الصق الصورة دلوقتي (Ctrl+V)';
   });
   document.getElementById('unitAddAiImagePasteZone').addEventListener('blur', function() {
     this.classList.remove('is-armed');
-    this.textContent = 'دوس هنا وبعدين الصق صورة (Ctrl+V)';
+    this.textContent = unitAddAiOneClick_ ? 'لصق صورة من الحافظة (ضغطة واحدة أو Ctrl+V)' : 'دوس هنا وبعدين الصق صورة (Ctrl+V)';
   });
-  document.getElementById('unitAddAiImagePasteZone').addEventListener('paste', function(e) {
-    const items = (e.clipboardData || window.clipboardData).items;
-    for (const item of items) {
-      if (item.type.indexOf('image') === 0) {
-        e.preventDefault();
-        const file = item.getAsFile();
-        const reader = new FileReader();
-        reader.onload = function() {
-          unitAddAiPastedImageBase64 = reader.result.split(',')[1];
-          unitAddAiPastedImageMime = file.type;
-          document.getElementById('unitAddAiPastedImageTag').src = reader.result;
-          document.getElementById('unitAddAiPastedImagePreview').style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-        return;
-      }
-    }
-  });
+  if (unitAddAiOneClick_) document.getElementById('unitAddAiImagePasteZone').textContent = 'لصق صورة من الحافظة (ضغطة واحدة أو Ctrl+V)';
+  function unitAddAiAcceptPastedImage_(file) {
+    const reader = new FileReader();
+    reader.onload = function() {
+      unitAddAiPastedImageBase64 = reader.result.split(',')[1];
+      unitAddAiPastedImageMime = file.type;
+      document.getElementById('unitAddAiPastedImageTag').src = reader.result;
+      document.getElementById('unitAddAiPastedImagePreview').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+  (function () {
+    var zone = document.getElementById('unitAddAiImagePasteZone');
+    aqPasteImage_.wire({
+      button: unitAddAiOneClick_ ? zone : null, zone: zone, onFiles: function (files) { unitAddAiAcceptPastedImage_(files[0]); },
+      message: function (t, tone) { var m = document.getElementById('unitAddAiExtractMsg'); if (!m) return; m.style.display = t ? 'block' : 'none'; m.style.color = tone === 'err' ? 'var(--error-fg)' : ''; m.textContent = t; }
+    });
+    zone.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && unitAddAiOneClick_) { e.preventDefault(); zone.click(); } });
+  })();
   document.getElementById('unitAddAiPastedImageRemove').addEventListener('click', function() {
     unitAddAiPastedImageBase64 = null;
     unitAddAiPastedImageMime = null;
@@ -9788,11 +9885,12 @@
     editImagesZone.classList.remove('drag-over');
     Array.from(e.dataTransfer.files).forEach(uploadEditImageFile);
   });
-  editImagesZone.addEventListener('paste', function(e) {
-    const items = (e.clipboardData || window.clipboardData).items;
-    for (const item of items) {
-      if (item.type.indexOf('image') === 0) uploadEditImageFile(item.getAsFile());
-    }
+  // Report 091: «لصق صورة» + Ctrl+V/⌘V داخل المنطقة عبر الأداة المشتركة — الملف يُسلَّم لنفس editImagesFileInput
+  // (change → uploadEditImageFile → uploadUnitImage → R2) بلا أي مسار رفع مختلف.
+  aqPasteImage_.wire({
+    button: document.getElementById('editImagesPasteBtn'), zone: editImagesZone, input: editImagesFileInput, multiple: true,
+    onFiles: function (files) { files.forEach(uploadEditImageFile); },
+    message: function (t, tone) { editImagesUploadMsg.style.color = tone === 'err' ? 'var(--error-fg)' : ''; editImagesUploadMsg.textContent = t; }
   });
   editAddImageLinkBtn.addEventListener('click', function() {
     const url = editImageLinkInput.value.trim();
@@ -10538,6 +10636,10 @@
     }).withFailureHandler(apiFailure_('تعذّر تحميل عدد المتصلين الآن')).getActiveUsersCount(getAuthCreds());
   }
 
+  // Report 091: «لصق صورة» يضع صورة الحافظة في نفس coverFileInput — ثم «رفع الصورة» يرفعها بنفس المسار (uploadCoverImage)
+  aqPasteImage_.wire({ button: document.getElementById('coverPasteBtn'), input: document.getElementById('coverFileInput'),
+    message: function (t, tone) { var m = document.getElementById('coverMsg'); m.className = tone === 'err' ? 'error' : 'success'; m.textContent = t; } });
+  document.getElementById('coverFileInput').addEventListener('change', function () { if (this.files && this.files[0]) { var m = document.getElementById('coverMsg'); m.className = 'success'; m.textContent = 'الصورة جاهزة «' + this.files[0].name + '» — اضغط «رفع الصورة»'; } });
   document.getElementById('coverUploadBtn').addEventListener('click', function() {
     const fileInput = document.getElementById('coverFileInput');
     const file = fileInput.files[0];
@@ -10944,7 +11046,7 @@
         <span class="um-note"> · أُضيف في ${umEsc(u.addedDate || '-')}</span></div>
 
       <div class="um-field aq-form-field"><label class="aq-form-label">تغيير صورة المستخدم</label>
-        <input type="file" id="umfPhoto" class="aq-file-input" accept="image/*"></div>
+        <div class="aq-upload-actions aq-upload-actions--inline"><input type="file" id="umfPhoto" class="aq-file-input" accept="image/*"><button type="button" class="aq-btn--form-secondary" id="umfPhotoPasteBtn">لصق صورة</button></div></div>
 
       <div class="um-field aq-form-field"><label class="aq-form-label">إعادة تعيين كلمة السر</label>
         <div class="um-inline">
@@ -11021,6 +11123,8 @@
       });
     });
 
+    // Report 091: «لصق صورة» — الملف يُسلَّم لنفس umfPhoto (change → نفس التحقق → uploadUserPhoto)
+    aqPasteImage_.wire({ button: document.getElementById('umfPhotoPasteBtn'), input: document.getElementById('umfPhoto'), message: function (t, tone) { setMsg(t, tone !== 'err'); } });
     document.getElementById('umfPhoto').addEventListener('change', function () {
       const file = this.files && this.files[0];
       if (!file) return;
@@ -11058,6 +11162,9 @@
     });
   })();
 
+  // Report 091: «لصق صورة» يضع صورة الحافظة في نفس newUserPhoto — تُرفع مع إنشاء الحساب بنفس المسار (uploadUserPhoto)
+  aqPasteImage_.wire({ button: document.getElementById('newUserPhotoPasteBtn'), input: document.getElementById('newUserPhoto'),
+    message: function (t, tone) { var m = document.getElementById('addUserMsg'); m.textContent = t; m.className = 'um-msg ' + (tone === 'err' ? 'err' : 'ok'); } });
   document.getElementById('addUserBtn').addEventListener('click', function () {
     // المرحلة 3.6: شِلنا حارس adminPin — المالك الداخل بدوره لازم يقدر يضيف مستخدم.
     // التفويض النهائي في السيرفر (addUserAccount → authorizeOwnerAdmin_) بيبقى صاحب القرار.
@@ -11410,6 +11517,8 @@
     ['dragenter', 'dragover'].forEach(function (ev) { zone.addEventListener(ev, function (e) { e.preventDefault(); zone.classList.add('drag-over'); }); });
     ['dragleave', 'drop'].forEach(function (ev) { zone.addEventListener(ev, function (e) { e.preventDefault(); zone.classList.remove('drag-over'); }); });
     zone.addEventListener('drop', function (e) { devLogoHandleFile(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]); });
+    // Report 091: «لصق صورة» + Ctrl+V/⌘V — الملف يُسلَّم لنفس devLogoFileInput (change → devLogoHandleFile → محرّر اللوجو → pending → الرفع عند الحفظ)
+    aqPasteImage_.wire({ button: document.getElementById('devLogoPasteBtn'), zone: zone, input: fileIn, onFiles: function (files) { devLogoHandleFile(files[0]); }, message: devLogoStatus_ });
     zone.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target === zone) { e.preventDefault(); pick(); } });
     document.getElementById('devProfileNameInput').addEventListener('input', function () {
       if (!devLogoPending && !document.getElementById('devProfileLogoInput').value.trim()) devLogoRender_();
@@ -11750,55 +11859,11 @@
     ['dragleave', 'drop'].forEach(function (ev) { zone.addEventListener(ev, function (e) { e.preventDefault(); zone.classList.remove('drag-over'); }); });
     zone.addEventListener('drop', function (e) { projCoverHandleFile(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]); });
     zone.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target === zone) { e.preventDefault(); pick(); } });
-    // Ctrl+V/Cmd+V داخل منطقة الغلاف (بعد الضغط عليها) - بنفس دالة المعالجة/التحقق الحالية
-    // projCoverHandleFile بالحرف الواحد (نفس أنواع الصور المسموحة، نفس حد 5 ميجابايت،
-    // نفس تخزين Pending حتى الحفظ) - فقط رسالة واضحة لو الحافظة نص/رابط بلا صورة.
-    zone.addEventListener('paste', function (e) {
-      var items = (e.clipboardData || window.clipboardData).items;
-      var foundImage = false;
-      for (var i = 0; i < items.length; i++) { if (items[i].type.indexOf('image') === 0) { foundImage = true; projCoverHandleFile(items[i].getAsFile()); } }
-      if (!foundImage) projCoverStatus_('لا توجد صورة في الحافظة.', 'err');
-    });
+    // Report 091: «لصق صورة» + Ctrl+V/⌘V عبر الأداة المشتركة — الملف يُسلَّم لنفس projCoverFileInput (change → projCoverHandleFile)
+    aqPasteImage_.wire({ button: document.getElementById('projCoverPasteBtn'), zone: zone, input: fileIn, onFiles: function (files) { projCoverHandleFile(files[0]); }, message: projCoverStatus_ });
     projCoverRender_();
   })();
 
-  /* ---------- زر "لصق صورة" (صورة الغلاف) ----------
-   * نفس فلسفة زر لصق صورة معرض المشروع بالضبط - navigator.clipboard.read() لقراءة صورة
-   * الحافظة بضغطة واحدة (Chrome/Edge)، ثم تمريرها لـ projCoverHandleFile الموجودة أصلًا
-   * بلا أي تعديل عليها - فتُطبَّق نفس قواعد النوع/الحجم/التخزين Pending تلقائيًا. المتصفحات
-   * التي لا تدعم القراءة (أبرزها Safari) يبقى فيها الـ Ctrl+V اليدوي أعلاه يعمل كـ Fallback. */
-  (function wireProjCoverPasteBtn() {
-    var btn = document.getElementById('projCoverPasteBtn'), zone = document.getElementById('projCoverDropzone');
-    if (!btn || !zone) return;
-    btn.addEventListener('click', function () {
-      if (!navigator.clipboard || !navigator.clipboard.read) {
-        projCoverStatus_('تعذر الوصول إلى الحافظة. يمكنك رفع الصورة من الجهاز.', 'err');
-        zone.focus();
-        return;
-      }
-      navigator.clipboard.read().then(function (clipItems) {
-        var target = null, targetType = null;
-        for (var i = 0; i < clipItems.length; i++) {
-          var imgType = clipItems[i].types.find(function (t) { return t.indexOf('image/') === 0; });
-          if (imgType) { target = clipItems[i]; targetType = imgType; break; }
-        }
-        if (!target) { projCoverStatus_('لا توجد صورة في الحافظة.', 'err'); return; }
-        target.getType(targetType).then(function (blob) {
-          // Blob من Clipboard API بلا اسم ملف - نغلّفه بـ File باسم افتراضي فقط حتى تعمل
-          // رسالة projCoverHandleFile الحالية (تعرض file.name) بشكل سليم - نفس التحقق/التخزين
-          // الموجودَين بالفعل داخل الدالة بلا أي تعديل عليها.
-          var ext = (blob.type.split('/')[1] || 'png').replace('jpeg', 'jpg');
-          var namedFile = new File([blob], 'pasted-image.' + ext, { type: blob.type });
-          projCoverHandleFile(namedFile);
-        }).catch(function () {
-          projCoverStatus_('تعذر تجهيز الصورة، حاول مرة أخرى.', 'err');
-        });
-      }).catch(function () {
-        projCoverStatus_('تعذر الوصول إلى الحافظة. يمكنك رفع الصورة من الجهاز.', 'err');
-        zone.focus();
-      });
-    });
-  })();
 
   /* ---------- معرض صور المشروع (Gallery) - نفس نمط صور الوحدة (رفع فوري)، بلا إعادة ترتيب ---------- */
   var projGalleryImages = [];
@@ -11867,55 +11932,14 @@
       e.preventDefault(); zone.classList.remove('drag-over');
       Array.from(e.dataTransfer.files).forEach(projUploadGalleryFile_);
     });
-    // Ctrl+V/Cmd+V داخل المنطقة (بعد الضغط عليها) - بنفس دالة الرفع الحالية بالحرف الواحد؛
-    // الإضافة الوحيدة هنا: رسالة واضحة لو الحافظة نص/رابط بلا صورة (بدل التجاهل الصامت).
-    zone.addEventListener('paste', function (e) {
-      var items = (e.clipboardData || window.clipboardData).items;
-      var foundImage = false;
-      for (var i = 0; i < items.length; i++) { if (items[i].type.indexOf('image') === 0) { foundImage = true; projUploadGalleryFile_(items[i].getAsFile()); } }
-      if (!foundImage) {
-        var m = document.getElementById('projGalleryUploadMsg');
-        m.style.color = 'var(--error-fg)';
-        m.textContent = 'لا توجد صورة في الحافظة.';
-      }
+    // Report 091: «لصق صورة» + Ctrl+V/⌘V عبر الأداة المشتركة — الملف يُسلَّم لنفس projGalleryFileInput (change → projUploadGalleryFile_)
+    aqPasteImage_.wire({
+      button: document.getElementById('projGalleryPasteBtn'), zone: zone, input: fileIn, multiple: true,
+      onFiles: function (files) { files.forEach(projUploadGalleryFile_); },
+      message: function (t, tone) { var m = document.getElementById('projGalleryUploadMsg'); m.style.color = tone === 'err' ? 'var(--error-fg)' : ''; m.textContent = t; }
     });
   })();
 
-  /* ---------- زر "لصق صورة" (معرض صور المشروع) ----------
-   * إضافة UX بس - نفس مسار الرفع الحالي بالحرف الواحد (projUploadGalleryFile_، فبلا Pending
-   * جديد وبلا رفع فوري مختلف عن باقي صور المعرض - سلوك الرفع الفوري نفسه المطبَّق على
-   * الصور المُختارة/المسحوبة حاليًا). navigator.clipboard.read() تدعمها Chrome/Edge لقراءة
-   * صورة الحافظة بضغطة واحدة؛ المتصفحات التي لا تدعمها (أبرزها Safari) يبقى فيها الـ Ctrl+V
-   * اليدوي (Paste Event أعلاه) يعمل بلا أي مشكلة كـ Fallback طبيعي - ما فيش Crash في الحالتين. */
-  (function wireProjGalleryPasteBtn() {
-    var btn = document.getElementById('projGalleryPasteBtn'), zone = document.getElementById('projGalleryZone');
-    if (!btn || !zone) return;
-    btn.addEventListener('click', function () {
-      var msg = document.getElementById('projGalleryUploadMsg');
-      msg.style.color = 'var(--error-fg)'; msg.textContent = '';
-      if (!navigator.clipboard || !navigator.clipboard.read) {
-        msg.textContent = 'تعذر الوصول إلى الحافظة. يمكنك رفع الصورة من الجهاز.';
-        zone.focus();
-        return;
-      }
-      navigator.clipboard.read().then(function (clipItems) {
-        var target = null, targetType = null;
-        for (var i = 0; i < clipItems.length; i++) {
-          var imgType = clipItems[i].types.find(function (t) { return t.indexOf('image/') === 0; });
-          if (imgType) { target = clipItems[i]; targetType = imgType; break; }
-        }
-        if (!target) { msg.textContent = 'لا توجد صورة في الحافظة.'; return; }
-        target.getType(targetType).then(function (blob) {
-          projUploadGalleryFile_(blob);
-        }).catch(function () {
-          msg.textContent = 'تعذر تجهيز الصورة، حاول مرة أخرى.';
-        });
-      }).catch(function () {
-        msg.textContent = 'تعذر الوصول إلى الحافظة. يمكنك رفع الصورة من الجهاز.';
-        zone.focus();
-      });
-    });
-  })();
 
   /* ---------- نموذج المشروع: وضع/تفريغ/تحميل للتعديل ---------- */
   function projSetFormMode_(name) {
@@ -13272,6 +13296,8 @@
       var photoInput = document.getElementById('dashProfPhotoInput');
       if (photoBtn && photoInput) {
         photoBtn.addEventListener('click', function () { photoInput.click(); });
+        // Report 091: «لصق صورة» — الملف يُسلَّم لنفس dashProfPhotoInput (change → نفس التحقق → محرّر القصّ → pending → الرفع عند الحفظ)
+        aqPasteImage_.wire({ button: document.getElementById('dashProfPhotoPasteBtn'), input: photoInput, message: function (t, tone) { setMsg(t, tone !== 'err'); } });
         photoInput.addEventListener('change', function () {
           var file = this.files && this.files[0];
           this.value = ''; // يسمح باختيار نفس الملف تاني لاحقًا (قبل/بعد الإلغاء سيّان)
@@ -13309,7 +13335,7 @@
       if (!slot) return;
       // ننقل عناصر رفع صورة الغلاف الموجودة (نفس المستمع/النداء الخلفي uploadCoverImage) —
       // نقل DOM لا يكسر المستمعات، والزر بيستخدم adminPin اللي اتظبط وقت فتح اللوحة.
-      ['coverFileInput', 'coverUploadBtn', 'coverMsg'].forEach(function (id) {
+      ['coverFileInput', 'coverPasteBtn', 'coverUploadBtn', 'coverMsg'].forEach(function (id) {   // Report 091: + زر «لصق صورة»
         var node = document.getElementById(id);
         if (node) slot.appendChild(node);
       });
