@@ -3488,6 +3488,24 @@
     #devFormModal #devFormCard > .aq-admin-card-head[hidden] { display: none; }
     #devFormModal .dev-actions { padding-top: var(--aq-space-3); border-top: 1px solid var(--aq-color-border-subtle); }
     #devFormModal #devFormCancelBtn { flex: 0 1 140px; }
+    /* Report 087: نفس المعالجة لمودال المشروعات ومودالَي الأرشيف (بحث/تصدير) */
+    #projFormModal .modal-box.dev-form-box { max-width: var(--aq-modal-xl); max-height: calc(100vh - 80px); overflow-y: auto; }
+    #projFormModal .aq-admin-card { box-shadow: none; margin-bottom: var(--aq-space-4); }
+    #projFormModal #projFormCard { border: 0; padding: 0; margin-bottom: 0; }
+    #projFormModal #projFormCard > .aq-admin-card-head > div { display: none; }
+    #projFormModal #projFormCard > .aq-admin-card-head { margin-bottom: 0; min-height: 0; }
+    #projFormModal #projFormCard > .aq-admin-card-head[hidden] { display: none; }
+    #projFormModal .aq-form-actions.dev-actions { position: static; box-shadow: none; background: transparent; margin: var(--aq-space-5) 0 0; padding: var(--aq-space-3) 0 0; border-top: 1px solid var(--aq-color-border-subtle); }   /* الشريط العام للأفعال لاصق (sticky) — داخل المودال يبقى في مكانه في آخر النموذج */
+    #projFormModal #projFormCancelBtn { flex: 0 1 140px; }
+    #dashPanel-projects .dev-page-actions { display: flex; justify-content: flex-start; margin: 0 0 var(--aq-space-5); }
+    #dashPanel-projects .dev-page-actions .aq-btn .ico { width: 16px; height: 16px; }
+    #dashPanel-archive .arc-page-actions { display: flex; justify-content: flex-start; gap: var(--aq-space-3); flex-wrap: wrap; margin: 0 0 var(--aq-space-5); }
+    #dashPanel-archive .arc-page-actions .aq-btn .ico { width: 16px; height: 16px; }
+    #dashPanel-archive .arc-filter-badge { margin-inline-start: 6px; }
+    #dashPanel-archive .arc-filter-badge[hidden] { display: none; }
+    #unitExportModal .modal-box.arc-form-box, #archiveFilterModal .modal-box.arc-form-box { max-width: var(--aq-modal-lg); max-height: calc(100vh - 80px); overflow-y: auto; }
+    #unitExportModal .aq-admin-card, #archiveFilterModal .aq-admin-card { border: 0; padding: 0; box-shadow: none; margin: 0; }
+    #unitExportModal .aq-admin-card-head > div > .aq-admin-card-title, #archiveFilterModal .aq-admin-card-head > div > .aq-admin-card-title { display: none; }   /* العنوان في رأس المودال — يبقى الشرح الفرعي */
     #dashPanel-developers .aq-empty { padding: var(--aq-space-8) var(--aq-space-4); }
 
     /* ---- المستخدمون ---- */
@@ -3714,6 +3732,9 @@
       #dashPanel-users .um-toolbar .aq-admin-card-actions, #dashPanel-users .um-toolbar .aq-admin-card-actions > * { width: 100%; }
       #devFormModal .modal-box.dev-form-box { max-height: calc(100vh - 24px); }
       #devFormModal .dev-actions button { flex: 1 1 100%; }
+      #projFormModal .modal-box.dev-form-box, #unitExportModal .modal-box.arc-form-box, #archiveFilterModal .modal-box.arc-form-box { max-height: calc(100vh - 24px); }
+      #projFormModal .dev-actions button { flex: 1 1 100%; }
+      #dashPanel-archive .arc-page-actions .aq-btn { flex: 1 1 100%; justify-content: center; }
       #dashPanel-developers .aq-form-grid--3, #dashPanel-developers .aq-form-grid--2, #dashPanel-users .aq-form-grid--3,
       #dashPanel-projects .aq-form-grid--3, #dashPanel-projects .aq-form-grid--2 { grid-template-columns: 1fr; }
       #umUserModal .modal-box.um-user-box { padding: var(--aq-space-5) var(--aq-space-4) 0; }
@@ -4431,6 +4452,18 @@
           <div class="dash-page-title">إدارة المشروعات</div>
           <p class="aq-page-intro">ملفات المشروعات العقارية: البيانات الأساسية، النبذة، المميزات، الموقع، وصور المشروع. اسم المشروع هنا هو نفسه "اسم المشروع" المستخدَم في نموذج الوحدة — عند تطابقهما يصبح اسم المشروع داخل تفاصيل الوحدة قابلًا للضغط ليفتح هذا الملف.</p>
 
+          <!-- Report 087: نموذج الإضافة/التعديل + المساعدة بالذكاء الاصطناعي انتقلا إلى مودال (#projFormModal) — نفس الحقول والـ ids والمعالجات؛ الصفحة بقت للكروت -->
+          <div class="dev-page-actions">
+            <button type="button" class="aq-btn aq-btn--primary" id="projAddBtn" aria-haspopup="dialog" aria-controls="projFormModal"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>إضافة مشروع</button>
+          </div>
+
+          <div class="modal-overlay" id="projFormModal" role="dialog" aria-modal="true" aria-labelledby="projFormModalTitle">
+          <div class="modal-box dev-form-box">
+            <div class="modal-header">
+              <div class="modal-title" id="projFormModalTitle">إضافة مشروع</div>
+              <button class="modal-close" id="projFormCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+            </div>
+
           <section class="aq-admin-card aq-form-assist ai-fill-panel" id="projAiPanel" aria-labelledby="projAiTitle">
             <div class="aq-admin-card-head">
               <div>
@@ -4571,9 +4604,12 @@
             <div class="aq-form-actions dev-actions">
               <button type="button" id="saveProjectBtn" class="aq-btn--form-primary">حفظ بيانات المشروع</button>
               <button type="button" id="clearProjectFormBtn" class="aq-btn--form-secondary">تفريغ النموذج</button>
+              <button type="button" id="projFormCancelBtn" class="aq-btn--form-secondary">إلغاء</button>
               <div id="saveProjectMsg" class="aq-form-msg aq-form-hint"></div>
             </div>
           </section>
+          </div><!-- /.modal-box -->
+          </div><!-- /#projFormModal -->
 
           <section class="aq-admin-card" id="projListCard" aria-labelledby="projListTitle">
             <div class="aq-admin-card-head">
@@ -4591,6 +4627,18 @@
           <div class="dash-page-title">الأرشيف</div>
           <p class="aq-page-intro">الوحدات اللي اتأرشفت (خرجت من البحث النشط) بنفس أرقامها. الاسترجاع بيرجّع الوحدة نفسها لنفس الرقم — وبيترفض تلقائيًا لو فيه وحدة نشطة مطابقة (نفس قواعد كشف التكرار في الإدخال). الأرشفة نفسها ما بتتشغّلش من هنا.</p>
           <!-- PHASE 4 / STEP 5B (Report 078): تصدير الوحدات — OWNER فقط (الحارس الحقيقي في السيرفر: exportUnits). الملف بيتولّد في السيرفر ويرجع Base64 وينزل هنا كـ Blob — بدون أي رابط عام أو تخزين. -->
+          <!-- Report 087: البحث في الأرشيف والتصدير في مودالين (نفس النماذج والـ ids والمعالجات) — الصفحة تبدأ بالكروت -->
+          <div class="dev-page-actions arc-page-actions">
+            <button type="button" class="aq-btn aq-btn--secondary" id="archiveFilterOpenBtn" aria-haspopup="dialog" aria-controls="archiveFilterModal"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>بحث في الأرشيف<span class="aq-badge aq-badge--info arc-filter-badge" id="archiveFilterBadge" hidden></span></button>
+            <button type="button" class="aq-btn aq-btn--primary" id="unitExportOpenBtn" aria-haspopup="dialog" aria-controls="unitExportModal"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 17v3h16v-3"/></svg>تصدير الوحدات</button>
+          </div>
+
+          <div class="modal-overlay" id="unitExportModal" role="dialog" aria-modal="true" aria-labelledby="unitExportModalTitle">
+          <div class="modal-box arc-form-box">
+            <div class="modal-header">
+              <div class="modal-title" id="unitExportModalTitle">تصدير الوحدات</div>
+              <button class="modal-close" id="unitExportCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+            </div>
           <section class="aq-admin-card" id="unitExportCard" aria-labelledby="unitExportTitle">
             <div class="aq-admin-card-head"><div><h3 class="aq-admin-card-title" id="unitExportTitle">تصدير الوحدات</h3><p class="aq-admin-card-sub">ملف XLSX أو CSV بترتيب الشيت الأصلي — بدون بيانات اتصال المالك/الوكيل، الصور كروابط. الحد الأقصى 5,000 وحدة في الملف.</p></div></div>
             <form class="aq-form-grid aq-form-grid--2" id="unitExportForm" autocomplete="off">
@@ -4601,6 +4649,15 @@
               <div class="aq-form-field aq-form-actions"><button type="submit" class="aq-btn aq-btn--primary" id="uxExportBtn">تصدير</button> <span class="aq-form-help" id="uxStatus" aria-live="polite"></span></div>
             </form>
           </section>
+          </div><!-- /.modal-box -->
+          </div><!-- /#unitExportModal -->
+
+          <div class="modal-overlay" id="archiveFilterModal" role="dialog" aria-modal="true" aria-labelledby="archiveFilterModalTitle">
+          <div class="modal-box arc-form-box">
+            <div class="modal-header">
+              <div class="modal-title" id="archiveFilterModalTitle">بحث في الأرشيف</div>
+              <button class="modal-close" id="archiveFilterCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+            </div>
           <section class="aq-admin-card" id="archiveFilterCard" aria-labelledby="archiveFilterTitle">
             <div class="aq-admin-card-head"><div><h3 class="aq-admin-card-title" id="archiveFilterTitle">بحث في الأرشيف</h3><p class="aq-admin-card-sub">الأحدث أرشفةً أولًا</p></div></div>
             <form class="aq-form-grid aq-form-grid--2" id="archiveFilterForm" autocomplete="off">
@@ -4612,6 +4669,9 @@
               <div class="aq-form-field aq-form-actions"><button type="submit" class="aq-btn aq-btn--primary" id="arcSearchBtn">بحث</button> <button type="button" class="aq-btn aq-btn--ghost" id="arcClearBtn">مسح</button></div>
             </form>
           </section>
+          </div><!-- /.modal-box -->
+          </div><!-- /#archiveFilterModal -->
+
           <section class="aq-admin-card" id="archiveListCard" aria-labelledby="archiveListTitle">
             <div class="aq-admin-card-head"><div><h3 class="aq-admin-card-title" id="archiveListTitle">الوحدات المؤرشفة</h3><p class="aq-admin-card-sub" id="archiveListCount" aria-live="polite"></p></div></div>
             <div id="archiveListContent" class="aq-dev-grid"></div>
@@ -10998,6 +11058,27 @@
     else { var add = document.getElementById('devAddBtn'); if (add) { try { add.focus({ preventScroll: true }); } catch (e) {} } }
   }
   window.__aqarDevFormOpen = devFormOpen_; window.__aqarDevFormClose = devFormClose_;
+  /* Report 087: نفس سلوك مودال النموذج لأي مودال آخر (المشروعات، بحث الأرشيف، التصدير) — فتح/إغلاق، تركيز، Escape، عودة التركيز للزر الفاتح */
+  function aqFormModal_(id, firstFieldId) {
+    var opener = null;
+    function el() { return document.getElementById(id); }
+    function open(from) {
+      var m = el(); if (!m) return;
+      opener = from || document.activeElement;
+      m.classList.add('open'); m.scrollTop = 0;
+      var box = m.querySelector('.modal-box'); if (box) box.scrollTop = 0;
+      setTimeout(function () { try { (document.getElementById(firstFieldId) || m.querySelector('.modal-close')).focus({ preventScroll: true }); } catch (e) {} }, 30);
+    }
+    function close() {
+      var m = el(); if (!m || !m.classList.contains('open')) return;
+      m.classList.remove('open');
+      var back = opener; opener = null;
+      if (back && document.contains(back)) { try { back.focus({ preventScroll: true }); } catch (e) {} }
+    }
+    document.addEventListener('keydown', function (e) { var m = el(); if (e.key === 'Escape' && m && m.classList.contains('open')) { e.preventDefault(); close(); } });
+    return { open: open, close: close, isOpen: function () { var m = el(); return !!(m && m.classList.contains('open')); } };
+  }
+  window.__aqarFormModal = aqFormModal_;
   (function wireDevFormModal() {
     var add = document.getElementById('devAddBtn'), closeBtn = document.getElementById('devFormCloseBtn'), cancel = document.getElementById('devFormCancelBtn'), m = document.getElementById('devFormModal');
     if (!add || !m) return;
@@ -11567,7 +11648,23 @@
   function projSetFormMode_(name) {
     var b = document.getElementById('projFormModeBadge'); if (!b) return;
     if (name) { b.textContent = 'وضع التعديل: ' + name; b.hidden = false; } else { b.textContent = ''; b.hidden = true; }
+    var t = document.getElementById('projFormModalTitle'); if (t) t.textContent = name ? 'تعديل بيانات المشروع' : 'إضافة مشروع';
+    var head = document.querySelector('#projFormCard > .aq-admin-card-head'); if (head) head.hidden = !name;
   }
+  var projFormModal_ = aqFormModal_('projFormModal', 'projNameInput');
+  (function wireProjFormModal() {
+    var add = document.getElementById('projAddBtn'), closeBtn = document.getElementById('projFormCloseBtn'), cancel = document.getElementById('projFormCancelBtn');
+    if (!add) return;
+    projSetFormMode_(null);
+    add.addEventListener('click', function () {
+      var badge = document.getElementById('projFormModeBadge');
+      if (badge && !badge.hidden) projClearForm_();   // كان في وضع تعديل → نموذج فارغ؛ مسودة إضافة تفضل كما هي
+      projSetFormMode_(null);
+      projFormModal_.open(add);
+    });
+    if (closeBtn) closeBtn.addEventListener('click', projFormModal_.close);
+    if (cancel) cancel.addEventListener('click', projFormModal_.close);
+  })();
   // إفراغ الحقول فقط - بلا لمس رسالة الحفظ (saveProjectMsg). نفس فصل Developer Profile
   // بالضبط: مسار "بعد نجاح الحفظ" ومسار "زر تفريغ النموذج" لهما احتياجان مختلفان تجاه
   // رسالة الحفظ (الأول يجب أن يُبقيها ظاهرة، الثاني يجب أن يمسحها) فلا تشتركان بدالة واحدة.
@@ -11690,8 +11787,8 @@
     projGalleryImages = String(p['Gallery Images'] || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
     projRenderGalleryPreview_();
     projSetFormMode_(p['Project Name'] || '');
-    var card = document.getElementById('projFormCard');
-    if (card && card.scrollIntoView) card.scrollIntoView({ behavior: 'smooth', block: 'start' }); else window.scrollTo(0, 0);
+    document.getElementById('saveProjectMsg').textContent = '';
+    projFormModal_.open(document.activeElement);   // Report 087: نفس النموذج داخل المودال بعنوان "تعديل بيانات المشروع"
   }
   window.editProject = editProject;
 
@@ -11713,9 +11810,9 @@
   function renderProjectsList(projects) {
     var content = document.getElementById('projectsListContent');
     var countEl = document.getElementById('projListCount');
-    if (countEl) countEl.textContent = projects.length ? (projects.length + ' مشروع مسجَّل — اضغط "تعديل" لتحميل البيانات في النموذج') : '';
+    if (countEl) countEl.textContent = projects.length ? (projects.length + ' مشروع مسجَّل — اضغط "تعديل" لفتح بيانات المشروع') : '';
     if (!projects.length) {
-      content.innerHTML = '<div class="aq-empty" style="grid-column:1/-1"><h3>لا توجد مشروعات مسجَّلة بعد</h3><p>أضف أول ملف مشروع من النموذج أعلاه.</p></div>';
+      content.innerHTML = '<div class="aq-empty" style="grid-column:1/-1"><h3>لا توجد مشروعات مسجَّلة بعد</h3><p>أضف أول ملف مشروع من زر «إضافة مشروع».</p></div>';
       return;
     }
     content.innerHTML = projects.map(function (p) {
@@ -11794,6 +11891,8 @@
             __projectNamesCache[key] = true;
             delete __projectProfileCache[key]; // تحديث القادم يجيب النسخة الجديدة
             projClearFormFields_(); // إفراغ الحقول فقط - رسالة النجاح المضبوطة أعلاه تبقى ظاهرة (لا تُمسَح هنا)
+            if (typeof showToast === 'function') showToast(res.message || 'تم حفظ بيانات المشروع', 'success');
+            projFormModal_.close();   // Report 087: الإغلاق بعد الحفظ — الكارت يتحدّث في القائمة
             loadProjectsList();
           }
         })
@@ -13824,6 +13923,13 @@
     var btn = document.getElementById('uxExportBtn');
     var status = document.getElementById('uxStatus');
     if (!form || !btn) return;
+    // Report 087: النموذج داخل مودال — الزر في شريط الصفحة يفتحه؛ بعد التصدير المودال يفضل مفتوحًا لعرض الحالة
+    var uxModal_ = (typeof aqFormModal_ === 'function') ? aqFormModal_('unitExportModal', 'uxScope') : null;
+    var uxOpenBtn = document.getElementById('unitExportOpenBtn');
+    if (uxOpenBtn && uxModal_) {
+      uxOpenBtn.addEventListener('click', function () { setStatus_(''); uxModal_.open(uxOpenBtn); });
+      var uxClose = document.getElementById('unitExportCloseBtn'); if (uxClose) uxClose.addEventListener('click', uxModal_.close);
+    }
     var busy = false;
     var MSG = {
       NO_RESULTS: 'لا توجد وحدات مطابقة للتصدير — عدّل الفلاتر أو النطاق وحاول تاني',
@@ -13975,9 +14081,21 @@
         countEl.textContent = ''; pager.hidden = true;
       });
     }
-    function reload_() { state.filters = readFilters_(); return fetchPage_(1, false); }
-    form.addEventListener('submit', function (e) { e.preventDefault(); reload_(); });
-    document.getElementById('arcClearBtn').addEventListener('click', function () { form.reset(); reload_(); });
+    function reload_() { state.filters = readFilters_(); arcFilterBadge_(); return fetchPage_(1, false); }
+    // Report 087: نموذج البحث داخل مودال — الإرسال/المسح يغلقانه؛ الشارة بجانب الزر تعرض عدد الفلاتر المفعّلة
+    var arcFilterModal_ = (typeof aqFormModal_ === 'function') ? aqFormModal_('archiveFilterModal', 'arcUnitId') : null;
+    function arcFilterBadge_() {
+      var b = document.getElementById('archiveFilterBadge'); if (!b) return;
+      var n = Object.keys(state.filters).filter(function (k) { return state.filters[k]; }).length;
+      b.textContent = n ? String(n) : ''; b.hidden = !n;
+    }
+    var arcOpenBtn = document.getElementById('archiveFilterOpenBtn');
+    if (arcOpenBtn && arcFilterModal_) {
+      arcOpenBtn.addEventListener('click', function () { arcFilterModal_.open(arcOpenBtn); });
+      var arcClose = document.getElementById('archiveFilterCloseBtn'); if (arcClose) arcClose.addEventListener('click', arcFilterModal_.close);
+    }
+    form.addEventListener('submit', function (e) { e.preventDefault(); reload_(); if (arcFilterModal_) arcFilterModal_.close(); });
+    document.getElementById('arcClearBtn').addEventListener('click', function () { form.reset(); reload_(); if (arcFilterModal_) arcFilterModal_.close(); });
     moreBtn.addEventListener('click', function () { if (!state.loading && state.items.length < state.total) fetchPage_(state.page + 1, true); });
     content.addEventListener('click', function (e) {
       var card = e.target && e.target.closest ? e.target.closest('.arc-card') : null;
