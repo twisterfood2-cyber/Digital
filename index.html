@@ -3661,6 +3661,12 @@
       margin-bottom: var(--aq-space-4); padding: 8px 12px; border-radius: var(--aq-radius-sm);
       background: var(--aq-danger-tint); color: var(--aq-error-fg); font-size: var(--aq-fs-caption); font-weight: 700;
     }
+    .pc-notice { margin-bottom: var(--aq-space-4); padding: 8px 12px; border-radius: var(--aq-radius-sm); background: var(--aq-warning-tint); color: var(--aq-warning-soft); font-size: var(--aq-fs-caption); font-weight: 700; }   /* Report 089: تنبيه الدقة المنخفضة (غير مانع) */
+    .pc-hint { margin: var(--aq-space-2) 0 0; font-size: var(--aq-fs-caption); color: var(--aq-prop-text-muted); text-align: center; }
+    /* Report 089: صورة معتمدة بانتظار "حفظ التعديلات" داخل مودال الملف الشخصي */
+    #profEditModal .prof-photo-pending { display: none; margin: 4px 0 0; font-size: var(--aq-fs-caption); font-weight: 700; color: var(--aq-color-primary); }
+    #profEditModal .prof-photo-pending.is-on { display: inline-flex; align-items: center; gap: 6px; }
+    #profEditModal .prof-photo-pending .aq-btn { min-height: 32px; padding: 0 10px; font-size: var(--aq-fs-caption); }
     /* منطقة القص: نُظهر الصورة كاملة القابلة للسحب/التكبير، مع إطار مربّع واضح في المنتصف
      * وتعتيم كل ما هو خارجه (box-shadow بانتشار كبير جدًا — نافذة صافية داخل ستارة داكنة). */
     .pc-stage {
@@ -4837,7 +4843,8 @@
                 <div class="aq-form-label">الصورة الشخصية</div>
                 <p class="aq-form-help">صورة مربّعة واضحة — يتم قصّها قبل الرفع. الحد الأقصى 5 ميجابايت.</p>
                 <button type="button" class="aq-btn aq-btn--secondary" id="dashProfPhotoBtn">تغيير الصورة</button>
-                <input type="file" id="dashProfPhotoInput" accept="image/*" hidden>
+                <input type="file" id="dashProfPhotoInput" accept="image/png,image/jpeg,image/webp" hidden>
+                <span class="prof-photo-pending" id="dashProfPhotoPending"><span>صورة جديدة جاهزة — تُحفظ عند «حفظ التعديلات»</span><button type="button" class="aq-btn aq-btn--ghost" id="dashProfPhotoUndoBtn">تراجع</button></span>
               </div>
             </div>
             <div class="aq-form-grid aq-form-grid--2">
@@ -5091,14 +5098,16 @@
 <div class="modal-overlay" id="photoCropModal">
   <div class="modal-box pc-box">
     <div class="modal-header">
-      <div class="modal-title">قص الصورة الشخصية</div>
+      <div class="modal-title">تعديل صورة الملف الشخصي</div>
       <button class="modal-close" id="pcCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
     <div class="pc-error" id="pcError" hidden></div>
+    <div class="pc-notice" id="pcNotice" hidden></div>
     <div class="pc-stage" id="pcStage" aria-label="منطقة تحديد القص — اسحب لتحريك الصورة">
       <div class="pc-imgwrap" id="pcImgWrap"><img id="pcImage" alt="" draggable="false"></div>
       <div class="pc-frame" aria-hidden="true"></div>
     </div>
+    <p class="pc-hint">اسحب الصورة لضبط موضعها، واستخدم التكبير/التصغير — الجزء داخل الإطار هو ما سيظهر في صورتك.</p>
     <div class="pc-zoom-row">
       <button type="button" class="pc-zoom-btn" id="pcZoomOutBtn" aria-label="تصغير"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
       <input type="range" id="pcZoomSlider" class="pc-zoom-slider" min="0" max="100" value="0" aria-label="مستوى التكبير">
@@ -5111,7 +5120,7 @@
     <div class="pc-actions">
       <button type="button" class="pc-btn secondary" id="pcCancelBtn">إلغاء</button>
       <button type="button" class="pc-btn secondary" id="pcResetBtn">إعادة ضبط</button>
-      <button type="button" class="pc-btn primary" id="pcConfirmBtn">تأكيد القص</button>
+      <button type="button" class="pc-btn primary" id="pcConfirmBtn">استخدام الصورة</button>
     </div>
   </div>
 </div>
@@ -8772,7 +8781,7 @@
       /* مودال قصّ الصورة الشخصية - إلغاء بلا حفظ (نفس مسار زر "إلغاء"/×). أولوية قبل أي
        * مودال آخر لأنه غالبًا الأعلى ظهورًا لو فُتح. */
       var pcm = document.getElementById('photoCropModal');
-      if (pcm && pcm.classList.contains('open')) { e.preventDefault(); pcm.classList.remove('open'); return; }
+      if (pcm && pcm.classList.contains('open')) { e.preventDefault(); if (typeof window.__aqarPhotoCropClose === 'function') window.__aqarPhotoCropClose(); else pcm.classList.remove('open'); return; }
       var ov = document.getElementById('unitCardOverlay');
       if (ov && ov.classList.contains('open')) { ov.classList.remove('open'); return; }
       /* Phase 2B: مودال التأكيد (aqConfirm) يعالج Escape بنفسه؛ معرض الصور له × فقط (كما هو). */
@@ -11153,7 +11162,11 @@
       var back = opener; opener = null;
       if (back && document.contains(back)) { try { back.focus({ preventScroll: true }); } catch (e) {} }
     }
-    document.addEventListener('keydown', function (e) { var m = el(); if (e.key === 'Escape' && m && m.classList.contains('open')) { e.preventDefault(); close(); } });
+    document.addEventListener('keydown', function (e) {
+      var m = el(); if (e.key !== 'Escape' || e.defaultPrevented || !m || !m.classList.contains('open')) return;   // defaultPrevented = مودال أعلى (القصّ) استهلك Escape
+      var pcm = document.getElementById('photoCropModal'); if (pcm && pcm.classList.contains('open')) return;
+      e.preventDefault(); close();
+    });
     return { open: open, close: close, isOpen: function () { var m = el(); return !!(m && m.classList.contains('open')); } };
   }
   window.__aqarFormModal = aqFormModal_;
@@ -12770,7 +12783,7 @@
       return Math.hypot(a.x - b.x, a.y - b.y);
     }
     pcStageEl.addEventListener('pointerdown', function (e) {
-      pcStageEl.setPointerCapture(e.pointerId);
+      try { pcStageEl.setPointerCapture(e.pointerId); } catch (err) { /* مؤشر غير نشط (بعض المتصفحات/الأحداث الاصطناعية) — السحب يعمل بدون التقاط */ }
       pcActivePointers[e.pointerId] = { x: e.clientX, y: e.clientY };
       if (Object.keys(pcActivePointers).length >= 2) {
         pcDragging = false;
@@ -12820,8 +12833,11 @@
     function pcClose() {
       photoCropModalEl.classList.remove('open');
       pcOnConfirm = null;
-      pcImageEl.src = '';
+      pcImageEl.src = '';   // تحرير الصورة الكبيرة من الذاكرة
+      pcNaturalW = pcNaturalH = 0;
+      var pn = document.getElementById('pcNotice'); if (pn) pn.hidden = true;
     }
+    window.__aqarPhotoCropClose = pcClose;
     document.getElementById('pcCancelBtn').addEventListener('click', pcClose);
     document.getElementById('pcCloseBtn').addEventListener('click', pcClose);
     photoCropModalEl.addEventListener('click', function (e) { if (e.target === photoCropModalEl) pcClose(); });
@@ -12857,6 +12873,8 @@
           if (!pcNaturalW || !pcNaturalH) { pcShowError('تعذّر قراءة هذه الصورة — جرّب صورة أخرى.'); return; }
           pcImageEl.style.width = pcNaturalW + 'px';
           pcImageEl.style.height = pcNaturalH + 'px';
+          var pn = document.getElementById('pcNotice');
+          if (pn) { var low = Math.min(pcNaturalW, pcNaturalH) < 240; pn.textContent = low ? 'الصورة منخفضة الدقة وقد تظهر بجودة أقل.' : ''; pn.hidden = !low; }   /* Report 089 */
           requestAnimationFrame(pcResetCrop);
         };
         pcImageEl.onerror = function () { pcShowError('تعذّر فتح هذا الملف — تأكد أنه صورة صالحة (JPG/PNG/WebP).'); };
@@ -12974,8 +12992,17 @@
     }
 
     var dashProfEditModal_ = null;
+    var dashProfPendingPhoto_ = null;   // Report 089: الصورة المقصوصة (dataURL JPEG مربّع) بانتظار "حفظ التعديلات" — لا رفع قبلها
+    function dashProfSetPending_(dataUrl) {
+      dashProfPendingPhoto_ = dataUrl || null;
+      var av = document.getElementById('dashProfAvatar');
+      if (av) av.innerHTML = dataUrl ? '<img id="dashProfEditImg" src="' + dataUrl + '" alt="">' : dashProfAvatarHtml_(dashProfState_ || {}, 'dashProfEditImg');
+      var pend = document.getElementById('dashProfPhotoPending'); if (pend) pend.classList.toggle('is-on', !!dataUrl);
+    }
     function dashProfileOpenEdit_(opener) {
       var p = dashProfState_ || {};
+      dashProfPendingPhoto_ = null;
+      var pend0 = document.getElementById('dashProfPhotoPending'); if (pend0) pend0.classList.remove('is-on');
       var nm = document.getElementById('dashProfName'); if (nm) nm.value = (p.name && p.name !== '—') ? p.name : '';
       var ph = document.getElementById('dashProfPhone'); if (ph) ph.value = p.phone || '';
       var em = document.getElementById('dashProfEmailRo'); if (em) em.value = p.email || '';
@@ -12999,8 +13026,12 @@
       dashProfileWired_ = true;
       dashProfEditModal_ = (typeof window.__aqarFormModal === 'function') ? window.__aqarFormModal('profEditModal', 'dashProfName') : null;
       var closeBtn = document.getElementById('profEditCloseBtn'), cancelBtn = document.getElementById('profEditCancelBtn');
-      if (closeBtn && dashProfEditModal_) closeBtn.addEventListener('click', dashProfEditModal_.close);
-      if (cancelBtn && dashProfEditModal_) cancelBtn.addEventListener('click', dashProfEditModal_.close);
+      // Report 089: إغلاق/إلغاء التعديل = التخلي عن الصورة المعتمدة غير المحفوظة (الصورة القديمة تبقى)
+      var discardAndClose = function () { dashProfSetPending_(null); if (dashProfEditModal_) dashProfEditModal_.close(); };
+      if (closeBtn) closeBtn.addEventListener('click', discardAndClose);
+      if (cancelBtn) cancelBtn.addEventListener('click', discardAndClose);
+      var undoBtn = document.getElementById('dashProfPhotoUndoBtn'); if (undoBtn) undoBtn.addEventListener('click', function () { dashProfSetPending_(null); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && dashProfPendingPhoto_ && dashProfEditModal_ && !dashProfEditModal_.isOpen()) dashProfSetPending_(null); });   // Escape أغلق مودال التعديل → تخلٍّ عن الصورة المعتمدة
       var msgEl = document.getElementById('dashProfMsg');
       var setMsg = function (t, ok) {
         if (!msgEl) return;
@@ -13015,6 +13046,9 @@
         name = name.trim();
         if (!name) { setMsg('الاسم مطلوب', false); return; }
         saveBtn.disabled = true; saveBtn.textContent = 'جاري الحفظ…'; setMsg('', true);
+        // Report 089: الصورة المعتمدة تُرفع أولًا عبر uploadMyPhoto القائمة (نفس المدخلات) ثم تُحفظ البيانات — فشل الرفع يوقف الحفظ ويُبقي الصورة القديمة
+        var pendingPhoto = dashProfPendingPhoto_;
+        var proceed = function () {
         google.script.run
           .withSuccessHandler(function (res) {
             saveBtn.disabled = false; saveBtn.textContent = 'حفظ التعديلات';
@@ -13032,6 +13066,24 @@
             setMsg('حدث خطأ: ' + (err && err.message ? err.message : 'تعذّر الحفظ'), false);
           })
           .updateMyProfile(dashProfileAuth(), { name: name, phone: phone.trim() });
+        };
+        if (!pendingPhoto) { proceed(); return; }
+        saveBtn.textContent = 'جاري رفع الصورة…'; setMsg('جاري رفع الصورة…', true);
+        google.script.run
+          .withSuccessHandler(function (res) {
+            if (!res || !res.success) { saveBtn.disabled = false; saveBtn.textContent = 'حفظ التعديلات'; setMsg((res && res.message) || 'فشل رفع الصورة', false); return; }
+            if (window.__currentUser) window.__currentUser.photo = res.url || '';
+            if (dashProfState_) dashProfState_.photo = res.url || '';
+            dashProfSetPending_(null);   // الصورة بقت محفوظة فعليًا — المعاينة من الرابط النهائي
+            dashProfileRefreshHero_();
+            saveBtn.textContent = 'جاري الحفظ…';
+            proceed();
+          })
+          .withFailureHandler(function (err) {
+            saveBtn.disabled = false; saveBtn.textContent = 'حفظ التعديلات';
+            setMsg('حدث خطأ: ' + (err && err.message ? err.message : 'تعذّر رفع الصورة'), false);
+          })
+          .uploadMyPhoto(dashProfileAuth(), pendingPhoto.split(',')[1], 'image/jpeg');
       });
 
       var photoBtn = document.getElementById('dashProfPhotoBtn');
@@ -13042,34 +13094,13 @@
           var file = this.files && this.files[0];
           this.value = ''; // يسمح باختيار نفس الملف تاني لاحقًا (قبل/بعد الإلغاء سيّان)
           if (!file) return;
-          if (!/^image\//.test(file.type)) { setMsg('اختر ملف صورة صالحًا', false); return; }
+          if (!/^image\/(png|jpe?g|webp)$/i.test(file.type)) { setMsg('اختر صورة JPG أو PNG أو WebP', false); return; }   // Report 089: بدون SVG/ملفات غير صور
           if (file.size > 5 * 1024 * 1024) { setMsg('الصورة كبيرة جدًا (الحد 5 ميجابايت)', false); return; }
-          // القصّ أولًا (تفاعلي بالكامل على المتصفح) - الرفع الفعلي عبر uploadMyPhoto القائمة
-          // لا يحدث إلا بعد "تأكيد القص"؛ الإلغاء لا يغيّر الصورة الحالية إطلاقًا.
+          setMsg('', true);
+          // Report 089: القصّ/الضبط ثم "استخدام الصورة" = اعتماد مؤقت فقط (بدون رفع) — الرفع الفعلي عند "حفظ التعديلات".
           openPhotoCropModal(file, function (croppedDataUrl) {
-            var av = document.getElementById('dashProfAvatar');
-            if (av) av.innerHTML = '<img src="' + croppedDataUrl + '" alt="">';
-            var b64 = croppedDataUrl.split(',')[1];
-            if (photoBtn) { photoBtn.disabled = true; photoBtn.textContent = 'جاري الرفع…'; }
-            setMsg('جاري رفع الصورة…', true);
-            google.script.run
-              .withSuccessHandler(function (res) {
-                if (photoBtn) { photoBtn.disabled = false; photoBtn.textContent = 'تغيير الصورة'; }
-                if (!res || !res.success) { setMsg((res && res.message) || 'فشل رفع الصورة', false); return; }
-                if (window.__currentUser) window.__currentUser.photo = res.url || '';
-                if (dashProfState_) dashProfState_.photo = res.url || '';
-                var av2 = document.getElementById('dashProfAvatar');
-                if (av2 && res.url) av2.innerHTML = '<img id="dashProfEditImg" src="' + dashProfileEsc(res.url) + '" alt="">';
-                dashProfileRefreshHero_();
-                setMsg(res.message || 'تم تحديث الصورة', true);
-                if (typeof showToast === 'function') showToast(res.message || 'تم تحديث صورتك', 'success');
-                dashProfileSyncElsewhere();
-              })
-              .withFailureHandler(function (err) {
-                if (photoBtn) { photoBtn.disabled = false; photoBtn.textContent = 'تغيير الصورة'; }
-                setMsg('حدث خطأ: ' + (err && err.message ? err.message : 'تعذّر رفع الصورة'), false);
-              })
-              .uploadMyPhoto(dashProfileAuth(), b64, 'image/jpeg');
+            dashProfSetPending_(croppedDataUrl);
+            setMsg('الصورة الجديدة جاهزة — اضغط «حفظ التعديلات» لاعتمادها', true);
           });
         });
       }
