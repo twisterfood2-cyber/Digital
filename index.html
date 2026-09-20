@@ -2535,7 +2535,7 @@
     body.app-view-explore .aq-hero {
       grid-template-columns: 1fr; min-height: 0; padding: 12px;
       background: var(--aq-prop-surface); border: 1px solid var(--aq-prop-border);
-      border-radius: var(--aq-prop-radius); box-shadow: var(--aq-prop-shadow);
+      border-radius: var(--aq-prop-radius); box-shadow: var(--aq-elev-panel);   /* Report 092: أعلى ارتفاعًا من الكروت — لوحة عائمة */
       margin-bottom: var(--aq-space-4);
       position: sticky; top: calc(var(--aq-header-h) + 8px); z-index: 20;
       /* إخفاء/إظهار ذكي عند التمرير (Part 1): نطوي الارتفاع الفعلي (max-height مقاس فعليًا
@@ -2603,10 +2603,17 @@
      * لوحة سعر Premium، المطور، وسطر "أضيفت • آخر تعديل" - كله بأقل ارتفاع ممكن.
      * ========================================================================= */
     /* Report 068: الحاوية على توكنز 066 — سطح/حدّ/زوايا/ظل واحد؛ hover = رفع خفيف + الدرجة الأعلى من الظل */
+    /* Report 092: عمق مرئي أوضح بلا تغميق — ظل قريب خفيف + ظل محيط أوسع وأنعم (نفس صبغة الظلال الخضراء الداكنة للهوية)؛
+       تدرّج الارتفاع: الخلفية < الكروت < لوحة البحث. الأبعاد/الزوايا/المحتوى بلا تغيير. */
+    :root {
+      --aq-elev-card:       0 1px 2px rgba(11,40,33,0.06), 0 4px 12px rgba(11,40,33,0.09), 0 18px 40px rgba(11,40,33,0.14);
+      --aq-elev-card-hover: 0 2px 4px rgba(11,40,33,0.06), 0 10px 20px rgba(11,40,33,0.12), 0 26px 52px rgba(11,40,33,0.18);
+      --aq-elev-panel:      0 1px 2px rgba(11,40,33,0.06), 0 10px 24px rgba(11,40,33,0.12), 0 32px 72px rgba(11,40,33,0.20);
+    }
     body.aq-search-ui .unit-card {
       background: var(--aq-color-surface); color: var(--aq-color-text);
       border: 1px solid var(--aq-color-border); border-right: 1px solid var(--aq-color-border);
-      border-radius: var(--radius-lg); box-shadow: var(--shadow-2);
+      border-radius: var(--radius-lg); box-shadow: var(--aq-elev-card);
       -webkit-backdrop-filter: none; backdrop-filter: none;
       padding: var(--aq-space-3); overflow: hidden; display: flex; flex-direction: column;
       transition: transform var(--ease), box-shadow var(--ease), border-color var(--ease);
@@ -2614,7 +2621,7 @@
     }
     body.aq-search-ui .unit-card:hover {
       background: var(--aq-color-surface); transform: translateY(-2px);
-      border-color: var(--aq-color-primary-line); box-shadow: var(--shadow-3);
+      border-color: var(--aq-color-primary-line); box-shadow: var(--aq-elev-card-hover);
     }
     body.aq-search-ui .unit-card:focus-visible { outline: 2px solid var(--aq-prop-green); outline-offset: 2px; }
     /* الصورة: الحاوية تحدد المساحة (نسبة ثابتة) والصورة تملؤها بقصّ مركزي - لا تتحكم أبعاد الصورة في الكارت */
@@ -3992,7 +3999,7 @@
     <button type="button" class="top-action-btn app-nav-btn" id="navExploreBtn" data-app-view="explore" data-route="explore"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m14.9 9.1-2 5.8-5.8 2 2-5.8Z"/></svg><span>استكشف</span></button>
     <button type="button" class="top-action-btn app-nav-btn top-action-calc" id="calcFabBtn" data-route="quote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/><line x1="16" y1="18" x2="16" y2="18"/></svg><span>عرض السعر</span></button>
     <button type="button" class="top-action-btn app-nav-btn top-action-price" id="priceInfoFabBtn" data-route="meter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>سعر المتر</span></button>
-    <button type="button" class="top-action-btn app-nav-btn" id="navAddUnitBtn" data-app-view="add" data-route="add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>إدخال وحدة</span></button>
+    <button type="button" class="top-action-btn app-nav-btn" id="navAddUnitBtn" data-app-view="add" data-route="add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>إضافة وحدة</span></button>
     <a href="https://resale-units.vercel.app/" target="_blank" rel="noopener" class="top-action-btn app-nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg><span>وحدات إعادة البيع</span></a>
     <!-- "الإحصائيات والمخزون" أُزيل من الشريط الرئيسي — الوصول إليه من لوحة التحكم / الشريط الجانبي فقط، وحسب صلاحية VIEW_STATISTICS. -->
     <button type="button" class="top-action-btn app-nav-btn top-action-admin" id="adminFab" data-app-view="dashboard" data-route="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>لوحة التحكم</span></button>
@@ -6904,7 +6911,7 @@
                   title: 'عرض السعر', subtitle: 'احسب عرض السعر وخطة السداد لوحدة' },
     meter:     { hash: '#meter',     view: 'meter',     navId: 'priceInfoFabBtn', navPerm: null,       perm: null,              label: 'سعر المتر',
                   title: 'سعر المتر', subtitle: 'متوسط سعر المتر لكل منطقة' },
-    add:       { hash: '#add',       view: 'add',       navId: 'navAddUnitBtn',   navPerm: 'ADD_UNIT', perm: 'ADD_UNIT',        label: 'إدخال وحدة',
+    add:       { hash: '#add',       view: 'add',       navId: 'navAddUnitBtn',   navPerm: 'ADD_UNIT', perm: 'ADD_UNIT',        label: 'إضافة وحدة',   /* Report 092: تسمية الزر فقط — المسار/الصلاحية/السلوك كما هي */
                   title: 'إدخال وحدة جديدة', subtitle: 'أضف وحدة جديدة إلى قاعدة البيانات',
                  denyMsg: 'صلاحيتك الحالية لا تسمح بإضافة وحدات' },
     /* ---- Phase 3B: أقسام لوحة التحكم كمسارات داخلية (#dashboard/<section>) ----
