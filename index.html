@@ -3744,10 +3744,10 @@
       .pc-actions { flex-direction: column; }
       .pc-btn { width: 100%; }
     }
-    /* Report 095: زر «إضافة مشروع» داخل الحالة الفارغة لملف المشروع */
-    #projectProfileModal .aq-empty-actions { margin-top: var(--aq-space-2); display: flex; justify-content: center; }
-    #projectProfileModal .aq-empty-actions .aq-btn { min-width: 180px; }
-    #projectProfileModal .aq-empty-actions .aq-btn svg { width: 16px; height: 16px; opacity: 1; }   /* لا ترث حجم أيقونة الحالة الفارغة (42px) */
+    /* Report 095/096: زر «إضافة مشروع» / «إضافة مطور» داخل الحالة الفارغة لملف المشروع / ملف المطوّر */
+    #projectProfileModal .aq-empty-actions, #developerProfileModal .aq-empty-actions { margin-top: var(--aq-space-3); display: flex; justify-content: center; }
+    #projectProfileModal .aq-empty-actions .aq-btn, #developerProfileModal .aq-empty-actions .aq-btn { min-width: 180px; }
+    #projectProfileModal .aq-empty-actions .aq-btn svg, #developerProfileModal .aq-empty-actions .aq-btn svg { width: 16px; height: 16px; opacity: 1; }   /* لا ترث حجم أيقونة الحالة الفارغة (42px) */
     /* Report 090: محرّر لوجو المطوّر — يعيد استخدام أصناف .pc-* + بلاطة اللوجو نفسها للمعاينة */
     #devLogoCropModal .modal-box.dl-box { max-width: var(--aq-modal-md); background: var(--aq-color-surface); color: var(--aq-color-text); border: 1px solid var(--aq-color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-3); padding: var(--aq-modal-pad); }
     #devLogoCropModal .modal-header { display: flex; align-items: center; justify-content: space-between; gap: var(--aq-space-3); margin-bottom: var(--aq-space-4); }
@@ -7988,7 +7988,18 @@
 
   let currentDevProfile = null;
 
+  function dpCanAddDeveloper_() { return typeof roleActive === 'function' && roleActive() && typeof hasPermission === 'function' && hasPermission('MANAGE_DEVELOPERS'); }
+  var __dpContextName = '';
+  function dpAddDeveloperFromProfile_() {
+    var draft = { name: __dpContextName };
+    developerProfileModal.classList.remove('open');
+    window.__aqarDeveloperDraft = draft;                                 // تُستهلك مرة واحدة عند فتح قسم "المطوّرون" (dashSelect)
+    var target = ROUTE_REGISTRY.developers.hash;                         // نفس مسار القسم القائم — بلا مسار جديد
+    if (location.hash === target) { if (typeof window.__aqarOpenAddDeveloper === 'function') { window.__aqarDeveloperDraft = null; window.__aqarOpenAddDeveloper(draft); } }
+    else location.hash = target;
+  }
   function showDeveloperProfile(developerName) {
+    __dpContextName = String(developerName || '').trim();   // Report 096: سياق المطوّر للحالة الفارغة
     document.getElementById('devProfileTitle').textContent = developerName;
     developerProfileModal.classList.add('open');
     const content = document.getElementById('devProfileContent');
@@ -7999,7 +8010,12 @@
       .withSuccessHandler(function(res) {
         if (!res.success) { content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:24px;">حصل خطأ في التحميل</div>'; return; }
         if (!res.found) {
-          content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:24px; line-height:1.8;">لسه معندناش بيانات مسجلة عن المطور ده.<br>تقدر تضيفها من لوحة التحكم</div>';
+          // Report 096: الحالة الفارغة قابلة للتنفيذ — زر «إضافة مطور» لمن يملك MANAGE_DEVELOPERS فقط (نفس شرط قسم "المطوّرون")؛
+          // الزر ينقل للقسم القائم ويفتح نموذج الإضافة القائم (#devAddBtn → #devFormModal) مع تمرير الاسم كمسودة — لا إنشاء تلقائي.
+          var action = dpCanAddDeveloper_()
+            ? '<div class="aq-empty-actions"><button type="button" class="aq-btn aq-btn--primary" id="dpAddDeveloperBtn"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> إضافة مطور</button></div>'
+            : '';
+          content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:24px; line-height:1.8;">لسه معندناش بيانات مسجلة عن المطور ده.<br>تقدر تضيفها من لوحة التحكم' + action + '</div>';
           return;
         }
         currentDevProfile = res;
@@ -8158,6 +8174,7 @@
 
   document.getElementById('devProfileCloseBtn').addEventListener('click', () => developerProfileModal.classList.remove('open'));
   developerProfileModal.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
+  document.getElementById('devProfileContent').addEventListener('click', function (e) { if (e.target.closest && e.target.closest('#dpAddDeveloperBtn')) { e.preventDefault(); dpAddDeveloperFromProfile_(); } });   // Report 096
 
   function renderSimilarUnits(units) {
     const content = document.getElementById('similarUnitsContent');
@@ -11535,6 +11552,14 @@
     });
     if (closeBtn) closeBtn.addEventListener('click', devFormClose_);
     if (cancel) cancel.addEventListener('click', devFormClose_);
+    // Report 096: فتح نموذج الإضافة القائم برمجيًا (من الحالة الفارغة لملف المطوّر) — نفس نقرة «إضافة مطوّر» ثم تعبئة حقل الاسم
+    // لو فاضي فقط بالاسم القادم من تفاصيل الوحدة/الرئيسية (بلا حفظ ولا نداء API).
+    window.__aqarOpenAddDeveloper = function (draft) {
+      if (!add) return;
+      add.click();
+      var n = document.getElementById('devProfileNameInput');
+      if (draft && n && !n.value.trim() && draft.name) n.value = draft.name;
+    };
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !e.defaultPrevented && m.classList.contains('open')) { e.preventDefault(); devFormClose_(); } });   // Report 090: defaultPrevented = محرّر اللوجو استهلك Escape
   })();
   // الرفع يسبق الحفظ. بلا لوجو مختار → الحفظ يكمل فورًا (السلوك الأصلي كما هو).
@@ -12795,7 +12820,10 @@
       else if (key === 'profile') dashRenderProfile();
       else if (key === 'users' && typeof window.__aqarLoadUsers === 'function') window.__aqarLoadUsers();
       else if (key === 'settings') dashReparentSettingsOnce();
-      else if (key === 'developers' && typeof window.__aqarLoadDevelopers === 'function') window.__aqarLoadDevelopers();
+      else if (key === 'developers' && typeof window.__aqarLoadDevelopers === 'function') {
+        window.__aqarLoadDevelopers();
+        if (window.__aqarDeveloperDraft && typeof window.__aqarOpenAddDeveloper === 'function') { var dd_ = window.__aqarDeveloperDraft; window.__aqarDeveloperDraft = null; window.__aqarOpenAddDeveloper(dd_); }   // Report 096
+      }
       else if (key === 'projects' && typeof window.__aqarLoadProjects === 'function') {
         window.__aqarLoadProjects();
         if (window.__aqarProjectDraft && typeof window.__aqarOpenAddProject === 'function') { var pd_ = window.__aqarProjectDraft; window.__aqarProjectDraft = null; window.__aqarOpenAddProject(pd_); }   // Report 095
