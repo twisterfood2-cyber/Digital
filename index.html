@@ -3744,6 +3744,10 @@
       .pc-actions { flex-direction: column; }
       .pc-btn { width: 100%; }
     }
+    /* Report 095: زر «إضافة مشروع» داخل الحالة الفارغة لملف المشروع */
+    #projectProfileModal .aq-empty-actions { margin-top: var(--aq-space-2); display: flex; justify-content: center; }
+    #projectProfileModal .aq-empty-actions .aq-btn { min-width: 180px; }
+    #projectProfileModal .aq-empty-actions .aq-btn svg { width: 16px; height: 16px; opacity: 1; }   /* لا ترث حجم أيقونة الحالة الفارغة (42px) */
     /* Report 090: محرّر لوجو المطوّر — يعيد استخدام أصناف .pc-* + بلاطة اللوجو نفسها للمعاينة */
     #devLogoCropModal .modal-box.dl-box { max-width: var(--aq-modal-md); background: var(--aq-color-surface); color: var(--aq-color-text); border: 1px solid var(--aq-color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-3); padding: var(--aq-modal-pad); }
     #devLogoCropModal .modal-header { display: flex; align-items: center; justify-content: space-between; gap: var(--aq-space-3); margin-bottom: var(--aq-space-4); }
@@ -7223,7 +7227,7 @@
     const projectIsClickable = has(projectNameRaw);
     const projectNameDisplay = esc(projectNameRaw || u['City']);
     const projectNameLinkHtml = projectIsClickable
-      ? `<a class="ud-link" href="javascript:void(0)" onclick='event.stopPropagation(); showProjectProfile(${attrJson_(projectNameRaw)}, ${attrJson_(u['Project Location URL'] || '')})'>${projectNameDisplay}</a>`
+      ? `<a class="ud-link" href="javascript:void(0)" onclick='event.stopPropagation(); showProjectProfile(${attrJson_(projectNameRaw)}, ${attrJson_(u['Project Location URL'] || '')}, ${attrJson_(u['Developer Name'] || '')})'>${projectNameDisplay}</a>`
       : projectNameDisplay;
 
     /* ---------- الملخّص (يمين المعرض على الشاشات العريضة) ---------- */
@@ -7330,7 +7334,7 @@
     const devTile = u['Developer Name'] ? `<div class="ud-tile">${ICON.building}<div class="ud-tile-txt"><span class="ud-tile-label">المطور</span><a class="ud-tile-value ud-link" href="javascript:void(0)" onclick='closeUnitCardOverlay(); showDeveloperProfile(${attrJson_(u['Developer Name'])})'>${esc(u['Developer Name'])}</a></div></div>` : '';
     // نفس منطق ud-name أعلاه بالحرف الواحد: رابط دومًا لو موجود اسم مشروع (بنفس فلسفة بلاطة "المطور").
     // بخلاف بلاطة "المطور" - لا نغلق تفاصيل الوحدة عند الضغط (ملف المشروع يظهر فوقها).
-    const projTile = ppHas_(projectNameRaw) ? `<div class="ud-tile">${ICON.building}<div class="ud-tile-txt"><span class="ud-tile-label">اسم المشروع</span><span class="ud-tile-value">${projectIsClickable ? `<a class="ud-link" href="javascript:void(0)" onclick='event.stopPropagation(); showProjectProfile(${attrJson_(projectNameRaw)}, ${attrJson_(u['Project Location URL'] || '')})'>${esc(projectNameRaw)}</a>` : esc(projectNameRaw)}</span></div></div>` : '';
+    const projTile = ppHas_(projectNameRaw) ? `<div class="ud-tile">${ICON.building}<div class="ud-tile-txt"><span class="ud-tile-label">اسم المشروع</span><span class="ud-tile-value">${projectIsClickable ? `<a class="ud-link" href="javascript:void(0)" onclick='event.stopPropagation(); showProjectProfile(${attrJson_(projectNameRaw)}, ${attrJson_(u['Project Location URL'] || '')}, ${attrJson_(u['Developer Name'] || '')})'>${esc(projectNameRaw)}</a>` : esc(projectNameRaw)}</span></div></div>` : '';
     const projTiles = [
       projTile,
       devTile,
@@ -8260,9 +8264,26 @@
   function ppEsc_(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
   function ppHas_(v) { return v !== undefined && v !== null && String(v).trim() !== ''; }
 
+  // Report 095: الحالة الفارغة قابلة للتنفيذ — زر «إضافة مشروع» يظهر فقط لمن يملك MANAGE_PROJECTS (نفس شرط قسم "المشروعات"
+  // في لوحة التحكم: دور مؤكَّد + الصلاحية؛ الباك-إند يظل مصدر الحقيقة). الزر ينقل فقط للقسم القائم ويفتح نموذج الإضافة
+  // القائم (#projAddBtn → #projFormModal) مع تمرير اسم المشروع/المطوّر كمسودة تُملأ في الحقول الفارغة — لا إنشاء تلقائي ولا نداء API.
+  function ppCanAddProject_() { return typeof roleActive === 'function' && roleActive() && typeof hasPermission === 'function' && hasPermission('MANAGE_PROJECTS'); }
+  var __ppContext = { name: '', developer: '' };
+  function ppAddProjectFromProfile_() {
+    var draft = { name: __ppContext.name, developer: __ppContext.developer };
+    closeProjectProfileModal();
+    if (typeof closeUnitCardOverlay === 'function') closeUnitCardOverlay();
+    window.__aqarProjectDraft = draft;                                   // تُستهلك مرة واحدة عند فتح قسم "المشروعات" (dashSelect)
+    var target = ROUTE_REGISTRY.projects.hash;                           // نفس مسار القسم القائم — بلا مسار جديد
+    if (location.hash === target) { if (typeof window.__aqarOpenAddProject === 'function') { window.__aqarProjectDraft = null; window.__aqarOpenAddProject(draft); } }
+    else location.hash = target;
+  }
   function buildProjectProfileHtml_(res, unitLocationFallback) {
     if (!res || !res.success || res.found === false) {
-      return '<div class="ud-top"><h3 class="ud-top-title">' + ICON.building + ' ملف المشروع</h3></div><div class="ud-body"><div class="aq-empty"><h3>لا توجد تفاصيل مسجلة لهذا المشروع حاليًا.</h3></div></div>';
+      var action = ppCanAddProject_()
+        ? '<div class="aq-empty-actions"><button type="button" class="aq-btn aq-btn--primary" id="ppAddProjectBtn"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> إضافة مشروع</button></div>'
+        : '';
+      return '<div class="ud-top"><h3 class="ud-top-title">' + ICON.building + ' ملف المشروع</h3></div><div class="ud-body"><div class="aq-empty"><h3>لا توجد تفاصيل مسجلة لهذا المشروع حاليًا.</h3>' + action + '</div></div>';
     }
     var tile = function (icon, label, value) { return ppHas_(value) ? ('<div class="ud-tile">' + icon + '<div class="ud-tile-txt"><span class="ud-tile-label">' + label + '</span><span class="ud-tile-value">' + ppEsc_(value) + '</span></div></div>') : ''; };
     var section = function (icon, title, inner) { return inner ? ('<section class="ud-sec"><h4 class="ud-sec-title">' + icon + title + '</h4>' + inner + '</section>') : ''; };
@@ -8320,11 +8341,12 @@
       '</div>';
   }
 
-  function showProjectProfile(projectName, unitLocationFallback) {
+  function showProjectProfile(projectName, unitLocationFallback, developerName) {
     var key = String(projectName || '').trim().toUpperCase();
     if (!key) return;
     var modal = document.getElementById('projectProfileModal');
     var body = document.getElementById('projectProfileBody');
+    __ppContext = { name: String(projectName || '').trim(), developer: String(developerName || '').trim() };   // Report 095: سياق المشروع للحالة الفارغة
     modal.classList.add('open');
     if (__projectProfileCache[key]) {
       body.innerHTML = buildProjectProfileHtml_(__projectProfileCache[key], unitLocationFallback);
@@ -8345,6 +8367,7 @@
   }
   document.getElementById('projectProfileCloseBtn').addEventListener('click', closeProjectProfileModal);
   document.getElementById('projectProfileModal').addEventListener('click', function (e) { if (e.target === this) closeProjectProfileModal(); });
+  document.getElementById('projectProfileBody').addEventListener('click', function (e) { if (e.target.closest && e.target.closest('#ppAddProjectBtn')) { e.preventDefault(); ppAddProjectFromProfile_(); } });   // Report 095
 
   // تحميل قائمة أسماء المشاريع في الخلفية بعد استقرار الجلسة - نداء واحد لكل الجلسة
   // (نفس توقيت loadCoverImage تقريبًا)، فيصبح اسم المشروع قابلًا للضغط من أول فتح تفاصيل وحدة.
@@ -12001,6 +12024,16 @@
     });
     if (closeBtn) closeBtn.addEventListener('click', projFormModal_.close);
     if (cancel) cancel.addEventListener('click', projFormModal_.close);
+    // Report 095: فتح نموذج الإضافة القائم برمجيًا (من الحالة الفارغة لملف المشروع) — نفس نقرة زر «إضافة مشروع» ثم تعبئة
+    // الحقلين الفارغين فقط باسم المشروع/المطوّر القادمَين من تفاصيل الوحدة (بلا حفظ ولا نداء API).
+    window.__aqarOpenAddProject = function (draft) {
+      if (!add) return;
+      add.click();
+      if (!draft) return;
+      var n = document.getElementById('projNameInput'), d = document.getElementById('projDeveloperInput');
+      if (n && !n.value.trim() && draft.name) n.value = draft.name;
+      if (d && !d.value.trim() && draft.developer) d.value = draft.developer;
+    };
   })();
   // إفراغ الحقول فقط - بلا لمس رسالة الحفظ (saveProjectMsg). نفس فصل Developer Profile
   // بالضبط: مسار "بعد نجاح الحفظ" ومسار "زر تفريغ النموذج" لهما احتياجان مختلفان تجاه
@@ -12763,7 +12796,10 @@
       else if (key === 'users' && typeof window.__aqarLoadUsers === 'function') window.__aqarLoadUsers();
       else if (key === 'settings') dashReparentSettingsOnce();
       else if (key === 'developers' && typeof window.__aqarLoadDevelopers === 'function') window.__aqarLoadDevelopers();
-      else if (key === 'projects' && typeof window.__aqarLoadProjects === 'function') window.__aqarLoadProjects();
+      else if (key === 'projects' && typeof window.__aqarLoadProjects === 'function') {
+        window.__aqarLoadProjects();
+        if (window.__aqarProjectDraft && typeof window.__aqarOpenAddProject === 'function') { var pd_ = window.__aqarProjectDraft; window.__aqarProjectDraft = null; window.__aqarOpenAddProject(pd_); }   // Report 095
+      }
       else if (key === 'archive' && typeof window.__aqarLoadArchive === 'function') window.__aqarLoadArchive();
       else if (key === 'audit' && typeof window.__aqarLoadAudit === 'function') window.__aqarLoadAudit();
     }
