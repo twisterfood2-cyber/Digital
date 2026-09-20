@@ -3744,6 +3744,16 @@
       .pc-actions { flex-direction: column; }
       .pc-btn { width: 100%; }
     }
+    /* Report 097: حقل بحث القوائم الإدارية (المطوّرون/المشروعات) — نفس .aq-form-control + أيقونة بحث + زر مسح؛ يجلس في رأس البطاقة ويلتفّ تحت العنوان على الشاشات الضيقة */
+    .aq-list-search { position: relative; flex: 0 1 320px; min-width: 200px; align-self: center; }
+    .aq-list-search > .ico { position: absolute; inset-inline-start: 12px; top: 50%; width: 16px; height: 16px; transform: translateY(-50%); color: var(--aq-color-primary); pointer-events: none; }
+    .aq-list-search .aq-form-control { padding-inline-start: 36px; padding-inline-end: 36px; min-height: var(--aq-btn-h-compact); }
+    .aq-list-search .aq-form-control::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }   /* زر المسح الخاص بنا بدل الأصلي */
+    .aq-list-search-clear { position: absolute; inset-inline-end: 6px; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; border-radius: 50%; border: 0; background: transparent; color: var(--aq-prop-text-muted); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
+    .aq-list-search-clear[hidden] { display: none; }
+    .aq-list-search-clear:hover { background: var(--aq-prop-green-soft); color: var(--aq-prop-green); }
+    .aq-list-search-clear .ico { width: 14px; height: 14px; }
+    @media (max-width: 640px) { .aq-list-search { flex-basis: 100%; min-width: 0; } }
     /* Report 095/096: زر «إضافة مشروع» / «إضافة مطور» داخل الحالة الفارغة لملف المشروع / ملف المطوّر */
     #projectProfileModal .aq-empty-actions, #developerProfileModal .aq-empty-actions { margin-top: var(--aq-space-3); display: flex; justify-content: center; }
     #projectProfileModal .aq-empty-actions .aq-btn, #developerProfileModal .aq-empty-actions .aq-btn { min-width: 180px; }
@@ -4562,6 +4572,8 @@
                 <h3 class="aq-admin-card-title" id="devListTitle">المطوّرون المسجّلون</h3>
                 <p class="aq-admin-card-sub" id="devListCount"></p>
               </div>
+              <!-- Report 097: بحث نصّي بسيط بالاسم — تصفية محلية للقائمة المحمّلة (بلا نداء شبكة) -->
+              <div class="aq-list-search"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" class="aq-form-control" id="devSearchInput" placeholder="ابحث عن مطور..." aria-label="البحث عن مطور" autocomplete="off" spellcheck="false"><button type="button" class="aq-list-search-clear" id="devSearchClear" aria-label="مسح البحث" hidden><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
             </div>
             <div id="devProfilesListContent" class="aq-dev-grid"></div>
           </section>
@@ -4736,6 +4748,8 @@
                 <h3 class="aq-admin-card-title" id="projListTitle">المشروعات المسجّلة</h3>
                 <p class="aq-admin-card-sub" id="projListCount"></p>
               </div>
+              <!-- Report 097: بحث نصّي بسيط بالاسم — نفس مكوّن بحث المطوّرين -->
+              <div class="aq-list-search"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" class="aq-form-control" id="projSearchInput" placeholder="ابحث عن مشروع..." aria-label="البحث عن مشروع" autocomplete="off" spellcheck="false"><button type="button" class="aq-list-search-clear" id="projSearchClear" aria-label="مسح البحث" hidden><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
             </div>
             <div id="projectsListContent" class="aq-dev-grid"></div>
           </section>
@@ -6353,6 +6367,23 @@
     return { wire: wire, readImages: readImages, fromEvent: fromEvent, canRead: canRead, MSG: MSG };
   })();
   window.__aqarPasteImage = aqPasteImage_;   // للاختبارات فقط
+
+  /* Report 097 — بحث نصّي محلي بسيط للقوائم الإدارية (مطوّرون/مشروعات): تطبيع عربي/إنجليزي + توصيل حقل بحث بزر مسح.
+   *   aqSearchNorm_(v): حروف صغيرة، إزالة التشكيل، توحيد أ/إ/آ→ا، ة→ه، ى→ي، ضغط المسافات — للمقارنة فقط (لا يلمس البيانات).
+   *   aqListSearch_(inputId, clearId, apply): input → apply()، زر × يمسح ويعيد التركيز، Escape يمسح؛ يُظهر × فقط مع نص. */
+  function aqSearchNorm_(v) {
+    return String(v == null ? '' : v).toLowerCase().replace(/[\u064B-\u0652\u0640]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/\s+/g, ' ').trim();
+  }
+  function aqListSearch_(inputId, clearId, apply) {
+    var input = document.getElementById(inputId), clear = document.getElementById(clearId);
+    if (!input) return { value: function () { return ''; } };
+    function sync() { if (clear) clear.hidden = !input.value; }
+    input.addEventListener('input', function () { sync(); apply(); });
+    input.addEventListener('keydown', function (e) { if (e.key === 'Escape' && input.value) { e.preventDefault(); e.stopPropagation(); input.value = ''; sync(); apply(); } });
+    if (clear) clear.addEventListener('click', function () { input.value = ''; sync(); apply(); input.focus(); });
+    return { value: function () { return aqSearchNorm_(input.value); } };
+  }
+  window.__aqarSearchNorm = aqSearchNorm_;   // للاختبارات فقط
 
   /* ---------- استخراج بيانات الوحدة بالذكاء الاصطناعي داخل نافذة الإضافة ---------- */
   let unitAddAiPastedImageBase64 = null;
@@ -11722,12 +11753,25 @@
     }).withFailureHandler(apiFailure_('تعذّر تحميل قائمة المطوّرين')).getAllDeveloperProfiles(devMgmtAuth());
   }
 
-  function renderDevProfilesList(profiles) {
+  // Report 097: القائمة المحمّلة تُحفظ كما هي؛ البحث تصفية محلية بالاسم (قراءة فقط) تُعاد بعد أي إعادة تحميل (إضافة/تعديل/حذف)
+  let devAllProfiles_ = [];
+  const devSearch_ = aqListSearch_('devSearchInput', 'devSearchClear', function () { devPaintList_(); });
+  function renderDevProfilesList(profiles) { devAllProfiles_ = Array.isArray(profiles) ? profiles : []; devPaintList_(); }
+  function devPaintList_() {
     const content = document.getElementById('devProfilesListContent');
     const countEl = document.getElementById('devListCount');
-    if (countEl) countEl.textContent = profiles.length ? (profiles.length + ' مطوّر مسجّل — اضغط "تعديل" لفتح بيانات المطوّر') : '';
-    if (!profiles.length) {
+    const q = devSearch_.value();
+    const all = devAllProfiles_;
+    const profiles = q ? all.filter(p => aqSearchNorm_(p.developerName).indexOf(q) !== -1) : all;
+    if (countEl) countEl.textContent = q
+      ? (profiles.length + ' مطوّر مطابق للبحث من ' + all.length)
+      : (all.length ? (all.length + ' مطوّر مسجّل — اضغط "تعديل" لفتح بيانات المطوّر') : '');
+    if (!all.length) {
       content.innerHTML = '<div class="aq-empty" style="grid-column:1/-1"><h3>لا يوجد مطوّرون مسجّلون بعد</h3><p>أضف أول ملف مطوّر من زر «إضافة مطوّر».</p></div>';
+      return;
+    }
+    if (!profiles.length) {
+      content.innerHTML = '<div class="aq-empty" style="grid-column:1/-1"><h3>لا يوجد مطور مطابق لبحثك.</h3><p>جرّب كلمة أقصر أو امسح البحث لعرض كل المطوّرين.</p></div>';
       return;
     }
     content.innerHTML = profiles.map(p => {
@@ -12202,12 +12246,25 @@
   }
   window.removeProject = removeProject;
 
-  function renderProjectsList(projects) {
+  // Report 097: نفس نمط بحث المطوّرين — بالاسم (واسم المطوّر الظاهر على البطاقة كمطابقة ثانوية)
+  var projAllProjects_ = [];
+  var projSearch_ = aqListSearch_('projSearchInput', 'projSearchClear', function () { projPaintList_(); });
+  function renderProjectsList(projects) { projAllProjects_ = Array.isArray(projects) ? projects : []; projPaintList_(); }
+  function projPaintList_() {
     var content = document.getElementById('projectsListContent');
     var countEl = document.getElementById('projListCount');
-    if (countEl) countEl.textContent = projects.length ? (projects.length + ' مشروع مسجَّل — اضغط "تعديل" لفتح بيانات المشروع') : '';
-    if (!projects.length) {
+    var q = projSearch_.value();
+    var all = projAllProjects_;
+    var projects = q ? all.filter(function (p) { return aqSearchNorm_(p['Project Name']).indexOf(q) !== -1 || aqSearchNorm_(p['Developer Name']).indexOf(q) !== -1; }) : all;
+    if (countEl) countEl.textContent = q
+      ? (projects.length + ' مشروع مطابق للبحث من ' + all.length)
+      : (all.length ? (all.length + ' مشروع مسجَّل — اضغط "تعديل" لفتح بيانات المشروع') : '');
+    if (!all.length) {
       content.innerHTML = '<div class="aq-empty" style="grid-column:1/-1"><h3>لا توجد مشروعات مسجَّلة بعد</h3><p>أضف أول ملف مشروع من زر «إضافة مشروع».</p></div>';
+      return;
+    }
+    if (!projects.length) {
+      content.innerHTML = '<div class="aq-empty" style="grid-column:1/-1"><h3>لا يوجد مشروع مطابق لبحثك.</h3><p>جرّب كلمة أقصر أو امسح البحث لعرض كل المشروعات.</p></div>';
       return;
     }
     content.innerHTML = projects.map(function (p) {
