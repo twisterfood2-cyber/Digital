@@ -11519,7 +11519,10 @@
       reader.readAsDataURL(file);
     };
   })();
-  function devSetFormMode_(name) {
+  // Report 098: حالة التعديل صريحة — { id: recordId (seq)، name } أو null (إضافة). لا تخمين من وجود البيانات، ولا اعتماد على الاسم كمعرّف.
+  var devEditing_ = null;
+  function devSetFormMode_(name, recordId) {
+    devEditing_ = name ? { id: Number(recordId) || null, name: name } : null;
     var b = document.getElementById('devFormModeBadge'); if (!b) return;
     if (name) { b.textContent = 'وضع التعديل: ' + name; b.hidden = false; } else { b.textContent = ''; b.hidden = true; }
     var t = document.getElementById('devFormModalTitle'); if (t) t.textContent = name ? 'تعديل بيانات المطوّر' : 'إضافة مطوّر';
@@ -11803,7 +11806,7 @@
     devLogoSetCurrent(p.logoUrl || '');
     var _f = document.getElementById('devLogoFileInput'); if (_f) _f.value = '';
     devLogoStatus_('');
-    devSetFormMode_(p.developerName || '');
+    devSetFormMode_(p.developerName || '', p.recordId);   // Report 098: mode = "edit" + المعرّف الثابت للصف
     document.getElementById('devProfileDescInput').value = p.description || '';
     document.getElementById('devProfileWorksInput').value = p.previousWorks || '';
     document.getElementById('saveDevProfileMsg').textContent = '';
@@ -11868,7 +11871,8 @@
         document.getElementById('devProfileYearInput').value.trim(),
         document.getElementById('devProfileDescInput').value.trim(),
         document.getElementById('devProfileWorksInput').value.trim(),
-        document.getElementById('devProfileLogoInput').value.trim()
+        document.getElementById('devProfileLogoInput').value.trim(),
+        devEditing_ ? { id: devEditing_.id, mode: 'edit' } : { mode: 'create' }   // Report 098: UPDATE بالمعرّف في التعديل / INSERT فقط في الإضافة
       );
     });
   });
@@ -12074,7 +12078,10 @@
 
 
   /* ---------- نموذج المشروع: وضع/تفريغ/تحميل للتعديل ---------- */
-  function projSetFormMode_(name) {
+  // Report 098: حالة التعديل صريحة — { id: "Record Id" (seq)، name } أو null (إضافة)
+  var projEditing_ = null;
+  function projSetFormMode_(name, recordId) {
+    projEditing_ = name ? { id: Number(recordId) || null, name: name } : null;
     var b = document.getElementById('projFormModeBadge'); if (!b) return;
     if (name) { b.textContent = 'وضع التعديل: ' + name; b.hidden = false; } else { b.textContent = ''; b.hidden = true; }
     var t = document.getElementById('projFormModalTitle'); if (t) t.textContent = name ? 'تعديل بيانات المشروع' : 'إضافة مشروع';
@@ -12225,7 +12232,7 @@
     var _f = document.getElementById('projCoverFileInput'); if (_f) _f.value = '';
     projGalleryImages = String(p['Gallery Images'] || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
     projRenderGalleryPreview_();
-    projSetFormMode_(p['Project Name'] || '');
+    projSetFormMode_(p['Project Name'] || '', p['Record Id']);   // Report 098: mode = "edit" + المعرّف الثابت للصف
     document.getElementById('saveProjectMsg').textContent = '';
     projFormModal_.open(document.activeElement);   // Report 087: نفس النموذج داخل المودال بعنوان "تعديل بيانات المشروع"
   }
@@ -12342,7 +12349,9 @@
             if (!__projectNamesCache) __projectNamesCache = {};
             __projectNamesCache[key] = true;
             delete __projectProfileCache[key]; // تحديث القادم يجيب النسخة الجديدة
+            if (projEditing_ && projEditing_.name) { var oldKey = String(projEditing_.name).trim().toUpperCase(); if (oldKey !== key) { delete __projectNamesCache[oldKey]; delete __projectProfileCache[oldKey]; } }   // Report 098: الاسم القديم بعد إعادة التسمية
             projClearFormFields_(); // إفراغ الحقول فقط - رسالة النجاح المضبوطة أعلاه تبقى ظاهرة (لا تُمسَح هنا)
+            projSetFormMode_(null);
             if (typeof showToast === 'function') showToast(res.message || 'تم حفظ بيانات المشروع', 'success');
             projFormModal_.close();   // Report 087: الإغلاق بعد الحفظ — الكارت يتحدّث في القائمة
             loadProjectsList();
@@ -12352,7 +12361,7 @@
           btn.disabled = false; btn.textContent = 'حفظ بيانات المشروع';
           msg.style.color = 'var(--error-fg)'; msg.textContent = 'حدث خطأ: ' + err.message;
         })
-        .saveProjectProfile(projMgmtAuth(), projectData);
+        .saveProjectProfile(projMgmtAuth(), projectData, projEditing_ ? { id: projEditing_.id, mode: 'edit' } : { mode: 'create' });   // Report 098
     });
   });
 
