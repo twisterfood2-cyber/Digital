@@ -2549,6 +2549,18 @@
     @media (prefers-reduced-motion: reduce) {
       body.app-view-explore .aq-hero { transition: none; }
     }
+    /* ---- Report 093: ضبط الإيقاع الرأسي لصفحة "استكشف" — إزالة الفراغ الميت فوق لوحة البحث (بلا ضغط للوحة نفسها) ----
+       السبب الجذري: body يحمل padding-top قديمًا (28px / 18px موبايل) من زمن الهيدر غير الثابت، فوق إزاحة #mainContainer
+       عن الهيدر الثابت (60 + 20). النتيجة ~48px فراغ ميت تحت الهيدر + رأس صفحة بهوامش 4/12/16. هنا (لهذا العرض فقط):
+       body padding-top → 0، إزاحة المحتوى 20 → 16، رأس الصفحة 0/8/12، وهامش لوحة البحث تحت 16 → 12. الخط/الحجم/اللوحة كما هي. */
+    body.aq-app-on.app-view-explore { padding-top: 0; }
+    body.aq-app-on.app-view-explore #mainContainer { padding-top: calc(var(--aq-header-h) + var(--aq-space-4)); }
+    body.app-view-explore .aq-page-header { margin: 0 0 var(--aq-space-3); padding-bottom: var(--aq-space-2); }
+    body.app-view-explore .aq-hero { margin-bottom: var(--aq-space-3); }
+    body.app-view-explore .aq-results-bar { margin-bottom: var(--aq-space-3); }   /* نفس الإيقاع 12px بين اللوحة/شريط النتائج/الكروت */
+    @media (max-width: 1024px) {
+      body.aq-app-on.app-view-explore #mainContainer { padding-top: calc(var(--aq-header-h) + var(--aq-space-3)); }   /* نفس إزاحة الشِل على الشاشات الصغيرة */
+    }
     body.app-view-explore .aq-hero::after,
     body.app-view-explore .aq-hero-media,
     body.app-view-explore .aq-hero-copy { display: none; }
