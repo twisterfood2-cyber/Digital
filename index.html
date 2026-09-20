@@ -3744,6 +3744,13 @@
       .pc-actions { flex-direction: column; }
       .pc-btn { width: 100%; }
     }
+    /* Report 099: إطار صورة المطوّر الموحّد 4:3 (لوجوهات المطوّرين فقط — لا يمسّ بلاطات المشاريع/الأرشيف المربّعة).
+       العرض = 4/3 × الارتفاع (84 → 112×84، 132 → 176×132)؛ الصورة contain داخل الإطار (لا قصّ للاسم/الرمز) على خلفية بيضاء كما كانت. */
+    .aq-logo-tile--dev { width: calc(var(--tile) * 4 / 3); aspect-ratio: 4 / 3; }
+    .aq-logo-tile--dev img { object-fit: contain; }
+    #devProfileContent .dev-hero-logo { width: 176px; aspect-ratio: 4 / 3; margin: 0 auto 10px; background: #fff; border-radius: 8px; padding: 6px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    #devProfileContent .dev-hero-logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    #devLogoCropModal .dl-preview-tile { --tile: 84px; }
     /* Report 097: حقل بحث القوائم الإدارية (المطوّرون/المشروعات) — نفس .aq-form-control + أيقونة بحث + زر مسح؛ يجلس في رأس البطاقة ويلتفّ تحت العنوان على الشاشات الضيقة */
     .aq-list-search { position: relative; flex: 0 1 320px; min-width: 200px; align-self: center; }
     .aq-list-search > .ico { position: absolute; inset-inline-start: 12px; top: 50%; width: 16px; height: 16px; transform: translateY(-50%); color: var(--aq-color-primary); pointer-events: none; }
@@ -4505,7 +4512,7 @@
               <div class="aq-form-section-head"><h4 class="aq-form-section-title">لوجو المطوّر</h4></div>
               <div class="aq-logo-upload" id="devLogoDropzone" tabindex="0" role="group" aria-label="رفع لوجو المطوّر">
                 <div class="aq-logo-upload-preview">
-                  <div class="aq-logo-tile aq-logo-tile--xl" id="devLogoPreviewTile" title="اختر صورة">—</div>
+                  <div class="aq-logo-tile aq-logo-tile--xl aq-logo-tile--dev" id="devLogoPreviewTile" title="اختر صورة">—</div>
                 </div>
                 <div class="aq-logo-upload-body">
                   <p class="aq-logo-upload-title" id="devLogoTitle">اسحب اللوجو هنا أو اختر صورة من جهازك</p>
@@ -5218,7 +5225,7 @@
     <div class="pc-notice" id="dlNotice" hidden></div>
     <div class="dl-modes" role="group" aria-label="نمط اللوجو">
       <button type="button" class="pc-btn dl-mode is-active" id="dlModeFull" data-mode="full" aria-pressed="true">اللوجو بالكامل (نسبة الصورة)</button>
-      <button type="button" class="pc-btn dl-mode" id="dlModeSquare" data-mode="square" aria-pressed="false">قصّ مربّع 1:1 (بطاقة المطوّر)</button>
+      <button type="button" class="pc-btn dl-mode" id="dlModeSquare" data-mode="card" aria-pressed="false">قصّ 4:3 (بطاقة المطوّر)</button>
     </div>
     <div class="pc-stage dl-stage" id="dlStage" aria-label="منطقة تعديل اللوجو — اسحب لتحريك الصورة">
       <div class="pc-imgwrap" id="dlImgWrap"><img id="dlImage" alt="" draggable="false"></div>
@@ -5231,7 +5238,7 @@
       <button type="button" class="pc-zoom-btn" id="dlZoomInBtn" aria-label="تكبير"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
     </div>
     <div class="pc-preview-row">
-      <div class="aq-logo-tile aq-logo-tile--lg dl-preview-tile"><canvas id="dlPreviewCanvas" width="168" height="168"></canvas></div>
+      <div class="aq-logo-tile aq-logo-tile--lg aq-logo-tile--dev dl-preview-tile"><canvas id="dlPreviewCanvas" width="224" height="168"></canvas></div>
       <div><div class="pc-preview-label">المعاينة كما ستظهر في بطاقة المطوّر</div><div class="pc-preview-label dl-preview-note" id="dlPreviewNote"></div></div>
     </div>
     <div class="pc-actions">
@@ -5738,6 +5745,12 @@
   // بنفس الاسم تحت /card/ بدل /full/ — بنشتقّها هنا للعرض فقط (روابط Drive القديمة وأي رابط تاني زي ما هم).
   var R2_IMG_BASE = 'https://img.aqaratdigital.com/';
   function isR2ImageUrl_(url) { return typeof url === 'string' && url.indexOf(R2_IMG_BASE) === 0; }
+  // Report 099: رابط نسخة العرض 4:3 للوجو المطوّر — assets/<logo>.webp → assets/<logo>.d43.webp (اشتقاق حتمي، نفس قاعدة السيرفر)؛
+  // غير ذلك (Drive/خارجي/مشتق أصلًا) يُعاد الرابط كما هو. العرض دائمًا مع onerror → المصدر (اللوجوهات القديمة بلا نسخة عرض).
+  function devLogoDisplayUrl_(url) {
+    if (!isR2ImageUrl_(url) || !/\/assets\/[^/?#]+\.webp$/i.test(url) || /\.d43\.webp$/i.test(url)) return url;
+    return url.replace(/\.webp$/i, '.d43.webp');
+  }
   function r2CardUrl_(url) {
     if (!isR2ImageUrl_(url)) return url;
     return url.replace(/^(https:\/\/img\.aqaratdigital\.com\/(?:units|projects)\/)full\//, '$1card/');
@@ -6384,6 +6397,7 @@
     return { value: function () { return aqSearchNorm_(input.value); } };
   }
   window.__aqarSearchNorm = aqSearchNorm_;   // للاختبارات فقط
+  window.__aqarDevLogoDisplayUrl = devLogoDisplayUrl_;   // Report 099 — للاختبارات فقط
 
   /* ---------- استخراج بيانات الوحدة بالذكاء الاصطناعي داخل نافذة الإضافة ---------- */
   let unitAddAiPastedImageBase64 = null;
@@ -7529,8 +7543,9 @@
         entry.logo.appendChild(img);
         requestAnimationFrame(function () { img.classList.add('is-visible'); });
       };
-      img.onerror = function () { showDevInitials_(entry); };
-      img.src = url;
+      var display = devLogoDisplayUrl_(url);   // Report 099: نسخة العرض 4:3 ثم المصدر
+      img.onerror = function () { if (display !== url && img.src !== url) { img.src = url; return; } showDevInitials_(entry); };
+      img.src = display;
     }
     names.forEach(function (name) {
       var tile = document.createElement('button');
@@ -8073,7 +8088,7 @@
 
     return `
       <div style="background:var(--aq-color-primary); border:1px solid var(--aq-color-primary); border-radius:16px; padding:22px 18px; margin-bottom:16px; text-align:center; position:relative; overflow:hidden;">
-        ${res.logoUrl ? `<img src="${escHtml_(res.logoUrl)}" style="max-width:130px; max-height:70px; object-fit:contain; margin-bottom:10px; position:relative; background:#fff; border-radius:8px; padding:4px;">` : ''}
+        ${res.logoUrl ? `<div class="dev-hero-logo"><img src="${escHtml_(devLogoDisplayUrl_(res.logoUrl))}" alt="" onerror="if(this.src!==${attrJs_(res.logoUrl)}){this.src=${attrJs_(res.logoUrl)}}else{this.parentNode.remove()}"></div>` : ''}
         <div style="color:var(--aq-color-on-primary); font-size:18px; font-weight:700; position:relative;">${escHtml_(res.developerName)}</div>
         ${res.foundedYear ? `<div style="color:var(--aq-color-primary-soft); font-size:12px; font-weight:700; margin-top:4px; position:relative;">تأسست عام ${escHtml_(res.foundedYear)}</div>` : ''}
       </div>
@@ -11352,7 +11367,10 @@
   function devLogoTileHtml_(url, name) {
     var ini = devEsc_(devInitials_(name)).replace(/'/g, '');
     if (!url) return ini;
-    return '<img src="' + devEsc_(url) + '" alt="" loading="lazy" decoding="async" onerror="this.parentNode.textContent=\'' + ini + '\'">';
+    // Report 099: نسخة العرض 4:3 أولًا (لو رابط R2 للوجو)، ثم المصدر عند غيابها (لوجوهات قديمة/Drive)، ثم الحروف الأولى
+    var display = devLogoDisplayUrl_(url);
+    var fallback = display !== url ? 'this.onerror=function(){this.parentNode.textContent=\'' + ini + '\'};this.src=' + JSON.stringify(url).replace(/"/g, '&quot;') : 'this.parentNode.textContent=\'' + ini + '\'';
+    return '<img src="' + devEsc_(display) + '" alt="" loading="lazy" decoding="async" onerror="' + fallback + '">';
   }
   function devLogoStatus_(text, tone) {
     var el = document.getElementById('devLogoStatus'); if (!el) return;
@@ -11394,7 +11412,7 @@
   /* ============================================================
    * Report 090 — محرّر لوجو المطوّر (بلا مكتبة): نفس نموذج التفاعل (سحب/قرص/تكبير مثبّت/إعادة ضبط/معاينة) مع فروق اللوجو:
    *   - النمط الافتراضي "full": الإطار بنسبة الصورة نفسها = اللوجو كاملًا بلا قصّ (Fit/Contain)؛ التكبير/السحب اختياريان لقصّ داخل نفس النسبة.
-   *   - النمط "square": إطار 1:1 (= بلاطة بطاقة المطوّر .aq-logo-tile التي تعرض اللوجو contain) — الصورة تغطي الإطار دائمًا.
+   *   - النمط "card" (Report 099): إطار 4:3 (= بلاطة بطاقة المطوّر .aq-logo-tile--dev التي تعرض اللوجو contain) — الصورة تغطي الإطار دائمًا.
    *   - الناتج: لو لم يُعدَّل شيء في "full" → ملف المطوّر الأصلي بايت-بايت (أفضل جودة + شفافية)؛ غير ذلك canvas بلا خلفية
    *     (PNG يحفظ الشفافية لمصادر PNG/WebP، JPEG للمصادر JPEG) بحدّ 800px على الضلع الأطول (سقف pipeline اللوجو) وبلا تكبير.
    *   - المعاينة = نفس بلاطة البطاقة (84px، contain، خلفية بيضاء وحافة 6px).
@@ -11408,7 +11426,7 @@
     function showErr(m) { errEl.textContent = m; errEl.hidden = false; }
     function layoutFrame() {
       var sw = stage.clientWidth, sh = stage.clientHeight, w, h;
-      if (mode === 'square') { w = h = Math.round(Math.min(sw, sh) * FRAME_PCT); }
+      if (mode === 'card') { w = Math.round(sw * FRAME_PCT); h = Math.round(w * 3 / 4); }   // Report 099: إطار بطاقة المطوّر 4:3
       else { var box = Math.min(sw, sh) * FRAME_PCT; var r = nW / nH; if (r >= 1) { w = box; h = box / r; } else { h = box; w = box * r; } w = Math.round(w); h = Math.round(h); }
       frame.style.width = w + 'px'; frame.style.height = h + 'px'; frame.style.left = Math.round((sw - w) / 2) + 'px'; frame.style.top = Math.round((sh - h) / 2) + 'px';
       fr = { left: Math.round((sw - w) / 2), top: Math.round((sh - h) / 2), width: w, height: h };
@@ -11421,12 +11439,12 @@
     function srcRect() { return { sx: (fr.left - tx) / scale, sy: (fr.top - ty) / scale, sw: fr.width / scale, sh: fr.height / scale }; }
     function isUntouched() { return mode === 'full' && Math.abs(scale - minScale) < 1e-6 && Math.abs(tx - (fr.left + fr.width / 2 - nW * scale / 2)) < 1 && Math.abs(ty - (fr.top + fr.height / 2 - nH * scale / 2)) < 1; }
     function paintPreview() {
-      var ctx = preview.getContext('2d'), w = preview.width, h = preview.height, pad = Math.round(w * 6 / 84);
+      var ctx = preview.getContext('2d'), w = preview.width, h = preview.height, pad = Math.round(h * 6 / 84);   // نفس حافة البلاطة 6px (الكانفس ×2)
       ctx.clearRect(0, 0, w, h); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h);
       var r = srcRect(); var ar = r.sw / r.sh; var dw = w - pad * 2, dh = h - pad * 2;
       if (ar >= 1) { dh = dw / ar; } else { dw = dh * ar; }
       ctx.drawImage(img, r.sx, r.sy, r.sw, r.sh, (w - dw) / 2, (h - dh) / 2, dw, dh);
-      noteEl.textContent = isUntouched() ? 'اللوجو كاملًا بلا قصّ' : (mode === 'square' ? 'قصّ مربّع 1:1' : 'قصّ ضمن نسبة الصورة');
+      noteEl.textContent = isUntouched() ? 'اللوجو كاملًا بلا قصّ' : (mode === 'card' ? 'قصّ 4:3' : 'قصّ ضمن نسبة الصورة');
     }
     function render() {
       wrap.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + scale + ')';
@@ -11783,7 +11801,7 @@
       const nameJs = name.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
       return `
       <article class="aq-dev-card">
-        <div class="aq-logo-tile aq-logo-tile--lg">${devLogoTileHtml_(p.logoUrl, name)}</div>
+        <div class="aq-logo-tile aq-logo-tile--lg aq-logo-tile--dev">${devLogoTileHtml_(p.logoUrl, name)}</div>
         <div class="aq-list-body">
           <div class="aq-dev-card-name">${devEsc_(name)}</div>
           <div class="aq-dev-card-meta">${devEsc_(p.ownerName || 'بدون اسم صاحب شركة')}</div>
