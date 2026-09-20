@@ -2549,18 +2549,9 @@
     @media (prefers-reduced-motion: reduce) {
       body.app-view-explore .aq-hero { transition: none; }
     }
-    /* ---- Report 093: ضبط الإيقاع الرأسي لصفحة "استكشف" — إزالة الفراغ الميت فوق لوحة البحث (بلا ضغط للوحة نفسها) ----
-       السبب الجذري: body يحمل padding-top قديمًا (28px / 18px موبايل) من زمن الهيدر غير الثابت، فوق إزاحة #mainContainer
-       عن الهيدر الثابت (60 + 20). النتيجة ~48px فراغ ميت تحت الهيدر + رأس صفحة بهوامش 4/12/16. هنا (لهذا العرض فقط):
-       body padding-top → 0، إزاحة المحتوى 20 → 16، رأس الصفحة 0/8/12، وهامش لوحة البحث تحت 16 → 12. الخط/الحجم/اللوحة كما هي. */
-    body.aq-app-on.app-view-explore { padding-top: 0; }
-    body.aq-app-on.app-view-explore #mainContainer { padding-top: calc(var(--aq-header-h) + var(--aq-space-4)); }
-    body.app-view-explore .aq-page-header { margin: 0 0 var(--aq-space-3); padding-bottom: var(--aq-space-2); }
+    /* ---- Report 093/094: إيقاع "استكشف" فقط (12px لوحة → شريط النتائج → الكروت). الإزاحة العلوية المشتركة لكل الصفحات في كتلة Report 094 آخر الملف. */
     body.app-view-explore .aq-hero { margin-bottom: var(--aq-space-3); }
-    body.app-view-explore .aq-results-bar { margin-bottom: var(--aq-space-3); }   /* نفس الإيقاع 12px بين اللوحة/شريط النتائج/الكروت */
-    @media (max-width: 1024px) {
-      body.aq-app-on.app-view-explore #mainContainer { padding-top: calc(var(--aq-header-h) + var(--aq-space-3)); }   /* نفس إزاحة الشِل على الشاشات الصغيرة */
-    }
+    body.app-view-explore .aq-results-bar { margin-bottom: var(--aq-space-3); }
     body.app-view-explore .aq-hero::after,
     body.app-view-explore .aq-hero-media,
     body.app-view-explore .aq-hero-copy { display: none; }
@@ -2621,6 +2612,9 @@
       --aq-elev-card:       0 1px 2px rgba(11,40,33,0.06), 0 4px 12px rgba(11,40,33,0.09), 0 18px 40px rgba(11,40,33,0.14);
       --aq-elev-card-hover: 0 2px 4px rgba(11,40,33,0.06), 0 10px 20px rgba(11,40,33,0.12), 0 26px 52px rgba(11,40,33,0.18);
       --aq-elev-panel:      0 1px 2px rgba(11,40,33,0.06), 0 10px 24px rgba(11,40,33,0.12), 0 32px 72px rgba(11,40,33,0.20);
+      /* Report 094: مستويان إضافيان بنفس اللغة — surface = حاوية/كارت داخل حاوية (مستوى 1 هادئ)، modal = مستوى 3 (فوق كل شيء) */
+      --aq-elev-surface:    0 1px 2px rgba(11,40,33,0.05), 0 6px 16px rgba(11,40,33,0.07);
+      --aq-elev-modal:      0 2px 6px rgba(11,40,33,0.08), 0 16px 40px rgba(11,40,33,0.16), 0 48px 96px rgba(11,40,33,0.22);
     }
     body.aq-search-ui .unit-card {
       background: var(--aq-color-surface); color: var(--aq-color-text);
@@ -3158,7 +3152,7 @@
       /* الخلفية الخضراء الفاتحة قريبة جدًا من لون خلفية الصفحة، فقلّ التباين الذي كان
          يُبرز الصندوق كعنصر Hero. تعويض بظل أعمق/أوضح (طبقتان: قريبة + بعيدة) خاصًا
          بهذا السياق فقط — بلا تغيير في الحدّ أو نصف القطر أو أي شيء آخر. */
-      box-shadow: 0 4px 14px rgba(11,40,33,0.10), 0 22px 48px rgba(11,40,33,0.16);
+      box-shadow: var(--aq-elev-panel);   /* Report 094: نفس لوحة "استكشف" (مستوى 2) بدل قيمة مفردة هنا */
     }
     /* الصف السفلي: دمج "مزيدًا من الفلاتر" + "البحث" + "مسح الفلاتر" في صفّ واحد
        بنفس أسلوب Grid المعتمد أصلًا في "استكشف" (grid-template-areas) — بلا أي نقل
@@ -3871,6 +3865,33 @@
     .ud-archived-banner .ud-archived-warn { flex-basis: 100%; font-size: var(--aq-fs-small); color: var(--danger, #b91c1c); }
     .unit-card-overlay.ud-archived-mode .ud-actions, .unit-card-overlay.ud-archived-mode .ud-status-select { display: none !important; }
     .unit-card-overlay.ud-archived-mode .ud-media-status { opacity: 0.55; }
+
+    /* ============================================================
+     * Report 094 — اتساق بصري عام: (أ) الإزاحة الرأسية العلوية، (ب) تدرّج الارتفاع/الظلال.
+     * (أ) الفراغ الميت تحت الهيدر الثابت (body padding-top القديم 28/18px + إزاحة 20px + رأس صفحة 4/16/12) ثبت بالقياس
+     *     في كل العروض المدقَّقة: الرئيسية، استكشف، عرض السعر، سعر المتر، إضافة وحدة، ولوحة التحكم (9 أقسام) — نفس البنية
+     *     (هيدر ثابت + #mainContainer). القائمة صريحة (لا قاعدة عمياء على body): بوابة الدخول وأي عرض غير مدقَّق خارجها.
+     * (ب) نفس لغة Report 092 (ظل قريب + محيط ناعم، صبغة rgba(11,40,33)): مستوى 0 الخلفية → 1 كارت/حاوية (card / surface)
+     *     → 2 لوحة بحث/حاوية نموذج رئيسية (panel) → 3 مودال (modal). الأبعاد/الزوايا/الألوان/الخط بلا تغيير.
+     * ============================================================ */
+    body.aq-app-on:is(.app-view-search, .app-view-explore, .app-view-quote, .app-view-meter, .app-view-add, .app-view-dashboard) { padding-top: 0; }
+    body.aq-app-on:is(.app-view-search, .app-view-explore, .app-view-quote, .app-view-meter, .app-view-add, .app-view-dashboard) #mainContainer { padding-top: calc(var(--aq-header-h) + var(--aq-space-4)); }
+    body.aq-app-on:is(.app-view-search, .app-view-explore, .app-view-quote, .app-view-meter, .app-view-add, .app-view-dashboard) .aq-page-header { margin: 0 0 var(--aq-space-3); padding-bottom: var(--aq-space-2); }
+    @media (max-width: 1024px) {
+      body.aq-app-on:is(.app-view-search, .app-view-explore, .app-view-quote, .app-view-meter, .app-view-add, .app-view-dashboard) #mainContainer { padding-top: calc(var(--aq-header-h) + var(--aq-space-3)); }   /* نفس إزاحة الشِل على الشاشات الصغيرة */
+    }
+    /* مستوى 1 — كروت قائمة بذاتها على الخلفية (KPI، كروت سعر المتر، بلاطات المطوّرين في الرئيسية عند التحويم) */
+    .aq-card.aq-card--kpi, #priceStatsModal .ps-card { box-shadow: var(--aq-elev-card); }
+    @media (hover: hover) { #priceStatsModal .ps-card:hover { box-shadow: var(--aq-elev-card-hover); } }
+    .aq-dev-tile { box-shadow: var(--aq-elev-surface); }
+    .aq-dev-tile:hover, .aq-dev-card:hover { box-shadow: var(--aq-elev-card); }
+    /* مستوى 1 هادئ — الحاويات الكبيرة وكروت القوائم داخل حاوية (لوحة التحكم/الإحصاءات/الملف الشخصي) */
+    #dashboardView .section, #statsView .section, #statsView .section.stats-mint-panel, #statsView .stats-table-block.stats-mint-panel,
+    .aq-admin-card, #dashPanel-profile .prof-hero, .aq-dev-card { box-shadow: var(--aq-elev-surface); }
+    /* مستوى 2 — لوحات البحث/الفلاتر وحاويات النماذج الرئيسية المعروضة داخل الصفحة (وليس كمودال) */
+    body.app-view-add #editModal .modal-box, body.app-view-quote #editModal .modal-box, body.app-view-meter #priceStatsModal .modal-box { box-shadow: var(--aq-elev-panel); }
+    /* مستوى 3 — المودالات الحقيقية (فوق الصفحة) */
+    .modal-box, #editModal .modal-box, #umUserModal .modal-box.um-user-box, #photoCropModal .modal-box.pc-box, #devLogoCropModal .modal-box.dl-box, .ud-modal-body { box-shadow: var(--aq-elev-modal); }
   </style>
 </head>
 <body>
