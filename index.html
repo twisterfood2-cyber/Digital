@@ -2598,8 +2598,10 @@
      * ~36% بنسبة 4:3 والمعلومات RTL يمين؛ سطح أبيض، حدّ #DDE2E1، زوايا --radius-lg، ظلال navy ناعمة؛ الحالة/رقم الوحدة
      * أعلى المعلومات؛ السعر أقوى عنصر (navy)؛ ≤640px يتكدّس رأسيًا (صورة ← معلومات ← مواصفات ← سعر ← إجراءات).
      * الخطافات محفوظة: .unit-card/.unit-id/.fav-btn/.compare-checkbox/.unit-cover img/.img-count-badge/status-<الحالة>. */
+    /* PHASE 3B: شبكة متجاوبة — 3 كروت أفقية في الصف على Desktop (≥1025)، 2 على التابلت (≤1024)، 1 عند ≤800 (الكارت يبقى أفقيًا)،
+       والتكديس الرأسي داخل الكارت يبدأ عند ≤640 (القاعدة القائمة). ارتفاع موحّد للصف بتمدّد الشبكة (align-items: stretch). */
     body.aq-search-ui .results-grid {
-      display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--aq-space-4);
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--aq-space-4); align-items: stretch;
     }
     /* Report 092/094: تدرّج الارتفاع (surface < card < panel < modal) — الصبغة navy (PHASE 2) */
     :root {
@@ -2608,9 +2610,9 @@
       --aq-elev-panel:      0 1px 2px rgba(17,29,58,0.06), 0 10px 24px rgba(17,29,58,0.12), 0 32px 72px rgba(17,29,58,0.20);
       --aq-elev-surface:    0 1px 2px rgba(17,29,58,0.05), 0 6px 16px rgba(17,29,58,0.07);
       --aq-elev-modal:      0 2px 6px rgba(17,29,58,0.08), 0 16px 40px rgba(17,29,58,0.16), 0 48px 96px rgba(17,29,58,0.22);
-      --aq-card-media-w:    34%;     /* عرض عمود الصورة على Desktop (4:3) */
-      --aq-card-media-min:  250px;
-      --aq-card-media-max:  400px;
+      --aq-card-media-w:    40%;     /* عرض عمود الصورة داخل كارت الشبكة الثلاثية (≈ 400–560px) — 4:3 كحدّ أدنى للارتفاع */
+      --aq-card-media-min:  150px;
+      --aq-card-media-max:  260px;
     }
     body.aq-search-ui .unit-card {
       background: var(--aq-color-surface); color: var(--aq-color-text);
@@ -2620,6 +2622,7 @@
       padding: 0; overflow: hidden; min-width: 0;
       display: flex; flex-direction: row; align-items: stretch;
       direction: ltr;                 /* حاوية التخطيط فقط: الصورة (أول عنصر) يسار — النص داخل .unit-body يبقى RTL */
+      container-type: inline-size;    /* PHASE 3B: ضبط الحشو/الخط حسب عرض الكارت الفعلي داخل الشبكة */
       transition: transform var(--ease), box-shadow var(--ease), border-color var(--ease);
       cursor: pointer;
     }
@@ -2797,14 +2800,33 @@
     body.aq-search-ui .unit-card.status-مباع .spec-chip { opacity: 0.85; }
     /* هيكل التحميل (skeleton) بنفس الهيئة الأفقية */
     body.aq-search-ui .skeleton-card { flex-direction: row; }
-    body.aq-search-ui .skeleton-card .skel-cover { flex: 0 0 var(--aq-card-media-w); min-width: var(--aq-card-media-min); max-width: var(--aq-card-media-max); height: auto; min-height: 200px; margin: 0; border-radius: 0; }
+    body.aq-search-ui .skeleton-card .skel-cover { flex: 0 0 var(--aq-card-media-w); min-width: var(--aq-card-media-min); max-width: var(--aq-card-media-max); height: auto; min-height: 180px; margin: 0; border-radius: 0; }
     body.aq-search-ui .skeleton-card .skel-line, body.aq-search-ui .skeleton-card .skel-chip-row, body.aq-search-ui .skeleton-card .skel-box { margin-inline: var(--aq-space-5); }
     body.aq-search-ui .skeleton-card .skel-line:first-of-type { margin-top: var(--aq-space-4); }
     /* ---- تابلت (641–1024): أفقي مضغوط — صورة أعرض قليلًا وحشو أقل ---- */
-    @media (max-width: 1024px) {
-      :root { --aq-card-media-w: 40%; --aq-card-media-min: 220px; }
+    /* كارت ضيق (≤ 600px داخل الشبكة): حشو أقل، عنوان/سعر أصغر درجة، شرائح مضغوطة، CTA مضغوط — يبقى أفقيًا */
+    @container (max-width: 600px) {
       body.aq-search-ui .unit-body { padding: var(--aq-space-3) var(--aq-space-4); gap: var(--aq-space-2); }
+      body.aq-search-ui .unit-title { font-size: var(--aq-fs-card-title); }
       body.aq-search-ui .unit-card .final-price { font-size: var(--aq-fs-section-title); }
+      body.aq-search-ui .spec-chip { padding: 4px 8px; gap: 5px; }
+      body.aq-search-ui .spec-chip .spec-txt b { font-size: var(--aq-fs-caption); }
+      body.aq-search-ui .unit-card-footer { gap: var(--aq-space-2) var(--aq-space-3); }
+      body.aq-search-ui .unit-cta { padding: 0 12px; min-height: 36px; }
+      body.aq-search-ui .unit-foot-meta { flex-basis: 100%; order: 3; }   /* المطور/التواريخ سطر كامل تحت السعر والـ CTA */
+    }
+    @container (max-width: 460px) {
+      body.aq-search-ui .unit-body { padding: var(--aq-space-3); }
+      body.aq-search-ui .spec-chip .spec-txt small { display: none; }     /* القيمة + الأيقونة كافية في الكارت الضيق جدًا */
+      body.aq-search-ui .unit-head-row .unit-id { padding: 1px 6px; }
+    }
+    /* ---- تابلت (≤1024): عمودان — وعند ≤800 عمود واحد (الكارت أعرض ويبقى أفقيًا) ---- */
+    @media (max-width: 1024px) {
+      body.aq-search-ui .results-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 800px) {
+      body.aq-search-ui .results-grid { grid-template-columns: minmax(0, 1fr); }
+      :root { --aq-card-media-w: 40%; --aq-card-media-min: 220px; --aq-card-media-max: 320px; }
     }
     /* ---- موبايل (≤640): تكديس رأسي بنفس اللغة البصرية: صورة ← معلومات ← مواصفات ← سعر ← إجراءات ---- */
     @media (max-width: 640px) {
