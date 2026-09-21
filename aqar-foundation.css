@@ -456,15 +456,17 @@
    ثقيلة، واللوجو هو البطل؛ العدد يبقى معلومة ثانوية لا شارة صارخة. */
 .aq-devs {
   margin: var(--aq-space-8) 0 var(--aq-space-4);
-  background: var(--aq-prop-canvas-2);
+  background: var(--aq-color-surface);            /* PHASE 4: سطح أبيض بحدّ ناعم وظل خفيف بدل الرمادي المصمت */
+  border: 1px solid var(--aq-color-border);
   border-radius: var(--aq-prop-radius-lg);
+  box-shadow: var(--aq-elev-surface);
   padding: var(--aq-space-7) var(--aq-space-5);
 }
 .aq-devs[hidden] { display: none !important; }
 .aq-devs-head { text-align: center; margin-bottom: var(--aq-space-5); }
 .aq-devs-title {
   margin: 0 0 6px; font-size: var(--aq-fs-section-title); font-weight: var(--aq-fw-bold);
-  color: var(--aq-prop-text);
+  color: var(--aq-color-primary);                 /* PHASE 4: عنوان navy */
 }
 .aq-devs-sub { margin: 0; font-size: var(--aq-fs-label); color: var(--aq-prop-text-muted); }
 /* Phase 2C — بطاقات مطوّرين حقيقية بدل الشريط الأفقي: شبكة متجاوبة (2 موبايل ·

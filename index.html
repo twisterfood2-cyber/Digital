@@ -2472,7 +2472,7 @@
     body.app-view-explore .aq-console-back { display: inline-flex; }
 
     /* ---- 2) الهيرو: صورة الغلاف نفسها (نفس مسار loadCoverImage) ---- */
-    .aq-hero-media { background-image: url('city-bg.jpg'); }
+    .aq-hero-media { background: var(--aq-color-primary-deep); }   /* PHASE 4: الصورة عنصر <img> داخلها (assets/hero-home.jpg) */
 
     /* ---- 3) الكونسول: الفلاتر ولوحة البحث الذكي داخل بطاقة بيضاء مرتفعة ---- */
     body.aq-search-ui .aq-console .filters-card,
@@ -3188,24 +3188,68 @@
     /* ---------------- الرئيسية: هيرو أكثر سعة ---------------- */
     /* تقليل المسافة الفارغة بين الشريط العلوي والسطر التعريفي — القيمة السابقة كانت
        var(--aq-space-8) (32px)؛ لا تلمس #mainContainer المشترك مع كل الصفحات. */
-    body.app-view-search .aq-hero { padding-top: var(--aq-space-5); }
-    /* السطر التعريفي "AqaR Digital · مخزون عقاري احترافي" أكبر قليلًا (12.5px → 14px،
-       ~12%) خاص بهذه الصفحة فقط — بلا لمس التوكن المشترك --aq-fs-label. */
-    body.app-view-search .aq-hero-eyebrow { font-size: 14px; margin-bottom: 12px; }
-    body.app-view-search .aq-hero-title { font-size: clamp(30px, 3.6vw, 46px); }
-    body.app-view-search .aq-hero-sub { max-width: 72ch; }
+    /* ===== LOCAL REDESIGN PHASE 4 — هيرو مصوّر + كونسول بحث متداخل =====
+     * نفس الـ DOM (#aqHero > .aq-hero-media + #aqHeroCopy + #aqConsole) ونفس النص ونفس منطق البحث. الآلية: الصورة طبقة مطلقة
+     * تغطي الهيرو ما عدا آخر --aq-hero-overlap من ارتفاعه، والكونسول في التدفّق الطبيعي فيتداخل جزئيًا مع الصورة وجزئيًا مع
+     * الكانفس — بلا هوامش سالبة ولا تموضع مطلق للصفحة. تدرّج navy موضعي (أعلى النص وأسفل الكونسول) لا يعتّم الصورة كلها. */
+    :root { --aq-hero-overlap: 112px; }
+    body.app-view-search .aq-hero {
+      position: relative; isolation: isolate; margin: 0 0 var(--aq-space-8);
+      padding: clamp(44px, 6vw, 76px) var(--aq-space-5) 0;
+    }
+    body.app-view-search .aq-hero-media {
+      position: absolute; inset: 0 0 var(--aq-hero-overlap) 0; z-index: -1;
+      border-radius: var(--radius-xl); overflow: hidden; background: var(--aq-color-primary-deep);
+      box-shadow: var(--aq-elev-surface);
+    }
+    body.app-view-search .aq-hero-media img {
+      width: 100%; height: 100%; object-fit: cover; object-position: center 55%; display: block;
+    }
+    body.app-view-search .aq-hero-media::after {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background: linear-gradient(180deg, rgba(17,29,58,0.38) 0%, rgba(17,29,58,0.14) 42%, rgba(17,29,58,0.10) 62%, rgba(17,29,58,0.46) 100%);
+    }
+    body.app-view-search .aq-hero-copy {
+      color: #FFFFFF; text-align: center; max-width: 820px; margin: 0 auto;
+      padding-bottom: var(--aq-space-8); min-height: 236px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+      text-shadow: 0 1px 2px rgba(17,29,58,0.35);
+    }
+    body.app-view-search .aq-hero-eyebrow {
+      font-size: 13.5px; margin-bottom: 14px; color: #FFFFFF; padding: 6px 14px; border-radius: var(--aq-radius-pill);
+      background: rgba(17,29,58,0.32); border: 1px solid rgba(255,255,255,0.22); text-shadow: none;
+      -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    }
+    body.app-view-search .aq-hero-eyebrow svg { color: var(--aq-color-secondary); }   /* Soft Lime — لمسة صغيرة واحدة */
+    body.app-view-search .aq-hero-title { font-size: clamp(30px, 3.6vw, 48px); color: #FFFFFF; margin-bottom: 12px; line-height: 1.2; }
+    body.app-view-search .aq-hero-sub { max-width: 66ch; color: rgba(255,255,255,0.88); font-size: clamp(14px, 1.1vw, 17px); }
 
     /* بطاقة البحث: عرض محدود ومركّزة (نِسَب المرجع) */
+    /* PHASE 4: الكونسول أبيض مرتفع (--aq-elev-modal) بعرض محدود ومركّز، يتداخل مع حدّ الهيرو */
     body.app-view-search .aq-console {
-      max-width: 760px; margin-inline: auto;
-      padding: var(--aq-space-6) var(--aq-space-5);
-      /* نفس خلفية "قيمة المخزون" (Mint خفيف) — الصندوق كاملًا (يشمل صفّ زرَّي "بحث
-         بالفلاتر"/"بحث ذكي")، بلا أي تغيير آخر. */
-      background: var(--aq-prop-green-soft, #E4EDEA);
-      /* الخلفية الخضراء الفاتحة قريبة جدًا من لون خلفية الصفحة، فقلّ التباين الذي كان
-         يُبرز الصندوق كعنصر Hero. تعويض بظل أعمق/أوضح (طبقتان: قريبة + بعيدة) خاصًا
-         بهذا السياق فقط — بلا تغيير في الحدّ أو نصف القطر أو أي شيء آخر. */
-      box-shadow: var(--aq-elev-panel);   /* Report 094: نفس لوحة "استكشف" (مستوى 2) بدل قيمة مفردة هنا */
+      position: relative; z-index: 1;
+      max-width: 960px; margin-inline: auto;
+      padding: var(--aq-space-6) var(--aq-space-6);
+      background: var(--aq-color-surface); border: 1px solid var(--aq-color-border); border-radius: var(--radius-xl);
+      box-shadow: var(--aq-elev-modal);
+    }
+    /* تابلت: تداخل أقل وحشو أخف */
+    @media (max-width: 1024px) {
+      :root { --aq-hero-overlap: 84px; }
+      body.app-view-search .aq-hero { padding-inline: var(--aq-space-4); }
+      body.app-view-search .aq-hero-copy { min-height: 200px; }
+      body.app-view-search .aq-console { padding: var(--aq-space-5) var(--aq-space-4); }
+    }
+    /* موبايل: هيرو مضغوط، الكونسول يبقى في التدفّق بتداخل بسيط، لا تمدّد ولا قصّ */
+    @media (max-width: 640px) {
+      :root { --aq-hero-overlap: 48px; }
+      body.app-view-search .aq-hero { padding: var(--aq-space-6) var(--aq-space-3) 0; margin-bottom: var(--aq-space-6); }
+      /* الصورة بارتفاع ثابت خلف النص فقط (الكونسول الطويل يبقى في التدفّق ويتداخل ~40px مع أسفل الصورة) */
+      body.app-view-search .aq-hero-media { inset: 0 0 auto 0; height: 268px; border-radius: var(--radius-lg); }
+      body.app-view-search .aq-hero-copy { min-height: 0; padding-bottom: var(--aq-space-4); }
+      body.app-view-search .aq-hero-eyebrow { font-size: 12px; padding: 5px 10px; }
+      body.app-view-search .aq-hero-title { font-size: clamp(24px, 7vw, 30px); }
+      body.app-view-search .aq-hero-sub { font-size: 13.5px; }
+      body.app-view-search .aq-console { padding: var(--aq-space-4) var(--aq-space-3); border-radius: var(--radius-lg); }
     }
     /* الصف السفلي: دمج "مزيدًا من الفلاتر" + "البحث" + "مسح الفلاتر" في صفّ واحد
        بنفس أسلوب Grid المعتمد أصلًا في "استكشف" (grid-template-areas) — بلا أي نقل
@@ -4152,6 +4196,9 @@
      ووضع النتائج (شريط بحث مضغوط لاصق أعلى الشبكة). التبديل بكلاس على #mainContainer
      فقط — لا مسار جديد، لا iframe، لا نافذة منفصلة، ولا نسخة ثانية من حقول البحث. -->
 <section class="aq-hero" id="aqHero">
+  <!-- LOCAL REDESIGN PHASE 4: صورة الهيرو (الرئيسية فقط — تُخفى في "استكشف" بالقاعدة القائمة). الأصل المؤقت = نسخة من city-bg.jpg؛
+       الصورة النهائية من المالك تُوضع في نفس المسار assets/hero-home.jpg بلا أي تغيير في الكود. -->
+  <div class="aq-hero-media" aria-hidden="true"><img src="assets/hero-home.jpg" alt="" fetchpriority="high" decoding="async"></div>
   <div class="aq-hero-copy" id="aqHeroCopy">
     <p class="aq-hero-eyebrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/><path d="M2 22h20"/></svg><span class="aq-ltr" dir="ltr">AqaR Digital</span> · مخزون عقاري احترافي</p>
     <h1 class="aq-hero-title">ابحث عن الوحدة المناسبة لعميلك</h1>
