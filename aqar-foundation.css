@@ -42,11 +42,18 @@
 .aq-btn--danger { background: transparent; color: var(--aq-color-danger); border-color: var(--aq-color-danger-border); }
 .aq-btn--danger:hover { background: var(--aq-color-danger-bg); color: var(--aq-color-danger); }
 .aq-btn--icon { width: var(--aq-icon-btn); min-height: var(--aq-icon-btn); padding: 0; border-radius: var(--aq-radius-sm); }
+/* LOCAL REDESIGN PHASE 2: دور CTA البرتقالي (Warm Orange) — للفعل الأقوى الوحيد في الشاشة فقط، لا للأزرار العادية.
+   نص أبيض غامق (3.2:1) → يُستخدم بحجم الزر القياسي 13.5–14px bold كأيقونة/عنوان قصير؛ للنص الصغير الطويل استخدم --aq-color-on-accent-strong */
+.aq-btn--cta { background: var(--aq-color-accent); color: var(--aq-color-on-accent); border-color: var(--aq-color-accent); box-shadow: 0 2px 10px rgba(233,104,46,0.24); }
+.aq-btn--cta:hover { background: var(--aq-color-accent-hover); border-color: var(--aq-color-accent-hover); box-shadow: 0 4px 14px rgba(233,104,46,0.30); }
+.aq-btn--cta:focus-visible { outline: 2px solid var(--aq-color-accent-text); outline-offset: 2px; }
+.aq-btn--primary { box-shadow: 0 1px 2px rgba(17,29,58,0.10); }
+.aq-btn--primary:hover { box-shadow: 0 3px 10px rgba(17,29,58,0.18); }
 .aq-btn:disabled, .aq-btn[aria-disabled="true"] { opacity: 0.6; cursor: not-allowed; pointer-events: none; }
 .aq-btn--loading { position: relative; color: transparent !important; pointer-events: none; }
 .aq-btn--loading::after {
   content: ""; position: absolute; width: 16px; height: 16px; border-radius: 50%;
-  border: 2px solid rgba(16,33,30,0.18); border-top-color: var(--aq-prop-green);
+  border: 2px solid var(--aq-color-primary-tint-3); border-top-color: var(--aq-color-primary);
   animation: aq-spin 700ms linear infinite;
 }
 @keyframes aq-spin { to { transform: rotate(360deg); } }
@@ -90,12 +97,15 @@
   border: 1px solid transparent; line-height: 1.6; white-space: nowrap;
 }
 .aq-badge--neutral { background: var(--aq-bg-muted-3); color: var(--aq-text-muted-d); border-color: var(--aq-line-dark); }
-.aq-badge--success { background: var(--aq-success-tint); color: var(--aq-success-soft); border-color: rgba(30,110,69,0.4); }
+.aq-badge--success { background: var(--aq-success-tint); color: var(--aq-success-soft); border-color: var(--aq-color-success-border); }
 .aq-badge--warning { background: var(--aq-warning-tint); color: var(--aq-warning-soft); border-color: var(--aq-color-warning-border); }
-.aq-badge--error   { background: var(--aq-danger-tint); color: var(--aq-danger-soft); border-color: rgba(176,39,31,0.4); }
+.aq-badge--error   { background: var(--aq-danger-tint); color: var(--aq-danger-soft); border-color: var(--aq-color-danger-border); }
 .aq-badge--role    { background: var(--aq-accent-tint-2); color: var(--aq-gold-soft); border-color: var(--aq-border-gold); }
 .aq-badge--status  { background: var(--aq-bg-muted-2); color: var(--aq-text-light); border-color: var(--aq-line-dark); }
 .aq-badge .aq-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+/* LOCAL REDESIGN PHASE 2: شارتا الهوية — accent (خصم/جديد: برتقالي فاتح + نص برتقالي داكن AA) و lime (متاح/تمييز: ليموني فاتح + نص navy) */
+.aq-badge--accent  { background: var(--aq-color-accent-soft); color: var(--aq-color-accent-text); border-color: var(--aq-color-accent-line); }
+.aq-badge--lime    { background: var(--aq-color-secondary-soft); color: var(--aq-color-primary); border-color: var(--aq-color-secondary-line); }
 
 /* ----------------------------------------------------------------- TABLES */
 .aq-table-wrap { overflow-x: auto; border-radius: var(--aq-radius-md); border: 1px solid var(--aq-line-dark); }
@@ -224,7 +234,7 @@
 .aq-select {
   appearance: none; -webkit-appearance: none; cursor: pointer;
   padding-inline-end: 34px;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23AEB9C6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2368727D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
   background-repeat: no-repeat; background-position: left 12px center; background-size: 14px;
 }
 .aq-check { display: inline-flex; align-items: center; gap: var(--aq-space-2); cursor: pointer; font-size: var(--aq-fs-body); color: var(--aq-text-primary); }
@@ -668,7 +678,7 @@ select.aq-form-control { height: var(--aq-input-h); padding-block: 0; }
   padding: var(--aq-space-3) 0 calc(var(--aq-space-3) + env(safe-area-inset-bottom, 0px));
   background: var(--aq-prop-surface);
   border-top: 1px solid var(--aq-prop-border);
-  box-shadow: 0 -8px 20px rgba(11,40,33,0.06);
+  box-shadow: 0 -8px 20px rgba(17,29,58,0.06);
 }
 .aq-form-actions > * { margin-top: 0 !important; }
 .aq-form-actions .aq-form-msg { flex: 1 1 100%; }

@@ -1,29 +1,41 @@
 /* ============================================================================
- * AqaR Digital — App Shell (Phase 2A)
+ * AqaR Digital — App Shell (Phase 2A · LOCAL REDESIGN PHASE 2: premium navy header)
  * ----------------------------------------------------------------------------
- * الهيكل الدائم للمنصة: Header علوي + Sidebar يمين + مساحة محتوى.
+ * الهيكل الدائم للمنصة: Header علوي + مساحة محتوى.
  *   - #mainContainer الحالي هو مساحة المحتوى نفسها (لم يُلف بغلاف جديد —
  *     كي تبقى كل عمليات appendChild الديناميكية القائمة سليمة).
- *   - .aq-header / .aq-sidebar شقيقان له، يظهران فقط مع body.aq-app-on
+ *   - .aq-header شقيق له، يظهر فقط مع body.aq-app-on
  *     (تُضاف في showApp بعد نجاح الدخول/استعادة الجلسة — عرض فقط، لا منطق).
- *   - #appNav المُنتقل إلى السايدبار يحتفظ بكل عناصره وids ومعالجاته كما هي.
+ *   - #appNav يحتفظ بكل عناصره وids ومعالجاته كما هي.
  *   - كل الطبقات تحت المودالات القائمة (1600+) — انظر خريطة z في aqar-tokens.css.
+ *   - LOCAL REDESIGN PHASE 2: الشكل فقط — سطح Deep Navy، نص فاتح، حالة نشطة بمؤشر برتقالي،
+ *     زر الهاتف CTA برتقالي، هوية المستخدم فاتحة. لا تغيير في المسارات/الصلاحيات/المعالجات/الـ DOM.
  * ==========================================================================*/
 
 /* ------------------------------------------------------- GLOBAL TOP HEADER
- * الهوية الجديدة: هيدر أبيض عريض يحمل التنقّل الأساسي للتطبيق كله.
- * السايدبار الجانبي لم يعد التنقّل الأساسي — التنقّل الوحيد الكانوني هنا،
- * وبنفس عناصر #appNav وnavIds القائمة (نفس منطق الصلاحيات بلا أي تغيير).
- * التخطيط ltr عمدًا (شعار يسار · تنقّل وسط · هاتف يمين) كما في المرجع،
- * مع بقاء كل نص عربي بسلوكه الطبيعي داخل عناصره. */
+ * سطح navy عريض يحمل التنقّل الأساسي للتطبيق كله (التنقّل الوحيد الكانوني، بنفس عناصر
+ * #appNav وnavIds القائمة ونفس منطق الصلاحيات). التخطيط ltr عمدًا (شعار يسار · تنقّل
+ * وسط · هاتف يمين) مع بقاء كل نص عربي بسلوكه الطبيعي داخل عناصره. */
+:root {
+  /* توكنز الهيدر الداكن فقط (نص/حدود/تظليل فوق الـ navy) — مشتقة من الهوية، لا ألوان جديدة */
+  --aq-header-bg:          var(--aq-color-primary);
+  --aq-header-fg:          #FFFFFF;
+  --aq-header-fg-muted:    rgba(255,255,255,0.72);
+  --aq-header-line:        rgba(255,255,255,0.14);
+  --aq-header-line-strong: rgba(255,255,255,0.26);
+  --aq-header-hover:       rgba(255,255,255,0.08);
+  --aq-header-active:      rgba(255,255,255,0.12);
+  --aq-header-shadow:      0 1px 0 rgba(255,255,255,0.04) inset, 0 4px 18px rgba(17,29,58,0.22);
+}
 .aq-header {
   display: none;
   position: fixed; top: 0; right: 0; left: 0; height: var(--aq-header-h);
   z-index: var(--aq-z-shell-header);
   direction: ltr;
-  background: var(--aq-prop-surface, #fff);
-  border-bottom: 1px solid var(--aq-prop-border, #E3E6E5);
-  box-shadow: 0 1px 3px rgba(11,40,33,0.06);
+  background: var(--aq-header-bg);
+  border-bottom: 1px solid var(--aq-header-line);
+  box-shadow: var(--aq-header-shadow);
+  color: var(--aq-header-fg);
   align-items: center; gap: var(--aq-space-4);
   padding: 0 var(--aq-space-5);
 }
@@ -32,20 +44,21 @@ body.aq-app-on .aq-header { display: flex; }
 /* ---- شعار AqaR Digital: DIGITAL فوق Real Estate (قفل هوية واحد) ---- */
 .aq-brand { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; text-decoration: none; }
 .aq-brand-mark {
-  width: 38px; height: 38px; border-radius: 10px; flex: 0 0 auto;
-  background: linear-gradient(140deg, var(--aq-prop-green, #0E5446) 0%, var(--aq-prop-green-ink, #023A3A) 100%);
+  width: 38px; height: 38px; border-radius: var(--radius-sm); flex: 0 0 auto;
+  background: var(--aq-color-surface);
   display: flex; align-items: center; justify-content: center;
-  color: #fff; font-weight: var(--aq-fw-black); font-size: var(--aq-fs-body-lg);
+  color: var(--aq-color-primary); font-weight: var(--aq-fw-black); font-size: var(--aq-fs-body-lg);
   letter-spacing: 0.5px;
+  box-shadow: 0 0 0 1px var(--aq-header-line), 0 2px 8px rgba(0,0,0,0.18);
 }
 .aq-brand-lockup { display: flex; flex-direction: column; line-height: 1; min-width: 0; }
 .aq-brand-word {
   font-size: 20px; font-weight: var(--aq-fw-black); letter-spacing: 0.16em;
-  color: var(--aq-prop-text, #16211E); text-transform: uppercase;
+  color: var(--aq-header-fg); text-transform: uppercase;
 }
 .aq-brand-sub {
   font-size: 10px; font-weight: var(--aq-fw-bold); letter-spacing: 0.30em;
-  color: var(--aq-prop-green, #0E5446); text-transform: uppercase; margin-top: 3px;
+  color: var(--aq-color-secondary); text-transform: uppercase; margin-top: 3px;   /* Soft Lime — استخدام محدود (10.6:1 على navy) */
 }
 
 /* ---- التنقّل الأساسي داخل الهيدر ---- */
@@ -62,76 +75,94 @@ body.aq-app-on .aq-header { display: flex; }
 .aq-header #appNav .app-nav-btn {
   flex: 0 0 auto; width: auto; max-width: none; min-width: 0;
   display: inline-flex; align-items: center; gap: 7px;
-  padding: 9px 13px; border-radius: var(--aq-radius-pill);
+  padding: 9px 13px; border-radius: var(--radius-sm);
   background: transparent; border: 1px solid transparent;
-  color: var(--aq-prop-text, #16211E);
+  color: var(--aq-header-fg-muted);
   font-family: var(--aq-font); font-size: var(--aq-fs-button); font-weight: var(--aq-fw-bold);
   cursor: pointer; white-space: nowrap; text-decoration: none;
+  position: relative;
   transition: background var(--aq-motion-base), color var(--aq-motion-base), border-color var(--aq-motion-base);
 }
-.aq-header #appNav .app-nav-btn svg { width: 17px; height: 17px; flex: 0 0 auto; opacity: 0.85; }
+.aq-header #appNav .app-nav-btn svg { width: 17px; height: 17px; flex: 0 0 auto; opacity: 0.9; }
 .aq-header #appNav .app-nav-btn:hover {
-  background: var(--aq-prop-green-soft, #E4EDEA); color: var(--aq-prop-green, #0E5446);
+  background: var(--aq-header-hover); color: var(--aq-header-fg);
 }
+/* الحالة النشطة: سطح أفتح قليلًا + حدّ ناعم + مؤشر برتقالي سفلي (الأكسنت الوحيد في التنقّل) */
 .aq-header #appNav .app-nav-btn.is-active {
-  background: var(--aq-prop-green-soft, #E4EDEA);
-  border-color: var(--aq-prop-green-line, #BFD8CF);
-  color: var(--aq-prop-green, #0E5446);
+  background: var(--aq-header-active);
+  border-color: var(--aq-header-line);
+  color: var(--aq-header-fg);
 }
-.aq-header #appNav .app-nav-btn:focus-visible { outline: var(--aq-focus-outline); outline-offset: 2px; }
+.aq-header #appNav .app-nav-btn.is-active::after {
+  content: ""; position: absolute; left: 12px; right: 12px; bottom: -1px; height: 2px;
+  border-radius: 2px; background: var(--aq-color-accent);
+}
+.aq-header #appNav .app-nav-btn:focus-visible { outline: 2px solid var(--aq-color-accent); outline-offset: 2px; }
 
-/* ---- طرف الهيدر: هوية المستخدم · خروج · زر الهاتف ---- */
+/* ---- طرف الهيدر: جرس الإشعارات · هوية المستخدم · خروج · زر الهاتف ---- */
 .aq-header-end { display: flex; align-items: center; gap: var(--aq-space-3); flex: 0 0 auto; }
 .aq-header-identity { display: flex; align-items: center; gap: var(--aq-space-2); min-width: 0; }
 .aq-header-identity .aq-id-text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.3; min-width: 0; }
 .aq-header-identity .aq-id-name {
-  font-size: var(--aq-fs-caption); font-weight: var(--aq-fw-bold); color: var(--aq-prop-text, #16211E);
+  font-size: var(--aq-fs-caption); font-weight: var(--aq-fw-bold); color: var(--aq-header-fg);
   max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.aq-header-identity .aq-id-role { font-size: var(--aq-fs-caption-sm); color: var(--aq-prop-green, #0E5446); font-weight: var(--aq-fw-medium); }
+.aq-header-identity .aq-id-role { font-size: var(--aq-fs-caption-sm); color: var(--aq-color-secondary); font-weight: var(--aq-fw-medium); }
 .aq-avatar {
   width: 34px; height: 34px; border-radius: 50%; flex: 0 0 auto; overflow: hidden;
-  background: var(--aq-prop-green-soft, #E4EDEA); border: 1px solid var(--aq-prop-green-line, #BFD8CF);
+  background: var(--aq-header-active); border: 1px solid var(--aq-header-line-strong);
   display: flex; align-items: center; justify-content: center;
-  color: var(--aq-prop-green, #0E5446); font-weight: var(--aq-fw-black); font-size: var(--aq-fs-body);
+  color: var(--aq-header-fg); font-weight: var(--aq-fw-black); font-size: var(--aq-fs-body);
 }
 .aq-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* زر أيقونة على الهيدر الداكن (جرس/خروج/قائمة): عائلة واحدة — نفس id/معالجات */
+.aq-header .aq-notif-bell,
+.aq-side-logout,
+.aq-menu-toggle {
+  background: transparent; border: 1px solid var(--aq-header-line-strong);
+  color: var(--aq-header-fg-muted); border-radius: var(--radius-sm);
+  transition: border-color var(--aq-motion-base), color var(--aq-motion-base), background var(--aq-motion-base);
+}
+.aq-header .aq-notif-bell:hover, .aq-header .aq-notif-bell[aria-expanded="true"],
+.aq-menu-toggle:hover {
+  background: var(--aq-header-hover); color: var(--aq-header-fg); border-color: var(--aq-header-fg-muted);
+}
+/* شارة العدّ: برتقالي الأكسنت + نص navy (5.1:1) — الرقم قائم كما هو */
+.aq-header .aq-notif-badge { background: var(--aq-color-accent); color: var(--aq-color-on-accent-strong); box-shadow: 0 0 0 2px var(--aq-header-bg); }
 
 /* زر الخروج — نفس id ونفس المعالج القائم، بشكل أيقوني داخل الهيدر */
 .aq-side-logout {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  width: var(--aq-icon-btn); height: var(--aq-icon-btn); padding: 0; border-radius: var(--aq-radius-sm);
-  background: transparent; border: 1px solid var(--aq-prop-border, #E3E6E5);
-  color: var(--aq-prop-text-muted, #6E7573); font-family: var(--aq-font);
+  width: var(--aq-icon-btn); height: var(--aq-icon-btn); padding: 0;
+  font-family: var(--aq-font);
   font-size: var(--aq-fs-caption); font-weight: var(--aq-fw-bold); cursor: pointer;
-  transition: border-color var(--aq-motion-base), color var(--aq-motion-base), background var(--aq-motion-base);
 }
 .aq-side-logout span { display: none; }
-.aq-side-logout:hover { border-color: var(--aq-danger-border); color: var(--aq-danger-soft); background: var(--aq-danger-tint); }
+.aq-side-logout:hover { border-color: var(--aq-color-danger-border); color: var(--aq-header-fg); background: rgba(176,39,31,0.32); }
 .aq-side-logout svg { width: 17px; height: 17px; }
-.aq-side-logout:focus-visible, .aq-menu-toggle:focus-visible { outline: var(--aq-focus-outline); outline-offset: 2px; }
+.aq-side-logout:focus-visible, .aq-menu-toggle:focus-visible, .aq-header .aq-notif-bell:focus-visible { outline: 2px solid var(--aq-color-accent); outline-offset: 2px; }
 
-/* زر الهاتف (أقصى اليمين) — الرقم الرسمي المستخدم في أصل الغلاف الخاص بالشركة */
+/* زر الهاتف (أقصى اليمين) — الـ CTA البرتقالي الوحيد في الهيدر؛ الرقم الرسمي كما هو */
 .aq-phone-cta {
   display: inline-flex; align-items: center; gap: 8px; flex: 0 0 auto;
-  padding: 11px 18px; border-radius: var(--aq-radius-pill);
-  background: var(--aq-color-primary); color: var(--aq-color-on-primary); text-decoration: none;
-  font-size: var(--aq-fs-button); font-weight: var(--aq-fw-bold); letter-spacing: 0.2px;
+  padding: 11px 18px; border-radius: var(--radius-sm);
+  background: var(--aq-color-accent); color: var(--aq-color-on-accent); text-decoration: none;
+  font-size: var(--aq-fs-body); font-weight: var(--aq-fw-black); letter-spacing: 0.2px;
   white-space: nowrap; direction: ltr;
-  transition: background var(--aq-motion-base), transform var(--aq-motion-fast);
-  box-shadow: none;
+  transition: background var(--aq-motion-base), transform var(--aq-motion-fast), box-shadow var(--aq-motion-base);
+  box-shadow: 0 2px 10px rgba(233,104,46,0.28);
 }
-.aq-phone-cta:hover { background: var(--aq-color-primary-dark); }
+.aq-phone-cta:hover { background: var(--aq-color-accent-hover); box-shadow: 0 4px 14px rgba(233,104,46,0.34); }
+.aq-phone-cta:active { transform: translateY(1px); }
+.aq-phone-cta:focus-visible { outline: 2px solid var(--aq-header-fg); outline-offset: 2px; }
 .aq-phone-cta svg { width: 16px; height: 16px; flex: 0 0 auto; }
 
 /* زر القائمة (موبايل) */
 .aq-menu-toggle {
-  display: none; background: transparent; border: 1px solid var(--aq-prop-border, #E3E6E5);
-  border-radius: var(--aq-radius-sm); color: var(--aq-prop-text, #16211E); cursor: pointer;
+  display: none; cursor: pointer;
   width: 38px; height: 38px; align-items: center; justify-content: center; flex: 0 0 auto;
-  transition: border-color var(--aq-motion-base), color var(--aq-motion-base);
 }
-.aq-menu-toggle:hover { border-color: var(--aq-prop-green, #0E5446); color: var(--aq-prop-green, #0E5446); }
 .aq-menu-toggle svg { width: 18px; height: 18px; min-width: 18px; flex: 0 0 18px; }
 
 /* ------------------------------------------------- CONTENT AREA (existing) */
@@ -151,21 +182,23 @@ body.aq-app-on #mainContainer > * { max-width: var(--aq-container-max); margin-i
 }
 @media (max-width: 1024px) {
   .aq-menu-toggle { display: flex; }
-  /* التنقّل يتحوّل إلى لوحة منسدلة أسفل الهيدر — لا سايدبار جانبي */
+  /* التنقّل يتحوّل إلى لوحة منسدلة أسفل الهيدر — لا سايدبار جانبي (نفس الآلية، سطح navy أعمق) */
   .aq-header #appNav {
     position: fixed; top: var(--aq-header-h); inset-inline: 0;
     display: none; flex-direction: column; align-items: stretch; gap: 2px;
-    background: var(--aq-prop-surface, #fff);
-    border-bottom: 1px solid var(--aq-prop-border, #E3E6E5);
-    box-shadow: 0 12px 28px rgba(11,40,33,0.12);
+    background: var(--aq-color-primary-deep);
+    border-bottom: 1px solid var(--aq-header-line);
+    box-shadow: 0 16px 36px rgba(17,29,58,0.30);
     padding: var(--aq-space-3); overflow-y: auto; max-height: calc(100vh - var(--aq-header-h));
     z-index: var(--aq-z-shell-sidebar);
   }
   body.aq-app-on.aq-drawer-open .aq-header #appNav { display: flex; }
   .aq-header #appNav .app-nav-btn {
-    width: 100%; justify-content: flex-start; border-radius: var(--aq-radius-sm);
+    width: 100%; justify-content: flex-start; border-radius: var(--radius-sm);
     padding: 12px 14px; direction: rtl; text-align: right;
   }
+  /* في اللوحة العمودية المؤشر البرتقالي يصبح شريطًا جانبيًا (يمين — بداية القراءة) */
+  .aq-header #appNav .app-nav-btn.is-active::after { left: auto; right: 0; top: 10px; bottom: 10px; width: 3px; height: auto; }
   body.aq-app-on.aq-drawer-open .aq-shell-overlay { display: block; }
   .aq-header-identity .aq-id-text { display: none; }
   .aq-phone-cta { padding: 10px 14px; }
@@ -196,23 +229,23 @@ body.aq-app-on #dashboardView .dash-page-title { display: none; }
   align-items: flex-end; justify-content: space-between; gap: var(--aq-space-4);
   margin: var(--aq-space-1) 0 var(--aq-space-4);
   padding-bottom: var(--aq-space-3);
-  border-bottom: 1px solid var(--aq-border-accent);
+  border-bottom: 1px solid var(--aq-color-border);
 }
 body.aq-app-on .aq-page-header:not([hidden]) { display: flex; }
 .aq-page-header-main { min-width: 0; flex: 1 1 auto; }
 .aq-page-crumbs {
   display: flex; flex-wrap: wrap; align-items: center; gap: var(--aq-space-1) var(--aq-space-2);
-  font-size: var(--aq-fs-caption); color: var(--aq-text-tertiary); margin-bottom: var(--aq-space-1);
+  font-size: var(--aq-fs-caption); color: var(--aq-color-text-muted); margin-bottom: var(--aq-space-1);
 }
-.aq-page-crumb.is-current { color: var(--aq-gold-soft); }
-.aq-page-crumb-sep { color: var(--aq-text-disabled); }
+.aq-page-crumb.is-current { color: var(--aq-color-primary); font-weight: var(--aq-fw-bold); }
+.aq-page-crumb-sep { color: var(--aq-color-text-disabled); }
 .aq-page-header .aq-page-title {
   margin: 0; font-size: var(--aq-fs-title-lg); font-weight: var(--aq-fw-bold); line-height: var(--aq-lh-tight);
-  color: var(--aq-text-primary); padding-inline-start: var(--aq-space-3); border-inline-start: 3px solid var(--aq-gold);
+  color: var(--aq-color-primary); padding-inline-start: var(--aq-space-3); border-inline-start: 3px solid var(--aq-color-accent);
 }
 .aq-page-subtitle {
   margin: var(--aq-space-1) 0 0; font-size: var(--aq-fs-label); line-height: var(--aq-lh-body);
-  color: var(--aq-text-tertiary); max-width: 620px;
+  color: var(--aq-color-text-muted); max-width: 620px;
 }
 .aq-page-actions { display: flex; align-items: center; gap: var(--aq-space-2); flex: 0 0 auto; }
 @media (max-width: 640px) {

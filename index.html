@@ -50,13 +50,13 @@
   <script defer src="aqar-shell.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0E5446">
+  <meta name="theme-color" content="#111D3A">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Digital RE">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230E5446%22/%3E%3Cpath fill=%22%23FFFFFF%22 fill-rule=%22evenodd%22 d=%22M31 22h20c17.7 0 28 11.5 28 28S68.7 78 51 78H31V22Zm14 13v30h6c9.4 0 14-6.2 14-15s-4.6-15-14-15h-6Z%22/%3E%3Ccircle cx=%2279%22 cy=%2279%22 r=%226%22 fill=%22%23B4FF6C%22/%3E%3C/svg%3E">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230E5446%22/%3E%3Cpath fill=%22%23FFFFFF%22 fill-rule=%22evenodd%22 d=%22M31 22h20c17.7 0 28 11.5 28 28S68.7 78 51 78H31V22Zm14 13v30h6c9.4 0 14-6.2 14-15s-4.6-15-14-15h-6Z%22/%3E%3Ccircle cx=%2279%22 cy=%2279%22 r=%226%22 fill=%22%23B4FF6C%22/%3E%3C/svg%3E">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23111D3A%22/%3E%3Cpath fill=%22%23FFFFFF%22 fill-rule=%22evenodd%22 d=%22M31 22h20c17.7 0 28 11.5 28 28S68.7 78 51 78H31V22Zm14 13v30h6c9.4 0 14-6.2 14-15s-4.6-15-14-15h-6Z%22/%3E%3Ccircle cx=%2279%22 cy=%2279%22 r=%226%22 fill=%22%23E9682E%22/%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23111D3A%22/%3E%3Cpath fill=%22%23FFFFFF%22 fill-rule=%22evenodd%22 d=%22M31 22h20c17.7 0 28 11.5 28 28S68.7 78 51 78H31V22Zm14 13v30h6c9.4 0 14-6.2 14-15s-4.6-15-14-15h-6Z%22/%3E%3Ccircle cx=%2279%22 cy=%2279%22 r=%226%22 fill=%22%23E9682E%22/%3E%3C/svg%3E">
   <style>
     :root {
       /* ============================================================
@@ -73,7 +73,7 @@
       --navy: var(--aq-color-primary);
       --navy-deep: var(--aq-color-primary-dark);
       --navy-dark: var(--aq-color-primary-deep);
-      --navy-soft: #0F6152;
+      --navy-soft: #1C2C55;                         /* LOCAL REDESIGN PHASE 2: navy أفتح (كان أخضر #0F6152) */
       /* accent family (was gold) — primary green, readable on light surfaces */
       --gold: var(--aq-color-primary);
       --gold-soft: var(--aq-color-primary);
@@ -88,7 +88,7 @@
       --muted: var(--aq-color-text-muted);
       /* lines & borders */
       --border: var(--aq-color-border-subtle);
-      --border-gold: rgba(14,84,70,0.22);            /* subtle green hairline */
+      --border-gold: rgba(17,29,58,0.18);            /* LOCAL REDESIGN PHASE 2: subtle navy hairline (كان أخضر) */
       --line-dark: var(--aq-color-border-subtle);
       /* environment */
       --page-bg: var(--aq-color-canvas);
@@ -276,9 +276,9 @@
     .filters-card select {
       background: var(--input-dark);
       color: var(--text-light);
-      border: 1px solid var(--aq-border-strong);
+      border: 1px solid var(--aq-color-border);
     }
-    .filters-card select { color-scheme: dark; }
+    .filters-card select { color-scheme: light; }   /* LOCAL REDESIGN PHASE 2: قوائم النظام فاتحة (الأسطح بيضاء) */
     .filters-card input::placeholder { color: var(--text-muted); }
     .filters-card input:focus,
     .filters-card select:focus {
@@ -303,7 +303,7 @@
     input, select {
       width: 100%;
       padding: 9px 11px;
-      border: 1px solid var(--border);
+      border: 1px solid var(--aq-color-border);   /* LOCAL REDESIGN PHASE 2: حدّ الحقول الموحّد #DDE2E1 (كان hairline شفاف) */
       border-radius: var(--radius-sm);
       font-size:  var(--aq-fs-small);
       font-family: inherit;
@@ -493,7 +493,7 @@
     .unit-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 2px 0 12px; padding: 2px 38px 0 44px; }
     .status-badge {
       font-size:  var(--aq-fs-caption-sm); padding: 3px 9px; border-radius:  var(--radius-sm); font-weight: 800; letter-spacing: 0; line-height: 1.35;
-      background: var(--aq-success-tint); color: var(--aq-success-soft); border: 1px solid var(--aq-success-border);
+      background: var(--aq-color-secondary-soft); color: var(--aq-color-primary); border: 1px solid var(--aq-color-secondary-line);   /* LOCAL REDESIGN PHASE 2: متاح = ليموني فاتح + navy */
     }
     .status-badge.محجوز { background: var(--aq-color-warning-bg); color: var(--aq-color-warning); border-color: var(--aq-color-warning-border); }
     .status-badge.مباع { background: var(--aq-danger-tint); color: var(--aq-danger-soft); border-color: var(--aq-danger-border); }
@@ -694,19 +694,19 @@
       position: fixed; bottom: 20px; right: 20px; z-index: 3000;
       display: flex; flex-direction: column; gap: 10px; align-items: flex-end;
     }
+    /* LOCAL REDESIGN PHASE 2: توست هادئ — سطح أبيض، نص navy، شريط جانبي دلالي (نجاح/خطأ/تحذير/معلومة) بدل الخلفيات المشبّعة */
     .toast {
-      background: var(--glass-strong); color: var(--text-light); padding: 12px 18px;
-      border: 1px solid var(--line-dark); border-radius: var(--radius-sm);
-      -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
-      font-size:  var(--aq-fs-small); font-weight: 600; box-shadow: var(--shadow-soft);
+      background: var(--aq-color-surface); color: var(--aq-color-text); padding: 12px 18px;
+      border: 1px solid var(--aq-color-border); border-inline-start: 4px solid var(--aq-color-primary); border-radius: var(--radius-md);
+      font-size:  var(--aq-fs-small); font-weight: 600; box-shadow: var(--shadow-3);
       opacity: 0; transform: translateY(10px); transition: opacity .25s, transform .25s;
       max-width: 320px;
     }
     .toast.show { opacity: 1; transform: translateY(0); }
-    .toast-success { background: rgba(30,110,69,0.95); border-color: rgba(30,110,69,0.6); }
-    .toast-error { background: rgba(176,39,31,0.95); border-color: var(--aq-danger-border-strong); }
-    .toast-warn { background: rgba(122,86,0,0.95); border-color: rgba(122,86,0,0.6); }
-    .toast-info { background: var(--glass-strong); }
+    .toast-success { border-inline-start-color: var(--aq-color-success); }
+    .toast-error { border-inline-start-color: var(--aq-color-danger); }
+    .toast-warn { border-inline-start-color: var(--aq-color-warning); }
+    .toast-info { border-inline-start-color: var(--aq-color-info); }
 
     /* شريط المقارنة العائم */
     #scrollTopBtn {
@@ -1258,7 +1258,7 @@
       padding: 8px 10px; font-size: var(--aq-fs-small); color: var(--text-light);
       border-radius: var(--radius-sm);
     }
-    #statsView .stats-activity-row.is-alt { background: rgba(14,84,70,0.045); }
+    #statsView .stats-activity-row.is-alt { background: rgba(17,29,58,0.045); }
 
     @media (max-width: 900px) {
       #statsView .stats-grid-2 { grid-template-columns: 1fr; }
@@ -1900,7 +1900,7 @@
     #sessionRestoreSplash::before {
       content: ""; position: absolute; inset: -24px; z-index: 0;
       background:
-        linear-gradient(180deg, rgba(14,84,70,0.68) 0%, rgba(14,84,70,0.64) 55%, rgba(14,84,70,0.6) 100%),
+        linear-gradient(180deg, rgba(17,29,58,0.70) 0%, rgba(17,29,58,0.66) 55%, rgba(17,29,58,0.62) 100%),
         url('city-bg.jpg') center / cover no-repeat;
       filter: blur(4px); pointer-events: none;
     }
@@ -1922,7 +1922,7 @@
     .access-gate::before {
       content: ""; position: absolute; inset: -24px; z-index: 0;
       background:
-        linear-gradient(180deg, rgba(14,84,70,0.68) 0%, rgba(14,84,70,0.64) 55%, rgba(14,84,70,0.6) 100%),
+        linear-gradient(180deg, rgba(17,29,58,0.70) 0%, rgba(17,29,58,0.66) 55%, rgba(17,29,58,0.62) 100%),
         url('city-bg.jpg') center / cover no-repeat;
       filter: blur(4px);
       pointer-events: none;
@@ -1993,7 +1993,7 @@
       display: flex; justify-content: space-between; align-items: center; gap: var(--aq-space-3);
       margin-bottom: var(--aq-space-4); padding-bottom: var(--aq-space-3); border-bottom: 1px solid var(--aq-color-border-subtle);
     }
-    .modal-title { font-size: var(--aq-fs-title-sm); font-weight: 700; letter-spacing: 0; line-height: var(--aq-lh-tight); color: var(--aq-color-text); min-width: 0; }
+    .modal-title { font-size: var(--aq-fs-title-sm); font-weight: 700; letter-spacing: 0; line-height: var(--aq-lh-tight); color: var(--aq-color-primary); min-width: 0; }   /* LOCAL REDESIGN PHASE 2: عنوان navy */
     .modal-close {
       background: var(--bg); color: var(--muted); border: 1px solid var(--border);
       border-radius: var(--radius-sm); width: var(--aq-icon-btn); height: var(--aq-icon-btn); font-size:  var(--aq-fs-body-lg); padding: 0;
@@ -2609,12 +2609,12 @@
     /* Report 092: عمق مرئي أوضح بلا تغميق — ظل قريب خفيف + ظل محيط أوسع وأنعم (نفس صبغة الظلال الخضراء الداكنة للهوية)؛
        تدرّج الارتفاع: الخلفية < الكروت < لوحة البحث. الأبعاد/الزوايا/المحتوى بلا تغيير. */
     :root {
-      --aq-elev-card:       0 1px 2px rgba(11,40,33,0.06), 0 4px 12px rgba(11,40,33,0.09), 0 18px 40px rgba(11,40,33,0.14);
-      --aq-elev-card-hover: 0 2px 4px rgba(11,40,33,0.06), 0 10px 20px rgba(11,40,33,0.12), 0 26px 52px rgba(11,40,33,0.18);
-      --aq-elev-panel:      0 1px 2px rgba(11,40,33,0.06), 0 10px 24px rgba(11,40,33,0.12), 0 32px 72px rgba(11,40,33,0.20);
+      --aq-elev-card:       0 1px 2px rgba(17,29,58,0.06), 0 4px 12px rgba(17,29,58,0.09), 0 18px 40px rgba(17,29,58,0.14);
+      --aq-elev-card-hover: 0 2px 4px rgba(17,29,58,0.06), 0 10px 20px rgba(17,29,58,0.12), 0 26px 52px rgba(17,29,58,0.18);
+      --aq-elev-panel:      0 1px 2px rgba(17,29,58,0.06), 0 10px 24px rgba(17,29,58,0.12), 0 32px 72px rgba(17,29,58,0.20);
       /* Report 094: مستويان إضافيان بنفس اللغة — surface = حاوية/كارت داخل حاوية (مستوى 1 هادئ)، modal = مستوى 3 (فوق كل شيء) */
-      --aq-elev-surface:    0 1px 2px rgba(11,40,33,0.05), 0 6px 16px rgba(11,40,33,0.07);
-      --aq-elev-modal:      0 2px 6px rgba(11,40,33,0.08), 0 16px 40px rgba(11,40,33,0.16), 0 48px 96px rgba(11,40,33,0.22);
+      --aq-elev-surface:    0 1px 2px rgba(17,29,58,0.05), 0 6px 16px rgba(17,29,58,0.07);
+      --aq-elev-modal:      0 2px 6px rgba(17,29,58,0.08), 0 16px 40px rgba(17,29,58,0.16), 0 48px 96px rgba(17,29,58,0.22);
     }
     body.aq-search-ui .unit-card {
       background: var(--aq-color-surface); color: var(--aq-color-text);
@@ -2826,7 +2826,7 @@
     }
     body.aq-search-ui .card-provenance { color: var(--aq-prop-text-faint); border-top-color: var(--aq-prop-border); }
     body.aq-search-ui .card-provenance a { color: var(--aq-prop-green); }
-    body.aq-search-ui .status-badge { background: var(--aq-prop-green-soft); color: var(--aq-prop-green-deep); border-color: var(--aq-prop-green-line); }
+    body.aq-search-ui .status-badge { background: var(--aq-color-secondary-soft); color: var(--aq-color-primary); border-color: var(--aq-color-secondary-line); }   /* LOCAL REDESIGN PHASE 2 */
     body.aq-search-ui .status-badge.محجوز { background: var(--aq-color-warning-bg); color: var(--aq-color-warning); border-color: var(--aq-color-warning-border); }
     body.aq-search-ui .status-badge.مباع { background: var(--aq-color-danger-bg); color: var(--aq-color-danger); border-color: var(--aq-color-danger-border); }
 
@@ -2859,7 +2859,7 @@
      * ولا تتحكم أبعاد الصورة الأصلية - عرضية/طولية/ضخمة - في ارتفاع الـ Modal) */
     .ud-media {
       position: relative; width: 100%; aspect-ratio: 16 / 10; overflow: hidden; border-radius: 14px;
-      background: var(--aq-prop-canvas-2); cursor: pointer; box-shadow: 0 6px 20px rgba(11,40,33,0.10);
+      background: var(--aq-prop-canvas-2); cursor: pointer; box-shadow: 0 6px 20px rgba(17,29,58,0.10);
     }
     .ud-media img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
     .ud-media-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--aq-prop-text-faint); cursor: default; font-weight: 700; }
@@ -2893,7 +2893,7 @@
     .ud-thumbs { display: flex; gap: 8px; padding: 10px 0 0; overflow-x: auto; scrollbar-width: thin; }
     .ud-thumbs img {
       width: 96px; aspect-ratio: 4 / 3; height: auto; object-fit: cover; object-position: center; flex: none;
-      border-radius: 10px; cursor: pointer; border: 2px solid transparent; box-shadow: 0 1px 4px rgba(11,40,33,0.10);
+      border-radius: 10px; cursor: pointer; border: 2px solid transparent; box-shadow: 0 1px 4px rgba(17,29,58,0.10);
       transition: border-color var(--ease), transform var(--ease);
     }
     .ud-thumbs img:hover { border-color: var(--aq-prop-green-line); }
@@ -2923,7 +2923,7 @@
     /* ---- الأقسام والبلاطات (Icon + Label + Value) ---- */
     .ud-sec {
       background: var(--aq-prop-surface); border: 1px solid var(--aq-prop-border); border-radius: 14px;
-      padding: 12px 14px 14px; box-shadow: 0 2px 10px rgba(11,40,33,0.05); min-width: 0;
+      padding: 12px 14px 14px; box-shadow: 0 2px 10px rgba(17,29,58,0.05); min-width: 0;
     }
     .ud-sec-title {
       display: flex; align-items: center; gap: 8px; margin: -12px -14px 12px; padding: 10px 14px;
@@ -2953,7 +2953,7 @@
       display: flex; align-items: stretch; gap: 14px; margin-bottom: 10px;
       background: linear-gradient(180deg, #FFFFFF 0%, var(--aq-prop-green-soft) 100%);
       border: 1px solid var(--aq-prop-green-line); border-radius: 14px; padding: 12px 14px;
-      box-shadow: 0 4px 14px rgba(11,40,33,0.08), inset 0 1px 0 #fff;
+      box-shadow: 0 4px 14px rgba(17,29,58,0.08), inset 0 1px 0 #fff;
     }
     .ud-price-total { display: flex; align-items: flex-start; gap: 10px; flex: 1 1 auto; min-width: 0; }
     .ud-price-total > .ico { width: 30px; height: 30px; flex: none; color: var(--aq-prop-green-deep); margin-top: 4px; }
@@ -3097,7 +3097,7 @@
       border: 1px solid var(--aq-prop-border); color-scheme: light;
     }
     /* زر التنقّل داخل الهيدر: لا يقلب لخلفية داكنة عند الضغط */
-    .aq-header #appNav .app-nav-btn:active { background: var(--aq-prop-green-soft); color: var(--aq-prop-green); }
+    .aq-header #appNav .app-nav-btn:active { background: var(--aq-header-active); color: var(--aq-header-fg); }   /* LOCAL REDESIGN PHASE 2: هيدر navy */
 
     /* بوابة الدخول: كانت لوحة داكنة فوق صورة — صارت بطاقة بيضاء على لوحة فاتحة */
     .access-gate { background: var(--aq-prop-canvas); }
