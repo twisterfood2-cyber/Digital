@@ -2654,15 +2654,30 @@
       color: var(--aq-color-text-muted); font-size: var(--aq-fs-caption); font-weight: 700;
     }
     body.aq-search-ui .unit-cover-empty .ico { width: 34px; height: 34px; color: var(--aq-color-primary-line); }
-    body.aq-search-ui .unit-cover-empty::after { display: none; }
+    body.aq-search-ui .unit-cover-empty::after { background: linear-gradient(to top, rgba(17,29,58,0.16), rgba(17,29,58,0)); }
+    /* PHASE 3C: الشريط السفلي فوق الصورة — رقم الوحدة يسار · عدّاد الصور · الحالة يمين (ltr داخل عمود الصورة) */
     body.aq-search-ui .unit-cover-strip {
-      position: absolute; z-index: 3; bottom: 10px; left: 10px; right: 10px;
-      display: flex; align-items: center; justify-content: flex-start; gap: 8px; pointer-events: none;
+      position: absolute; z-index: 3; bottom: 8px; left: 8px; right: 8px;
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 6px; pointer-events: none; direction: ltr; min-width: 0;
+      /* لو الصورة ضيقة (شبكة 3 أعمدة) تلتف الحالة لسطر ثانٍ فوق الرقم بدل أن تُقصّ — تبقى يمينًا بفضل margin-left:auto */
     }
+    body.aq-search-ui .unit-cover-strip .unit-id {
+      display: inline-flex; align-items: center; flex: none;
+      background: rgba(255,255,255,0.92); color: var(--aq-color-primary); border: 1px solid rgba(255,255,255,0.6);
+      border-radius: var(--radius-sm); padding: 2px 8px; font-size: var(--aq-fs-caption-sm); font-weight: 800; letter-spacing: 0.4px;
+      direction: ltr; unicode-bidi: isolate; font-variant-numeric: tabular-nums; box-shadow: var(--shadow-1);
+      -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+    }
+    body.aq-search-ui .unit-cover-strip .status-badge {
+      display: inline-flex; align-items: center; gap: 5px; flex: none; margin-left: auto;
+      border-radius: var(--aq-radius-pill); padding: 2px 9px; font-size: var(--aq-fs-caption-sm); font-weight: 800; line-height: 1.5;
+      box-shadow: var(--shadow-1); white-space: nowrap;
+    }
+    body.aq-search-ui .unit-cover-strip .status-badge .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: none; }
     body.aq-search-ui .unit-cover-strip .img-count-badge {
       position: static; display: inline-flex; align-items: center; gap: 4px;
       background: rgba(17,29,58,0.62); color: #fff; border: 1px solid rgba(255,255,255,0.16);
-      border-radius: var(--aq-radius-pill); padding: 3px 9px; font-size: var(--aq-fs-caption-sm); font-weight: 700; direction: ltr;
+      border-radius: var(--aq-radius-pill); padding: 2px 7px; font-size: var(--aq-fs-caption-sm); font-weight: 700; direction: ltr; flex: none;
     }
     body.aq-search-ui .unit-cover-strip .img-count-badge .ico { width: 12px; height: 12px; }
     /* المفضلة (أعلى يمين الصورة) / المقارنة (أعلى يسار الصورة) — نفس العناصر والوظائف، سطح أبيض شبه شفاف + ظل خفيف */
@@ -2697,18 +2712,9 @@
     /* ---- عمود المعلومات (يمين، RTL) ---- */
     body.aq-search-ui .unit-body {
       direction: rtl; flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column;
-      padding: var(--aq-space-4) var(--aq-space-5); gap: var(--aq-space-3);
+      padding: var(--aq-space-3) var(--aq-space-4); gap: var(--aq-space-2);   /* PHASE 3C: أكثر إحكامًا بعد نقل الحالة/الرقم إلى الصورة */
     }
-    body.aq-search-ui .unit-card .unit-info-block { min-height: 0; display: flex; flex-direction: column; gap: var(--aq-space-2); }
-    /* الصف الأول: الحالة (ليموني/navy · تحذير · خطر) + رقم الوحدة (ثانوي) + شارة تغيّر سعر المفضلة */
-    body.aq-search-ui .unit-head-row { display: flex; align-items: center; flex-wrap: wrap; gap: var(--aq-space-2); min-width: 0; }
-    body.aq-search-ui .unit-head-row .status-badge { display: inline-flex; align-items: center; gap: 6px; border-radius: var(--aq-radius-pill); padding: 3px 10px; font-size: var(--aq-fs-caption-sm); font-weight: 800; }
-    body.aq-search-ui .unit-head-row .status-badge .status-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex: none; }
-    body.aq-search-ui .unit-head-row .unit-id {
-      color: var(--aq-color-text-muted); font-size: var(--aq-fs-caption); font-weight: 700; letter-spacing: 0.4px;
-      direction: ltr; unicode-bidi: isolate; font-variant-numeric: tabular-nums;
-      background: var(--aq-color-surface-subtle); border: 1px solid var(--aq-color-border); border-radius: var(--radius-sm); padding: 2px 8px;
-    }
+    body.aq-search-ui .unit-card .unit-info-block { min-height: 0; display: flex; flex-direction: column; gap: 6px; }
     body.aq-search-ui .unit-title { color: var(--aq-color-text); font-size: var(--aq-fs-title-sm); font-weight: 700; line-height: var(--aq-lh-tight); margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     body.aq-search-ui .unit-card .unit-title-name { color: var(--aq-color-primary); font-weight: 800; }
     body.aq-search-ui .unit-card .unit-title-type { color: var(--aq-color-text-muted); font-weight: 600; font-size: var(--aq-fs-small); }
@@ -2734,7 +2740,7 @@
     body.aq-search-ui .spec-chip .spec-txt small { font-size: var(--aq-fs-caption-sm); color: var(--aq-color-text-muted); font-weight: 600; }
     /* ---- التذييل: السعر (أقوى عنصر) · المطور/التواريخ · عرض التفاصيل ---- */
     body.aq-search-ui .unit-card-footer {
-      margin-top: auto; padding-top: var(--aq-space-3); border-top: 1px solid var(--aq-color-border-subtle);
+      margin-top: auto; padding-top: var(--aq-space-2); border-top: 1px solid var(--aq-color-border-subtle);
       display: flex; align-items: center; flex-wrap: wrap; gap: var(--aq-space-3) var(--aq-space-4); min-width: 0;
     }
     body.aq-search-ui .unit-card .unit-price-box {
@@ -2818,7 +2824,6 @@
     @container (max-width: 460px) {
       body.aq-search-ui .unit-body { padding: var(--aq-space-3); }
       body.aq-search-ui .spec-chip .spec-txt small { display: none; }     /* القيمة + الأيقونة كافية في الكارت الضيق جدًا */
-      body.aq-search-ui .unit-head-row .unit-id { padding: 1px 6px; }
     }
     /* ---- تابلت (≤1024): عمودان — وعند ≤800 عمود واحد (الكارت أعرض ويبقى أفقيًا) ---- */
     @media (max-width: 1024px) {
@@ -7150,15 +7155,18 @@
     const images = (u['Images'] || '').split(',').map(s => s.trim()).filter(Boolean);
     const eager = typeof idx === 'number' && idx < (typeof eagerCardImages_ === 'number' ? eagerCardImages_ : 0);
     const imgLoadAttrs = eager ? 'loading="eager" fetchpriority="high" decoding="async"' : 'loading="lazy" decoding="async"';
-    const coverStrip = images.length > 1 ? `
+    /* PHASE 3C: رقم الوحدة (يسار) + عدّاد الصور + الحالة (يمين) كطبقة فوق أسفل الصورة — نسخة واحدة لكل عنصر، .unit-id تبقى داخل الكارت */
+    const coverStrip = `
         <div class="unit-cover-strip">
-          <span class="img-count-badge">${ICON.camera} ${images.length}</span>
-        </div>` : '';
+          <span class="unit-id">${escHtml_(u['Unit ID'])}</span>
+          ${images.length > 1 ? `<span class="img-count-badge">${ICON.camera} ${images.length}</span>` : ''}
+          <span class="status-badge ${escHtml_(u['Status'])}"><i class="status-dot"></i>${escHtml_(u['Status'])}</span>
+        </div>`;
     const coverHtml = images.length > 0 ? `
       <div class="unit-cover">
         <img src="${escHtml_(getThumbUrl(images[0]))}" alt="صورة الوحدة" ${imgLoadAttrs} onerror="thumbFallback_(this)">
         ${coverStrip}
-      </div>` : `<div class="unit-cover unit-cover-empty">${ICON.building}<span>لا توجد صورة</span></div>`;
+      </div>` : `<div class="unit-cover unit-cover-empty">${ICON.building}<span>لا توجد صورة</span>${coverStrip}</div>`;
 
     const favPrice = getFavoritePrice(u['Unit ID']);
     const currentPrice = Number(u['Price']) || 0;
@@ -7235,11 +7243,6 @@
       </div>
       <div class="unit-body">
         <div class="unit-info-block">
-          <div class="unit-head-row">
-            <span class="status-badge ${escHtml_(u['Status'])}"><i class="status-dot"></i>${escHtml_(u['Status'])}</span>
-            <span class="unit-id">${escHtml_(u['Unit ID'])}</span>
-            ${priceDropBadge}
-          </div>
           <div class="unit-title"><span class="unit-title-name">${escHtml_(u['Project Name'] || u['City'])}</span> <span class="unit-title-type">- ${escHtml_(u['Property Type'])}</span></div>
           <div class="unit-loc">${ICON.pin} ${escHtml_(u['City'])} - ${escHtml_(u['Area/District'])}</div>
           ${row1.length ? `<div class="unit-specs">${row1.join('')}</div>` : ''}
@@ -7248,6 +7251,7 @@
         </div>
         <div class="unit-card-footer">
           ${priceHtml}
+          ${priceDropBadge}
           <div class="unit-foot-meta">
             ${u['Developer Name'] ? `<div class="unit-dev-row">${ICON.building}<span class="dev-label">المطور:</span> <span class="dev-name">${escHtml_(u['Developer Name'])}</span></div>` : ''}
             ${metaLine}
