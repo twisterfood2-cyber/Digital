@@ -2593,102 +2593,92 @@
     }
     body.aq-search-ui .fav-toggle-btn .ico { width: 14px; height: 14px; margin: 0; }
 
-    /* ---- 6) بطاقة العقار (نفس buildUnitCardHtml — إعادة تنسيق فقط) ---- */
-    /* حدّ أدنى أضيق للمسار (264px بدل 300px) → 3 أعمدة عند 1280 و4 عند الشاشات
-       الأعرض، بكثافة أقرب لشبكة المرجع بلا أي تغيير في بناء البطاقة. */
+    /* ---- 6) بطاقة العقار (نفس buildUnitCardHtml — إعادة تنسيق فقط) ----
+     * LOCAL REDESIGN PHASE 3 — الكارت الأفقي Premium (Explore): قائمة عمود واحد كامل العرض؛ صورة يسار (Desktop)
+     * ~36% بنسبة 4:3 والمعلومات RTL يمين؛ سطح أبيض، حدّ #DDE2E1، زوايا --radius-lg، ظلال navy ناعمة؛ الحالة/رقم الوحدة
+     * أعلى المعلومات؛ السعر أقوى عنصر (navy)؛ ≤640px يتكدّس رأسيًا (صورة ← معلومات ← مواصفات ← سعر ← إجراءات).
+     * الخطافات محفوظة: .unit-card/.unit-id/.fav-btn/.compare-checkbox/.unit-cover img/.img-count-badge/status-<الحالة>. */
     body.aq-search-ui .results-grid {
-      gap: var(--aq-space-5);
-      grid-template-columns: repeat(auto-fill, minmax(min(100%, 264px), 1fr));
+      display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--aq-space-4);
     }
-    /* =========================================================================
-     * كارت الوحدة في "استكشف" — Compact Premium Card (مرجع: unit card.png)
-     * الحالة + رقم الوحدة فوق الجزء السفلي من الصورة (بلا صف مستقل)، صفّان من المواصفات،
-     * لوحة سعر Premium، المطور، وسطر "أضيفت • آخر تعديل" - كله بأقل ارتفاع ممكن.
-     * ========================================================================= */
-    /* Report 068: الحاوية على توكنز 066 — سطح/حدّ/زوايا/ظل واحد؛ hover = رفع خفيف + الدرجة الأعلى من الظل */
-    /* Report 092: عمق مرئي أوضح بلا تغميق — ظل قريب خفيف + ظل محيط أوسع وأنعم (نفس صبغة الظلال الخضراء الداكنة للهوية)؛
-       تدرّج الارتفاع: الخلفية < الكروت < لوحة البحث. الأبعاد/الزوايا/المحتوى بلا تغيير. */
+    /* Report 092/094: تدرّج الارتفاع (surface < card < panel < modal) — الصبغة navy (PHASE 2) */
     :root {
       --aq-elev-card:       0 1px 2px rgba(17,29,58,0.06), 0 4px 12px rgba(17,29,58,0.09), 0 18px 40px rgba(17,29,58,0.14);
       --aq-elev-card-hover: 0 2px 4px rgba(17,29,58,0.06), 0 10px 20px rgba(17,29,58,0.12), 0 26px 52px rgba(17,29,58,0.18);
       --aq-elev-panel:      0 1px 2px rgba(17,29,58,0.06), 0 10px 24px rgba(17,29,58,0.12), 0 32px 72px rgba(17,29,58,0.20);
-      /* Report 094: مستويان إضافيان بنفس اللغة — surface = حاوية/كارت داخل حاوية (مستوى 1 هادئ)، modal = مستوى 3 (فوق كل شيء) */
       --aq-elev-surface:    0 1px 2px rgba(17,29,58,0.05), 0 6px 16px rgba(17,29,58,0.07);
       --aq-elev-modal:      0 2px 6px rgba(17,29,58,0.08), 0 16px 40px rgba(17,29,58,0.16), 0 48px 96px rgba(17,29,58,0.22);
+      --aq-card-media-w:    34%;     /* عرض عمود الصورة على Desktop (4:3) */
+      --aq-card-media-min:  250px;
+      --aq-card-media-max:  400px;
     }
     body.aq-search-ui .unit-card {
       background: var(--aq-color-surface); color: var(--aq-color-text);
       border: 1px solid var(--aq-color-border); border-right: 1px solid var(--aq-color-border);
       border-radius: var(--radius-lg); box-shadow: var(--aq-elev-card);
       -webkit-backdrop-filter: none; backdrop-filter: none;
-      padding: var(--aq-space-3); overflow: hidden; display: flex; flex-direction: column;
+      padding: 0; overflow: hidden; min-width: 0;
+      display: flex; flex-direction: row; align-items: stretch;
+      direction: ltr;                 /* حاوية التخطيط فقط: الصورة (أول عنصر) يسار — النص داخل .unit-body يبقى RTL */
       transition: transform var(--ease), box-shadow var(--ease), border-color var(--ease);
       cursor: pointer;
     }
     body.aq-search-ui .unit-card:hover {
-      background: var(--aq-color-surface); transform: translateY(-2px);
+      background: var(--aq-color-surface); transform: translateY(-1px);
       border-color: var(--aq-color-primary-line); box-shadow: var(--aq-elev-card-hover);
     }
-    body.aq-search-ui .unit-card:focus-visible { outline: 2px solid var(--aq-prop-green); outline-offset: 2px; }
-    /* الصورة: الحاوية تحدد المساحة (نسبة ثابتة) والصورة تملؤها بقصّ مركزي - لا تتحكم أبعاد الصورة في الكارت */
+    body.aq-search-ui .unit-card:focus-visible { outline: 2px solid var(--aq-color-primary); outline-offset: 2px; }
+    /* ---- عمود الصورة (يسار) ---- */
+    body.aq-search-ui .unit-media {
+      position: relative; flex: 0 0 var(--aq-card-media-w); min-width: var(--aq-card-media-min); max-width: var(--aq-card-media-max);
+      aspect-ratio: 4 / 3; align-self: stretch; background: var(--aq-color-surface-muted); overflow: hidden;
+    }
     body.aq-search-ui .unit-cover {
-      position: relative; margin: calc(-1 * var(--aq-space-3)) calc(-1 * var(--aq-space-3)) var(--aq-space-3); border-radius: 0; width: auto; height: auto;
-      aspect-ratio: 4 / 3; overflow: hidden; background: var(--aq-prop-canvas-2);
+      position: absolute; inset: 0; margin: 0; border-radius: 0; width: auto; height: auto; aspect-ratio: auto;
+      overflow: hidden; background: var(--aq-color-surface-muted);
     }
     body.aq-search-ui .unit-cover img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; transition: transform 320ms ease; }
-    body.aq-search-ui .unit-card:hover .unit-cover img { transform: scale(1.02); }
+    body.aq-search-ui .unit-card:hover .unit-cover img { transform: scale(1.015); }
+    /* تدرّج navy خفيف أسفل الصورة فقط حيث تجلس شارة عدّاد الصور — لا تعتيم للصورة كلها */
     body.aq-search-ui .unit-cover::after {
-      content: ''; position: absolute; inset: auto 0 0 0; height: 52%;
-      background: linear-gradient(to top, rgba(2,32,26,0.62), rgba(2,32,26,0));
+      content: ''; position: absolute; inset: auto 0 0 0; height: 38%;
+      background: linear-gradient(to top, rgba(17,29,58,0.42), rgba(17,29,58,0));
       pointer-events: none;
     }
-    body.aq-search-ui .unit-cover-empty { background: linear-gradient(135deg, var(--aq-color-surface-muted), var(--aq-color-primary-soft)); }
-    /* شريط الحالة + رقم الوحدة (+ عدّاد الصور) فوق أسفل الصورة */
+    body.aq-search-ui .unit-cover-empty {
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--aq-space-2);
+      background: linear-gradient(135deg, var(--aq-color-surface-muted), var(--aq-color-primary-soft));
+      color: var(--aq-color-text-muted); font-size: var(--aq-fs-caption); font-weight: 700;
+    }
+    body.aq-search-ui .unit-cover-empty .ico { width: 34px; height: 34px; color: var(--aq-color-primary-line); }
+    body.aq-search-ui .unit-cover-empty::after { display: none; }
     body.aq-search-ui .unit-cover-strip {
-      position: absolute; z-index: 3; bottom: 10px; right: 10px; left: 10px;
-      display: flex; align-items: center; gap: 8px; pointer-events: none;
-    }
-    body.aq-search-ui .unit-cover-strip .status-badge {
-      display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
-      background: var(--aq-color-primary-deep); color: var(--aq-color-on-solid); border: 1px solid rgba(255,255,255,0.18);
-      border-radius: var(--aq-radius-pill); padding: 4px 11px; font-size: var(--aq-fs-caption); font-weight: 700;
-      box-shadow: var(--shadow-1);
-    }
-    body.aq-search-ui .unit-cover-strip .status-badge .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #B4FF6C; flex: none; }
-    body.aq-search-ui .unit-cover-strip .status-badge.محجوز { background: var(--aq-color-warning-solid); color: var(--aq-color-on-solid); } /* Report 066: color صريح — كان يُغلب بقاعدة الشارة الفاتحة (نفس الخصوصية) فيختفي النص */
-    body.aq-search-ui .unit-cover-strip .status-badge.محجوز .status-dot { background: #FFD97A; }
-    body.aq-search-ui .unit-cover-strip .status-badge.مباع { background: var(--aq-color-danger-solid); color: var(--aq-color-on-solid); }
-    body.aq-search-ui .unit-cover-strip .status-badge.مباع .status-dot { background: #FFB4AC; }
-    body.aq-search-ui .unit-cover-strip .unit-id {
-      color: #fff; font-size: var(--aq-fs-body); font-weight: 800; letter-spacing: 0.6px;
-      text-shadow: 0 1px 6px rgba(2,20,16,0.55); margin-inline-start: 2px; direction: ltr; unicode-bidi: isolate;
-    }
-    /* فاصل رأسي رفيع بين الحالة ورقم الوحدة - كما في الصورة المرجعية */
-    body.aq-search-ui .unit-cover-strip .cover-strip-divider {
-      width: 1px; height: 15px; background: rgba(255,255,255,0.4); flex: none; font-style: normal;
+      position: absolute; z-index: 3; bottom: 10px; left: 10px; right: 10px;
+      display: flex; align-items: center; justify-content: flex-start; gap: 8px; pointer-events: none;
     }
     body.aq-search-ui .unit-cover-strip .img-count-badge {
-      position: static; margin-inline-start: auto; display: inline-flex; align-items: center; gap: 4px;
-      background: rgba(2,32,26,0.62); color: #fff; border: 1px solid rgba(255,255,255,0.16);
-      border-radius: var(--aq-radius-pill); padding: 3px 8px; font-size: var(--aq-fs-caption-sm); font-weight: 700;
+      position: static; display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(17,29,58,0.62); color: #fff; border: 1px solid rgba(255,255,255,0.16);
+      border-radius: var(--aq-radius-pill); padding: 3px 9px; font-size: var(--aq-fs-caption-sm); font-weight: 700; direction: ltr;
     }
     body.aq-search-ui .unit-cover-strip .img-count-badge .ico { width: 12px; height: 12px; }
-    /* المفضلة / المقارنة - نفس العناصر والوظائف، هوية خضراء فاتحة فوق الصورة */
-    /* Report 068: المفضلة دائرة 32 (كانت 42×32 بسبب padding الزر العام) والمقارنة مربّع 32 (كان 26، والمربع الداخلي 24×20 بسبب padding الحقول) */
+    /* المفضلة (أعلى يمين الصورة) / المقارنة (أعلى يسار الصورة) — نفس العناصر والوظائف، سطح أبيض شبه شفاف + ظل خفيف */
     body.aq-search-ui .fav-btn {
-      width: 32px; height: 32px; padding: 0;
-      background: rgba(255,255,255,0.92); border: 1px solid var(--aq-color-primary-line);
-      color: var(--aq-color-primary); box-shadow: var(--shadow-1);
+      top: 10px; left: auto; right: 10px; width: 34px; height: 34px; padding: 0; border-radius: 50%;
+      background: rgba(255,255,255,0.94); border: 1px solid rgba(255,255,255,0.7);
+      color: var(--aq-color-primary); box-shadow: var(--shadow-2); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+      font-size: var(--aq-fs-body);
     }
-    body.aq-search-ui .fav-btn:hover { background: var(--aq-color-surface); border-color: var(--aq-color-primary); }
-    body.aq-search-ui .fav-btn.active { color: var(--aq-color-primary); border-color: var(--aq-color-primary); }
-    body.aq-search-ui .fav-btn.active .ico { fill: currentColor; stroke: none; }
+    body.aq-search-ui .fav-btn:hover { transform: scale(1.06); background: var(--aq-color-surface); border-color: var(--aq-color-primary-line); }
+    body.aq-search-ui .fav-btn.active { color: var(--aq-color-accent); border-color: var(--aq-color-accent-line); }
+    body.aq-search-ui .fav-btn.active .ico { fill: currentColor; stroke: currentColor; }
+    body.aq-search-ui .fav-btn .ico { width: 16px; height: 16px; }
     body.aq-search-ui .compare-checkbox {
-      width: 32px; height: 32px; padding: 0;
-      background: rgba(255,255,255,0.92); border-radius: var(--radius-sm); border: 1px solid var(--aq-color-primary-line);
-      box-shadow: var(--shadow-1);
+      top: 10px; right: auto; left: 10px; width: 34px; height: 34px; padding: 0;
+      background: rgba(255,255,255,0.94); border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.7);
+      box-shadow: var(--shadow-2); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
     }
-    body.aq-search-ui .compare-checkbox:hover { background: var(--aq-color-surface); border-color: var(--aq-color-primary); }
+    body.aq-search-ui .compare-checkbox:hover { background: var(--aq-color-surface); border-color: var(--aq-color-primary-line); }
     body.aq-search-ui .compare-checkbox:focus-within { outline: 2px solid var(--aq-color-primary); outline-offset: 2px; }
     body.aq-search-ui .compare-checkbox input {
       appearance: none; -webkit-appearance: none; margin: 0; padding: 0; display: block;
@@ -2701,100 +2691,136 @@
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
       background-repeat: no-repeat; background-position: center; background-size: 12px 12px;
     }
-    /* الاسم / النوع / الموقع */
-    body.aq-search-ui .unit-card .unit-info-block { min-height: 0; }
-    /* Report 068: المستوى 2 — العنوان 16/700 (كان 15/800)، النوع لاحقة أهدأ، الموقع 12 muted */
-    body.aq-search-ui .unit-title { color: var(--aq-color-text); font-size: var(--aq-fs-card-title); font-weight: 700; }
-    body.aq-search-ui .unit-loc { color: var(--aq-color-text-muted); font-weight: 600; }
-    body.aq-search-ui .unit-card .unit-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: var(--aq-space-1); line-height: var(--aq-lh-tight); }
-    /* اسم الوحدة (بارز) + نوع العقار كلاحقة أهدأ - نفس الـhierarchy في الصورة المرجعية */
-    body.aq-search-ui .unit-card .unit-title-name { color: var(--aq-color-text); font-weight: 700; }
-    body.aq-search-ui .unit-card .unit-title-type { color: var(--aq-color-text-muted); font-weight: 600; font-size: var(--aq-fs-caption); }
-    body.aq-search-ui .unit-card .unit-loc { margin-bottom: var(--aq-space-2); font-size: var(--aq-fs-caption); }
-    body.aq-search-ui .unit-card .unit-loc .ico { color: var(--aq-color-primary); }
-    /* المواصفات: صفّان بثلاث شرائح (سطر واحد لكل شريحة) */
-    body.aq-search-ui .unit-card .unit-specs {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: var(--aq-space-2);
-      margin: 0 0 var(--aq-space-2); min-height: 0; overflow: visible;
-      direction: rtl;   /* ترتيب بصري حتمي: أول شريحة في DOM = أقصى اليمين، لا يتأثر بأي وراثة/استجابة */
+    /* ---- عمود المعلومات (يمين، RTL) ---- */
+    body.aq-search-ui .unit-body {
+      direction: rtl; flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column;
+      padding: var(--aq-space-4) var(--aq-space-5); gap: var(--aq-space-3);
     }
+    body.aq-search-ui .unit-card .unit-info-block { min-height: 0; display: flex; flex-direction: column; gap: var(--aq-space-2); }
+    /* الصف الأول: الحالة (ليموني/navy · تحذير · خطر) + رقم الوحدة (ثانوي) + شارة تغيّر سعر المفضلة */
+    body.aq-search-ui .unit-head-row { display: flex; align-items: center; flex-wrap: wrap; gap: var(--aq-space-2); min-width: 0; }
+    body.aq-search-ui .unit-head-row .status-badge { display: inline-flex; align-items: center; gap: 6px; border-radius: var(--aq-radius-pill); padding: 3px 10px; font-size: var(--aq-fs-caption-sm); font-weight: 800; }
+    body.aq-search-ui .unit-head-row .status-badge .status-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex: none; }
+    body.aq-search-ui .unit-head-row .unit-id {
+      color: var(--aq-color-text-muted); font-size: var(--aq-fs-caption); font-weight: 700; letter-spacing: 0.4px;
+      direction: ltr; unicode-bidi: isolate; font-variant-numeric: tabular-nums;
+      background: var(--aq-color-surface-subtle); border: 1px solid var(--aq-color-border); border-radius: var(--radius-sm); padding: 2px 8px;
+    }
+    body.aq-search-ui .unit-title { color: var(--aq-color-text); font-size: var(--aq-fs-title-sm); font-weight: 700; line-height: var(--aq-lh-tight); margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    body.aq-search-ui .unit-card .unit-title-name { color: var(--aq-color-primary); font-weight: 800; }
+    body.aq-search-ui .unit-card .unit-title-type { color: var(--aq-color-text-muted); font-weight: 600; font-size: var(--aq-fs-small); }
+    body.aq-search-ui .unit-card .unit-loc {
+      display: flex; align-items: center; gap: 6px; margin: 0; font-size: var(--aq-fs-small); color: var(--aq-color-text-muted); font-weight: 600;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
+    }
+    body.aq-search-ui .unit-card .unit-loc .ico { width: 15px; height: 15px; flex: none; color: var(--aq-color-accent); }
+    /* المواصفات: شرائح مضغوطة (أيقونة + قيمة + تسمية) تلتف تلقائيًا — نفس الحقول ونفس الترتيب */
+    body.aq-search-ui .unit-card .unit-specs {
+      display: flex; flex-wrap: wrap; gap: var(--aq-space-2); margin: 0; min-height: 0; overflow: visible; direction: rtl;
+    }
+    body.aq-search-ui .unit-card .unit-specs + .unit-specs { margin-top: calc(-1 * var(--aq-space-1)); }
     body.aq-search-ui .spec-chip {
-      /* توسيط حقيقي لمجموعة (أيقونة + قيمة/تسمية) داخل الكارت: justify-content:center يوسّط
-       * المجموعة على المحور الرئيسي بصرف النظر عن اتجاه RTL (بخلاف flex-start الافتراضي
-       * الذي كان يُلصق المجموعة بحافة الكارت اليمنى تحت RTL). لا تغيير في الحجم/الحدود/الحشو. */
-      display: flex; align-items: center; justify-content: center; gap: var(--aq-space-2); min-width: 0;
+      display: inline-flex; align-items: center; gap: 7px; min-width: 0; max-width: 100%;
       background: var(--aq-color-surface-subtle); color: var(--aq-color-text);
       border: 1px solid var(--aq-color-border); border-radius: var(--radius-sm);
-      padding: var(--aq-space-1) var(--aq-space-2); box-shadow: none; white-space: nowrap;
+      padding: 5px 10px; box-shadow: none; white-space: nowrap;
     }
-    body.aq-search-ui .spec-chip .ico { width: 16px; height: 16px; flex: none; color: var(--aq-color-primary); }
-    /* align-items:center يوسّط كل سطر (القيمة والتسمية) بالنسبة للآخر عند اختلاف طولهما،
-     * بدل ترك الافتراضي (stretch) يمدّد السطرين لعرض واحد فيظهر السطر الأقصر ملتصقًا
-     * بحافة تبعًا لاتجاه RTL رغم توسيط المجموعة الخارجية. */
-    body.aq-search-ui .spec-chip .spec-txt { display: flex; flex-direction: column; align-items: center; min-width: 0; line-height: 1.2; }
-    /* max-width:100% يُبقي القيمة/التسمية داخل عرض الشريحة (فيعمل الـ ellipsis) مع بقائهما متمركزتين */
-    body.aq-search-ui .spec-chip .spec-txt b { font-size: var(--aq-fs-caption); font-weight: 700; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
-    body.aq-search-ui .spec-chip .spec-txt small { font-size: var(--aq-fs-caption-sm); color: var(--aq-color-text-muted); font-weight: 600; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
-    /* كروت ضيقة (شبكة 5-6 أعمدة): إخفاء أيقونة الشريحة وتقليص الحشو حتى تبقى القيمة والتسمية مقروءتين */
-    body.aq-search-ui .unit-card { container-type: inline-size; }
-    @container (max-width: 250px) {
-      body.aq-search-ui .spec-chip { gap: var(--aq-space-1); padding: var(--aq-space-1) 6px; }
-      body.aq-search-ui .spec-chip > .ico { display: none; }
-      body.aq-search-ui .unit-card .unit-price-box { padding: var(--aq-space-2) 10px; }
-      body.aq-search-ui .unit-card .final-price { font-size: var(--aq-fs-body-lg); }
+    body.aq-search-ui .spec-chip .ico { width: 15px; height: 15px; flex: none; color: var(--aq-color-primary); }
+    body.aq-search-ui .spec-chip .spec-txt { display: inline-flex; align-items: baseline; gap: 5px; min-width: 0; line-height: 1.3; }
+    body.aq-search-ui .spec-chip .spec-txt b { font-size: var(--aq-fs-small); font-weight: 700; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+    body.aq-search-ui .spec-chip .spec-txt small { font-size: var(--aq-fs-caption-sm); color: var(--aq-color-text-muted); font-weight: 600; }
+    /* ---- التذييل: السعر (أقوى عنصر) · المطور/التواريخ · عرض التفاصيل ---- */
+    body.aq-search-ui .unit-card-footer {
+      margin-top: auto; padding-top: var(--aq-space-3); border-top: 1px solid var(--aq-color-border-subtle);
+      display: flex; align-items: center; flex-wrap: wrap; gap: var(--aq-space-3) var(--aq-space-4); min-width: 0;
     }
-    /* لوحة السعر Premium: عمق + حدّ + ظل ناعم، بلا زيادة مبالغ فيها في الارتفاع */
-    body.aq-search-ui .unit-card-footer { margin-top: auto; padding-top: 0; }
-    /* لوحة السعر: عمود رأسي (flex-column, align-items:center) - السعر النهائي وسعر المتر
-     * (.price-center) يتمركزان تلقائيًا بالنسبة لعرض المستطيل بالكامل لأن align-items:center
-     * يُوسّط كل عنصر بحسب عرض محتواه هو، بصرف النظر عمّا يعلوه من عناصر (.price-top). فوقه،
-     * صفّ السعر قبل الخصم + Badge الخصم (عند وجود خصم) يُثبَّت على جانب البداية (يمين RTL)
-     * عبر align-self:flex-start - نفس توزيع الصورة المرجعية (كليهما مجموعة واحدة أعلى يمين
-     * اللوحة، والسعر النهائي بارز ومتمركز تمامًا أسفلهما). */
-    /* Report 068: المستوى 1 — لوحة السعر سطح مُبرَز مسطّح (بلا تدرّج/ظل) والسعر 20/800 بالأخضر الأساسي الواحد */
     body.aq-search-ui .unit-card .unit-price-box {
-      display: flex; flex-direction: column; align-items: center; gap: var(--aq-space-1);
-      background: var(--aq-color-surface-accent);
-      border: 1px solid var(--aq-color-primary-line); border-radius: var(--radius-md); padding: var(--aq-space-2) var(--aq-space-3); margin-top: var(--aq-space-2);
-      box-shadow: none;
+      display: flex; flex-direction: column; align-items: flex-start; gap: 2px; flex: 0 1 auto; min-width: 0;
+      background: transparent; border: 0; border-radius: 0; padding: 0; margin: 0; box-shadow: none;
+      height: auto; overflow: visible; justify-content: flex-start; text-align: start;   /* يلغي صندوق السعر القديم (108px/تدرّج) */
     }
-    body.aq-search-ui .unit-card .price-top {
-      align-self: flex-start; display: flex; align-items: center; gap: 8px; max-width: 100%; min-width: 0;
-    }
-    body.aq-search-ui .unit-card .price-old-group { display: flex; flex-direction: column; gap: 1px; align-items: flex-end; text-align: end; min-width: 0; }
-    body.aq-search-ui .unit-card .price-center {
-      display: flex; flex-direction: column; align-items: center; gap: 1px; min-width: 0; text-align: center;
-    }
+    body.aq-search-ui .unit-card .price-top { display: flex; align-items: center; gap: var(--aq-space-2); max-width: 100%; min-width: 0; }
+    body.aq-search-ui .unit-card .price-old-group { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+    body.aq-search-ui .unit-card .price-center { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; min-width: 0; }
     body.aq-search-ui .unit-card .price-old-label { font-size: var(--aq-fs-caption-sm); color: var(--aq-color-text-muted); font-weight: 600; white-space: nowrap; }
     body.aq-search-ui .unit-card .old-price { font-size: var(--aq-fs-caption); color: var(--aq-color-text-muted); font-weight: 600; text-decoration: line-through; white-space: nowrap; }
-    body.aq-search-ui .unit-card .final-price { font-size: var(--aq-fs-section-title); line-height: var(--aq-lh-tight); color: var(--aq-color-primary); font-weight: 800; margin: 0; white-space: nowrap; font-variant-numeric: tabular-nums; }
-    body.aq-search-ui .unit-card .final-price .cur { font-size: var(--aq-fs-caption); font-weight: 700; }
-    body.aq-search-ui .unit-card .per-meter { display: inline-flex; align-items: center; gap: var(--aq-space-1); font-size: var(--aq-fs-caption-sm); color: var(--aq-color-text-muted); font-weight: 600; margin: 0; }
+    body.aq-search-ui .unit-card .final-price {
+      font-size: var(--aq-fs-title-lg); line-height: var(--aq-lh-tight); color: var(--aq-color-primary); font-weight: 800; margin: 0; white-space: nowrap;
+      font-variant-numeric: tabular-nums; unicode-bidi: isolate;
+    }
+    body.aq-search-ui .unit-card .final-price .cur { font-size: var(--aq-fs-small); font-weight: 700; color: var(--aq-color-text-muted); }
+    body.aq-search-ui .unit-card .per-meter { display: inline-flex; align-items: center; gap: 4px; font-size: var(--aq-fs-caption); color: var(--aq-color-text-muted); font-weight: 600; margin: 0; }
     body.aq-search-ui .unit-card .per-meter .ico { width: 12px; height: 12px; color: var(--aq-color-primary); }
+    /* خصم: برتقالي فاتح + نص برتقالي داكن (.aq-badge--accent) — بلا برتقالي مشبّع كخلفية */
     body.aq-search-ui .discount-tag {
-      display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; flex: none;
-      background: var(--aq-color-warning-bg); color: var(--aq-color-warning); border: 1px solid var(--aq-color-warning-border); border-radius: var(--aq-radius-pill);
-      padding: 4px 10px; font-size: var(--aq-fs-caption-sm); font-weight: 700; box-shadow: none;
+      display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; flex: none; margin: 0;
+      background: var(--aq-color-accent-soft); color: var(--aq-color-accent-text); border: 1px solid var(--aq-color-accent-line); border-radius: var(--aq-radius-pill);
+      padding: 3px 9px; font-size: var(--aq-fs-caption-sm); font-weight: 800; line-height: 1.5; box-shadow: none;
     }
     body.aq-search-ui .discount-tag .ico { width: 12px; height: 12px; }
-    /* المطور + سطر التواريخ (بلا صناديق - أقل مساحة رأسية) */
-    body.aq-search-ui .unit-dev-row {
-      display: flex; align-items: center; gap: var(--aq-space-2); min-width: 0;
-      font-size: var(--aq-fs-caption); color: var(--aq-color-text-muted); font-weight: 600;
-      margin-top: var(--aq-space-2); overflow: hidden;
+    /* شارة تغيّر سعر المفضلة: المعنى الدلالي محفوظ (نزول = نجاح، زيادة = خطر) بأسطح فاتحة بدل الصلبة */
+    body.aq-search-ui .price-drop-badge {
+      display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: var(--aq-radius-pill);
+      background: var(--aq-color-success-bg); color: var(--aq-color-success); border: 1px solid var(--aq-color-success-border);
+      font-size: var(--aq-fs-caption-sm); font-weight: 700; letter-spacing: 0; text-align: start;
     }
-    body.aq-search-ui .unit-dev-row .ico { flex-shrink: 0; color: var(--aq-color-primary); }
+    body.aq-search-ui .price-drop-badge.price-up-badge { background: var(--aq-color-danger-bg); color: var(--aq-color-danger); border-color: var(--aq-color-danger-border); }
+    body.aq-search-ui .price-drop-badge .ico { width: 12px; height: 12px; }
+    /* المطور + سطر التواريخ */
+    body.aq-search-ui .unit-foot-meta { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+    body.aq-search-ui .unit-dev-row {
+      display: flex; align-items: center; gap: 6px; min-width: 0; margin: 0;
+      font-size: var(--aq-fs-caption); color: var(--aq-color-text-muted); font-weight: 600; overflow: hidden;
+    }
+    body.aq-search-ui .unit-dev-row .ico { flex-shrink: 0; width: 14px; height: 14px; color: var(--aq-color-primary); }
     body.aq-search-ui .unit-dev-row .dev-name { color: var(--aq-color-text); font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
     body.aq-search-ui .unit-meta-line {
-      display: flex; align-items: center; gap: var(--aq-space-2); min-width: 0; margin-top: var(--aq-space-1);
+      display: flex; align-items: center; gap: 6px; min-width: 0; margin: 0;
       font-size: var(--aq-fs-caption-sm); color: var(--aq-color-text-muted); font-weight: 600;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     body.aq-search-ui .unit-meta-line .ico { width: 12px; height: 12px; flex: none; }
     body.aq-search-ui .unit-meta-line span { overflow: hidden; text-overflow: ellipsis; }
     body.aq-search-ui .unit-meta-line i { font-style: normal; margin: 0 2px; }
+    /* "عرض التفاصيل": عنصر بصري بشكل الزر الأساسي (navy) — الكارت كله هو الزر (role=button) */
+    body.aq-search-ui .unit-cta {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex: none;
+      min-height: var(--aq-btn-h-compact); padding: 0 16px; border-radius: var(--radius-sm);
+      background: var(--aq-color-primary); color: var(--aq-color-on-primary);
+      font-size: var(--aq-fs-button); font-weight: 700; white-space: nowrap; box-shadow: 0 1px 2px rgba(17,29,58,0.10);
+      transition: background var(--ease), box-shadow var(--ease);
+    }
+    body.aq-search-ui .unit-cta .ico { width: 15px; height: 15px; }
+    body.aq-search-ui .unit-card:hover .unit-cta { background: var(--aq-color-primary-dark); box-shadow: 0 3px 10px rgba(17,29,58,0.18); }
+    /* مباع: الصورة رمادية (قاعدة الأساس) + تخفيف السعر والشرائح */
     body.aq-search-ui .unit-card.status-مباع .unit-price-box,
     body.aq-search-ui .unit-card.status-مباع .spec-chip { opacity: 0.85; }
+    /* هيكل التحميل (skeleton) بنفس الهيئة الأفقية */
+    body.aq-search-ui .skeleton-card { flex-direction: row; }
+    body.aq-search-ui .skeleton-card .skel-cover { flex: 0 0 var(--aq-card-media-w); min-width: var(--aq-card-media-min); max-width: var(--aq-card-media-max); height: auto; min-height: 200px; margin: 0; border-radius: 0; }
+    body.aq-search-ui .skeleton-card .skel-line, body.aq-search-ui .skeleton-card .skel-chip-row, body.aq-search-ui .skeleton-card .skel-box { margin-inline: var(--aq-space-5); }
+    body.aq-search-ui .skeleton-card .skel-line:first-of-type { margin-top: var(--aq-space-4); }
+    /* ---- تابلت (641–1024): أفقي مضغوط — صورة أعرض قليلًا وحشو أقل ---- */
+    @media (max-width: 1024px) {
+      :root { --aq-card-media-w: 40%; --aq-card-media-min: 220px; }
+      body.aq-search-ui .unit-body { padding: var(--aq-space-3) var(--aq-space-4); gap: var(--aq-space-2); }
+      body.aq-search-ui .unit-card .final-price { font-size: var(--aq-fs-section-title); }
+    }
+    /* ---- موبايل (≤640): تكديس رأسي بنفس اللغة البصرية: صورة ← معلومات ← مواصفات ← سعر ← إجراءات ---- */
+    @media (max-width: 640px) {
+      body.aq-search-ui .results-grid { gap: var(--aq-space-3); }
+      body.aq-search-ui .unit-card { flex-direction: column; }
+      body.aq-search-ui .unit-media { flex: 0 0 auto; width: 100%; min-width: 0; max-width: none; aspect-ratio: 4 / 3; }
+      body.aq-search-ui .unit-body { padding: var(--aq-space-3) var(--aq-space-3) var(--aq-space-4); }
+      body.aq-search-ui .unit-title { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+      body.aq-search-ui .unit-card-footer { flex-direction: column; align-items: stretch; gap: var(--aq-space-3); }
+      body.aq-search-ui .unit-card .unit-price-box { align-items: flex-start; }
+      body.aq-search-ui .unit-card .final-price { font-size: var(--aq-fs-section-title); white-space: normal; }
+      body.aq-search-ui .unit-foot-meta { flex-basis: auto; }
+      body.aq-search-ui .unit-cta { width: 100%; min-height: var(--aq-btn-h); }
+      body.aq-search-ui .skeleton-card { flex-direction: column; }
+      body.aq-search-ui .skeleton-card .skel-cover { flex: 0 0 auto; width: 100%; max-width: none; min-height: 180px; }
+    }
     /* ---- أنماط مشتركة/قديمة تخصّ مودالات أخرى وتصدير المقارنة (كما كانت) ---- */
     body.aq-search-ui .unit-top { padding: 0; margin: 0 0 8px; }
     body.aq-search-ui .unit-id { color: var(--aq-prop-text-faint); }
@@ -7094,24 +7120,23 @@
     } catch (e) { return 4; }
   }
   function buildUnitCardHtml(u, idx) {
+    /* LOCAL REDESIGN PHASE 3 — الكارت الأفقي (Explore): نفس البيانات الـ 25 (CARD_FIELDS) ونفس الخطافات التي يقرأها الـ JS
+     * القائم بلا تغيير: .unit-card (role="button" tabindex="0" + status-<الحالة>) · .unit-id داخل الكارت (openCardDetailsFromEl_)
+     * · .fav-btn (toggleFavorite) · .compare-checkbox (toggleCompare) · .unit-cover img (thumbFallback_) · .img-count-badge.
+     * التغيير في الشكل فقط: صورة يسار (Desktop) + معلومات RTL يمين؛ الحالة ورقم الوحدة أعلى المعلومات؛ السعر أقوى عنصر؛
+     * "عرض التفاصيل" عنصر بصري (span) لأن الكارت كله هو الزر (المعالج المفوَّض يتجاهل button/a/select/input/label فقط). */
     const images = (u['Images'] || '').split(',').map(s => s.trim()).filter(Boolean);
     const eager = typeof idx === 'number' && idx < (typeof eagerCardImages_ === 'number' ? eagerCardImages_ : 0);
     const imgLoadAttrs = eager ? 'loading="eager" fetchpriority="high" decoding="async"' : 'loading="lazy" decoding="async"';
-    /* الحالة + رقم الوحدة (+ عدّاد الصور) فوق الجزء السفلي من الصورة نفسها (Overlay) - بلا صف
-     * مستقل أسفل الصورة، فيوفَّر ارتفاع صف كامل. .unit-id تبقى داخل الكارت لأن فتح التفاصيل
-     * (openCardDetailsFromEl_) يقرأ رقم الوحدة منها. */
-    const coverStrip = `
+    const coverStrip = images.length > 1 ? `
         <div class="unit-cover-strip">
-          <span class="status-badge ${escHtml_(u['Status'])}"><i class="status-dot"></i>${escHtml_(u['Status'])}</span>
-          <i class="cover-strip-divider"></i>
-          <span class="unit-id">${escHtml_(u['Unit ID'])}</span>
-          ${images.length > 1 ? `<span class="img-count-badge">${ICON.camera} ${images.length}</span>` : ''}
-        </div>`;
+          <span class="img-count-badge">${ICON.camera} ${images.length}</span>
+        </div>` : '';
     const coverHtml = images.length > 0 ? `
       <div class="unit-cover">
         <img src="${escHtml_(getThumbUrl(images[0]))}" alt="صورة الوحدة" ${imgLoadAttrs} onerror="thumbFallback_(this)">
         ${coverStrip}
-      </div>` : `<div class="unit-cover unit-cover-empty">${coverStrip}</div>`;
+      </div>` : `<div class="unit-cover unit-cover-empty">${ICON.building}<span>لا توجد صورة</span></div>`;
 
     const favPrice = getFavoritePrice(u['Unit ID']);
     const currentPrice = Number(u['Price']) || 0;
@@ -7120,24 +7145,18 @@
     let priceDropBadge = '';
     if (priceDropped) {
       priceDropBadge = `
-      <div class="price-drop-badge" title="السعر نزل من ${fmtNum(favPrice)} لـ ${fmtNum(currentPrice)} جنيه">
+      <span class="price-drop-badge" title="السعر نزل من ${fmtNum(favPrice)} لـ ${fmtNum(currentPrice)} جنيه">
         ${ICON.trendDown} نزل السعر ${fmtNum(favPrice - currentPrice)} جنيه
-      </div>`;
+      </span>`;
     } else if (priceIncreased) {
       priceDropBadge = `
-      <div class="price-drop-badge price-up-badge" title="السعر زاد من ${fmtNum(favPrice)} لـ ${fmtNum(currentPrice)} جنيه">
+      <span class="price-drop-badge price-up-badge" title="السعر زاد من ${fmtNum(favPrice)} لـ ${fmtNum(currentPrice)} جنيه">
         ${ICON.trendUp} زاد السعر ${fmtNum(currentPrice - favPrice)} جنيه
-      </div>`;
+      </span>`;
     }
 
-    // شريحة مواصفة: أيقونة + قيمة (بارزة) + تسمية صغيرة - سطر واحد للحفاظ على ارتفاع الكارت
+    // شريحة مواصفة: أيقونة + قيمة (بارزة) + تسمية صغيرة — نفس الحقول ونفس الترتيب المنطقي السابق (المساحة ← الغرف ← الحمامات ← الدور ← الجاردن/الروف/التراس ← التشطيب)
     const chip = (icon, value, label) => `<span class="spec-chip">${icon}<span class="spec-txt"><b>${escHtml_(value)}</b><small>${label}</small></span></span>`;
-    /* ترتيب العرض الثابت (أولوية منطقية، لا ترتيب الحقول الخام) - بصريًا من اليمين لليسار
-     * لأن شبكة .unit-specs مضبوطة صراحةً على direction:rtl (أول عنصر في DOM = أقصى اليمين):
-     *   الصف 1: المساحة ← الغرف ← الحمامات
-     *   الصف 2: الدور ← (الجاردن أو الروف أو التراس) ← التشطيب
-     *   ثم أي معلومة مكانية إضافية (لو وُجد أكثر من جاردن/روف/تراس) في صف تالٍ بنفس الشريحة.
-     * الحقول الغائبة تُحذف كليًا (لا Placeholder فارغ) فتتوزع الشرائح المتبقية طبيعيًا. */
     const row1 = [
       u['Unit Area (sqm)'] ? chip(ICON.area, u['Unit Area (sqm)'] + ' م²', 'المساحة') : '',
       u['Rooms'] ? chip(ICON.bed, u['Rooms'], 'غرف') : '',
@@ -7164,7 +7183,7 @@
               <span class="price-old-label">السعر قبل الخصم</span>
               <span class="old-price">${fmtNum(u['Price'])} جنيه</span>
             </div>
-            <span class="discount-tag">${ICON.tag} خصم ${escHtml_(u['Discount Percentage'])}%</span>
+            <span class="discount-tag aq-badge aq-badge--accent">${ICON.tag} خصم ${escHtml_(u['Discount Percentage'])}%</span>
           </div>
           <div class="price-center">
             <div class="final-price">${fmtNum(u['Price After Discount'])} <span class="cur">جنيه</span></div>
@@ -7185,23 +7204,34 @@
     return `
     <div class="unit-card status-${escHtml_(u['Status'])}" role="button" tabindex="0"
          aria-label="عرض تفاصيل الوحدة ${escHtml_(u['Unit ID'])} - ${escHtml_(u['Property Type'])}${u['Project Name'] ? ' - ' + escHtml_(u['Project Name']) : ''}">
-      ${coverHtml}
-      ${priceDropBadge}
-      <button type="button" class="fav-btn ${isFavorite(u['Unit ID']) ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite(${attrJs_(u['Unit ID'])}, this, ${currentPrice})" title="إضافة للمفضلة" aria-label="إضافة للمفضلة" aria-pressed="${isFavorite(u['Unit ID']) ? 'true' : 'false'}">${ICON.heart}</button>
-      <label class="compare-checkbox" title="إضافة للمقارنة" onclick="event.stopPropagation()">
-        <input type="checkbox" ${compareList.indexOf(u['Unit ID']) !== -1 ? 'checked' : ''} onchange="toggleCompare(${attrJs_(u['Unit ID'])}, this)" aria-label="إضافة للمقارنة">
-      </label>
-      <div class="unit-info-block">
-        <div class="unit-title"><span class="unit-title-name">${escHtml_(u['Project Name'] || u['City'])}</span> <span class="unit-title-type">- ${escHtml_(u['Property Type'])}</span></div>
-        <div class="unit-loc">${ICON.pin} ${escHtml_(u['City'])} - ${escHtml_(u['Area/District'])}</div>
-        ${row1.length ? `<div class="unit-specs">${row1.join('')}</div>` : ''}
-        ${row2.length ? `<div class="unit-specs unit-specs-2">${row2.join('')}</div>` : ''}
-        ${row3.length ? `<div class="unit-specs unit-specs-3">${row3.join('')}</div>` : ''}
+      <div class="unit-media">
+        ${coverHtml}
+        <button type="button" class="fav-btn ${isFavorite(u['Unit ID']) ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite(${attrJs_(u['Unit ID'])}, this, ${currentPrice})" title="إضافة للمفضلة" aria-label="إضافة للمفضلة" aria-pressed="${isFavorite(u['Unit ID']) ? 'true' : 'false'}">${ICON.heart}</button>
+        <label class="compare-checkbox" title="إضافة للمقارنة" onclick="event.stopPropagation()">
+          <input type="checkbox" ${compareList.indexOf(u['Unit ID']) !== -1 ? 'checked' : ''} onchange="toggleCompare(${attrJs_(u['Unit ID'])}, this)" aria-label="إضافة للمقارنة">
+        </label>
       </div>
-      <div class="unit-card-footer">
-        ${priceHtml}
-        ${u['Developer Name'] ? `<div class="unit-dev-row">${ICON.building}<span class="dev-label">المطور:</span> <span class="dev-name">${escHtml_(u['Developer Name'])}</span></div>` : ''}
-        ${metaLine}
+      <div class="unit-body">
+        <div class="unit-info-block">
+          <div class="unit-head-row">
+            <span class="status-badge ${escHtml_(u['Status'])}"><i class="status-dot"></i>${escHtml_(u['Status'])}</span>
+            <span class="unit-id">${escHtml_(u['Unit ID'])}</span>
+            ${priceDropBadge}
+          </div>
+          <div class="unit-title"><span class="unit-title-name">${escHtml_(u['Project Name'] || u['City'])}</span> <span class="unit-title-type">- ${escHtml_(u['Property Type'])}</span></div>
+          <div class="unit-loc">${ICON.pin} ${escHtml_(u['City'])} - ${escHtml_(u['Area/District'])}</div>
+          ${row1.length ? `<div class="unit-specs">${row1.join('')}</div>` : ''}
+          ${row2.length ? `<div class="unit-specs unit-specs-2">${row2.join('')}</div>` : ''}
+          ${row3.length ? `<div class="unit-specs unit-specs-3">${row3.join('')}</div>` : ''}
+        </div>
+        <div class="unit-card-footer">
+          ${priceHtml}
+          <div class="unit-foot-meta">
+            ${u['Developer Name'] ? `<div class="unit-dev-row">${ICON.building}<span class="dev-label">المطور:</span> <span class="dev-name">${escHtml_(u['Developer Name'])}</span></div>` : ''}
+            ${metaLine}
+          </div>
+          <span class="unit-cta" aria-hidden="true">عرض التفاصيل ${ICON.chevronLeft}</span>
+        </div>
       </div>
     </div>`;
   }
