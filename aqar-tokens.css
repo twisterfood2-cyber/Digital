@@ -19,38 +19,38 @@
    *    --navy / --gold في index.html) بقت aliases لهذه الأدوار.
    * ================================================================== */
   /* Brand green — دور أساسي واحد + حالات تفاعل واضحة */
-  --aq-color-primary:        #0E5446;   /* الأساسي: أزرار، أسعار، تنقّل نشط، أيقونات */
-  --aq-color-primary-deep:   #004C43;   /* عميق: شرائط/بانرات، شارة "متاح" على الصور */
-  --aq-color-primary-dark:   #023A3A;   /* داكن: hover/pressed للأساسي + الـ CTA البطل (بحث/دخول) */
-  --aq-color-primary-soft:   #D9E9E2;   /* تظليل نشط (كان #E4EDEA — قريب جدًا من الأبيض) */
-  --aq-color-primary-line:   #BFD8CF;   /* حدّ أخضر باهت (رقائق/شارات) */
-  --aq-color-primary-tint-1: rgba(14,84,70,0.06);
-  --aq-color-primary-tint-2: rgba(14,84,70,0.10);
-  --aq-color-primary-tint-3: rgba(14,84,70,0.16);
-  --aq-color-primary-tint-4: rgba(14,84,70,0.28);
+  --aq-color-primary:        #137A63;   /* [080 prototype] الأساسي: أزرار، أسعار، تنقّل نشط، أيقونات — كان #0E5446 (5.26:1 على الأبيض) */
+  --aq-color-primary-deep:   #04584C;   /* [080 prototype] عميق: شرائط/بانرات، شارة "متاح" على الصور — كان #004C43 */
+  --aq-color-primary-dark:   #0E5446;   /* [080 prototype] hover/pressed + الـ CTA البطل (بحث/دخول) — كان #023A3A (الأساسي القديم بقى درجة الضغط) */
+  --aq-color-primary-soft:   #DCF4E8;   /* [080 prototype] تظليل نشط — كان #D9E9E2 (نعناعي أوضح) */
+  --aq-color-primary-line:   #A9DCC7;   /* [080 prototype] حدّ أخضر — كان #BFD8CF */
+  --aq-color-primary-tint-1: rgba(19,122,99,0.07);   /* [080 prototype] نفس الأساسي الجديد — كانت rgba(14,84,70,…) */
+  --aq-color-primary-tint-2: rgba(19,122,99,0.12);
+  --aq-color-primary-tint-3: rgba(19,122,99,0.18);
+  --aq-color-primary-tint-4: rgba(19,122,99,0.30);
   --aq-color-accent:         #B4FF6C;   /* مؤشر صغير فقط (نقاط) — ممنوع كنص/خلفية كبيرة */
   --aq-color-on-primary:     #FFFFFF;
   /* Surfaces — 4 أدوار بدل ~10 درجات متقاربة */
-  --aq-color-canvas:         #F7F7F7;   /* خلفية الصفحة */
+  --aq-color-canvas:         #F3F6F5;   /* [080 prototype] خلفية الصفحة — كان #F7F7F7 (حيادي فاتح بميل أخضر خفيف عشان الأبيض يبرز) */
   --aq-color-surface:        #FFFFFF;   /* كروت/هيدر/مودالات/حقول */
-  --aq-color-surface-subtle: #F5F7F6;   /* بلاطات/صفوف/أزرار إغلاق/هياكل (يجمع FAFAFA/F1F4F3/F5F7F6/ECEFEE) */
-  --aq-color-surface-muted:  #E7EDED;   /* أقسام فاتحة ثانوية (يجمع E7EDED/DCE7E3/EBF2EF) */
-  --aq-color-surface-accent: #EEF4F1;   /* سطح مُبرَز خفيف (صندوق السعر، عنصر إشعار غير مقروء) */
+  --aq-color-surface-subtle: #F1F6F4;   /* [080 prototype] بلاطات/صفوف — كان #F5F7F6 */
+  --aq-color-surface-muted:  #E3EDE9;   /* [080 prototype] أقسام فاتحة ثانوية — كان #E7EDED */
+  --aq-color-surface-accent: #E9F7F0;   /* [080 prototype] سطح مُبرَز (صندوق السعر، إشعار غير مقروء) — كان #EEF4F1 */
   /* Text — تدرّج واضح ومتوافق AA على الأبيض والكانفس والتظليل */
   --aq-color-text:             #16211E;
   --aq-color-text-secondary:   rgba(22,33,30,0.78);
-  --aq-color-text-muted:       #5F6866;   /* كان #6E7573 (4.4:1 على الكانفس) → 5.9:1 أبيض / 5.5:1 كانفس */
+  --aq-color-text-muted:       #5A6E67;   /* [080 prototype] كان #5F6866 → ميل أخضر خفيف؛ 5.44:1 أبيض / 5.0:1 subtle */
   --aq-color-text-placeholder: #6E7573;   /* كان #8A908E (3.25:1) → 4.71:1 على الأبيض (القيمة القديمة للـ muted، نزلت درجة) */
   --aq-color-text-disabled:    rgba(22,33,30,0.42);
   /* Borders — دوران فقط */
-  --aq-color-border:         #D3D8D7;   /* الحدّ الافتراضي (كان #E3E6E5 عند 1.26:1 → 1.44:1) */
-  --aq-color-border-strong:  #C3CBC8;   /* حدّ أوضح (حقول نشطة/فواصل بارزة) ≈ 1.7:1 */
-  --aq-color-border-subtle:  rgba(16,33,30,0.10); /* hairline داخلي (فواصل صفوف) */
+  --aq-color-border:         #CFDBD6;   /* [080 prototype] الحدّ الافتراضي — كان #D3D8D7 (نفس الوضوح 1.45:1 بميل أخضر) */
+  --aq-color-border-strong:  #B9CFC6;   /* [080 prototype] حدّ أوضح — كان #C3CBC8 */
+  --aq-color-border-subtle:  rgba(19,74,60,0.12); /* [080 prototype] hairline داخلي — كان rgba(16,33,30,0.10) */
   /* Status triad — bg / border / fg / solid لكل حالة، تُستخدم على الكارت والشارة والمؤشر والتوست */
-  --aq-color-success:        #1E6E45;  --aq-color-success-bg: #E4F1E9;  --aq-color-success-border: #BFD8CF;  --aq-color-success-solid: #1E6E45;
-  --aq-color-warning:        #8A6412;  --aq-color-warning-bg: #FDF3DC;  --aq-color-warning-border: #EBDCB4;  --aq-color-warning-solid: #8A6412;
-  --aq-color-danger:         #B0271F;  --aq-color-danger-bg:  #FBE9E7;  --aq-color-danger-border:  #F0CFCB;  --aq-color-danger-solid:  #B0271F;
-  --aq-color-info:           #1C4A75;  --aq-color-info-bg:    #DBE7F3;  --aq-color-info-border:    rgba(28,74,117,0.30);
+  --aq-color-success:        #177E3E;  --aq-color-success-bg: #E1F6E9;  --aq-color-success-border: #A8E3BE;  --aq-color-success-solid: #177E3E;   /* [080 prototype] كان #1E6E45 / #E4F1E9 / #BFD8CF */
+  --aq-color-warning:        #8F6600;  --aq-color-warning-bg: #FFF1CC;  --aq-color-warning-border: #F0D585;  --aq-color-warning-solid: #9C6B00;   /* [080 prototype] كان #8A6412 / #FDF3DC / #EBDCB4 / #8A6412 */
+  --aq-color-danger:         #C62828;  --aq-color-danger-bg:  #FDE7E5;  --aq-color-danger-border:  #F4BFBA;  --aq-color-danger-solid:  #C62828;   /* [080 prototype] كان #B0271F / #FBE9E7 / #F0CFCB */
+  --aq-color-info:           #1F5C94;  --aq-color-info-bg:    #DEEBFA;  --aq-color-info-border:    rgba(31,92,148,0.30);   /* [080 prototype] كان #1C4A75 / #DBE7F3 */
   --aq-color-on-solid:       #FFFFFF;  /* نص فوق الألوان الصلبة (شارات الغلاف) */
   /* Radius — سُلّم واحد (الكروت تبقى 16) */
   --radius-sm:   8px;
@@ -60,10 +60,10 @@
   --radius-pill: 999px;
   /* Elevation — 4 درجات بلون ظل واحد (rgba(11,40,33)) */
   --shadow-0: none;
-  --shadow-1: 0 1px 3px rgba(11,40,33,0.08);
-  --shadow-2: 0 6px 18px rgba(11,40,33,0.10);
-  --shadow-3: 0 18px 44px rgba(11,40,33,0.18);
-  --aq-focus-ring: 0 0 0 3px rgba(14,84,70,0.18);
+  --shadow-1: 0 1px 3px rgba(12,60,48,0.10);     /* [080 prototype] ظل بميل أخضر أوضح قليلًا — كان rgba(11,40,33,0.08/0.10/0.18) */
+  --shadow-2: 0 8px 22px rgba(12,60,48,0.12);
+  --shadow-3: 0 20px 48px rgba(12,60,48,0.20);
+  --aq-focus-ring: 0 0 0 3px rgba(19,122,99,0.26);   /* [080 prototype] كان rgba(14,84,70,0.18) */
   /* Overlay — خلفية واحدة لكل المودالات (اللايتبوكس مستثنى عمدًا: أغمق بلا blur) */
   --aq-overlay:        rgba(4,12,22,0.60);
   --aq-overlay-blur:   3px;
