@@ -76,7 +76,10 @@
 
   // ألوان قوالب الإنتاج حرفيًا (= توكنز aqar-tokens.css: --aq-prop-green-deep/-soft/-line/-text/-text-muted/-text-faint/-border/-canvas-2/-accent/--aq-error-fg)
   /* Report 073: ألوان الحالة = ثلاثية الهوية (066)، والتظليلات/الحدود/النص الثانوي على قيم التوكنز الحالية — بدون أي تغيير في التخطيط */
-  const HEX = { greenDeep: '#004C43', soft: '#D9E9E2', line: '#BFD8CF', text: '#16211E', muted: '#5F6866', faint: '#6E7573', border: '#D3D8D7', canvas2: '#E7EDED', accent: '#B4FF6C', red: '#B0271F', white: '#FFFFFF', stAvail: '#1E6E45', stReserved: '#8A6412', stSold: '#B0271F' };
+  /* الهوية الجديدة (2026-09-23): الورقة تفضل بيضاء (قابلة للطباعة والمشاركة)، والشريط العلوي/السفلي فحمي
+     زي هيدر الموقع، واللمسة العنبرية بدل الأخضر/اللايم. أسماء المفاتيح اتسابت زي ما هي عشان ما نلمسش باقي المحرّك. */
+  const HEX = { greenDeep: '#17171A', soft: '#FBF1E2', line: '#C9C9CF', text: '#16161A', muted: '#5C5C63', faint: '#6B6B72', border: '#E2E2E6', canvas2: '#F3F3F4', accent: '#F2A93B', red: '#B0271F', white: '#FFFFFF', stAvail: '#1E6E45', stReserved: '#8A6412', stSold: '#B0271F' };
+  const HEX_ACCENT_LINE = '#F0D9AE';   // حدّ عنبري فاتح لصناديق السعر/الدفع
   const STATUS_COLOR = (s) => (s === 'متاح' ? HEX.stAvail : (s === 'محجوز' ? HEX.stReserved : HEX.stSold));
 
   // أحجام الخط بالـ px كما في القوالب (تُحوَّل بنفس K) — Cairo أطول رأسيًا من Segoe فنستخدم line-height صريحًا
@@ -230,6 +233,7 @@
     // صندوق السعر: margin 6px 20px 0، padding 14px 16px، radius 10
     y += 6; const hasDisc = Number(u['Discount Percentage']) > 0; const boxH = (hasDisc ? 14 + 20 + 4 + 37 : 14 + 37) + (u['Price per Meter'] ? 16 : 0) + 14;   // ارتفاعات مقيسة من baseline
     drawRoundedBox(20, y, TEMPLATE_W - 40, boxH, 10, HEX.soft);
+    fillRect(TEMPLATE_W - 24, y + 10, 4, boxH - 20, HEX.accent);   // شريط عنبري رفيع على حافة صندوق السعر (توقيع الهوية)
     let iy = y + 14; const right = TEMPLATE_W - 36;
     if (hasDisc) {
       const old = fmt(u['Price']) + ' جنيه'; const ow = drawTextRTL(old, right, baseline(iy, 20), T.priceOld, HEX.muted) / K;
