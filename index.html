@@ -4491,6 +4491,23 @@
     body.app-view-explore .aq-results-bar .aq-sort-field select { background: var(--aq-color-surface); color: var(--aq-color-text); border: 1px solid var(--aq-color-border-strong); border-radius: 999px; height: 40px; padding: 0 12px; }
     body.app-view-explore .aq-console { background: var(--aq-color-surface) !important; border: 1px solid var(--aq-color-border) !important; box-shadow: var(--aq-elev-panel) !important; }
     body.app-view-explore .aq-console .filters-card { background: transparent !important; }
+
+    /* ---- طلب المالك: العنوان في سطر واحد، السطر الداعم في سطر واحد، الصندوق أعلى بسطرين، وعنوان/وصف المطوّرين في سطر واحد ---- */
+    body.app-view-search .aq-hero { padding-top: clamp(16px, 2.6vw, 30px); margin-bottom: var(--aq-space-5); }
+    body.app-view-search .aq-hero-eyebrow { margin-bottom: 8px; }
+    body.app-view-search .aq-hero-title { white-space: nowrap; max-width: none; font-size: clamp(28px, 3.4vw, 50px); line-height: 1.3; margin-bottom: 4px; }
+    body.app-view-search .aq-hero-sub { white-space: nowrap; max-width: none; margin-bottom: 0; }
+    body.app-view-search .aq-hero-copy { padding-bottom: 6px; }
+    :root { --aq-hero-overlap: 120px; }
+    body.app-view-search .aq-devs { margin-top: 0; margin-bottom: var(--aq-space-8); }
+    body.app-view-search .aq-devs-head { display: flex; align-items: baseline; justify-content: flex-start; gap: 14px; flex-wrap: nowrap; margin-bottom: var(--aq-space-4); }
+    body.app-view-search .aq-devs-title { margin: 0; white-space: nowrap; }
+    body.app-view-search .aq-devs-sub { margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+    @media (max-width: 900px) {
+      body.app-view-search .aq-hero-title, body.app-view-search .aq-hero-sub { white-space: normal; }
+      body.app-view-search .aq-devs-head { flex-wrap: wrap; }
+      body.app-view-search .aq-devs-sub { white-space: normal; }
+    }
   </style>
 </head>
 <body>
