@@ -4010,6 +4010,138 @@
     body.app-view-add #editModal .modal-box, body.app-view-quote #editModal .modal-box, body.app-view-meter #priceStatsModal .modal-box { box-shadow: var(--aq-elev-panel); }
     /* مستوى 3 — المودالات الحقيقية (فوق الصفحة) */
     .modal-box, #editModal .modal-box, #umUserModal .modal-box.um-user-box, #photoCropModal .modal-box.pc-box, #devLogoCropModal .modal-box.dl-box, .ud-modal-body { box-shadow: var(--aq-elev-modal); }
+
+    /* ======================================================================================================
+     * LOCAL PROTOTYPE A — "Editorial Luxury" (الرئيسية + الاستكشاف فقط). عرض فقط: نفس الـ DOM/ids/الوظائف.
+     * أقسام كحلية داكنة تملك الشاشة (الهيرو، رأس الاستكشاف)، تايبوغرافي ضخم غير متماثل (يمين)، خط برتقالي كتوقيع،
+     * شريط بحث زجاجي، كروت بصورة أكبر وسعر أضخم ومعلومات أقل. يُقيَّم مع النموذج B ثم يُعتمد واحد.
+     * ====================================================================================================== */
+    :root {
+      --pa-ink: #0B1430; --pa-navy: #111D3A; --pa-orange: #E9682E; --pa-lime: #B8D898;
+      --pa-glass: rgba(11,20,48,0.62); --pa-glass-line: rgba(255,255,255,0.16);
+      --aq-hero-overlap: 96px;
+    }
+    /* ---------- الرئيسية: هيرو full-bleed بارتفاع كبير، نص يمين، صورة تتنفس يسار ---------- */
+    body.app-view-search #mainContainer { padding-top: var(--aq-header-h); }
+    body.app-view-search .aq-hero {
+      max-width: none !important; margin-inline: calc(-1 * var(--aq-content-pad));   /* bleed إلى حدود الحاوية (بدون 100vw = بدون overflow) */
+      margin-bottom: var(--aq-space-12); padding: clamp(72px, 9vw, 128px) clamp(20px, 6vw, 96px) 0;
+      min-height: min(78vh, 760px); display: flex; flex-direction: column; justify-content: flex-end;
+    }
+    body.app-view-search .aq-hero-media { inset: 0 0 var(--aq-hero-overlap) 0; border-radius: 0; box-shadow: none; }
+    body.app-view-search .aq-hero-media img { object-position: 42% 55%; transform: scale(1.02); }
+    body.app-view-search .aq-hero-media::after {
+      background:
+        linear-gradient(270deg, rgba(11,20,48,0.86) 0%, rgba(11,20,48,0.62) 34%, rgba(11,20,48,0.18) 62%, rgba(11,20,48,0.06) 100%),
+        linear-gradient(180deg, rgba(11,20,48,0.35) 0%, rgba(11,20,48,0) 30%, rgba(11,20,48,0) 70%, rgba(11,20,48,0.55) 100%);
+    }
+    body.app-view-search .aq-hero-copy {
+      max-width: 1320px; width: 100%; margin: 0 auto; text-align: right; align-items: flex-start;
+      min-height: 0; padding-bottom: clamp(40px, 5vw, 72px); text-shadow: none;
+    }
+    body.app-view-search .aq-hero-eyebrow {
+      background: transparent; border: 0; padding: 0; margin: 0 0 22px; -webkit-backdrop-filter: none; backdrop-filter: none;
+      font-size: 13px; letter-spacing: 0.18em; color: rgba(255,255,255,0.82); font-weight: 700; gap: 14px;
+    }
+    body.app-view-search .aq-hero-eyebrow::before { content: ""; width: 44px; height: 2px; background: var(--pa-orange); border-radius: 2px; }
+    body.app-view-search .aq-hero-eyebrow svg { display: none; }
+    body.app-view-search .aq-hero-title {
+      font-size: clamp(40px, 5.2vw, 78px); font-weight: 900; line-height: 1.1; letter-spacing: -0.01em; max-width: 17ch; margin: 0 0 18px;
+    }
+    body.app-view-search .aq-hero-sub { font-size: clamp(15px, 1.25vw, 19px); font-weight: 400; color: rgba(255,255,255,0.80); max-width: 52ch; margin: 0; line-height: 1.8; }
+    /* شريط البحث الزجاجي — عريض، سطر واحد على الديسكتوب */
+    body.app-view-search .aq-console {
+      max-width: 1320px; padding: var(--aq-space-4) var(--aq-space-5) var(--aq-space-5);
+      background: var(--pa-glass); border: 1px solid var(--pa-glass-line); border-radius: 22px;
+      -webkit-backdrop-filter: blur(18px) saturate(1.2); backdrop-filter: blur(18px) saturate(1.2);
+      box-shadow: 0 30px 80px rgba(11,20,48,0.45), inset 0 1px 0 rgba(255,255,255,0.10);
+    }
+    body.app-view-search .aq-console-modes { background: rgba(255,255,255,0.08); border-color: var(--pa-glass-line); }
+    body.app-view-search .aq-console-mode { color: rgba(255,255,255,0.72); }
+    body.app-view-search .aq-console-mode:hover { color: #fff; }
+    body.app-view-search .aq-console-mode.is-active { background: var(--pa-orange); color: #fff; }
+    body.app-view-search .aq-console .filters-card { background: transparent !important; border: 0 !important; box-shadow: none !important; }
+    body.app-view-search .aq-console .filters-card label { color: rgba(255,255,255,0.78); letter-spacing: 0.06em; }
+    body.app-view-search .aq-console .toggle-details-btn .label, body.app-view-search .aq-console .toggle-details-btn .chevron { color: #fff; }
+    body.app-view-search .aq-console .filters-card > .grid#aqPrimaryFilters { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+    body.app-view-search .aq-console input:not([type="checkbox"]):not([type="radio"]), body.app-view-search .aq-console select {
+      background: rgba(255,255,255,0.96); border-color: transparent; color: var(--pa-navy);
+    }
+    body.app-view-search .aq-console #searchBtn { background: var(--pa-orange); color: #fff; font-weight: 800; font-size: 15px; box-shadow: 0 8px 22px rgba(233,104,46,0.38); }
+    body.app-view-search .aq-console #searchBtn:hover { background: var(--aq-color-accent-hover); }
+    body.app-view-search .aq-console #clearBtn { background: transparent; color: rgba(255,255,255,0.85); border: 1px solid var(--pa-glass-line); }
+    body.app-view-search .aq-console .toggle-details-btn { color: rgba(255,255,255,0.85); background: transparent; border-color: var(--pa-glass-line); }
+    body.app-view-search .aq-console .ai-search-panel { color: #fff; }
+    body.app-view-search .aq-console .ai-search-desc, body.app-view-search .aq-console .ai-search-head { color: rgba(255,255,255,0.8); }
+    body.app-view-search .aq-console #nlSearchInput { background: rgba(255,255,255,0.96); border-color: transparent; }
+    body.app-view-search .aq-console #nlSearchBtn { background: var(--pa-orange); color: #fff; }
+    /* المطوّرون: عنوان editorial يمين + خط برتقالي، بلاطات بلا حدود ثقيلة */
+    body.app-view-search .aq-devs { background: transparent; border: 0; box-shadow: none; padding: 0; margin: 0 0 var(--aq-space-12); }
+    body.app-view-search .aq-devs-head { text-align: right; margin-bottom: var(--aq-space-6); }
+    body.app-view-search .aq-devs-title { font-size: clamp(26px, 2.6vw, 38px); font-weight: 900; letter-spacing: -0.01em; }
+    body.app-view-search .aq-devs-title::after { content: ""; display: block; width: 56px; height: 3px; background: var(--pa-orange); border-radius: 2px; margin-top: 12px; }
+    body.app-view-search .aq-devs-sub { font-size: 15px; }
+    body.app-view-search .aq-dev-tile { border-radius: 18px; border-color: transparent; background: #fff; box-shadow: var(--aq-elev-surface); }
+    body.app-view-search .aq-dev-tile:hover { box-shadow: var(--aq-elev-card-hover); transform: translateY(-4px); }
+    body.app-view-search .aq-dev-meta { background: #fff; border-top-color: var(--aq-color-border-subtle); }
+    /* ---------- الاستكشاف: رأس كحلي داكن يملك أعلى الصفحة، الكونسول فاتح داخله ---------- */
+    body.app-view-explore #mainContainer { padding-top: var(--aq-header-h); }
+    body.app-view-explore .aq-page-header {
+      max-width: none !important; margin: 0 calc(-1 * var(--aq-content-pad)) 0 !important; padding: 40px clamp(20px, 6vw, 96px) 168px !important;
+      background: var(--pa-ink); border: 0; color: #fff;
+    }
+    body.app-view-explore .aq-page-header .aq-page-title { color: #fff; font-size: clamp(30px, 3.2vw, 46px); font-weight: 900; border-inline-start-color: var(--pa-orange); }
+    body.app-view-explore .aq-page-subtitle, body.app-view-explore .aq-page-crumbs { color: rgba(255,255,255,0.72); }
+    body.app-view-explore .aq-hero { margin: -136px auto var(--aq-space-5) !important; position: relative; z-index: 2; max-height: none !important; }
+    body.app-view-explore .aq-console { background: #fff !important; border: 1px solid var(--aq-color-border) !important; border-radius: 20px; padding: var(--aq-space-4) var(--aq-space-5) !important; box-shadow: 0 24px 60px rgba(11,20,48,0.28) !important; }
+    body.app-view-explore .aq-console .filters-card { background: transparent !important; border: 0 !important; box-shadow: none !important; padding-inline: 0 !important; }
+    body.app-view-explore .aq-results-bar { margin-bottom: var(--aq-space-5); }
+    body.app-view-explore .aq-results-bar .aq-chip.is-active, body.app-view-explore .aq-results-bar .aq-chip[aria-pressed="true"] { background: var(--pa-navy); color: #fff; border-color: var(--pa-navy); }
+    /* الكارت: صورة أكبر (48%)، سعر ضخم، مواصفات بلا حدود، تفاصيل عند hover */
+    :root { --aq-card-media-w: 44%; --aq-card-media-max: 300px; }
+    body.aq-search-ui .unit-card { border-radius: 24px; border-color: transparent; box-shadow: 0 2px 6px rgba(11,20,48,0.05), 0 18px 40px rgba(11,20,48,0.10); }
+    body.aq-search-ui .unit-card:hover { border-color: transparent; transform: translateY(-4px); box-shadow: 0 6px 12px rgba(11,20,48,0.06), 0 30px 64px rgba(11,20,48,0.18); }
+    body.aq-search-ui .unit-cover::after { height: 55%; background: linear-gradient(to top, rgba(11,20,48,0.62), rgba(11,20,48,0)); }
+    body.aq-search-ui .unit-card .unit-title { font-size: 19px; }
+    body.aq-search-ui .unit-card .unit-title-name { color: var(--pa-ink); font-weight: 900; }
+    body.aq-search-ui .spec-chip { background: transparent; border: 0; padding: 2px 0; gap: 6px; }
+    body.aq-search-ui .spec-chip .ico { color: var(--pa-orange); }
+    body.aq-search-ui .spec-chip .spec-txt b { font-size: 14px; }
+    body.aq-search-ui .spec-chip .spec-txt small { display: inline; font-size: 11px; }
+    body.aq-search-ui .unit-card .unit-specs { gap: 4px 14px; }
+    body.aq-search-ui .unit-card .unit-specs + .unit-specs { margin-top: 0; }
+    body.aq-search-ui .unit-card-footer { border-top: 0; padding-top: 0; }
+    body.aq-search-ui .unit-card .final-price { font-size: 26px; font-weight: 900; color: var(--pa-ink); letter-spacing: -0.01em; }
+    body.aq-search-ui .unit-card .final-price .cur { font-size: 13px; color: var(--aq-color-text-muted); }
+    body.aq-search-ui .unit-card .per-meter { color: var(--pa-orange); font-weight: 700; }
+    body.aq-search-ui .unit-card .per-meter .ico { color: var(--pa-orange); }
+    body.aq-search-ui .unit-cta { background: transparent; color: var(--pa-navy); box-shadow: none; border: 1.5px solid var(--pa-navy); border-radius: 999px; }
+    body.aq-search-ui .unit-card:hover .unit-cta { background: var(--pa-navy); color: #fff; box-shadow: 0 8px 20px rgba(17,29,58,0.28); }
+    body.aq-search-ui .unit-cover-strip .unit-id { background: rgba(11,20,48,0.55); color: #fff; border-color: rgba(255,255,255,0.18); }
+    body.aq-search-ui .unit-cover-strip .status-badge { box-shadow: 0 0 0 3px rgba(184,216,152,0.25); }
+    body.aq-search-ui .unit-cover-strip .status-badge.محجوز, body.aq-search-ui .unit-cover-strip .status-badge.مباع { box-shadow: var(--shadow-1); }
+    body.aq-search-ui .fav-btn { background: rgba(11,20,48,0.45); border-color: rgba(255,255,255,0.22); color: #fff; }
+    body.aq-search-ui .fav-btn.active { background: var(--pa-orange); border-color: var(--pa-orange); color: #fff; }
+    body.aq-search-ui .compare-checkbox { background: rgba(11,20,48,0.45); border-color: rgba(255,255,255,0.22); }
+    body.aq-search-ui .compare-checkbox input { border-color: rgba(255,255,255,0.7); background: transparent; }
+    @media (max-width: 1024px) {
+      body.app-view-search .aq-console .filters-card > .grid#aqPrimaryFilters { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      body.app-view-search .aq-hero { min-height: 0; }
+      body.app-view-explore .aq-page-header { padding-bottom: 150px !important; }
+    }
+    @media (max-width: 640px) {
+      body.app-view-search .aq-hero { padding: 56px 16px 0; margin-bottom: var(--aq-space-8); margin-inline: calc(-1 * var(--aq-space-2)); }
+      body.app-view-explore .aq-page-header { margin-inline: calc(-1 * var(--aq-space-2)) !important; }
+      body.app-view-search .aq-hero-media { inset: 0 0 auto 0; height: 300px; }
+      body.app-view-search .aq-hero-title { font-size: clamp(30px, 9vw, 40px); max-width: none; }
+      body.app-view-search .aq-hero-copy { padding-bottom: 28px; }
+      body.app-view-search .aq-console { padding: var(--aq-space-4) var(--aq-space-3); border-radius: 18px; }
+      body.app-view-search .aq-console .filters-card > .grid#aqPrimaryFilters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      body.app-view-search .aq-devs-head { text-align: center; }
+      body.app-view-search .aq-devs-title::after { margin-inline: auto; }
+      body.app-view-explore .aq-page-header { padding: 28px 16px 120px !important; }
+      body.app-view-explore .aq-hero { margin-top: -100px !important; }
+    }
   </style>
 </head>
 <body>
