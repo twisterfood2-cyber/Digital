@@ -4046,7 +4046,7 @@
     body.app-view-search .aq-hero-eyebrow::before { content: ""; width: 44px; height: 2px; background: var(--pa-orange); border-radius: 2px; }
     body.app-view-search .aq-hero-eyebrow svg { display: none; }
     body.app-view-search .aq-hero-title {
-      font-size: clamp(40px, 5.2vw, 78px); font-weight: 900; line-height: 1.1; letter-spacing: -0.01em; max-width: 17ch; margin: 0 0 18px;
+      font-size: clamp(40px, 5vw, 74px); font-weight: 900; line-height: 1.25; letter-spacing: -0.01em; max-width: 17ch; margin: 0 0 18px;
     }
     body.app-view-search .aq-hero-sub { font-size: clamp(15px, 1.25vw, 19px); font-weight: 400; color: rgba(255,255,255,0.80); max-width: 52ch; margin: 0; line-height: 1.8; }
     /* شريط البحث الزجاجي — عريض، سطر واحد على الديسكتوب */
@@ -4142,6 +4142,86 @@
       body.app-view-explore .aq-page-header { padding: 28px 16px 120px !important; }
       body.app-view-explore .aq-hero { margin-top: -100px !important; }
     }
+
+    /* ======================================================================================================
+     * EDITORIAL LUXURY — امتداد الشخصية لباقي الشاشات (عرض فقط، نفس الـ DOM/ids/الوظائف):
+     * بوابة الدخول · شريحة كحلية لرأس كل صفحة · سايدبار لوحة التحكم الداكن · تفاصيل الوحدة · عناوين المودالات · سعر المتر.
+     * ====================================================================================================== */
+    /* ---- بوابة الدخول: الصورة النهائية بتدرّج كحلي جانبي + عبارة العلامة يمين + بطاقة دخول بيضاء يسار ---- */
+    .access-gate { padding: 24px; }
+    .access-gate::before {
+      inset: 0; filter: none;
+      background:
+        linear-gradient(270deg, rgba(11,20,48,0.88) 0%, rgba(11,20,48,0.70) 38%, rgba(11,20,48,0.30) 70%, rgba(11,20,48,0.18) 100%),
+        url('assets/hero-home.png') 40% 55% / cover no-repeat;
+    }
+    #sessionRestoreSplash::before { inset: 0; filter: none; background: linear-gradient(180deg, rgba(11,20,48,0.86), rgba(11,20,48,0.72)), url('assets/hero-home.png') 40% 55% / cover no-repeat; }
+    .access-gate-layout { position: relative; z-index: 1; width: 100%; max-width: 1180px; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(320px, 420px); gap: clamp(24px, 6vw, 96px); align-items: center; }
+    .access-gate-brand { color: #fff; text-align: right; }
+    .access-gate-brand .agb-eyebrow { display: inline-flex; align-items: center; gap: 14px; font-size: 13px; letter-spacing: 0.18em; font-weight: 700; color: rgba(255,255,255,0.82); margin-bottom: 22px; }
+    .access-gate-brand .agb-eyebrow::before { content: ""; width: 44px; height: 2px; background: var(--pa-orange); border-radius: 2px; }
+    .access-gate-brand h1 { margin: 0 0 16px; font-size: clamp(34px, 4.2vw, 58px); font-weight: 900; line-height: 1.32; letter-spacing: -0.01em; max-width: 16ch; }
+    .access-gate-brand p { margin: 0; font-size: clamp(15px, 1.2vw, 18px); font-weight: 400; line-height: 1.8; color: rgba(255,255,255,0.80); max-width: 48ch; }
+    .access-gate-box { max-width: none; background: #fff !important; border: 0 !important; border-radius: 24px; padding: 40px 34px; box-shadow: 0 30px 80px rgba(11,20,48,0.45) !important; text-align: right; }
+    .access-gate-box .icon { color: var(--pa-orange) !important; margin-bottom: 12px; }
+    .access-gate-box h2 { font-size: 22px; font-weight: 900; color: var(--pa-ink) !important; }
+    .access-gate-box p { text-align: right; }
+    .access-gate-box input { background: var(--aq-color-surface-subtle) !important; border-color: transparent !important; height: 48px; }
+    .access-gate-box input:focus { background: #fff !important; border-color: var(--pa-navy) !important; }
+    .access-gate-box button { height: 50px; font-size: 15px; font-weight: 800; border-radius: 12px; }
+    @media (max-width: 900px) {
+      .access-gate-layout { grid-template-columns: minmax(0, 1fr); gap: 28px; max-width: 460px; }
+      .access-gate-brand { text-align: center; }
+      .access-gate-brand h1 { max-width: none; font-size: clamp(28px, 7vw, 40px); }
+      .access-gate-brand p { margin-inline: auto; }
+      .access-gate-brand .agb-eyebrow::before { display: none; }
+      .access-gate-box { padding: 28px 22px; }
+    }
+    /* ---- رأس الصفحة: شريحة كحلية داكنة لكل الصفحات الداخلية (نفس توقيع "استكشف") ---- */
+    body.aq-app-on:not(.app-view-search) #mainContainer { padding-top: var(--aq-header-h); }
+    body.aq-app-on:not(.app-view-search):not(.app-view-explore) .aq-page-header {
+      max-width: none !important; margin: 0 calc(-1 * var(--aq-content-pad)) var(--aq-space-6) !important;
+      padding: 36px clamp(20px, 6vw, 96px) 40px !important; background: var(--pa-ink); border: 0; color: #fff;
+    }
+    body.aq-app-on:not(.app-view-search) .aq-page-header .aq-page-title { color: #fff; font-size: clamp(28px, 3vw, 42px); font-weight: 900; border-inline-start: 3px solid var(--pa-orange); }
+    body.aq-app-on:not(.app-view-search) .aq-page-subtitle, body.aq-app-on:not(.app-view-search) .aq-page-crumbs, body.aq-app-on:not(.app-view-search) .aq-page-crumb.is-current { color: rgba(255,255,255,0.74); }
+    body.aq-app-on:not(.app-view-search) .aq-page-crumb-sep { color: rgba(255,255,255,0.4); }
+    /* ---- لوحة التحكم: سايدبار كحلي داكن بمؤشر برتقالي ---- */
+    .dash-sidebar { background: var(--pa-ink); border: 0; border-radius: 20px; padding: 18px 12px; box-shadow: 0 18px 40px rgba(11,20,48,0.22); -webkit-backdrop-filter: none; backdrop-filter: none; }
+    .dash-brand { color: #fff; border-bottom-color: rgba(255,255,255,0.12); font-weight: 900; }
+    .dash-brand span { color: rgba(255,255,255,0.6); }
+    .dash-nav-item { color: rgba(255,255,255,0.78); position: relative; border-radius: 12px; }
+    .dash-nav-item:hover { background: rgba(255,255,255,0.08); border-color: transparent; color: #fff; }
+    .dash-nav-item.is-active { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.14); color: #fff; }
+    .dash-nav-item.is-active::before { content: ""; position: absolute; right: -12px; top: 10px; bottom: 10px; width: 3px; border-radius: 3px; background: var(--pa-orange); }
+    .dash-nav-item svg { color: rgba(255,255,255,0.9); }
+    .dash-nav-item.is-active svg { color: var(--pa-orange); }
+    .dash-nav-item.dash-logout { color: #FFB4AC; background: rgba(176,39,31,0.22); border-color: transparent; }
+    .dash-nav-item.dash-logout:hover { background: rgba(176,39,31,0.34); }
+    .dash-nav-item:focus-visible { outline-color: var(--pa-orange); }
+    /* ---- تفاصيل الوحدة: شارات الصورة على الهوية، عناوين الأقسام بخط برتقالي، اسم ضخم ---- */
+    .ud-media-status { background: var(--aq-color-secondary-soft) !important; color: var(--pa-navy) !important; border: 0; box-shadow: var(--shadow-1); }
+    .ud-media-status .status-dot { background: currentColor !important; }
+    .ud-media-status.محجوز { background: var(--aq-color-warning-bg) !important; color: var(--aq-color-warning) !important; }
+    .ud-media-status.مباع { background: var(--aq-color-danger-bg) !important; color: var(--aq-color-danger) !important; }
+    .ud-media-id { background: rgba(11,20,48,0.62) !important; border: 1px solid rgba(255,255,255,0.18); }
+    .ud-name { font-size: 30px; font-weight: 900; color: var(--pa-ink); letter-spacing: -0.01em; }
+    .ud-sec-title { font-weight: 900; color: var(--pa-ink); }
+    .ud-sec-title::after { content: ""; flex: 0 0 28px; height: 2px; background: var(--pa-orange); border-radius: 2px; margin-inline-start: 4px; }
+    .ud-sec-title .ico { color: var(--pa-orange); }
+    .ud-actions .icon-action-btn { border-radius: 999px; }
+    .ud-actions .icon-action-btn:hover { border-color: var(--pa-navy) !important; background: var(--aq-color-surface-accent) !important; color: var(--pa-navy) !important; }
+    .ud-actions .icon-action-btn.ud-act-primary:hover { background: var(--pa-orange) !important; border-color: var(--pa-orange) !important; }
+    /* ---- عناوين المودالات: توقيع برتقالي ---- */
+    .modal-title { border-inline-start: 3px solid var(--pa-orange); padding-inline-start: 12px; font-weight: 900; color: var(--pa-ink); }
+    .aq-admin-card > h3, .aq-section-block > h2, .aq-devs-title, .ud-top-title { font-weight: 900; }
+    /* ---- سعر المتر: بطاقات على الهوية بدل التدرّج الأخضر القديم ---- */
+    #priceStatsModal .ps-media::before { background: linear-gradient(180deg, rgba(11,20,48,0.30) 0%, rgba(11,20,48,0.15) 55%, rgba(11,20,48,0.62) 100%) !important; }
+    #priceStatsModal .ps-media { background: var(--pa-ink); }
+    #priceStatsModal .ps-price { color: var(--pa-ink); font-weight: 900; }
+    #priceStatsModal .ps-group-title .ico { color: var(--pa-orange); }
+    /* ---- الرقاقة النشطة في شريط النتائج والأزرار الأساسية ---- */
+    .aq-btn--primary { border-radius: 12px; }
   </style>
 </head>
 <body>
@@ -4246,6 +4326,13 @@
 
 <!-- بوابة دخول المستخدمين - محدش يقدر يشوف أو يستخدم أي حاجة قبل ما يسجل دخول صحيح -->
 <div class="access-gate" id="loginGate">
+  <div class="access-gate-layout">
+  <!-- EDITORIAL LUXURY: عبارة العلامة (عرض فقط) -->
+  <div class="access-gate-brand" aria-hidden="true">
+    <span class="agb-eyebrow">AqaR Digital · مخزون عقاري احترافي</span>
+    <h1>منصّة فريق المبيعات لإدارة المخزون العقاري</h1>
+    <p>ابحث، قارن، واحسب خطط السداد لعملائك من مكان واحد — بسرعة ودقّة وهوية تليق بـ Digital Real Estate.</p>
+  </div>
   <div class="access-gate-box">
     <div class="icon"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
     <h2>الدخول لنظام Digital Real Estate</h2>
@@ -4254,6 +4341,7 @@
     <input type="password" id="loginPassword" placeholder="كلمة السر" autocomplete="current-password">
     <button id="loginBtn">دخول</button>
     <div class="access-gate-status" id="loginStatus"></div>
+  </div>
   </div>
 </div>
 
