@@ -4787,14 +4787,14 @@
     }
     .unit-card-overlay, .modal-overlay { background: rgba(0,0,0,0.88); }
     /* ---- صندوق البحث في استكشف: نفس إضاءة كارت التفاصيل ---- */
-    body.app-view-explore .aq-console {
+    body.app-view-explore .aq-console, body.app-view-search .aq-console {
       border: 1px solid rgba(255,255,255,0.42) !important;
       box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12), inset 0 1px 0 rgba(255,255,255,0.30),
                   0 0 0 1px rgba(0,0,0,0.9),
                   0 0 24px 2px rgba(255,255,255,0.18), 0 0 70px 16px rgba(255,255,255,0.12),
                   0 24px 70px rgba(0,0,0,0.8) !important;
     }
-    body.app-view-explore .aq-console::before { background: linear-gradient(225deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.18) 38%, rgba(255,255,255,0.06) 70%, rgba(255,255,255,0.14) 100%); }
+    body.app-view-explore .aq-console::before, body.app-view-search .aq-console::before { background: linear-gradient(225deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.18) 38%, rgba(255,255,255,0.06) 70%, rgba(255,255,255,0.14) 100%); }
   </style>
 </head>
 <body>
