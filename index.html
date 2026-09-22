@@ -55,8 +55,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Digital RE">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23111D3A%22/%3E%3Cpath fill=%22%23FFFFFF%22 fill-rule=%22evenodd%22 d=%22M31 22h20c17.7 0 28 11.5 28 28S68.7 78 51 78H31V22Zm14 13v30h6c9.4 0 14-6.2 14-15s-4.6-15-14-15h-6Z%22/%3E%3Ccircle cx=%2279%22 cy=%2279%22 r=%226%22 fill=%22%23E9682E%22/%3E%3C/svg%3E">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23111D3A%22/%3E%3Cpath fill=%22%23FFFFFF%22 fill-rule=%22evenodd%22 d=%22M31 22h20c17.7 0 28 11.5 28 28S68.7 78 51 78H31V22Zm14 13v30h6c9.4 0 14-6.2 14-15s-4.6-15-14-15h-6Z%22/%3E%3Ccircle cx=%2279%22 cy=%2279%22 r=%226%22 fill=%22%23E9682E%22/%3E%3C/svg%3E">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%2317171A%22/%3E%3Cpath fill=%22%23FFFFFF%22 fill-rule=%22evenodd%22 d=%22M31 22h20c17.7 0 28 11.5 28 28S68.7 78 51 78H31V22Zm14 13v30h6c9.4 0 14-6.2 14-15s-4.6-15-14-15h-6Z%22/%3E%3Ccircle cx=%2279%22 cy=%2279%22 r=%226%22 fill=%22%23F2A93B%22/%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%2317171A%22/%3E%3Cpath fill=%22%23FFFFFF%22 fill-rule=%22evenodd%22 d=%22M31 22h20c17.7 0 28 11.5 28 28S68.7 78 51 78H31V22Zm14 13v30h6c9.4 0 14-6.2 14-15s-4.6-15-14-15h-6Z%22/%3E%3Ccircle cx=%2279%22 cy=%2279%22 r=%226%22 fill=%22%23F2A93B%22/%3E%3C/svg%3E">
   <style>
     :root {
       /* ============================================================
@@ -4736,6 +4736,46 @@
         background: linear-gradient(225deg, rgba(242,169,59,0.75) 0%, rgba(242,169,59,0.25) 40%, rgba(255,255,255,0.06) 75%, rgba(255,255,255,0.12) 100%);
       }
     }
+    /* ---- تنظيف بقايا الثيم السابق (أخضر/كحلي/ذهبي فاتح) بعد مراجعة كل الصفحات والنوافذ ---- */
+    :root {
+      --border-gold: rgba(255,255,255,0.14);          /* كان خطًّا كحليًّا شبه خفي على الداكن */
+      --aq-color-primary-deep: #17171A;               /* كان أزرق فاتح — يظهر كخلفية احتياطية وفي الرسوم */
+    }
+    /* خلفية الهيرو الاحتياطية + الأغلفة الفارغة خارج شاشة البحث */
+    .aq-hero-media { background: #17171A; }
+    .unit-cover, .unit-cover-empty { background: linear-gradient(135deg, #1F1F23, #26262B) !important; color: var(--aq-color-text-muted) !important; }
+    .unit-cover img { background: #1F1F23; }
+    /* عدّاد الصور فوق الصورة: كان كحلي/أخضر قديم */
+    .unit-cover .img-count-badge, .ud-media .img-count-badge {
+      background: rgba(13,13,15,0.72) !important; color: #fff !important; border: 1px solid rgba(255,255,255,0.18) !important;
+    }
+    /* شارة الخصم خارج شاشة البحث: كانت ذهبية فاتحة بنص أبيض (غير مقروءة) */
+    .discount-tag { background: var(--aq-color-accent-soft) !important; color: var(--aq-color-accent-text) !important; border: 1px solid var(--aq-color-accent-line) !important; }
+    /* زر العودة لأعلى: كان نصه كحلي داكن فوق سطح داكن */
+    #scrollTopBtn { color: var(--aq-color-text) !important; border-color: rgba(255,255,255,0.14) !important; }
+    /* أعمدة الإحصاءات: كانت بيضاء صريحة (لون الهوية القديم) → عنبري */
+    #statsView .bar-fill, #dashboardView .bar-fill { background: var(--aq-color-accent) !important; }
+    /* أزرار واتساب المتبقية (ملف المطوّر / عرض السعر / الوحدات المشابهة): أخضر فاتح بنص أبيض */
+    #quoteWhatsAppBtn, #devProfileWhatsAppBtn, #similarUnitsContent button[onclick^="shareOnWhatsApp"], #editModal #quoteWhatsAppBtn {
+      background: #1F8A4C !important; border-color: #1F8A4C !important; color: #fff !important;
+    }
+    #quoteWhatsAppBtn:hover, #devProfileWhatsAppBtn:hover, #similarUnitsContent button[onclick^="shareOnWhatsApp"]:hover { background: #24A05A !important; }
+    /* أزرار كانت بخلفية "navy" (صارت بيضاء) ونص أبيض = غير مرئية */
+    #shareImagesConfirmBtn, #editDifferentUnitBtn { background: var(--aq-color-accent) !important; color: #1A1200 !important; }
+    #editSameUnitBtn, #editSameTermsBtn { background: #1F1F23 !important; color: var(--aq-color-text) !important; border: 1px solid rgba(255,255,255,0.18) !important; }
+    /* ملف المطوّر (النافذة فقط — ملف الـ PDF يظل أبيض كما هو): اللوحة العلوية كانت بيضاء */
+    #devProfileContent div[style*="background:var(--aq-color-primary)"] {
+      background: #1F1F23 !important; border-color: var(--aq-color-accent-line) !important;
+    }
+    #devProfileContent div[style*="background:var(--aq-color-primary)"] > div { color: var(--aq-color-text) !important; }
+    #devProfileContent button[style*="background:var(--aq-color-primary)"] { background: var(--aq-color-primary) !important; color: #111111 !important; }
+    #devProfileContent [style*="color:var(--aq-color-primary-soft)"] { color: var(--aq-color-text-muted) !important; }
+    #devProfileContent [style*="background:var(--navy)"] { background: var(--aq-color-accent) !important; color: #1A1200 !important; }
+    /* زر حذف الصورة الملصوقة: نص أبيض فوق أحمر فاتح */
+    #unitAddAiPastedImageRemove, #editModal #unitAddAiPastedImageRemove { color: #2A0B08 !important; }
+    /* بطاقات المطوّرين في الرئيسية: لون نص موروث أسود */
+    .aq-dev-tile, .aq-dev-meta { color: var(--aq-color-text); }
+    body.app-view-search .aq-dev-meta { background: var(--aq-color-surface-subtle); }
   </style>
 </head>
 <body>
@@ -14946,7 +14986,7 @@
     var categoryChart = null, statusChart = null;
     /* Report 071: لوحة ألوان الرسوم من توكنز الهوية (بدون الذهبي القديم ولا الأخضرين المتقاعدين) — القيم الاحتياطية = نفس التوكنز */
     function aqTokenColor_(name, fallback) { try { var v = getComputedStyle(document.documentElement).getPropertyValue(name).trim(); return v || fallback; } catch (e) { return fallback; } }
-    var CATEGORY_PALETTE = [aqTokenColor_('--aq-color-primary', '#0E5446'), aqTokenColor_('--aq-color-success', '#1E6E45'), aqTokenColor_('--aq-color-warning', '#8A6412'), aqTokenColor_('--aq-color-text-muted', '#5F6866'), aqTokenColor_('--aq-color-primary-deep', '#004C43'), aqTokenColor_('--aq-color-primary-line', '#BFD8CF')];
+    var CATEGORY_PALETTE = [aqTokenColor_('--aq-color-accent', '#F2A93B'), aqTokenColor_('--aq-color-secondary', '#B8D898'), aqTokenColor_('--aq-color-info', '#8FB8E8'), aqTokenColor_('--aq-color-warning', '#F5C965'), aqTokenColor_('--aq-color-danger', '#F5A19A'), aqTokenColor_('--aq-color-text-muted', '#A8A8AE')];
     var STATUS_COLORS = { 'متاح': aqTokenColor_('--aq-color-success', '#1E6E45'), 'محجوز': aqTokenColor_('--aq-color-warning', '#8A6412'), 'مباع': aqTokenColor_('--aq-color-danger', '#B0271F') };
 
     /* Report 071 (معتمد من المالك): عنصر قابل للنقر فعليًا يبقى قابلًا للتركيز والتفعيل بالكيبورد — نفس معالج النقر، بلا تغيير في المنطق */
