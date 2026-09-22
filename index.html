@@ -4680,6 +4680,16 @@
     body.aq-search-ui .unit-card .per-meter { font-size: 11px !important; opacity: 0.85; }
     body.aq-search-ui .unit-card .unit-price-box { padding-top: 2px; }
     @container (max-width: 460px) { body.aq-search-ui .unit-card .final-price { font-size: 23px !important; } }
+
+    /* ---- كارت الاستكشاف: "حافة ضوء" متدرّجة (إضاءة من أعلى اليمين) + توهّج أبيض خفيف جدًا أسفل/يمين — يفصل الكارت عن الخلفية بلا ظل رمادي ---- */
+    body.aq-search-ui .unit-card { position: relative; border-color: rgba(255,255,255,0.10); box-shadow: 6px 10px 28px rgba(255,255,255,0.045), 0 14px 34px rgba(0,0,0,0.55); }
+    body.aq-search-ui .unit-card::before {
+      content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none; z-index: 6;
+      background: linear-gradient(225deg, rgba(255,255,255,0.42) 0%, rgba(255,255,255,0.14) 38%, rgba(255,255,255,0.05) 70%, rgba(255,255,255,0.10) 100%);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite: exclude;
+    }
+    body.aq-search-ui .unit-card:hover { box-shadow: 8px 14px 34px rgba(255,255,255,0.07), 0 22px 50px rgba(0,0,0,0.6); }
+    body.aq-search-ui .unit-card:hover::before { background: linear-gradient(225deg, rgba(242,169,59,0.75) 0%, rgba(242,169,59,0.25) 40%, rgba(255,255,255,0.06) 75%, rgba(255,255,255,0.12) 100%); }
   </style>
 </head>
 <body>
