@@ -4673,6 +4673,13 @@
     body.aq-search-ui .unit-card .final-price { font-size: var(--aq-fs-section-title); line-height: 1.15; }
     body.aq-search-ui .unit-card .per-meter { font-size: 11px; }
     @media (max-width: 640px) { body.aq-search-ui .unit-card-footer { flex-direction: row; flex-wrap: wrap; } }
+
+    /* ---- كارت الاستكشاف (طلب المالك): السعر بعد الخصم هو "بطل" الكارت — أكبر وأثقل مع توهّج عنبري خفيف ---- */
+    body.aq-search-ui .unit-card .final-price { font-size: 26px !important; font-weight: 900 !important; letter-spacing: -0.01em; line-height: 1.1 !important; color: var(--aq-color-accent) !important; text-shadow: 0 0 22px rgba(242,169,59,0.28); }
+    body.aq-search-ui .unit-card .final-price .cur { font-size: 12px !important; font-weight: 700 !important; color: rgba(246,245,242,0.7) !important; text-shadow: none; }
+    body.aq-search-ui .unit-card .per-meter { font-size: 11px !important; opacity: 0.85; }
+    body.aq-search-ui .unit-card .unit-price-box { padding-top: 2px; }
+    @container (max-width: 460px) { body.aq-search-ui .unit-card .final-price { font-size: 23px !important; } }
   </style>
 </head>
 <body>
