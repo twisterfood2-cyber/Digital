@@ -50,7 +50,7 @@
   <script defer src="aqar-shell.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#111D3A">
+  <meta name="theme-color" content="#0D0D0F">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -4018,7 +4018,7 @@
      * ====================================================================================================== */
     :root {
       --pa-ink: #0B1430; --pa-navy: #111D3A; --pa-orange: #E9682E; --pa-lime: #B8D898;
-      --pa-glass: rgba(11,20,48,0.62); --pa-glass-line: rgba(255,255,255,0.16);
+      --pa-glass: rgba(13,13,15,0.62); --pa-glass-line: rgba(255,255,255,0.16);
       --aq-hero-overlap: 96px;
     }
     /* ---------- الرئيسية: هيرو full-bleed بارتفاع كبير، نص يمين، صورة تتنفس يسار ---------- */
@@ -4032,8 +4032,8 @@
     body.app-view-search .aq-hero-media img { object-position: 42% 55%; transform: scale(1.02); }
     body.app-view-search .aq-hero-media::after {
       background:
-        linear-gradient(270deg, rgba(11,20,48,0.86) 0%, rgba(11,20,48,0.62) 34%, rgba(11,20,48,0.18) 62%, rgba(11,20,48,0.06) 100%),
-        linear-gradient(180deg, rgba(11,20,48,0.35) 0%, rgba(11,20,48,0) 30%, rgba(11,20,48,0) 70%, rgba(11,20,48,0.55) 100%);
+        linear-gradient(270deg, rgba(13,13,15,0.86) 0%, rgba(13,13,15,0.62) 34%, rgba(13,13,15,0.18) 62%, rgba(13,13,15,0.06) 100%),
+        linear-gradient(180deg, rgba(13,13,15,0.35) 0%, rgba(13,13,15,0) 30%, rgba(13,13,15,0) 70%, rgba(13,13,15,0.55) 100%);
     }
     body.app-view-search .aq-hero-copy {
       max-width: 1320px; width: 100%; margin: 0 auto; text-align: right; align-items: flex-start;
@@ -4054,7 +4054,7 @@
       max-width: 1320px; padding: var(--aq-space-4) var(--aq-space-5) var(--aq-space-5);
       background: var(--pa-glass); border: 1px solid var(--pa-glass-line); border-radius: 22px;
       -webkit-backdrop-filter: blur(18px) saturate(1.2); backdrop-filter: blur(18px) saturate(1.2);
-      box-shadow: 0 30px 80px rgba(11,20,48,0.45), inset 0 1px 0 rgba(255,255,255,0.10);
+      box-shadow: 0 30px 80px rgba(13,13,15,0.45), inset 0 1px 0 rgba(255,255,255,0.10);
     }
     body.app-view-search .aq-console-modes { background: rgba(255,255,255,0.08); border-color: var(--pa-glass-line); }
     body.app-view-search .aq-console-mode { color: rgba(255,255,255,0.72); }
@@ -4093,15 +4093,15 @@
     body.app-view-explore .aq-page-header .aq-page-title { color: #fff; font-size: clamp(30px, 3.2vw, 46px); font-weight: 900; border-inline-start-color: var(--pa-orange); }
     body.app-view-explore .aq-page-subtitle, body.app-view-explore .aq-page-crumbs { color: rgba(255,255,255,0.72); }
     body.app-view-explore .aq-hero { margin: -136px auto var(--aq-space-5) !important; position: relative; z-index: 2; max-height: none !important; }
-    body.app-view-explore .aq-console { background: #fff !important; border: 1px solid var(--aq-color-border) !important; border-radius: 20px; padding: var(--aq-space-4) var(--aq-space-5) !important; box-shadow: 0 24px 60px rgba(11,20,48,0.28) !important; }
+    body.app-view-explore .aq-console { background: #fff !important; border: 1px solid var(--aq-color-border) !important; border-radius: 20px; padding: var(--aq-space-4) var(--aq-space-5) !important; box-shadow: 0 24px 60px rgba(13,13,15,0.28) !important; }
     body.app-view-explore .aq-console .filters-card { background: transparent !important; border: 0 !important; box-shadow: none !important; padding-inline: 0 !important; }
     body.app-view-explore .aq-results-bar { margin-bottom: var(--aq-space-5); }
     body.app-view-explore .aq-results-bar .aq-chip.is-active, body.app-view-explore .aq-results-bar .aq-chip[aria-pressed="true"] { background: var(--pa-navy); color: #fff; border-color: var(--pa-navy); }
     /* الكارت: صورة أكبر (48%)، سعر ضخم، مواصفات بلا حدود، تفاصيل عند hover */
     :root { --aq-card-media-w: 44%; --aq-card-media-max: 300px; }
-    body.aq-search-ui .unit-card { border-radius: 24px; border-color: transparent; box-shadow: 0 2px 6px rgba(11,20,48,0.05), 0 18px 40px rgba(11,20,48,0.10); }
-    body.aq-search-ui .unit-card:hover { border-color: transparent; transform: translateY(-4px); box-shadow: 0 6px 12px rgba(11,20,48,0.06), 0 30px 64px rgba(11,20,48,0.18); }
-    body.aq-search-ui .unit-cover::after { height: 55%; background: linear-gradient(to top, rgba(11,20,48,0.62), rgba(11,20,48,0)); }
+    body.aq-search-ui .unit-card { border-radius: 24px; border-color: transparent; box-shadow: 0 2px 6px rgba(13,13,15,0.05), 0 18px 40px rgba(13,13,15,0.10); }
+    body.aq-search-ui .unit-card:hover { border-color: transparent; transform: translateY(-4px); box-shadow: 0 6px 12px rgba(13,13,15,0.06), 0 30px 64px rgba(13,13,15,0.18); }
+    body.aq-search-ui .unit-cover::after { height: 55%; background: linear-gradient(to top, rgba(13,13,15,0.62), rgba(13,13,15,0)); }
     body.aq-search-ui .unit-card .unit-title { font-size: 19px; }
     body.aq-search-ui .unit-card .unit-title-name { color: var(--pa-ink); font-weight: 900; }
     body.aq-search-ui .spec-chip { background: transparent; border: 0; padding: 2px 0; gap: 6px; }
@@ -4117,12 +4117,12 @@
     body.aq-search-ui .unit-card .per-meter .ico { color: var(--pa-orange); }
     body.aq-search-ui .unit-cta { background: transparent; color: var(--pa-navy); box-shadow: none; border: 1.5px solid var(--pa-navy); border-radius: 999px; }
     body.aq-search-ui .unit-card:hover .unit-cta { background: var(--pa-navy); color: #fff; box-shadow: 0 8px 20px rgba(17,29,58,0.28); }
-    body.aq-search-ui .unit-cover-strip .unit-id { background: rgba(11,20,48,0.55); color: #fff; border-color: rgba(255,255,255,0.18); }
+    body.aq-search-ui .unit-cover-strip .unit-id { background: rgba(13,13,15,0.55); color: #fff; border-color: rgba(255,255,255,0.18); }
     body.aq-search-ui .unit-cover-strip .status-badge { box-shadow: 0 0 0 3px rgba(184,216,152,0.25); }
     body.aq-search-ui .unit-cover-strip .status-badge.محجوز, body.aq-search-ui .unit-cover-strip .status-badge.مباع { box-shadow: var(--shadow-1); }
-    body.aq-search-ui .fav-btn { background: rgba(11,20,48,0.45); border-color: rgba(255,255,255,0.22); color: #fff; }
+    body.aq-search-ui .fav-btn { background: rgba(13,13,15,0.45); border-color: rgba(255,255,255,0.22); color: #fff; }
     body.aq-search-ui .fav-btn.active { background: var(--pa-orange); border-color: var(--pa-orange); color: #fff; }
-    body.aq-search-ui .compare-checkbox { background: rgba(11,20,48,0.45); border-color: rgba(255,255,255,0.22); }
+    body.aq-search-ui .compare-checkbox { background: rgba(13,13,15,0.45); border-color: rgba(255,255,255,0.22); }
     body.aq-search-ui .compare-checkbox input { border-color: rgba(255,255,255,0.7); background: transparent; }
     @media (max-width: 1024px) {
       body.app-view-search .aq-console .filters-card > .grid#aqPrimaryFilters { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -4152,17 +4152,17 @@
     .access-gate::before {
       inset: 0; filter: none;
       background:
-        linear-gradient(270deg, rgba(11,20,48,0.88) 0%, rgba(11,20,48,0.70) 38%, rgba(11,20,48,0.30) 70%, rgba(11,20,48,0.18) 100%),
+        linear-gradient(270deg, rgba(13,13,15,0.88) 0%, rgba(13,13,15,0.70) 38%, rgba(13,13,15,0.30) 70%, rgba(13,13,15,0.18) 100%),
         url('assets/hero-home.png') 40% 55% / cover no-repeat;
     }
-    #sessionRestoreSplash::before { inset: 0; filter: none; background: linear-gradient(180deg, rgba(11,20,48,0.86), rgba(11,20,48,0.72)), url('assets/hero-home.png') 40% 55% / cover no-repeat; }
+    #sessionRestoreSplash::before { inset: 0; filter: none; background: linear-gradient(180deg, rgba(13,13,15,0.86), rgba(13,13,15,0.72)), url('assets/hero-home.png') 40% 55% / cover no-repeat; }
     .access-gate-layout { position: relative; z-index: 1; width: 100%; max-width: 1180px; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(320px, 420px); gap: clamp(24px, 6vw, 96px); align-items: center; }
     .access-gate-brand { color: #fff; text-align: right; }
     .access-gate-brand .agb-eyebrow { display: inline-flex; align-items: center; gap: 14px; font-size: 13px; letter-spacing: 0.18em; font-weight: 700; color: rgba(255,255,255,0.82); margin-bottom: 22px; }
     .access-gate-brand .agb-eyebrow::before { content: ""; width: 44px; height: 2px; background: var(--pa-orange); border-radius: 2px; }
     .access-gate-brand h1 { margin: 0 0 16px; font-size: clamp(34px, 4.2vw, 58px); font-weight: 900; line-height: 1.32; letter-spacing: -0.01em; max-width: 16ch; }
     .access-gate-brand p { margin: 0; font-size: clamp(15px, 1.2vw, 18px); font-weight: 400; line-height: 1.8; color: rgba(255,255,255,0.80); max-width: 48ch; }
-    .access-gate-box { max-width: none; background: #fff !important; border: 0 !important; border-radius: 24px; padding: 40px 34px; box-shadow: 0 30px 80px rgba(11,20,48,0.45) !important; text-align: right; }
+    .access-gate-box { max-width: none; background: #fff !important; border: 0 !important; border-radius: 24px; padding: 40px 34px; box-shadow: 0 30px 80px rgba(13,13,15,0.45) !important; text-align: right; }
     .access-gate-box .icon { color: var(--pa-orange) !important; margin-bottom: 12px; }
     .access-gate-box h2 { font-size: 22px; font-weight: 900; color: var(--pa-ink) !important; }
     .access-gate-box p { text-align: right; }
@@ -4187,7 +4187,7 @@
     body.aq-app-on:not(.app-view-search) .aq-page-subtitle, body.aq-app-on:not(.app-view-search) .aq-page-crumbs, body.aq-app-on:not(.app-view-search) .aq-page-crumb.is-current { color: rgba(255,255,255,0.74); }
     body.aq-app-on:not(.app-view-search) .aq-page-crumb-sep { color: rgba(255,255,255,0.4); }
     /* ---- لوحة التحكم: سايدبار كحلي داكن بمؤشر برتقالي ---- */
-    .dash-sidebar { background: var(--pa-ink); border: 0; border-radius: 20px; padding: 18px 12px; box-shadow: 0 18px 40px rgba(11,20,48,0.22); -webkit-backdrop-filter: none; backdrop-filter: none; }
+    .dash-sidebar { background: var(--pa-ink); border: 0; border-radius: 20px; padding: 18px 12px; box-shadow: 0 18px 40px rgba(13,13,15,0.22); -webkit-backdrop-filter: none; backdrop-filter: none; }
     .dash-brand { color: #fff; border-bottom-color: rgba(255,255,255,0.12); font-weight: 900; }
     .dash-brand span { color: rgba(255,255,255,0.6); }
     .dash-nav-item { color: rgba(255,255,255,0.78); position: relative; border-radius: 12px; }
@@ -4204,7 +4204,7 @@
     .ud-media-status .status-dot { background: currentColor !important; }
     .ud-media-status.محجوز { background: var(--aq-color-warning-bg) !important; color: var(--aq-color-warning) !important; }
     .ud-media-status.مباع { background: var(--aq-color-danger-bg) !important; color: var(--aq-color-danger) !important; }
-    .ud-media-id { background: rgba(11,20,48,0.62) !important; border: 1px solid rgba(255,255,255,0.18); }
+    .ud-media-id { background: rgba(13,13,15,0.62) !important; border: 1px solid rgba(255,255,255,0.18); }
     .ud-name { font-size: 30px; font-weight: 900; color: var(--pa-ink); letter-spacing: -0.01em; }
     .ud-sec-title { font-weight: 900; color: var(--pa-ink); }
     .ud-sec-title::after { content: ""; flex: 0 0 28px; height: 2px; background: var(--pa-orange); border-radius: 2px; margin-inline-start: 4px; }
@@ -4216,12 +4216,281 @@
     .modal-title { border-inline-start: 3px solid var(--pa-orange); padding-inline-start: 12px; font-weight: 900; color: var(--pa-ink); }
     .aq-admin-card > h3, .aq-section-block > h2, .aq-devs-title, .ud-top-title { font-weight: 900; }
     /* ---- سعر المتر: بطاقات على الهوية بدل التدرّج الأخضر القديم ---- */
-    #priceStatsModal .ps-media::before { background: linear-gradient(180deg, rgba(11,20,48,0.30) 0%, rgba(11,20,48,0.15) 55%, rgba(11,20,48,0.62) 100%) !important; }
+    #priceStatsModal .ps-media::before { background: linear-gradient(180deg, rgba(13,13,15,0.30) 0%, rgba(13,13,15,0.15) 55%, rgba(13,13,15,0.62) 100%) !important; }
     #priceStatsModal .ps-media { background: var(--pa-ink); }
     #priceStatsModal .ps-price { color: var(--pa-ink); font-weight: 900; }
     #priceStatsModal .ps-group-title .ico { color: var(--pa-orange); }
     /* ---- الرقاقة النشطة في شريط النتائج والأزرار الأساسية ---- */
     .aq-btn--primary { border-radius: 12px; }
+
+    /* ======================================================================================================
+     * DARK NAVY THEME (local) — الموقع كله على كانفس كحلي عميق بروح المرجع (داكن + أكسنت برتقالي).
+     * طبقة توكنز فوق النظام القائم + تصحيحات مستهدفة. عرض فقط: نفس الـ DOM/ids/الوظائف.
+     * ====================================================================================================== */
+    :root {
+      /* أسطح — 3 درجات */
+      --aq-color-canvas: #0B1430; --aq-color-surface: #131F45; --aq-color-surface-subtle: #182650; --aq-color-surface-muted: #1F2E5C; --aq-color-surface-accent: #1B2A5A;
+      /* نص */
+      --aq-color-text: #F4F5F3; --aq-color-text-secondary: rgba(244,245,243,0.78); --aq-color-text-muted: #A9B3C9; --aq-color-text-placeholder: #8B96B0; --aq-color-text-disabled: rgba(244,245,243,0.38);
+      /* حدود */
+      --aq-color-border: rgba(255,255,255,0.10); --aq-color-border-strong: rgba(255,255,255,0.20); --aq-color-border-subtle: rgba(255,255,255,0.08);
+      /* "الأساسي" على الداكن = فاتح (أزرار بيضاء بنص كحلي، عناوين/أسعار فاتحة) */
+      --aq-color-primary: #F4F5F3; --aq-color-primary-dark: #FFFFFF; --aq-color-primary-deep: #E3E7F0; --aq-color-on-primary: #0B1430;
+      --aq-color-primary-soft: rgba(255,255,255,0.10); --aq-color-primary-line: rgba(255,255,255,0.22);
+      --aq-color-primary-tint-1: rgba(255,255,255,0.05); --aq-color-primary-tint-2: rgba(255,255,255,0.09); --aq-color-primary-tint-3: rgba(255,255,255,0.14); --aq-color-primary-tint-4: rgba(255,255,255,0.26);
+      /* الأكسنت */
+      --aq-color-accent-soft: rgba(233,104,46,0.16); --aq-color-accent-line: rgba(233,104,46,0.42); --aq-color-accent-text: #F5A16E; --aq-color-on-accent-strong: #0B1430;
+      --aq-color-secondary-soft: rgba(184,216,152,0.16); --aq-color-secondary-line: rgba(184,216,152,0.40); --aq-color-secondary-text: #B8D898;
+      /* الحالات على الداكن */
+      --aq-color-success: #8FD9A8; --aq-color-success-bg: rgba(30,110,69,0.24); --aq-color-success-border: rgba(143,217,168,0.35); --aq-color-success-solid: #1E6E45;
+      --aq-color-warning: #F5C965; --aq-color-warning-bg: rgba(138,100,18,0.28); --aq-color-warning-border: rgba(245,201,101,0.35); --aq-color-warning-solid: #8A6412;
+      --aq-color-danger: #F5A19A; --aq-color-danger-bg: rgba(176,39,31,0.26); --aq-color-danger-border: rgba(245,161,154,0.35); --aq-color-danger-solid: #B0271F;
+      --aq-color-info: #8FB8E8; --aq-color-info-bg: rgba(28,74,117,0.32); --aq-color-info-border: rgba(143,184,232,0.35);
+      /* ظلال أعمق، هالة خفيفة */
+      --shadow-1: 0 1px 2px rgba(0,0,0,0.30); --shadow-2: 0 8px 24px rgba(0,0,0,0.35); --shadow-3: 0 24px 56px rgba(0,0,0,0.45);
+      --aq-elev-surface: 0 1px 2px rgba(0,0,0,0.25), 0 8px 20px rgba(0,0,0,0.25); --aq-elev-card: 0 2px 6px rgba(0,0,0,0.25), 0 18px 40px rgba(0,0,0,0.35);
+      --aq-elev-card-hover: 0 4px 10px rgba(0,0,0,0.3), 0 28px 60px rgba(0,0,0,0.45); --aq-elev-panel: 0 12px 30px rgba(0,0,0,0.4); --aq-elev-modal: 0 30px 80px rgba(0,0,0,0.6);
+      --aq-overlay: rgba(3,7,20,0.72); --aq-focus-ring: 0 0 0 3px rgba(233,104,46,0.35);
+      --aq-bg-muted-1: rgba(255,255,255,0.04); --aq-bg-muted-2: rgba(255,255,255,0.07); --aq-bg-muted-3: rgba(255,255,255,0.10);
+      --aq-border-gold: rgba(255,255,255,0.12); --aq-border-accent-strong: rgba(255,255,255,0.28);
+      --pa-ink: #0B1430; --pa-navy: #131F45;
+      /* الهيدر يندمج مع الكانفس */
+      --aq-header-bg: #0B1430; --aq-header-line: rgba(255,255,255,0.08); --aq-header-shadow: 0 1px 0 rgba(255,255,255,0.04);
+    }
+    html, body { background: var(--aq-color-canvas); color: var(--aq-color-text); }
+    body { background-image: none !important; }
+    .aq-header { border-bottom: 1px solid var(--aq-header-line); }
+    /* الأزرار ذات النص الأبيض المفروض فوق خلفية "navy" (صارت فاتحة) → نص كحلي */
+    #nlSearchBtn, #searchBtn, .fav-toggle-btn.active, .edit-btn, .empty-state button,
+    #scrollTopBtn, .compare-table th, .dash-drawer-toggle, #dashboardView .dash-cta,
+    .um-primary, .um-avatar, #umUserBody .um-actions button.primary, #umUserBody .um-inline button,
+    .admin-panel .small-btn, .access-gate-box button, #editSaveBtn, .images-choose-btn, #quoteExportBtn, .ai-extract-btn,
+    #pdfContactConfirmBtn, #devProfileExportPdfBtn { color: #111111 !important; }
+    /* الـ CTA الأساسي في الشاشات = برتقالي (توقيع المرجع) */
+    #searchBtn, #nlSearchBtn, #editSaveBtn, #dashboardView .dash-cta, .access-gate-box button, .unit-cta, #loadMoreBtn {
+      background: var(--aq-color-accent) !important; color: #fff !important; border-color: transparent !important; box-shadow: 0 8px 22px rgba(233,104,46,0.30);
+    }
+    #searchBtn:hover, #nlSearchBtn:hover, #editSaveBtn:hover, .access-gate-box button:hover, #loadMoreBtn:hover { background: var(--aq-color-accent-hover) !important; }
+    .aq-btn--primary { box-shadow: 0 6px 18px rgba(0,0,0,0.35); }   /* الأزرار الأساسية = التوكن الأساسي (أبيض/نص كحلي) — البرتقالي للـ CTA البطل فقط */
+    .aq-btn--secondary, #clearBtn, .modal-close { background: rgba(255,255,255,0.06); color: var(--aq-color-text); border-color: var(--aq-color-border-strong); }
+    /* حقول الإدخال داكنة */
+    input, select, textarea, .filters-card input, .filters-card select, .aq-input, .aq-select, .aq-textarea, .access-gate-box input,
+    body.app-view-search .aq-console input:not([type="checkbox"]):not([type="radio"]), body.app-view-search .aq-console select {
+      background: rgba(255,255,255,0.06) !important; color: var(--aq-color-text) !important; border-color: var(--aq-color-border-strong) !important; color-scheme: dark;
+    }
+    input::placeholder, textarea::placeholder { color: var(--aq-color-text-placeholder) !important; }
+    input:focus, select:focus, textarea:focus, .access-gate-box input:focus { border-color: var(--aq-color-accent) !important; background: rgba(255,255,255,0.09) !important; }
+    select option { background: #17171A; color: #F6F5F2; }
+    /* الدخول: بطاقة داكنة زجاجية */
+    .access-gate-box { background: rgba(23,23,26,0.86) !important; -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border: 1px solid var(--aq-color-border) !important; }
+    .access-gate-box h2 { color: #fff !important; }
+    /* الرئيسية: الهيرو أطول وأغمق أطرافه، الكونسول سطح داكن بحدّ خفيف، الكلمة الملوّنة في العنوان */
+    body.app-view-search .aq-hero-media::after {
+      background: linear-gradient(270deg, rgba(13,13,15,0.92) 0%, rgba(13,13,15,0.70) 34%, rgba(13,13,15,0.25) 62%, rgba(13,13,15,0.10) 100%),
+                  linear-gradient(180deg, rgba(13,13,15,0.55) 0%, rgba(13,13,15,0) 30%, rgba(13,13,15,0.10) 70%, rgba(13,13,15,1) 100%);
+    }
+    body.app-view-search .aq-hero-title .aq-hero-accent { font-style: normal; color: var(--aq-color-accent); }
+    body.app-view-search .aq-console { background: rgba(23,23,26,0.78); border-color: var(--aq-color-border-strong); box-shadow: 0 30px 80px rgba(0,0,0,0.5); }
+    body.app-view-search .aq-hero-eyebrow { color: var(--aq-color-accent); }
+    body.app-view-search .aq-hero-eyebrow::before { background: var(--aq-color-accent); }
+    body.app-view-search .aq-devs-title::after { background: var(--aq-color-accent); }
+    body.app-view-search .aq-dev-tile { background: var(--aq-color-surface); border: 1px solid var(--aq-color-border); }
+    .aq-dev-logo { background: var(--aq-color-surface-subtle); color: var(--aq-color-text); }
+    .aq-dev-meta { background: var(--aq-color-surface) !important; }
+    /* شرائح رأس الصفحة: تدرّج من السطح إلى الكانفس بدل شريحة مصمتة */
+    body.app-view-explore .aq-page-header, body.aq-app-on:not(.app-view-search):not(.app-view-explore) .aq-page-header { background: linear-gradient(180deg, #17171A 0%, #0D0D0F 100%); }
+    body.app-view-explore .aq-console { background: var(--aq-color-surface) !important; border-color: var(--aq-color-border) !important; box-shadow: var(--aq-elev-panel) !important; }
+    /* الكروت: سطح داكن، سعر برتقالي، حدّ خفيف بدل الظل */
+    body.aq-search-ui .unit-card { background: var(--aq-color-surface); border: 1px solid var(--aq-color-border); box-shadow: none; }
+    body.aq-search-ui .unit-card:hover { border-color: rgba(255,255,255,0.22); box-shadow: 0 20px 50px rgba(0,0,0,0.45); }
+    body.aq-search-ui .unit-card .unit-title-name { color: #fff; }
+    body.aq-search-ui .unit-card .final-price { color: var(--aq-color-accent); }
+    body.aq-search-ui .unit-card .final-price .cur { color: var(--aq-color-text-muted); }
+    body.aq-search-ui .unit-card .per-meter { color: var(--aq-color-text-muted); }
+    body.aq-search-ui .spec-chip .ico { color: var(--aq-color-text-muted); }
+    body.aq-search-ui .spec-chip .spec-txt b { color: #fff; }
+    body.aq-search-ui .unit-cta { border-color: rgba(255,255,255,0.22); color: #fff; background: transparent !important; box-shadow: none; }
+    body.aq-search-ui .unit-card:hover .unit-cta { background: var(--aq-color-accent) !important; border-color: var(--aq-color-accent); }
+    body.aq-search-ui .unit-cover-strip .unit-id { background: rgba(13,13,15,0.72); }
+    body.aq-search-ui .unit-cover-empty { background: var(--aq-color-surface-subtle); }
+    body.aq-search-ui .unit-card-footer { border-top-color: var(--aq-color-border-subtle); }
+    body.aq-search-ui .compare-checkbox input:checked { background-color: var(--aq-color-accent); border-color: var(--aq-color-accent); }
+    body.aq-search-ui .skeleton-card .skel { background: linear-gradient(90deg, #1F1F23 25%, #2A2A30 37%, #1F1F23 63%); }
+    .aq-chip.is-active, .aq-chip[aria-pressed="true"] { background: var(--aq-color-accent) !important; border-color: var(--aq-color-accent) !important; color: #fff !important; }
+    .aq-console-mode.is-active { background: var(--aq-color-accent); color: #fff; }
+    /* التفاصيل / المودالات / التوست */
+    .modal-box, .unit-card-overlay-box, .aq-modal { background: var(--aq-color-surface); border-color: var(--aq-color-border); }
+    .modal-title, .ud-name, .ud-sec-title, .ud-top-title { color: #fff; }
+    .modal-title { border-inline-start-color: var(--aq-color-accent); }
+    .ud-sec-title::after { background: var(--aq-color-accent); }
+    .ud-tile, .ud-sec, .prof-account, .aq-admin-card, .aq-dev-card, .aq-card, .ps-card { background: var(--aq-color-surface-subtle); border-color: var(--aq-color-border); color: var(--aq-color-text); }
+    .ud-actions .icon-action-btn { background: rgba(255,255,255,0.06) !important; color: #fff !important; border-color: var(--aq-color-border-strong) !important; }
+    .ud-actions .icon-action-btn .ico { color: #fff !important; }
+    .ud-actions .icon-action-btn.ud-act-primary { background: var(--aq-color-accent) !important; border-color: var(--aq-color-accent) !important; }
+    .toast { background: var(--aq-color-surface); color: var(--aq-color-text); border-color: var(--aq-color-border-strong); }
+    .ud-price-hero { background: linear-gradient(135deg, #26262B, #17171A) !important; border: 1px solid var(--aq-color-border-strong) !important; box-shadow: none !important; }
+    .ud-price-value { color: var(--aq-color-accent) !important; }
+    .ud-price-total > .ico { color: var(--aq-color-accent) !important; }
+    .aq-header #appNav .app-nav-btn.is-active { background: rgba(255,255,255,0.10); color: #fff; }
+    /* لوحة التحكم على الداكن */
+    .dash-sidebar { background: var(--aq-color-surface); box-shadow: none; border: 1px solid var(--aq-color-border); }
+    .dash-nav-item.is-active { background: rgba(233,104,46,0.16); color: #fff; }
+    .dash-nav-item.is-active::before { background: var(--aq-color-accent); }
+    .dash-nav-item.is-active svg { color: var(--aq-color-accent); }
+    .aq-table th { background: var(--aq-color-surface-subtle); color: var(--aq-color-text); border-bottom-color: var(--aq-color-border); }
+    .aq-table td { border-bottom-color: var(--aq-color-border-subtle); }
+    .aq-kpi, .aq-kpi-grid > * { background: var(--aq-color-surface); border-color: var(--aq-color-border); }
+    .aq-page-title { color: #fff; }
+    /* الموبايل: شريط تنقّل سفلي عائم بنفس أزرار #appNav (بدل الـ drawer) */
+    @media (max-width: 1024px) {
+      .aq-menu-toggle { display: none !important; }
+      .aq-shell-overlay { display: none !important; }
+      .aq-header #appNav {
+        display: flex !important; flex-direction: row; align-items: stretch; gap: 2px;
+        top: auto; bottom: 10px; inset-inline: 10px; max-height: none; overflow-x: auto; overflow-y: hidden;
+        padding: 6px; border-radius: 22px; border: 1px solid var(--aq-color-border-strong);
+        background: rgba(23,23,26,0.94); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+        box-shadow: 0 16px 40px rgba(0,0,0,0.6); scrollbar-width: none; direction: rtl;
+      }
+      .aq-header #appNav::-webkit-scrollbar { display: none; }
+      .aq-header #appNav .app-nav-btn {
+        flex: 1 0 auto; min-width: 64px; width: auto; flex-direction: column; justify-content: center; gap: 4px;
+        padding: 8px 6px; border-radius: 16px; font-size: 10.5px; font-weight: 700; text-align: center; color: rgba(255,255,255,0.72);
+      }
+      .aq-header #appNav .app-nav-btn svg { width: 20px; height: 20px; }
+      .aq-header #appNav .app-nav-btn.is-active { background: var(--aq-color-accent); color: #fff; border-color: transparent; }
+      .aq-header #appNav .app-nav-btn.is-active::after { display: none; }
+      body.aq-app-on #mainContainer { padding-bottom: 96px; }
+      .toast-container { bottom: 92px; }
+    }
+
+    /* ======================================================================================================
+     * REFERENCE-FAITHFUL LAYER — بنية وألوان المرجع (فحمي + عنبري): هيرو بصورة والعنوان فوقها بكلمة ملوّنة،
+     * شريط بحث واحد + زر فلاتر مربّع (الفلاتر تُكشف بزر «المزيد من الفلاتر» القائم)، رقائق، كروت رأسية بصورة كبيرة
+     * (شبكة على الديسكتوب / عرض أفقي على الموبايل)، شريط سفلي. عرض فقط — نفس الـ DOM/ids/الوظائف.
+     * ====================================================================================================== */
+    :root {
+      --aq-color-canvas: #0D0D0F; --aq-color-surface: #17171A; --aq-color-surface-subtle: #1F1F23; --aq-color-surface-muted: #26262B; --aq-color-surface-accent: #232326;
+      --aq-color-text: #F6F5F2; --aq-color-text-secondary: rgba(246,245,242,0.78); --aq-color-text-muted: #A8A8AE; --aq-color-text-placeholder: #8C8C93;
+      --aq-color-border: rgba(255,255,255,0.09); --aq-color-border-strong: rgba(255,255,255,0.18); --aq-color-border-subtle: rgba(255,255,255,0.07);
+      --aq-color-accent: #F2A93B; --aq-color-accent-hover: #E39A2A; --aq-color-accent-soft: rgba(242,169,59,0.16); --aq-color-accent-line: rgba(242,169,59,0.45); --aq-color-accent-text: #F2A93B; --aq-color-on-accent: #1A1200; --aq-color-on-accent-strong: #1A1200;
+      --aq-color-primary: #F6F5F2; --aq-color-on-primary: #111111; --aq-color-primary-soft: rgba(255,255,255,0.10); --aq-color-primary-line: rgba(255,255,255,0.22);
+      --aq-color-secondary-text: #B8D898; --aq-focus-ring: 0 0 0 3px rgba(242,169,59,0.35);
+      --pa-orange: #F2A93B; --pa-ink: #0D0D0F; --pa-navy: #17171A; --aq-header-bg: #0D0D0F;
+      --aq-overlay: rgba(0,0,0,0.75);
+    }
+    html, body { background: var(--aq-color-canvas); }
+    .aq-phone-cta, #searchBtn, #nlSearchBtn, #editSaveBtn, #dashboardView .dash-cta, .access-gate-box button, #loadMoreBtn, .aq-notif-badge { color: var(--aq-color-on-accent) !important; }
+    .aq-header .aq-notif-badge { color: #1A1200; }
+    body.app-view-search .aq-console-mode.is-active, .aq-console-mode.is-active, .aq-chip.is-active, .aq-chip[aria-pressed="true"], .dash-nav-item.is-active { color: #1A1200 !important; }
+    .dash-nav-item.is-active { background: var(--aq-color-accent) !important; }
+    .dash-nav-item.is-active svg { color: #1A1200 !important; }
+    .aq-header #appNav .app-nav-btn.is-active::after { background: var(--aq-color-accent); }
+    /* ---- الرئيسية: الهيرو بالصورة والعنوان فوقها + كبسولة "عروض مميزة" بنقطة عنبرية ---- */
+    body.app-view-search .aq-hero { min-height: min(72vh, 700px); padding-top: clamp(64px, 8vw, 110px); }
+    body.app-view-search .aq-hero-media { inset: 0 0 var(--aq-hero-overlap) 0; }
+    body.app-view-search .aq-hero-media::after {
+      background: linear-gradient(180deg, rgba(13,13,15,0.55) 0%, rgba(13,13,15,0.15) 35%, rgba(13,13,15,0.35) 65%, rgba(13,13,15,1) 100%),
+                  linear-gradient(270deg, rgba(13,13,15,0.65) 0%, rgba(13,13,15,0.25) 45%, rgba(13,13,15,0) 100%);
+    }
+    body.app-view-search .aq-hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: rgba(23,23,26,0.72); border: 1px solid rgba(255,255,255,0.12); color: var(--aq-color-accent); font-size: 12.5px; letter-spacing: 0.02em; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+    body.app-view-search .aq-hero-eyebrow::before { width: 8px; height: 8px; border-radius: 50%; background: var(--aq-color-accent); }
+    body.app-view-search .aq-hero-title { font-size: clamp(36px, 4.6vw, 66px); line-height: 1.28; }
+    body.app-view-search .aq-hero-title .aq-hero-accent { color: var(--aq-color-accent); }
+    body.app-view-search .aq-hero-sub { color: rgba(246,245,242,0.72); font-size: 15px; }
+    /* ---- الرئيسية: عنوان القسم بأسلوب المرجع (بلا خط تحته) ---- */
+    body.app-view-search .aq-devs-title::after { display: none; }
+    body.app-view-search .aq-devs-title { font-size: clamp(22px, 2.2vw, 30px); }
+    /* ---- الرئيسية: صندوق البحث الأصلي (نفس الحقول والتخطيط) بالألوان الجديدة + مسافة رأسية أقل فوقه ---- */
+    body.app-view-search .aq-hero { min-height: 0; padding-top: clamp(28px, 4vw, 48px); margin-bottom: var(--aq-space-8); }
+    body.app-view-search .aq-hero-copy { padding-bottom: 20px; min-height: 0; }
+    body.app-view-search .aq-hero-eyebrow { margin-bottom: 12px; }
+    body.app-view-search .aq-hero-title { font-size: clamp(32px, 4vw, 56px); margin-bottom: 8px; }
+    body.app-view-search .aq-hero-sub { margin: 0; }
+    :root { --aq-hero-overlap: 140px; }
+    body.app-view-search .aq-console {
+      display: block; width: 100%; max-width: 960px; margin-inline: auto;
+      background: rgba(23,23,26,0.94); border: 1px solid var(--aq-color-border-strong); border-radius: 20px;
+      padding: var(--aq-space-5) var(--aq-space-6) var(--aq-space-6); box-shadow: 0 30px 80px rgba(0,0,0,0.55);
+      -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    }
+    body.app-view-search .aq-console-modes { order: 0; margin: 0 0 var(--aq-space-3); padding: 4px; gap: 4px; background: rgba(255,255,255,0.06); border: 1px solid var(--aq-color-border); border-radius: 999px; }
+    body.app-view-search .aq-console-mode { padding: 8px 18px; border-radius: 999px; border-bottom: 0; color: var(--aq-color-text-muted) !important; font-size: var(--aq-fs-small); }
+    body.app-view-search .aq-console-mode.is-active { background: var(--aq-color-accent) !important; color: #1A1200 !important; }
+    body.app-view-search .aq-console .filters-card { display: grid !important; grid-template-columns: 1fr; grid-template-areas: "fields" "adv" "advblk" "actions"; gap: var(--aq-space-3); background: transparent !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; }
+    body.app-view-search .aq-console .filters-card > .grid#aqPrimaryFilters { grid-area: fields; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0; }
+    body.app-view-search #aqPrimaryFilters > * { display: block !important; }
+    body.app-view-search .aq-console .filters-card label { color: var(--aq-color-text-muted); }
+    body.app-view-search .aq-console input:not([type="checkbox"]):not([type="radio"]), body.app-view-search .aq-console select { height: 48px; border-radius: 12px; }
+    body.app-view-search .aq-console .filters-card > .toggle-details-btn { grid-area: adv; width: auto; height: auto; margin: 0 !important; padding: 6px 2px; border: 0 !important; background: transparent !important; color: var(--aq-color-accent) !important; display: inline-flex; align-items: center; gap: 6px; justify-self: start; font-size: var(--aq-fs-small); }
+    body.app-view-search .aq-console .filters-card > .toggle-details-btn::before { display: none; }
+    body.app-view-search .aq-console .filters-card > .toggle-details-btn .label, body.app-view-search .aq-console .filters-card > .toggle-details-btn .chevron { display: inline; color: var(--aq-color-accent); }
+    body.app-view-search .aq-console .filters-card > #advancedFiltersBlock { grid-area: advblk; margin: 0 !important; padding: var(--aq-space-4); border-radius: 14px; background: rgba(255,255,255,0.04); border: 1px solid var(--aq-color-border); }
+    body.app-view-search .aq-console .filters-card > .btn-row { grid-area: actions; margin: 0; display: flex; gap: var(--aq-space-2); justify-content: flex-end; }
+    body.app-view-search .aq-console #searchBtn { flex: 1 1 auto; height: 52px; border-radius: 14px; font-size: 15px; padding: 0 28px; }
+    body.app-view-search .aq-console #clearBtn { display: inline-flex; flex: 0 0 auto; height: 52px; border-radius: 14px; background: rgba(255,255,255,0.06); color: var(--aq-color-text); border: 1px solid var(--aq-color-border-strong); }
+    body.app-view-search .aq-console .ai-search-panel { background: transparent; border: 0; padding: 0; }
+    body.app-view-search .aq-console #nlSearchInput { height: 52px; border-radius: 12px; }
+    body.app-view-search .aq-console #nlSearchBtn { height: 52px; border-radius: 14px; }
+    @media (max-width: 1024px) { body.app-view-search .aq-console .filters-card > .grid#aqPrimaryFilters { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 640px) {
+      body.app-view-search .aq-hero { padding: 24px 12px 0; }
+      body.app-view-search .aq-hero-media { inset: 0 0 auto 0; height: 300px; }
+      body.app-view-search .aq-hero-title { font-size: clamp(26px, 7.5vw, 34px); }
+      body.app-view-search .aq-console { padding: var(--aq-space-4) var(--aq-space-3); border-radius: 18px; }
+      body.app-view-search .aq-console .filters-card > .grid#aqPrimaryFilters { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      body.app-view-search .aq-console #searchBtn, body.app-view-search .aq-console #clearBtn { height: 48px; }
+    }
+
+    /* ---- كارت الوحدة الأفقي (3C كما هو) بألوان الثيم الداكن: سطح داكن مرتفع، حدّ خفيف، نص أبيض، أكسنت عنبري للسعر/الأيقونات ---- */
+    body.aq-search-ui .unit-card { background: var(--aq-color-surface); border: 1px solid var(--aq-color-border); box-shadow: 0 2px 6px rgba(0,0,0,0.25), 0 18px 40px rgba(0,0,0,0.35); }
+    body.aq-search-ui .unit-card:hover { border-color: rgba(255,255,255,0.20); box-shadow: 0 6px 12px rgba(0,0,0,0.3), 0 28px 60px rgba(0,0,0,0.45); }
+    body.aq-search-ui .unit-cover::after { background: linear-gradient(to top, rgba(13,13,15,0.72), rgba(13,13,15,0)); }
+    body.aq-search-ui .unit-cover-empty { background: var(--aq-color-surface-subtle); color: var(--aq-color-text-muted); }
+    body.aq-search-ui .unit-card .unit-title-name { color: #fff; }
+    body.aq-search-ui .unit-card .unit-title-type, body.aq-search-ui .unit-card .unit-loc { color: var(--aq-color-text-muted); }
+    body.aq-search-ui .unit-card .unit-loc .ico { color: var(--aq-color-accent); }
+    /* هندسة 3C كما هي (صورة 40%، رقائق مضغوطة، سعر 22px) — لا زيادة في ارتفاع الكارت */
+    :root { --aq-card-media-w: 40%; --aq-card-media-max: 260px; }
+    body.aq-search-ui .unit-card .unit-title { font-size: var(--aq-fs-title-sm); }
+    body.aq-search-ui .unit-card .unit-specs { gap: var(--aq-space-2); }
+    body.aq-search-ui .unit-card .unit-specs + .unit-specs { margin-top: calc(-1 * var(--aq-space-1)); }
+    body.aq-search-ui .unit-card-footer { border-top: 1px solid var(--aq-color-border-subtle); padding-top: var(--aq-space-2); }
+    body.aq-search-ui .unit-card .final-price { font-size: var(--aq-fs-title-lg); }
+    body.aq-search-ui .unit-cta { border-radius: var(--radius-sm); }
+    body.aq-search-ui .spec-chip { background: rgba(255,255,255,0.05); border: 1px solid var(--aq-color-border); padding: 3px 8px; gap: 5px; border-radius: var(--radius-sm); }
+    /* داخل شبكة الثلاثة أعمدة (كارت ≤ 600px): القيمة + الأيقونة فقط (كما في 3C) حتى تبقى الشرائح في صفّين */
+    @container (max-width: 600px) {
+      body.aq-search-ui .spec-chip .spec-txt small { display: none; }
+      body.aq-search-ui .unit-card .unit-specs { gap: 6px; }
+      body.aq-search-ui .unit-body { padding: var(--aq-space-3) var(--aq-space-4); gap: 6px; }
+      body.aq-search-ui .unit-card .final-price { font-size: var(--aq-fs-section-title); }
+    }
+    body.aq-search-ui .spec-chip .ico { color: var(--aq-color-accent); }
+    body.aq-search-ui .spec-chip .spec-txt b { color: var(--aq-color-text); }
+    body.aq-search-ui .spec-chip .spec-txt small { color: var(--aq-color-text-muted); }
+    body.aq-search-ui .unit-card-footer { border-top-color: var(--aq-color-border-subtle); }
+    body.aq-search-ui .unit-card .final-price { color: var(--aq-color-accent); }
+    body.aq-search-ui .unit-card .final-price .cur, body.aq-search-ui .unit-card .per-meter, body.aq-search-ui .unit-card .old-price, body.aq-search-ui .unit-card .price-old-label { color: var(--aq-color-text-muted); }
+    body.aq-search-ui .unit-card .per-meter .ico { color: var(--aq-color-accent); }
+    body.aq-search-ui .unit-dev-row .dev-name { color: var(--aq-color-text); }
+    body.aq-search-ui .unit-dev-row .ico { color: var(--aq-color-text-muted); }
+    body.aq-search-ui .unit-cta { background: transparent !important; color: #fff; border: 1.5px solid rgba(255,255,255,0.32); box-shadow: none; }
+    body.aq-search-ui .unit-card:hover .unit-cta { background: var(--aq-color-accent) !important; border-color: var(--aq-color-accent); color: #1A1200; }
+    body.aq-search-ui .unit-cover-strip .unit-id { background: rgba(13,13,15,0.72); color: #fff; border-color: rgba(255,255,255,0.18); }
+    body.aq-search-ui .unit-cover-strip .status-badge { box-shadow: none; }
+    body.aq-search-ui .fav-btn { background: rgba(13,13,15,0.55); border-color: rgba(255,255,255,0.22); color: #fff; }
+    body.aq-search-ui .fav-btn.active { background: var(--aq-color-accent); border-color: var(--aq-color-accent); color: #1A1200; }
+    body.aq-search-ui .compare-checkbox { background: rgba(13,13,15,0.55); border-color: rgba(255,255,255,0.22); }
+    body.aq-search-ui .compare-checkbox input { border-color: rgba(255,255,255,0.7); background: transparent; }
+    body.aq-search-ui .compare-checkbox input:checked { background-color: var(--aq-color-accent); border-color: var(--aq-color-accent); }
+    body.aq-search-ui .skeleton-card .skel { background: linear-gradient(90deg, #1F1F23 25%, #2A2A30 37%, #1F1F23 63%); }
+    /* رقائق شريط النتائج وقائمة الترتيب على الداكن */
+    body.app-view-explore .aq-results-bar .aq-chip { background: var(--aq-color-surface); border-color: var(--aq-color-border-strong); color: var(--aq-color-text); }
+    body.app-view-explore .aq-results-bar .aq-chip.is-active, body.app-view-explore .aq-results-bar .aq-chip[aria-pressed="true"] { background: var(--aq-color-accent) !important; border-color: var(--aq-color-accent) !important; color: #1A1200 !important; }
+    body.app-view-explore .aq-results-bar .aq-sort-field select { background: var(--aq-color-surface); color: var(--aq-color-text); border: 1px solid var(--aq-color-border-strong); border-radius: 999px; height: 40px; padding: 0 12px; }
+    body.app-view-explore .aq-console { background: var(--aq-color-surface) !important; border: 1px solid var(--aq-color-border) !important; box-shadow: var(--aq-elev-panel) !important; }
+    body.app-view-explore .aq-console .filters-card { background: transparent !important; }
   </style>
 </head>
 <body>
@@ -4421,7 +4690,7 @@
   <div class="aq-hero-media" aria-hidden="true"><img src="assets/hero-home.png" alt="" fetchpriority="high" decoding="async"></div>
   <div class="aq-hero-copy" id="aqHeroCopy">
     <p class="aq-hero-eyebrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/><path d="M2 22h20"/></svg><span class="aq-ltr" dir="ltr">AqaR Digital</span> · مخزون عقاري احترافي</p>
-    <h1 class="aq-hero-title">ابحث عن الوحدة المناسبة لعميلك</h1>
+    <h1 class="aq-hero-title">ابحث عن الوحدة <em class="aq-hero-accent">المناسبة</em> لعميلك</h1>
     <p class="aq-hero-sub">اعثر على الوحدة المناسبة، قارن الأسعار، واحسب خطة السداد — كل ذلك في مكان واحد.</p>
   </div>
 
