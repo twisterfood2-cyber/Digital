@@ -4834,6 +4834,21 @@
     #dashPanel-users .um-card.is-owner::before { background: linear-gradient(225deg, rgba(242,169,59,0.55) 0%, rgba(242,169,59,0.18) 40%, rgba(255,255,255,0.05) 75%, rgba(255,255,255,0.10) 100%); }
     @media (hover: hover) { #dashPanel-users .um-card:hover { transform: translateY(-2px); } }
     #dashPanel-users .um-card { transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease; }
+    /* ---- معاينة صورة المستخدم الجديد بعد القصّ (قبل الحفظ) ---- */
+    /* الصف يلفّ لما تظهر المعاينة عشان ما يحصلش تمدد أفقي في النموذج */
+    .aq-upload-actions--inline { flex-wrap: wrap; gap: 8px; align-items: center; }
+    .um-photo-preview { position: relative; display: inline-flex; flex: 0 0 auto; margin-inline-start: 4px; }
+    .um-photo-preview[hidden] { display: none; }   /* [hidden] لازم يغلب display المخصّص */
+    .um-photo-preview img {
+      width: 44px; height: 44px; border-radius: 12px; object-fit: cover; display: block;
+      border: 1px solid var(--aq-color-accent-line); background: var(--aq-color-surface-subtle);
+    }
+    .um-photo-preview button {
+      position: absolute; inset-inline-end: -6px; inset-block-start: -6px; width: 20px; height: 20px; padding: 0;
+      border-radius: 50%; border: 1px solid rgba(255,255,255,0.22); background: #1F1F23; color: var(--aq-color-text);
+      font-size: 13px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .um-photo-preview button:hover { background: var(--aq-color-danger-bg); border-color: var(--aq-color-danger-border); color: var(--aq-color-danger); }
   </style>
 </head>
 <body>
@@ -5802,7 +5817,7 @@
                   </div>
                   <div class="aq-form-field">
                     <label class="aq-form-label" for="newUserPhoto">صورة المستخدم (اختياري)</label>
-                    <div class="aq-upload-actions aq-upload-actions--inline"><input type="file" id="newUserPhoto" class="aq-file-input" accept="image/*"><button type="button" class="aq-btn--form-secondary" id="newUserPhotoPasteBtn">لصق صورة</button></div>
+                    <div class="aq-upload-actions aq-upload-actions--inline"><input type="file" id="newUserPhoto" class="aq-file-input" accept="image/*"><button type="button" class="aq-btn--form-secondary" id="newUserPhotoPasteBtn">لصق صورة</button><span class="um-photo-preview" id="newUserPhotoPreview" hidden><img id="newUserPhotoPreviewImg" alt=""><button type="button" id="newUserPhotoClearBtn" aria-label="إزالة الصورة">×</button></span></div>
                   </div>
                 </div>
                 <div class="um-hint aq-form-hint" id="umOwnerHint" hidden>إنشاء حساب "مالك" يتطلب تسجيل دخولك أنت بحساب مالك.</div>
@@ -6118,7 +6133,7 @@
 <div class="modal-overlay" id="photoCropModal">
   <div class="modal-box pc-box">
     <div class="modal-header">
-      <div class="modal-title">تعديل صورة الملف الشخصي</div>
+      <div class="modal-title" id="pcTitle">تعديل صورة الملف الشخصي</div>
       <button class="modal-close" id="pcCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
     <div class="pc-error" id="pcError" hidden></div>
@@ -12199,20 +12214,23 @@
 
     // Report 091: «لصق صورة» — الملف يُسلَّم لنفس umfPhoto (change → نفس التحقق → uploadUserPhoto)
     aqPasteImage_.wire({ button: document.getElementById('umfPhotoPasteBtn'), input: document.getElementById('umfPhoto'), message: function (t, tone) { setMsg(t, tone !== 'err'); } });
+    // طلب المالك: قصّ الصورة قبل الحفظ — نفس محرّر القصّ بتاع الملف الشخصي (مربّع 1:1، تكبير/تحريك)،
+    // والرفع بيحصل بعد «استخدام الصورة» فقط. الإلغاء = ما يتبعتش أي حاجة للسيرفر.
     document.getElementById('umfPhoto').addEventListener('change', function () {
       const file = this.files && this.files[0];
+      this.value = '';   // يسمح باختيار نفس الملف تاني بعد الإلغاء
       if (!file) return;
+      if (!/^image\/(png|jpe?g|webp)$/i.test(file.type)) { setMsg('اختر صورة JPG أو PNG أو WebP', false); return; }
       if (file.size > 5 * 1024 * 1024) { setMsg('الصورة كبيرة جدًا (الحد 5 ميجابايت)', false); return; }
-      run('رفع الصورة');
-      const reader = new FileReader();
-      reader.onload = function () {
-        const b64 = String(reader.result).split(',')[1];
+      setMsg('', true);
+      openPhotoCropModal(file, function (croppedDataUrl) {
+        run('رفع الصورة');
+        const b64 = String(croppedDataUrl).split(',')[1];
         google.script.run
           .withSuccessHandler(r => onDone(r, 'تم تحديث صورة المستخدم بنجاح'))
           .withFailureHandler(e => setMsg('حدث خطأ: ' + (e && e.message), false))
-          .uploadUserPhoto(umAuth(), u.email, b64, file.type);
-      };
-      reader.readAsDataURL(file);
+          .uploadUserPhoto(umAuth(), u.email, b64, 'image/jpeg');
+      }, { title: 'قصّ صورة المستخدم' });
     });
 
     document.getElementById('umBtnDelete').addEventListener('click', function () {
@@ -12239,6 +12257,36 @@
   // Report 091: «لصق صورة» يضع صورة الحافظة في نفس newUserPhoto — تُرفع مع إنشاء الحساب بنفس المسار (uploadUserPhoto)
   aqPasteImage_.wire({ button: document.getElementById('newUserPhotoPasteBtn'), input: document.getElementById('newUserPhoto'),
     message: function (t, tone) { var m = document.getElementById('addUserMsg'); m.textContent = t; m.className = 'um-msg ' + (tone === 'err' ? 'err' : 'ok'); } });
+
+  /* طلب المالك: قصّ صورة المستخدم الجديد قبل الحفظ. الصورة المقصوصة بتتخزن مؤقتًا هنا (Data URL)
+     وبتترفع مع إنشاء الحساب بنفس المسار (uploadUserPhoto) — مفيش رفع قبل ما الحساب يتعمل. */
+  var newUserPhotoPending = null;
+  function newUserPhotoSetPending_(dataUrl) {
+    newUserPhotoPending = dataUrl || null;
+    var wrap = document.getElementById('newUserPhotoPreview');
+    var img = document.getElementById('newUserPhotoPreviewImg');
+    if (!wrap || !img) return;
+    if (dataUrl) { img.src = dataUrl; wrap.hidden = false; } else { img.removeAttribute('src'); wrap.hidden = true; }
+  }
+  (function () {
+    var input = document.getElementById('newUserPhoto');
+    var clearBtn = document.getElementById('newUserPhotoClearBtn');
+    var setAddMsg = function (t, ok) { var m = document.getElementById('addUserMsg'); m.textContent = t; m.className = 'um-msg ' + (ok ? 'ok' : 'err'); };
+    if (clearBtn) clearBtn.addEventListener('click', function () { newUserPhotoSetPending_(null); input.value = ''; setAddMsg('', true); });
+    if (!input) return;
+    input.addEventListener('change', function () {
+      var file = this.files && this.files[0];
+      this.value = '';
+      if (!file) return;
+      if (!/^image\/(png|jpe?g|webp)$/i.test(file.type)) { setAddMsg('اختر صورة JPG أو PNG أو WebP', false); return; }
+      if (file.size > 5 * 1024 * 1024) { setAddMsg('الصورة كبيرة جدًا (الحد 5 ميجابايت)', false); return; }
+      setAddMsg('', true);
+      openPhotoCropModal(file, function (croppedDataUrl) {
+        newUserPhotoSetPending_(croppedDataUrl);
+        setAddMsg('الصورة جاهزة — هتتحفظ مع إنشاء الحساب', true);
+      }, { title: 'قصّ صورة المستخدم الجديد' });
+    });
+  })();
   document.getElementById('addUserBtn').addEventListener('click', function () {
     // المرحلة 3.6: شِلنا حارس adminPin — المالك الداخل بدوره لازم يقدر يضيف مستخدم.
     // التفويض النهائي في السيرفر (addUserAccount → authorizeOwnerAdmin_) بيبقى صاحب القرار.
@@ -12248,6 +12296,7 @@
     const role = document.getElementById('newUserRole').value;
     const phone = document.getElementById('newUserPhone').value.trim();
     const photoFile = document.getElementById('newUserPhoto').files[0] || null;
+    const photoPending = newUserPhotoPending;   // الصورة بعد القصّ (لها الأولوية)
     const msg = document.getElementById('addUserMsg');
     const setMsg = (t, ok) => { msg.textContent = t; msg.className = 'um-msg ' + (ok ? 'ok' : 'err'); };
 
@@ -12267,9 +12316,15 @@
           finish();
           setMsg('تمت إضافة المستخدم' + (res.role && res.role !== role ? ' — تم ضبط الصلاحية على ' + res.role + ' (صلاحيتك لا تسمح بمنح OWNER)' : ''), true);
           ['newUserName', 'newUserEmail', 'newUserPassword', 'newUserPhone', 'newUserPhoto'].forEach(id => { document.getElementById(id).value = ''; });
+          newUserPhotoSetPending_(null);
           loadUsersList();
         };
-        if (photoFile) {
+        if (photoPending) {
+          google.script.run
+            .withSuccessHandler(created)
+            .withFailureHandler(created)
+            .uploadUserPhoto(umAuth(), email, String(photoPending).split(',')[1], 'image/jpeg');
+        } else if (photoFile) {
           const reader = new FileReader();
           reader.onload = function () {
             const b64 = String(reader.result).split(',')[1];
@@ -14205,9 +14260,12 @@
      * @param {File} file - ملف الصورة (من input[type=file]) - تم التحقق من نوعه/حجمه مسبقًا.
      * @param {Function} onConfirm - يُستدعى بـ(dataUrl) للصورة المقصوصة (JPEG مربّع) عند تأكيد المستخدم للقصّ فقط.
      */
-    function openPhotoCropModal(file, onConfirm) {
+    function openPhotoCropModal(file, onConfirm, options) {
       pcHideError();
       pcOnConfirm = onConfirm;
+      // عنوان المودال حسب السياق (صورتي / صورة مستخدم تاني) — نفس المحرّر بالظبط
+      var pcTitleEl = document.getElementById('pcTitle');
+      if (pcTitleEl) pcTitleEl.textContent = (options && options.title) || 'تعديل صورة الملف الشخصي';
       var reader = new FileReader();
       reader.onload = function () {
         pcImageEl.onload = function () {
