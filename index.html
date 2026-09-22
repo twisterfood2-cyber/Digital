@@ -11997,10 +11997,23 @@
     renderUsersList(filtered);
   }
 
+  /* الترتيب حسب آخر نشاط (طلب المالك): المتصلون الآن الأول، بعدين الأحدث ظهورًا، وآخرهم اللي لسه ما سجّلش دخول.
+     عرض فقط — نسخة من المصفوفة، ولا بيمسّ umAllUsers ولا أي بيانات على السيرفر. الترتيب بيتطبّق وقت الرسم بس،
+     فتحديث الحضور كل 90 ثانية (umApplyPresenceInPlace) ما بيعيدش ترتيب الكروت تحت إيد المستخدم. */
+  function umSortByActivity(users) {
+    return users.slice().sort(function (a, b) {
+      var ao = a.online ? 1 : 0, bo = b.online ? 1 : 0;
+      if (ao !== bo) return bo - ao;
+      var al = Number(a.lastSeen) || 0, bl = Number(b.lastSeen) || 0;
+      if (al !== bl) return bl - al;
+      return String(a.name || a.email || '').localeCompare(String(b.name || b.email || ''), 'ar');
+    });
+  }
+
   function renderUsersList(users) {
     const content = document.getElementById('usersListContent');
     if (!users.length) { content.innerHTML = '<div class="um-empty">مفيش مستخدمين مطابقين</div>'; return; }
-    content.innerHTML = users.map(function (u) {
+    content.innerHTML = umSortByActivity(users).map(function (u) {
       const isOwner = u.role === 'OWNER';
       const active = u.status === 'نشط';
       return `
