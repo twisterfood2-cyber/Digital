@@ -4581,6 +4581,39 @@
     .unit-details-box .unit-card-overlay-close:hover { background: rgba(255,255,255,0.12) !important; border-color: rgba(255,255,255,0.3) !important; }
     .ud-thumbs img { border: 1px solid rgba(255,255,255,0.14); }
     .ud-thumbs img.active { border-color: var(--aq-color-accent); }
+
+    /* ---- سعر المتر على الثيم الداكن (طلب المالك): بطاقات مرفوعة، صورة زخرفية بتدرّج داكن، السعر عنبري، نصوص مقروءة ---- */
+    body.app-view-meter .aq-page-header { padding: 24px clamp(20px, 6vw, 96px) 18px !important; margin-bottom: 0 !important; }
+    body.app-view-meter .aq-page-header-main { display: flex; align-items: baseline; gap: 14px; flex-wrap: nowrap; min-width: 0; }
+    body.aq-app-on.app-view-meter .aq-page-header .aq-page-title { white-space: nowrap; font-size: clamp(14px, 1.2vw, 17px); font-weight: 800; padding-inline-start: 10px; border-inline-start-width: 2px; }
+    body.app-view-meter .aq-page-subtitle { margin: 0; white-space: nowrap; }
+    body.app-view-meter .aq-page-crumbs { display: none; }
+    body.app-view-meter #priceStatsModal .modal-box {
+      background: #1B1B20 !important; border: 1px solid rgba(255,255,255,0.14) !important; border-radius: 20px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 1px 2px rgba(0,0,0,0.5), 0 14px 34px rgba(0,0,0,0.5) !important;
+    }
+    #priceStatsModal .ps-search-wrap .price-stats-search { background: rgba(255,255,255,0.06) !important; border-color: rgba(255,255,255,0.14) !important; color: #fff !important; }
+    #priceStatsModal .ps-search-wrap .ico { color: var(--aq-color-accent); }
+    #priceStatsModal .ps-summary span { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); color: var(--aq-color-text); }
+    #priceStatsModal .ps-summary span .ico { color: var(--aq-color-accent); }
+    #priceStatsModal .ps-group-head { border-bottom: 1px solid rgba(255,255,255,0.10) !important; }
+    #priceStatsModal .ps-group-title { color: #fff; }
+    #priceStatsModal .ps-group-title .ico { color: var(--aq-color-accent) !important; }
+    #priceStatsModal .ps-card { background: #1F1F23 !important; border: 1px solid rgba(255,255,255,0.14) !important; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 10px 26px rgba(0,0,0,0.45) !important; }
+    @media (hover: hover) { #priceStatsModal .ps-card:hover { border-color: rgba(255,255,255,0.26) !important; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 18px 44px rgba(0,0,0,0.55) !important; } }
+    /* الصورة الزخرفية: صورة الهيرو النهائية بتدرّج داكن (لا الأخضر القديم ولا الأسود المصمت)، وارتفاع أقل */
+    #priceStatsModal .ps-media { background: #232328 url('assets/hero-home.png') center 55% / cover no-repeat !important; aspect-ratio: 16 / 5; max-height: 150px; color: #fff !important; }
+    #priceStatsModal .ps-media::before { background: linear-gradient(180deg, rgba(13,13,15,0.25) 0%, rgba(13,13,15,0.35) 50%, rgba(13,13,15,0.85) 100%) !important; }
+    #priceStatsModal .ps-area { color: #fff !important; text-shadow: 0 1px 3px rgba(0,0,0,0.6); }
+    #priceStatsModal .ps-count { background: rgba(13,13,15,0.72) !important; color: #fff !important; border: 1px solid rgba(255,255,255,0.18); }
+    #priceStatsModal .ps-price { color: var(--aq-color-accent) !important; }
+    #priceStatsModal .ps-price small { color: var(--aq-color-text-muted) !important; }
+    #priceStatsModal .ps-counts b { color: #fff !important; }
+    #priceStatsModal .ps-counts .is-calc { color: var(--aq-color-secondary) !important; }
+    #priceStatsModal .ps-icon { background: rgba(242,169,59,0.14) !important; color: var(--aq-color-accent) !important; }
+    #priceStatsModal .ps-view, #priceStatsModal .ps-card button { background: rgba(255,255,255,0.06) !important; color: #fff !important; border: 1px solid rgba(255,255,255,0.18) !important; border-radius: 12px; }
+    #priceStatsModal .ps-view:hover, #priceStatsModal .ps-card button:hover { background: var(--aq-color-accent) !important; border-color: var(--aq-color-accent) !important; color: #1A1200 !important; }
+    #priceStatsModal .ps-empty { color: var(--aq-color-text-muted); }
   </style>
 </head>
 <body>
