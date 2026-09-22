@@ -4548,6 +4548,39 @@
     body.app-view-explore .aq-console input:not([type="checkbox"]):not([type="radio"]), body.app-view-explore .aq-console select,
     body.app-view-search .aq-console input:not([type="checkbox"]):not([type="radio"]), body.app-view-search .aq-console select { background: rgba(255,255,255,0.06) !important; border-color: rgba(255,255,255,0.14) !important; }
     body.app-view-explore .aq-console-modes, body.app-view-search .aq-console-modes { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.12); }
+
+    /* ---- نافذة تفاصيل الوحدة على الثيم الداكن (طلب المالك): إطار مرفوع، رؤوس أقسام أهدأ، بلاطات أوضح، سعر بارز، شارة الحالة مقروءة ---- */
+    #unitCardOverlay .unit-details-box, .unit-card-overlay-box.unit-details-box {
+      background: #1B1B20 !important; border: 1px solid rgba(255,255,255,0.14) !important; border-radius: 22px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.55), 0 30px 80px rgba(0,0,0,0.7) !important;
+    }
+    .ud-top { border-bottom: 1px solid rgba(255,255,255,0.10) !important; }
+    .ud-sec { background: #1F1F23 !important; border: 1px solid rgba(255,255,255,0.10) !important; box-shadow: inset 0 1px 0 rgba(255,255,255,0.04); }
+    .ud-sec-title { background: rgba(255,255,255,0.03) !important; border: 0 !important; border-bottom: 1px solid rgba(255,255,255,0.10) !important; color: #fff; }
+    .ud-tile { background: #26262B !important; border: 1px solid rgba(255,255,255,0.12) !important; }
+    .ud-tile-label { color: var(--aq-color-text-muted) !important; }
+    .ud-tile-value { color: #fff !important; }
+    .ud-tile .ico { color: var(--aq-color-accent) !important; }
+    .ud-price-hero { background: rgba(242,169,59,0.08) !important; border: 1px solid rgba(242,169,59,0.30) !important; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05) !important; }
+    .ud-price-label { color: var(--aq-color-text-muted) !important; }
+    .ud-price-value { color: var(--aq-color-accent) !important; }
+    .ud-media { background: #232328 !important; border: 1px solid rgba(255,255,255,0.10); }
+    .ud-media-status { background: rgba(13,13,15,0.72) !important; color: var(--aq-color-secondary) !important; border: 1px solid rgba(184,216,152,0.55) !important; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+    .ud-media-status .status-dot { background: currentColor !important; }
+    .ud-media-status.محجوز { color: #F5C965 !important; border-color: rgba(245,201,101,0.55) !important; }
+    .ud-media-status.مباع { color: #F5A19A !important; border-color: rgba(245,161,154,0.55) !important; }
+    .ud-media-id { background: rgba(13,13,15,0.72) !important; border: 1px solid rgba(255,255,255,0.18); }
+    .ud-actions .icon-action-btn { background: rgba(255,255,255,0.06) !important; border: 1px solid rgba(255,255,255,0.16) !important; color: #fff !important; }
+    .ud-actions .icon-action-btn:hover { background: rgba(255,255,255,0.10) !important; border-color: rgba(255,255,255,0.28) !important; }
+    .ud-actions .icon-action-btn.ud-act-primary { background: var(--aq-color-accent) !important; border-color: var(--aq-color-accent) !important; color: #1A1200 !important; }
+    .ud-actions .icon-action-btn.ud-act-primary .ico { color: #1A1200 !important; }
+    .ud-actions .icon-action-btn.ud-act-primary:hover { background: var(--aq-color-accent-hover) !important; }
+    .ud-status-row .status-badge { background: rgba(184,216,152,0.14); color: var(--aq-color-secondary); border-color: rgba(184,216,152,0.45); }
+    .status-select, .ud-status-select { background: rgba(255,255,255,0.06) !important; border-color: rgba(255,255,255,0.16) !important; color: #fff !important; }
+    .unit-details-box .unit-card-overlay-close { background: rgba(255,255,255,0.06) !important; border: 1px solid rgba(255,255,255,0.16) !important; color: #fff !important; }
+    .unit-details-box .unit-card-overlay-close:hover { background: rgba(255,255,255,0.12) !important; border-color: rgba(255,255,255,0.3) !important; }
+    .ud-thumbs img { border: 1px solid rgba(255,255,255,0.14); }
+    .ud-thumbs img.active { border-color: var(--aq-color-accent); }
   </style>
 </head>
 <body>
