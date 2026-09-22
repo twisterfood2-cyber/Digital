@@ -4512,7 +4512,7 @@
     /* ---- استكشف (طلب المالك): العنوان والوصف في سطر واحد، وصندوق البحث مباشرة تحتهما ---- */
     body.app-view-explore .aq-page-header { padding: 24px clamp(20px, 6vw, 96px) 18px !important; margin-bottom: 0 !important; }
     body.app-view-explore .aq-page-header-main { display: flex; align-items: baseline; gap: 14px; flex-wrap: nowrap; min-width: 0; }
-    body.app-view-explore .aq-page-header .aq-page-title { white-space: nowrap; font-size: clamp(14px, 1.2vw, 17px); }   /* طلب المالك: نصف الحجم السابق */
+    body.aq-app-on.app-view-explore .aq-page-header .aq-page-title { white-space: nowrap; font-size: clamp(14px, 1.2vw, 17px); font-weight: 800; padding-inline-start: 10px; border-inline-start-width: 2px; }   /* طلب المالك: نصف الحجم السابق */
     body.app-view-explore .aq-page-subtitle { margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
     body.app-view-explore .aq-page-crumbs { display: none; }
     body.app-view-explore .aq-hero { margin-top: 0 !important; margin-bottom: var(--aq-space-4) !important; top: auto !important; }   /* top: 68px القديم كان يزيح الصندوق لأسفل */
