@@ -4614,6 +4614,49 @@
     #priceStatsModal .ps-view, #priceStatsModal .ps-card button { background: rgba(255,255,255,0.06) !important; color: #fff !important; border: 1px solid rgba(255,255,255,0.18) !important; border-radius: 12px; }
     #priceStatsModal .ps-view:hover, #priceStatsModal .ps-card button:hover { background: var(--aq-color-accent) !important; border-color: var(--aq-color-accent) !important; color: #1A1200 !important; }
     #priceStatsModal .ps-empty { color: var(--aq-color-text-muted); }
+
+    /* ---- باقي الصفحات على الثيم الداكن (طلب المالك): رأس صفحة موحّد مضغوط، لوحات مرفوعة، شارات/أزرار مقروءة ---- */
+    /* رأس الصفحة لكل الصفحات الداخلية (إضافة/عرض السعر/لوحة التحكم) بنفس أسلوب استكشف وسعر المتر */
+    body.aq-app-on:not(.app-view-search):not(.app-view-explore):not(.app-view-meter) .aq-page-header { padding: 24px clamp(20px, 6vw, 96px) 18px !important; margin-bottom: var(--aq-space-4) !important; }
+    body.aq-app-on:not(.app-view-search) .aq-page-header-main { display: flex; align-items: baseline; gap: 14px; flex-wrap: nowrap; min-width: 0; }
+    body.aq-app-on:not(.app-view-search) .aq-page-header .aq-page-title { white-space: nowrap; font-size: clamp(14px, 1.2vw, 17px); font-weight: 800; padding-inline-start: 10px; border-inline-start-width: 2px; }
+    body.aq-app-on:not(.app-view-search) .aq-page-subtitle { margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+    body.aq-app-on:not(.app-view-search) .aq-page-crumbs { display: none; }
+    @media (max-width: 900px) { body.aq-app-on:not(.app-view-search) .aq-page-header-main { flex-wrap: wrap; gap: 4px 12px; } body.aq-app-on:not(.app-view-search) .aq-page-subtitle { white-space: normal; } }
+    /* اللوحات والمودالات: نفس وصفة "اللوح المرفوع" */
+    .modal-box, .aq-admin-card, #dashPanel-profile .prof-hero, .aq-dev-card, .aq-kpi, .aq-card, .dash-sidebar {
+      background: #1B1B20 !important; border: 1px solid rgba(255,255,255,0.14) !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 1px 2px rgba(0,0,0,0.5), 0 14px 34px rgba(0,0,0,0.5) !important;
+    }
+    .modal-box { border-radius: 22px; }
+    .aq-admin-card .aq-admin-card, .aq-admin-card .aq-form-assist, #devFormModal .aq-admin-card, #projFormModal .aq-admin-card { background: #1F1F23 !important; box-shadow: none !important; border-color: rgba(255,255,255,0.10) !important; }
+    .aq-dev-card:hover { border-color: rgba(255,255,255,0.26) !important; }
+    /* لوحة التحكم: العنصر النشط في التنقّل الفرعي عنبري، بطاقة "المتصلون الآن" داكنة */
+    .dash-nav-item.is-active, .aq-subnav-item.is-active { background: var(--aq-color-accent) !important; color: #1A1200 !important; border-color: var(--aq-color-accent) !important; }
+    .dash-nav-item.is-active svg, .aq-subnav-item.is-active svg { color: #1A1200 !important; }
+    #dashboardView .dash-live-card { background: #1F1F23 !important; border: 1px solid rgba(255,255,255,0.14) !important; }
+    #dashboardView .dash-live-card, #dashboardView .dash-live-card * { color: #fff !important; }
+    #dashboardView .dash-live-card .live-dot, #dashboardView .dash-live-card .is-online { color: var(--aq-color-secondary) !important; }
+    /* شارات الأدوار */
+    .aq-badge--role, .um-role, .um-role-badge, .um-badge.role-OWNER, .dash-role-badge { background: rgba(242,169,59,0.14) !important; color: var(--aq-color-accent) !important; border: 1px solid rgba(242,169,59,0.40) !important; }
+    .um-badge.role-MANAGER { background: rgba(143,184,232,0.14) !important; color: #8FB8E8 !important; border: 1px solid rgba(143,184,232,0.4) !important; }
+    .um-badge.role-SALES { background: rgba(184,216,152,0.14) !important; color: #B8D898 !important; border: 1px solid rgba(184,216,152,0.4) !important; }
+    .um-badge.role-DATA_ENTRY { background: rgba(196,160,240,0.14) !important; color: #C4A0F0 !important; border: 1px solid rgba(196,160,240,0.4) !important; }
+    .um-badge.status-active, .um-badge.is-active { background: rgba(143,217,168,0.14) !important; color: #8FD9A8 !important; border: 1px solid rgba(143,217,168,0.4) !important; }
+    :root { --aq-role-owner-bg: rgba(242,169,59,0.14); --aq-role-owner-fg: #F2A93B; --aq-role-manager-bg: rgba(143,184,232,0.14); --aq-role-manager-fg: #8FB8E8; --aq-role-sales-bg: rgba(184,216,152,0.14); --aq-role-sales-fg: #B8D898; --aq-role-entry-bg: rgba(196,160,240,0.14); --aq-role-entry-fg: #C4A0F0; }
+    /* الحقول (بما فيها حقول datalist) والأزرار الثانوية داخل المودالات */
+    input[list], input[type="search"], .aq-list-search input { background: rgba(255,255,255,0.06) !important; color: #fff !important; border-color: rgba(255,255,255,0.14) !important; }
+    .um-chips button, .aq-chip-tag, .arc-chip { background: rgba(255,255,255,0.06); color: var(--aq-color-text); border: 1px solid rgba(255,255,255,0.14); }
+    .um-chips button.active { background: var(--aq-color-accent) !important; color: #1A1200 !important; border-color: var(--aq-color-accent) !important; }
+    /* واتساب: أخضر دلالي صلب بنص أبيض (بدل الفاتح غير المقروء) */
+    .whatsapp-btn, .aq-btn--success { background: #1F8A4C !important; color: #fff !important; border-color: #1F8A4C !important; }
+    .whatsapp-btn:hover, .aq-btn--success:hover { background: #24A05A !important; }
+    /* مودال الإشعارات والمقارنة والوحدات المشابهة: صفوف على سطح أوضح */
+    .notif-item, .su-item, .similar-item, .compare-table th, .compare-table td { border-color: rgba(255,255,255,0.10) !important; }
+    .compare-table th { background: rgba(255,255,255,0.06) !important; color: #fff !important; }
+    .notif-item.is-unread { background: rgba(242,169,59,0.08) !important; }
+    /* التوست */
+    .toast { background: #1F1F23; border: 1px solid rgba(255,255,255,0.16); }
   </style>
 </head>
 <body>
