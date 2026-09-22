@@ -4849,6 +4849,23 @@
       font-size: 13px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;
     }
     .um-photo-preview button:hover { background: var(--aq-color-danger-bg); border-color: var(--aq-color-danger-border); color: var(--aq-color-danger); }
+    /* ---- كارت تفاصيل الوحدة: بقايا اللون الأخضر الغامق (بقى #17171A على الداكن = شبه مختفي) ---- */
+    /* اسم المشروع كرابط + أيقونات الموقع/سعر المتر/الخريطة كانت كلها بلون شبه أسود فوق سطح داكن */
+    .unit-details-box .ud-link, #unitCardOverlay .ud-link { color: var(--aq-color-accent) !important; }
+    .unit-details-box .ud-link:hover, #unitCardOverlay .ud-link:hover { color: var(--aq-color-accent-hover) !important; }
+    /* العنوان الرئيسي أبيض عشان السعر يفضل هو الوحيد العنبري البارز (تسلسل بصري) — واللون بيتحوّل عنبري عند المرور */
+    .unit-details-box .ud-name .ud-link, #unitCardOverlay .ud-name .ud-link { color: var(--aq-color-text) !important; }
+    .unit-details-box .ud-name .ud-link:hover, #unitCardOverlay .ud-name .ud-link:hover { color: var(--aq-color-accent) !important; }
+    .ud-locline .ico, .ud-price-ppm .ico, .ud-map .ico, .ud-tile > .ico { color: var(--aq-color-accent) !important; }
+    .ud-notes li::before { background: var(--aq-color-accent) !important; }
+    /* الحروف داخل صورة المستخدم كانت بلون داكن فوق دائرة داكنة */
+    .um-avatar { color: var(--aq-color-text) !important; }
+    #dashPanel-users .um-card .um-avatar, #umUserBody .um-avatar { background: rgba(242,169,59,0.14) !important; color: var(--aq-color-accent) !important; border: 1px solid var(--aq-color-accent-line) !important; }
+    /* مقبض شريط التكبير في محرّر القصّ */
+    .pc-zoom-slider::-webkit-slider-thumb { background: var(--aq-color-accent) !important; border-color: rgba(255,255,255,0.65) !important; }
+    .pc-zoom-slider::-moz-range-thumb { background: var(--aq-color-accent) !important; border-color: rgba(255,255,255,0.65) !important; }
+    /* قراءة أوضح: عناوين الحقول الصغيرة داخل الكارت كانت 10px */
+    .ud-tile-label, .ud-price-label { font-size: 11px !important; letter-spacing: 0.2px; }
   </style>
 </head>
 <body>
