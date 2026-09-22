@@ -4776,6 +4776,14 @@
     /* بطاقات المطوّرين في الرئيسية: لون نص موروث أسود */
     .aq-dev-tile, .aq-dev-meta { color: var(--aq-color-text); }
     body.app-view-search .aq-dev-meta { background: var(--aq-color-surface-subtle); }
+    /* ---- كارت تفاصيل الوحدة: حدود واضحة تفصله عن خلفية الموقع السوداء (طلب المالك) ---- */
+    #unitCardOverlay .unit-details-box, .unit-card-overlay-box.unit-details-box,
+    .unit-card-overlay-box, .unit-details-box, .modal-box {
+      border: 1px solid rgba(255,255,255,0.30) !important;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.10), inset 0 1px 0 rgba(255,255,255,0.26),
+                  0 0 0 1px rgba(0,0,0,0.85), 8px 14px 40px rgba(255,255,255,0.07), 0 30px 80px rgba(0,0,0,0.78) !important;
+    }
+    .unit-card-overlay, .modal-overlay { background: rgba(0,0,0,0.82); }
   </style>
 </head>
 <body>
