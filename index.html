@@ -4866,6 +4866,35 @@
     .pc-zoom-slider::-moz-range-thumb { background: var(--aq-color-accent) !important; border-color: rgba(255,255,255,0.65) !important; }
     /* قراءة أوضح: عناوين الحقول الصغيرة داخل الكارت كانت 10px */
     .ud-tile-label, .ud-price-label { font-size: 11px !important; letter-spacing: 0.2px; }
+    /* ---- شريط المقارنة: الزر كان أبيض بنص أبيض، والاختيار مكنش باين على الكارت ---- */
+    #compareGoBtn { background: var(--aq-color-accent) !important; color: #1A1200 !important; font-weight: 800; border: 0; }
+    #compareGoBtn:hover:not(:disabled) { background: var(--aq-color-accent-hover) !important; }
+    #compareGoBtn:disabled { background: rgba(255,255,255,0.10) !important; color: var(--aq-color-text-muted) !important; }
+    .compare-bar .clear-link, #compareClearBtn { color: var(--aq-color-text-muted) !important; }
+    .compare-bar .clear-link:hover, #compareClearBtn:hover { color: var(--aq-color-text) !important; }
+    /* مربّع الاختيار على الكارت: لما يتحدّد يبقى عنبري بعلامة ✓ داكنة + إطار الكارت بيتلوّن */
+    body.aq-search-ui .compare-checkbox input[type="checkbox"]:checked {
+      background-color: var(--aq-color-accent) !important; border-color: var(--aq-color-accent) !important;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231A1200' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") !important; background-size: 12px 12px; background-position: center; background-repeat: no-repeat;
+    }
+    body.aq-search-ui .compare-checkbox:has(input:checked) {
+      background: rgba(242,169,59,0.22) !important; border-color: var(--aq-color-accent) !important;
+    }
+    body.aq-search-ui .unit-card:has(.compare-checkbox input:checked)::before {
+      background: linear-gradient(225deg, rgba(242,169,59,0.85) 0%, rgba(242,169,59,0.35) 40%, rgba(255,255,255,0.08) 75%, rgba(255,255,255,0.12) 100%);
+    }
+    /* الموبايل: شريط المقارنة كان مختفي بالكامل تحت شريط التنقّل السفلي العائم → مرفوع فوقه كبطاقة عائمة */
+    @media (max-width: 1024px) {
+      .compare-bar {
+        bottom: calc(10px + var(--aq-bottomnav-h, 72px) + 10px);
+        inset-inline: 10px; left: auto; right: auto; width: auto;
+        border: 1px solid var(--aq-color-border-strong); border-radius: 18px; padding: 10px 14px;
+        background: rgba(23,23,26,0.96); box-shadow: 0 16px 40px rgba(0,0,0,0.6);
+        flex-wrap: nowrap; gap: 10px; justify-content: space-between;
+      }
+      .compare-bar > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      #compareGoBtn { flex: 0 0 auto; padding: 9px 14px; }
+    }
   </style>
 </head>
 <body>
