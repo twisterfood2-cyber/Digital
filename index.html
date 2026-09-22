@@ -4664,7 +4664,9 @@
     /* ---- كارت الاستكشاف (طلب المالك): بلا زر «عرض التفاصيل» (الكارت كله قابل للنقر) + ارتفاع أقل ---- */
     body.aq-search-ui .unit-cta { display: none !important; }
     body.aq-search-ui .unit-card-footer { padding-top: 6px; gap: 4px 12px; align-items: center; }
-    body.aq-search-ui .unit-foot-meta { flex: 1 1 160px; flex-basis: 160px !important; order: 0 !important; gap: 2px; }
+    /* المطوّر وتواريخ الإضافة/التعديل: سطران مستقلان تحت السعر (طلب المالك) */
+    body.aq-search-ui .unit-foot-meta { flex: 1 1 100%; flex-basis: 100% !important; order: 3 !important; gap: 2px; }
+    body.aq-search-ui .unit-dev-row, body.aq-search-ui .unit-meta-line { display: flex; width: 100%; }
     body.aq-search-ui .unit-body { gap: 6px; padding-top: 10px; padding-bottom: 10px; }
     body.aq-search-ui .unit-card .unit-info-block { gap: 4px; }
     body.aq-search-ui .unit-card .unit-price-box { gap: 0; }
