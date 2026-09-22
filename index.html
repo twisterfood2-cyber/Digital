@@ -4690,6 +4690,14 @@
     }
     body.aq-search-ui .unit-card:hover { box-shadow: 8px 14px 34px rgba(255,255,255,0.07), 0 22px 50px rgba(0,0,0,0.6); }
     body.aq-search-ui .unit-card:hover::before { background: linear-gradient(225deg, rgba(242,169,59,0.75) 0%, rgba(242,169,59,0.25) 40%, rgba(255,255,255,0.06) 75%, rgba(255,255,255,0.12) 100%); }
+
+    /* ---- صندوق البحث (استكشف + الرئيسية): نفس حافة الضوء المتدرّجة والتوهّج الأبيض الخفيف ---- */
+    body.app-view-explore .aq-console, body.app-view-search .aq-console { position: relative; border-color: rgba(255,255,255,0.10) !important; box-shadow: 6px 10px 28px rgba(255,255,255,0.045), 0 14px 34px rgba(0,0,0,0.55) !important; }
+    body.app-view-explore .aq-console::before, body.app-view-search .aq-console::before {
+      content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none; z-index: 6;
+      background: linear-gradient(225deg, rgba(255,255,255,0.42) 0%, rgba(255,255,255,0.14) 38%, rgba(255,255,255,0.05) 70%, rgba(255,255,255,0.10) 100%);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite: exclude;
+    }
   </style>
 </head>
 <body>
