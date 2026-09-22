@@ -4795,6 +4795,45 @@
                   0 24px 70px rgba(0,0,0,0.8) !important;
     }
     body.app-view-explore .aq-console::before, body.app-view-search .aq-console::before { background: linear-gradient(225deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.18) 38%, rgba(255,255,255,0.06) 70%, rgba(255,255,255,0.14) 100%); }
+    /* ---- لوحة التحكم / المستخدمون: عرض ككروت في شبكة (3 كروت على الأقل في الصف) ---- */
+    #dashPanel-users .um-list {
+      display: grid !important; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      max-height: none; overflow: visible; padding: 0;
+    }
+    @media (min-width: 1280px) { #dashPanel-users .um-list { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+    @media (min-width: 1000px) and (max-width: 1279px) { #dashPanel-users .um-list { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    @media (min-width: 680px) and (max-width: 999px) { #dashPanel-users .um-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 679px) { #dashPanel-users .um-list { grid-template-columns: 1fr; } }
+    #dashPanel-users .um-empty { grid-column: 1 / -1; }
+    /* الكارت نفسه: صورة + اسم فوق، بيانات تحتها، وشريط سفلي للحضور والحالة */
+    #dashPanel-users .um-card {
+      display: grid !important; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "avatar main" "foot foot";
+      grid-template-rows: 1fr auto;        /* الشريط السفلي ملزوق تحت مهما طال الاسم → كل كروت الصف بنفس الارتفاع */
+      align-items: start; gap: 12px; padding: 16px 16px 12px; height: 100%;
+      background: var(--aq-color-surface-muted, #26262B) !important; border-radius: var(--radius-lg, 16px);
+      min-height: 150px;
+    }
+    #dashPanel-users .um-card .um-avatar { grid-area: avatar; width: 52px; height: 52px; border-radius: 14px; font-size: 18px; }
+    #dashPanel-users .um-card .um-main { grid-area: main; min-width: 0; }
+    #dashPanel-users .um-card .um-right {
+      grid-area: foot; flex-direction: row !important; align-items: center; justify-content: space-between;
+      width: 100%; gap: 8px; margin-top: 4px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.10);
+    }
+    #dashPanel-users .um-name { font-size: 15px; font-weight: 800; line-height: 1.4; gap: 6px; }
+    #dashPanel-users .um-name > :not(.um-badge) { overflow-wrap: anywhere; }
+    /* الإيميل الطويل بينزل لسطرين بدل ما يتقص بنقط */
+    #dashPanel-users .um-sub {
+      font-size: 12px; margin-top: 4px; white-space: normal; overflow-wrap: anywhere; overflow: hidden;
+      display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2;
+    }
+    #dashPanel-users .um-sub .ltr { direction: ltr; unicode-bidi: isolate; }
+    #dashPanel-users .um-presence { margin: 0; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    #dashPanel-users .um-card .um-status { flex: 0 0 auto; }
+    /* المالك: حدّ عنبري خفيف يفرّقه بلا ضجيج */
+    #dashPanel-users .um-card.is-owner { border-color: var(--aq-color-accent-line) !important; }
+    #dashPanel-users .um-card.is-owner::before { background: linear-gradient(225deg, rgba(242,169,59,0.55) 0%, rgba(242,169,59,0.18) 40%, rgba(255,255,255,0.05) 75%, rgba(255,255,255,0.10) 100%); }
+    @media (hover: hover) { #dashPanel-users .um-card:hover { transform: translateY(-2px); } }
+    #dashPanel-users .um-card { transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease; }
   </style>
 </head>
 <body>
