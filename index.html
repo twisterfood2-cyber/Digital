@@ -278,7 +278,7 @@
       color: var(--text-light);
       border: 1px solid var(--aq-color-border);
     }
-    .filters-card select { color-scheme: light; }   /* LOCAL REDESIGN PHASE 2: قوائم النظام فاتحة (الأسطح بيضاء) */
+    .filters-card select { color-scheme: dark; }   /* AUDIT 2026-09-23: قوائم النظام داكنة مع الثيم (كانت light من أيام الأسطح البيضاء) */
     .filters-card input::placeholder { color: var(--text-muted); }
     .filters-card input:focus,
     .filters-card select:focus {
@@ -2092,7 +2092,7 @@
     #priceStatsModal .ps-media {   /* خلفية زخرفية فقط (city-bg.jpg — أصل الموقع) — لا تمثّل نوع العقار */
       position: relative; aspect-ratio: 16 / 7; max-height: 200px; min-height: 96px; background: var(--aq-color-primary-deep) url('city-bg.jpg') center / cover no-repeat; color: var(--aq-color-on-primary);
     }   /* الارتفاع بيتبع العرض لحدّ 200px — الكارت العريض (نوع واحد = 100%) ما يبقاش شريط ضخم */
-    #priceStatsModal .ps-media::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,76,67,0.42) 0%, rgba(0,76,67,0.28) 55%, rgba(0,76,67,0.62) 100%); }   /* نفس درجة --aq-color-primary-deep (#004C43) بشفافية */
+    #priceStatsModal .ps-media::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(13,13,15,0.45) 0%, rgba(13,13,15,0.32) 55%, rgba(13,13,15,0.62) 100%); }   /* نفس درجة --aq-color-primary-deep (#004C43) بشفافية */
     #priceStatsModal .ps-card:nth-child(3n+2) .ps-media { background-position: center top; }
     #priceStatsModal .ps-card:nth-child(3n) .ps-media { background-position: center bottom; }
     #priceStatsModal .ps-media-text { position: absolute; inset: auto 0 0 0; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
@@ -2491,7 +2491,7 @@
       border: 1px solid var(--aq-prop-border); border-radius: var(--aq-prop-radius-sm);
       height: var(--aq-input-h); padding: 0 13px; font-size: var(--aq-fs-small);
     }
-    body.aq-search-ui .aq-console select { color-scheme: light; }
+    body.aq-search-ui .aq-console select { color-scheme: dark; }   /* AUDIT 2026-09-23 */
     body.aq-search-ui .aq-console input::placeholder { color: var(--aq-color-text-placeholder); }
     body.aq-search-ui .aq-console input:focus,
     body.aq-search-ui .aq-console select:focus {
@@ -2922,7 +2922,7 @@
       background: var(--aq-color-primary-deep); color: var(--aq-color-on-solid); border: 1px solid rgba(255,255,255,0.18);
       border-radius: var(--aq-radius-pill); padding: 4px 11px; font-size: var(--aq-fs-caption); font-weight: 800;
     }
-    .ud-media-status .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #B4FF6C; }
+    .ud-media-status .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--aq-color-secondary); }
     .ud-media-status.محجوز { background: rgba(138,100,18,0.92); } .ud-media-status.محجوز .status-dot { background: #FFD97A; }
     .ud-media-status.مباع { background: rgba(176,57,47,0.92); } .ud-media-status.مباع .status-dot { background: #FFB4AC; }
     .ud-media-strip { position: absolute; z-index: 2; bottom: 12px; left: 12px; right: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; pointer-events: none; }
@@ -4915,6 +4915,26 @@
     .aq-pdf-sheet .compare-table td.row-label { background: #F5F5F6 !important; color: #16161A !important; font-weight: 800; }
     .aq-pdf-sheet .compare-table th, .aq-pdf-sheet .compare-table td { border-color: #E2E2E6 !important; }
     .aq-pdf-sheet .compare-table img { border-color: #E2E2E6 !important; }
+    /* ======================================================================================================
+     * AUDIT 2026-09-23 — تدقيق شامل لثيم Dark Premium: إصلاحات اتّساق وتباين فقط (بدون أي تغيير في المنطق).
+     * ====================================================================================================== */
+    /* F-4: عناصر النظام (شريط التمرير، منتقي التاريخ، القوائم) تتبع الثيم الداكن */
+    :root { color-scheme: dark; }
+    /* F-5: لون حلقة التركيز الموحّد = العنبري (كان التوكن لسه أبيض) */
+    :root { --aq-focus-outline: 2px solid var(--aq-color-accent); --aq-neutral-disabled: rgba(255,255,255,0.14); }
+    /* F-1: العنصر النشط في شريط التنقّل السفلي — نص/أيقونة داكنة فوق العنبري (كان أبيض على عنبري = تباين 2.0) */
+    @media (max-width: 1024px) {
+      .aq-header #appNav .app-nav-btn.is-active { color: #1A1200 !important; }
+      .aq-header #appNav .app-nav-btn.is-active svg { color: #1A1200 !important; }
+    }
+    /* F-2: زر التأكيد الخطر — نص داكن فوق الأحمر الفاتح (كان أبيض = تباين 2.01) */
+    #aqConfirmOk.is-danger, .aq-btn--form-primary.is-danger, button.is-danger.aq-btn--form-primary { color: #2A0B08 !important; font-weight: 800; }
+    /* F-11: حلقة تركيز واضحة للحقول (كان تغيير لون الحدّ فقط) */
+    input:focus-visible, select:focus-visible, textarea:focus-visible, .aq-form-control:focus-visible {
+      outline: 2px solid var(--aq-color-accent); outline-offset: 1px;
+    }
+    /* F-12 (لا تغيير): مربّع المقارنة داخل <label> — مساحة اللمس الفعلية هي الغلاف 34×34 وليست الـ input 18px،
+       فالقياس الأولي كان إيجابية كاذبة ولا داعي لتكبير العنصر أو تغيير شكله المعتمد. */
   </style>
 </head>
 <body>
@@ -9209,7 +9229,7 @@
           <span style="font-size:12px;color:#fff;font-weight:700;">${escHtml_(agentName || 'Digital Real Estate Team')}${agentPhone ? ' — ' : ''}<span style="color:#F2A93B;">${escHtml_(agentPhone || '')}</span></span>
           <span style="font-size:9px;color:#C9C9CF;white-space:nowrap;">Contact Info</span>
         </div>
-        <div style="padding:10px 20px;text-align:center;font-size:10px;color:#5F6866;">
+        <div style="padding:10px 20px;text-align:center;font-size:10px;color:#6B6B72;">
           تم إصدار هذا الملف بتاريخ ${new Date().toLocaleDateString('ar-EG')}
         </div>
       `;
