@@ -4508,6 +4508,18 @@
       body.app-view-search .aq-devs-head { flex-wrap: wrap; }
       body.app-view-search .aq-devs-sub { white-space: normal; }
     }
+
+    /* ---- استكشف (طلب المالك): العنوان والوصف في سطر واحد، وصندوق البحث مباشرة تحتهما ---- */
+    body.app-view-explore .aq-page-header { padding: 24px clamp(20px, 6vw, 96px) 18px !important; margin-bottom: 0 !important; }
+    body.app-view-explore .aq-page-header-main { display: flex; align-items: baseline; gap: 14px; flex-wrap: nowrap; min-width: 0; }
+    body.app-view-explore .aq-page-header .aq-page-title { white-space: nowrap; font-size: clamp(24px, 2.4vw, 34px); }
+    body.app-view-explore .aq-page-subtitle { margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+    body.app-view-explore .aq-page-crumbs { display: none; }
+    body.app-view-explore .aq-hero { margin-top: 0 !important; margin-bottom: var(--aq-space-4) !important; top: auto !important; }   /* top: 68px القديم كان يزيح الصندوق لأسفل */
+    @media (max-width: 900px) {
+      body.app-view-explore .aq-page-header-main { flex-wrap: wrap; gap: 4px 12px; }
+      body.app-view-explore .aq-page-subtitle { white-space: normal; }
+    }
   </style>
 </head>
 <body>
