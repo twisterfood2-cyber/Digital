@@ -88,7 +88,7 @@
       --muted: var(--aq-color-text-muted);
       /* lines & borders */
       --border: var(--aq-color-border-subtle);
-      --border-gold: rgba(17,29,58,0.18);            /* LOCAL REDESIGN PHASE 2: subtle navy hairline (كان أخضر) */
+      /* LOCAL REDESIGN PHASE 2: subtle navy hairline (كان أخضر) */
       --line-dark: var(--aq-color-border-subtle);
       /* environment */
       --page-bg: var(--aq-color-canvas);
@@ -2092,7 +2092,7 @@
     #priceStatsModal .ps-media {   /* خلفية زخرفية فقط (city-bg.jpg — أصل الموقع) — لا تمثّل نوع العقار */
       position: relative; aspect-ratio: 16 / 7; max-height: 200px; min-height: 96px; background: var(--aq-color-primary-deep) url('city-bg.jpg') center / cover no-repeat; color: var(--aq-color-on-primary);
     }   /* الارتفاع بيتبع العرض لحدّ 200px — الكارت العريض (نوع واحد = 100%) ما يبقاش شريط ضخم */
-    #priceStatsModal .ps-media::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(13,13,15,0.45) 0%, rgba(13,13,15,0.32) 55%, rgba(13,13,15,0.62) 100%); }   /* نفس درجة --aq-color-primary-deep (#004C43) بشفافية */
+    #priceStatsModal .ps-media::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(13,13,15,0.45) 0%, rgba(13,13,15,0.32) 55%, rgba(13,13,15,0.62) 100%); }   /* تدرّج فحمي بشفافية — نفس درجة الخلفية (كان أخضر #004C43 قبل ثيم Dark Premium) */
     #priceStatsModal .ps-card:nth-child(3n+2) .ps-media { background-position: center top; }
     #priceStatsModal .ps-card:nth-child(3n) .ps-media { background-position: center bottom; }
     #priceStatsModal .ps-media-text { position: absolute; inset: auto 0 0 0; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
@@ -2559,7 +2559,7 @@
       box-shadow: none; border: none; padding: 0;
       /* خلفية الصندوق كاملًا (يشمل صفّ زرَّي "بحث بالفلاتر"/"بحث ذكي" فوق صندوق الحقول) —
          نفس خلفية "قيمة المخزون" (Mint خفيف). */
-      background: var(--aq-prop-green-soft, #E4EDEA);
+      background: var(--aq-prop-green-soft);
     }
     body.app-view-explore .aq-console-modes { margin-bottom: 10px; }
     /* شبكة الفلاتر تتحوّل إلى صف أفقي مضغوط (تسميات صغيرة فوق كل حقل) */
@@ -2605,14 +2605,8 @@
     }
     /* Report 092/094: تدرّج الارتفاع (surface < card < panel < modal) — الصبغة navy (PHASE 2) */
     :root {
-      --aq-elev-card:       0 1px 2px rgba(17,29,58,0.06), 0 4px 12px rgba(17,29,58,0.09), 0 18px 40px rgba(17,29,58,0.14);
-      --aq-elev-card-hover: 0 2px 4px rgba(17,29,58,0.06), 0 10px 20px rgba(17,29,58,0.12), 0 26px 52px rgba(17,29,58,0.18);
-      --aq-elev-panel:      0 1px 2px rgba(17,29,58,0.06), 0 10px 24px rgba(17,29,58,0.12), 0 32px 72px rgba(17,29,58,0.20);
-      --aq-elev-surface:    0 1px 2px rgba(17,29,58,0.05), 0 6px 16px rgba(17,29,58,0.07);
-      --aq-elev-modal:      0 2px 6px rgba(17,29,58,0.08), 0 16px 40px rgba(17,29,58,0.16), 0 48px 96px rgba(17,29,58,0.22);
-      --aq-card-media-w:    40%;     /* عرض عمود الصورة داخل كارت الشبكة الثلاثية (≈ 400–560px) — 4:3 كحدّ أدنى للارتفاع */
+      /* عرض عمود الصورة داخل كارت الشبكة الثلاثية (≈ 400–560px) — 4:3 كحدّ أدنى للارتفاع */
       --aq-card-media-min:  150px;
-      --aq-card-media-max:  260px;
     }
     body.aq-search-ui .unit-card {
       background: var(--aq-color-surface); color: var(--aq-color-text);
@@ -3192,7 +3186,6 @@
      * نفس الـ DOM (#aqHero > .aq-hero-media + #aqHeroCopy + #aqConsole) ونفس النص ونفس منطق البحث. الآلية: الصورة طبقة مطلقة
      * تغطي الهيرو ما عدا آخر --aq-hero-overlap من ارتفاعه، والكونسول في التدفّق الطبيعي فيتداخل جزئيًا مع الصورة وجزئيًا مع
      * الكانفس — بلا هوامش سالبة ولا تموضع مطلق للصفحة. تدرّج navy موضعي (أعلى النص وأسفل الكونسول) لا يعتّم الصورة كلها. */
-    :root { --aq-hero-overlap: 112px; }
     body.app-view-search .aq-hero {
       position: relative; isolation: isolate; margin: 0 0 var(--aq-space-8);
       padding: clamp(44px, 6vw, 76px) var(--aq-space-5) 0;
@@ -3257,7 +3250,7 @@
        مباشرة) سليمة تمامًا ولا تتأثر إطلاقًا. صفّا "بحث بالفلاتر"/"بحث ذكي" فوق
        هذا الصندوق (.aq-console-modes) خارج .filters-card بالكامل — لم يُلمَسا. */
     body.app-view-search .aq-console .filters-card {
-      background: var(--aq-prop-green-soft, #E4EDEA);
+      background: var(--aq-prop-green-soft);
       display: grid;
       grid-template-columns: auto 1fr;
       grid-template-areas: "fields fields" "adv actions" "advblk advblk";
@@ -3293,7 +3286,7 @@
       gap: var(--aq-space-2) var(--aq-space-3); align-items: center;
       /* خلفية صندوق البحث في "استكشف" فقط — نفس خلفية "قيمة المخزون" (Mint خفيف)،
          بلا أي تغيير في خانات البحث نفسها (Input/Select) ولا في أي صفحة أخرى. */
-      background: var(--aq-prop-green-soft, #E4EDEA);
+      background: var(--aq-prop-green-soft);
     }
     body.app-view-explore .aq-console .filters-card > .grid { grid-area: fields; }
     body.app-view-explore .aq-console .filters-card > .toggle-details-btn {
@@ -4017,9 +4010,7 @@
      * شريط بحث زجاجي، كروت بصورة أكبر وسعر أضخم ومعلومات أقل. يُقيَّم مع النموذج B ثم يُعتمد واحد.
      * ====================================================================================================== */
     :root {
-      --pa-ink: #0B1430; --pa-navy: #111D3A; --pa-orange: #E9682E; --pa-lime: #B8D898;
       --pa-glass: rgba(13,13,15,0.62); --pa-glass-line: rgba(255,255,255,0.16);
-      --aq-hero-overlap: 96px;
     }
     /* ---------- الرئيسية: هيرو full-bleed بارتفاع كبير، نص يمين، صورة تتنفس يسار ---------- */
     body.app-view-search #mainContainer { padding-top: var(--aq-header-h); }
@@ -4043,7 +4034,7 @@
       background: transparent; border: 0; padding: 0; margin: 0 0 22px; -webkit-backdrop-filter: none; backdrop-filter: none;
       font-size: 13px; letter-spacing: 0.18em; color: rgba(255,255,255,0.82); font-weight: 700; gap: 14px;
     }
-    body.app-view-search .aq-hero-eyebrow::before { content: ""; width: 44px; height: 2px; background: var(--pa-orange); border-radius: 2px; }
+    body.app-view-search .aq-hero-eyebrow::before { content: ""; width: 44px; height: 2px; background: var(--aq-color-accent); border-radius: 2px; }
     body.app-view-search .aq-hero-eyebrow svg { display: none; }
     body.app-view-search .aq-hero-title {
       font-size: clamp(40px, 5vw, 74px); font-weight: 900; line-height: 1.25; letter-spacing: -0.01em; max-width: 17ch; margin: 0 0 18px;
@@ -4059,27 +4050,27 @@
     body.app-view-search .aq-console-modes { background: rgba(255,255,255,0.08); border-color: var(--pa-glass-line); }
     body.app-view-search .aq-console-mode { color: rgba(255,255,255,0.72); }
     body.app-view-search .aq-console-mode:hover { color: #fff; }
-    body.app-view-search .aq-console-mode.is-active { background: var(--pa-orange); color: #fff; }
+    body.app-view-search .aq-console-mode.is-active { background: var(--aq-color-accent); color: #fff; }
     body.app-view-search .aq-console .filters-card { background: transparent !important; border: 0 !important; box-shadow: none !important; }
     body.app-view-search .aq-console .filters-card label { color: rgba(255,255,255,0.78); letter-spacing: 0.06em; }
     body.app-view-search .aq-console .toggle-details-btn .label, body.app-view-search .aq-console .toggle-details-btn .chevron { color: #fff; }
     body.app-view-search .aq-console .filters-card > .grid#aqPrimaryFilters { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
     body.app-view-search .aq-console input:not([type="checkbox"]):not([type="radio"]), body.app-view-search .aq-console select {
-      background: rgba(255,255,255,0.96); border-color: transparent; color: var(--pa-navy);
+      background: rgba(255,255,255,0.96); border-color: transparent; color: var(--aq-color-surface);
     }
-    body.app-view-search .aq-console #searchBtn { background: var(--pa-orange); color: #fff; font-weight: 800; font-size: 15px; box-shadow: 0 8px 22px rgba(233,104,46,0.38); }
+    body.app-view-search .aq-console #searchBtn { background: var(--aq-color-accent); color: #fff; font-weight: 800; font-size: 15px; box-shadow: 0 8px 22px rgba(233,104,46,0.38); }
     body.app-view-search .aq-console #searchBtn:hover { background: var(--aq-color-accent-hover); }
     body.app-view-search .aq-console #clearBtn { background: transparent; color: rgba(255,255,255,0.85); border: 1px solid var(--pa-glass-line); }
     body.app-view-search .aq-console .toggle-details-btn { color: rgba(255,255,255,0.85); background: transparent; border-color: var(--pa-glass-line); }
     body.app-view-search .aq-console .ai-search-panel { color: #fff; }
     body.app-view-search .aq-console .ai-search-desc, body.app-view-search .aq-console .ai-search-head { color: rgba(255,255,255,0.8); }
     body.app-view-search .aq-console #nlSearchInput { background: rgba(255,255,255,0.96); border-color: transparent; }
-    body.app-view-search .aq-console #nlSearchBtn { background: var(--pa-orange); color: #fff; }
+    body.app-view-search .aq-console #nlSearchBtn { background: var(--aq-color-accent); color: #fff; }
     /* المطوّرون: عنوان editorial يمين + خط برتقالي، بلاطات بلا حدود ثقيلة */
     body.app-view-search .aq-devs { background: transparent; border: 0; box-shadow: none; padding: 0; margin: 0 0 var(--aq-space-12); }
     body.app-view-search .aq-devs-head { text-align: right; margin-bottom: var(--aq-space-6); }
     body.app-view-search .aq-devs-title { font-size: clamp(26px, 2.6vw, 38px); font-weight: 900; letter-spacing: -0.01em; }
-    body.app-view-search .aq-devs-title::after { content: ""; display: block; width: 56px; height: 3px; background: var(--pa-orange); border-radius: 2px; margin-top: 12px; }
+    body.app-view-search .aq-devs-title::after { content: ""; display: block; width: 56px; height: 3px; background: var(--aq-color-accent); border-radius: 2px; margin-top: 12px; }
     body.app-view-search .aq-devs-sub { font-size: 15px; }
     body.app-view-search .aq-dev-tile { border-radius: 18px; border-color: transparent; background: #fff; box-shadow: var(--aq-elev-surface); }
     body.app-view-search .aq-dev-tile:hover { box-shadow: var(--aq-elev-card-hover); transform: translateY(-4px); }
@@ -4088,40 +4079,39 @@
     body.app-view-explore #mainContainer { padding-top: var(--aq-header-h); }
     body.app-view-explore .aq-page-header {
       max-width: none !important; margin: 0 calc(-1 * var(--aq-content-pad)) 0 !important; padding: 40px clamp(20px, 6vw, 96px) 168px !important;
-      background: var(--pa-ink); border: 0; color: #fff;
+      background: var(--aq-color-canvas); border: 0; color: #fff;
     }
-    body.app-view-explore .aq-page-header .aq-page-title { color: #fff; font-size: clamp(30px, 3.2vw, 46px); font-weight: 900; border-inline-start-color: var(--pa-orange); }
+    body.app-view-explore .aq-page-header .aq-page-title { color: #fff; font-size: clamp(30px, 3.2vw, 46px); font-weight: 900; border-inline-start-color: var(--aq-color-accent); }
     body.app-view-explore .aq-page-subtitle, body.app-view-explore .aq-page-crumbs { color: rgba(255,255,255,0.72); }
     body.app-view-explore .aq-hero { margin: -136px auto var(--aq-space-5) !important; position: relative; z-index: 2; max-height: none !important; }
     body.app-view-explore .aq-console { background: #fff !important; border: 1px solid var(--aq-color-border) !important; border-radius: 20px; padding: var(--aq-space-4) var(--aq-space-5) !important; box-shadow: 0 24px 60px rgba(13,13,15,0.28) !important; }
     body.app-view-explore .aq-console .filters-card { background: transparent !important; border: 0 !important; box-shadow: none !important; padding-inline: 0 !important; }
     body.app-view-explore .aq-results-bar { margin-bottom: var(--aq-space-5); }
-    body.app-view-explore .aq-results-bar .aq-chip.is-active, body.app-view-explore .aq-results-bar .aq-chip[aria-pressed="true"] { background: var(--pa-navy); color: #fff; border-color: var(--pa-navy); }
+    body.app-view-explore .aq-results-bar .aq-chip.is-active, body.app-view-explore .aq-results-bar .aq-chip[aria-pressed="true"] { background: var(--aq-color-surface); color: #fff; border-color: var(--aq-color-surface); }
     /* الكارت: صورة أكبر (48%)، سعر ضخم، مواصفات بلا حدود، تفاصيل عند hover */
-    :root { --aq-card-media-w: 44%; --aq-card-media-max: 300px; }
     body.aq-search-ui .unit-card { border-radius: 24px; border-color: transparent; box-shadow: 0 2px 6px rgba(13,13,15,0.05), 0 18px 40px rgba(13,13,15,0.10); }
     body.aq-search-ui .unit-card:hover { border-color: transparent; transform: translateY(-4px); box-shadow: 0 6px 12px rgba(13,13,15,0.06), 0 30px 64px rgba(13,13,15,0.18); }
     body.aq-search-ui .unit-cover::after { height: 55%; background: linear-gradient(to top, rgba(13,13,15,0.62), rgba(13,13,15,0)); }
     body.aq-search-ui .unit-card .unit-title { font-size: 19px; }
-    body.aq-search-ui .unit-card .unit-title-name { color: var(--pa-ink); font-weight: 900; }
+    body.aq-search-ui .unit-card .unit-title-name { color: var(--aq-color-canvas); font-weight: 900; }
     body.aq-search-ui .spec-chip { background: transparent; border: 0; padding: 2px 0; gap: 6px; }
-    body.aq-search-ui .spec-chip .ico { color: var(--pa-orange); }
+    body.aq-search-ui .spec-chip .ico { color: var(--aq-color-accent); }
     body.aq-search-ui .spec-chip .spec-txt b { font-size: 14px; }
     body.aq-search-ui .spec-chip .spec-txt small { display: inline; font-size: 11px; }
     body.aq-search-ui .unit-card .unit-specs { gap: 4px 14px; }
     body.aq-search-ui .unit-card .unit-specs + .unit-specs { margin-top: 0; }
     body.aq-search-ui .unit-card-footer { border-top: 0; padding-top: 0; }
-    body.aq-search-ui .unit-card .final-price { font-size: 26px; font-weight: 900; color: var(--pa-ink); letter-spacing: -0.01em; }
+    body.aq-search-ui .unit-card .final-price { font-size: 26px; font-weight: 900; color: var(--aq-color-canvas); letter-spacing: -0.01em; }
     body.aq-search-ui .unit-card .final-price .cur { font-size: 13px; color: var(--aq-color-text-muted); }
-    body.aq-search-ui .unit-card .per-meter { color: var(--pa-orange); font-weight: 700; }
-    body.aq-search-ui .unit-card .per-meter .ico { color: var(--pa-orange); }
-    body.aq-search-ui .unit-cta { background: transparent; color: var(--pa-navy); box-shadow: none; border: 1.5px solid var(--pa-navy); border-radius: 999px; }
-    body.aq-search-ui .unit-card:hover .unit-cta { background: var(--pa-navy); color: #fff; box-shadow: 0 8px 20px rgba(17,29,58,0.28); }
+    body.aq-search-ui .unit-card .per-meter { color: var(--aq-color-accent); font-weight: 700; }
+    body.aq-search-ui .unit-card .per-meter .ico { color: var(--aq-color-accent); }
+    body.aq-search-ui .unit-cta { background: transparent; color: var(--aq-color-surface); box-shadow: none; border: 1.5px solid var(--aq-color-surface); border-radius: 999px; }
+    body.aq-search-ui .unit-card:hover .unit-cta { background: var(--aq-color-surface); color: #fff; box-shadow: 0 8px 20px rgba(17,29,58,0.28); }
     body.aq-search-ui .unit-cover-strip .unit-id { background: rgba(13,13,15,0.55); color: #fff; border-color: rgba(255,255,255,0.18); }
     body.aq-search-ui .unit-cover-strip .status-badge { box-shadow: 0 0 0 3px rgba(184,216,152,0.25); }
     body.aq-search-ui .unit-cover-strip .status-badge.محجوز, body.aq-search-ui .unit-cover-strip .status-badge.مباع { box-shadow: var(--shadow-1); }
     body.aq-search-ui .fav-btn { background: rgba(13,13,15,0.45); border-color: rgba(255,255,255,0.22); color: #fff; }
-    body.aq-search-ui .fav-btn.active { background: var(--pa-orange); border-color: var(--pa-orange); color: #fff; }
+    body.aq-search-ui .fav-btn.active { background: var(--aq-color-accent); border-color: var(--aq-color-accent); color: #fff; }
     body.aq-search-ui .compare-checkbox { background: rgba(13,13,15,0.45); border-color: rgba(255,255,255,0.22); }
     body.aq-search-ui .compare-checkbox input { border-color: rgba(255,255,255,0.7); background: transparent; }
     @media (max-width: 1024px) {
@@ -4159,15 +4149,15 @@
     .access-gate-layout { position: relative; z-index: 1; width: 100%; max-width: 1180px; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(320px, 420px); gap: clamp(24px, 6vw, 96px); align-items: center; }
     .access-gate-brand { color: #fff; text-align: right; }
     .access-gate-brand .agb-eyebrow { display: inline-flex; align-items: center; gap: 14px; font-size: 13px; letter-spacing: 0.18em; font-weight: 700; color: rgba(255,255,255,0.82); margin-bottom: 22px; }
-    .access-gate-brand .agb-eyebrow::before { content: ""; width: 44px; height: 2px; background: var(--pa-orange); border-radius: 2px; }
+    .access-gate-brand .agb-eyebrow::before { content: ""; width: 44px; height: 2px; background: var(--aq-color-accent); border-radius: 2px; }
     .access-gate-brand h1 { margin: 0 0 16px; font-size: clamp(34px, 4.2vw, 58px); font-weight: 900; line-height: 1.32; letter-spacing: -0.01em; max-width: 16ch; }
     .access-gate-brand p { margin: 0; font-size: clamp(15px, 1.2vw, 18px); font-weight: 400; line-height: 1.8; color: rgba(255,255,255,0.80); max-width: 48ch; }
     .access-gate-box { max-width: none; background: #fff !important; border: 0 !important; border-radius: 24px; padding: 40px 34px; box-shadow: 0 30px 80px rgba(13,13,15,0.45) !important; text-align: right; }
-    .access-gate-box .icon { color: var(--pa-orange) !important; margin-bottom: 12px; }
-    .access-gate-box h2 { font-size: 22px; font-weight: 900; color: var(--pa-ink) !important; }
+    .access-gate-box .icon { color: var(--aq-color-accent) !important; margin-bottom: 12px; }
+    .access-gate-box h2 { font-size: 22px; font-weight: 900; color: var(--aq-color-canvas) !important; }
     .access-gate-box p { text-align: right; }
     .access-gate-box input { background: var(--aq-color-surface-subtle) !important; border-color: transparent !important; height: 48px; }
-    .access-gate-box input:focus { background: #fff !important; border-color: var(--pa-navy) !important; }
+    .access-gate-box input:focus { background: #fff !important; border-color: var(--aq-color-surface) !important; }
     .access-gate-box button { height: 50px; font-size: 15px; font-weight: 800; border-radius: 12px; }
     @media (max-width: 900px) {
       .access-gate-layout { grid-template-columns: minmax(0, 1fr); gap: 28px; max-width: 460px; }
@@ -4181,45 +4171,45 @@
     body.aq-app-on:not(.app-view-search) #mainContainer { padding-top: var(--aq-header-h); }
     body.aq-app-on:not(.app-view-search):not(.app-view-explore) .aq-page-header {
       max-width: none !important; margin: 0 calc(-1 * var(--aq-content-pad)) var(--aq-space-6) !important;
-      padding: 36px clamp(20px, 6vw, 96px) 40px !important; background: var(--pa-ink); border: 0; color: #fff;
+      padding: 36px clamp(20px, 6vw, 96px) 40px !important; background: var(--aq-color-canvas); border: 0; color: #fff;
     }
-    body.aq-app-on:not(.app-view-search) .aq-page-header .aq-page-title { color: #fff; font-size: clamp(28px, 3vw, 42px); font-weight: 900; border-inline-start: 3px solid var(--pa-orange); }
+    body.aq-app-on:not(.app-view-search) .aq-page-header .aq-page-title { color: #fff; font-size: clamp(28px, 3vw, 42px); font-weight: 900; border-inline-start: 3px solid var(--aq-color-accent); }
     body.aq-app-on:not(.app-view-search) .aq-page-subtitle, body.aq-app-on:not(.app-view-search) .aq-page-crumbs, body.aq-app-on:not(.app-view-search) .aq-page-crumb.is-current { color: rgba(255,255,255,0.74); }
     body.aq-app-on:not(.app-view-search) .aq-page-crumb-sep { color: rgba(255,255,255,0.4); }
     /* ---- لوحة التحكم: سايدبار كحلي داكن بمؤشر برتقالي ---- */
-    .dash-sidebar { background: var(--pa-ink); border: 0; border-radius: 20px; padding: 18px 12px; box-shadow: 0 18px 40px rgba(13,13,15,0.22); -webkit-backdrop-filter: none; backdrop-filter: none; }
+    .dash-sidebar { background: var(--aq-color-canvas); border: 0; border-radius: 20px; padding: 18px 12px; box-shadow: 0 18px 40px rgba(13,13,15,0.22); -webkit-backdrop-filter: none; backdrop-filter: none; }
     .dash-brand { color: #fff; border-bottom-color: rgba(255,255,255,0.12); font-weight: 900; }
     .dash-brand span { color: rgba(255,255,255,0.6); }
     .dash-nav-item { color: rgba(255,255,255,0.78); position: relative; border-radius: 12px; }
     .dash-nav-item:hover { background: rgba(255,255,255,0.08); border-color: transparent; color: #fff; }
     .dash-nav-item.is-active { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.14); color: #fff; }
-    .dash-nav-item.is-active::before { content: ""; position: absolute; right: -12px; top: 10px; bottom: 10px; width: 3px; border-radius: 3px; background: var(--pa-orange); }
+    .dash-nav-item.is-active::before { content: ""; position: absolute; right: -12px; top: 10px; bottom: 10px; width: 3px; border-radius: 3px; background: var(--aq-color-accent); }
     .dash-nav-item svg { color: rgba(255,255,255,0.9); }
-    .dash-nav-item.is-active svg { color: var(--pa-orange); }
+    .dash-nav-item.is-active svg { color: var(--aq-color-accent); }
     .dash-nav-item.dash-logout { color: #FFB4AC; background: rgba(176,39,31,0.22); border-color: transparent; }
     .dash-nav-item.dash-logout:hover { background: rgba(176,39,31,0.34); }
-    .dash-nav-item:focus-visible { outline-color: var(--pa-orange); }
+    .dash-nav-item:focus-visible { outline-color: var(--aq-color-accent); }
     /* ---- تفاصيل الوحدة: شارات الصورة على الهوية، عناوين الأقسام بخط برتقالي، اسم ضخم ---- */
-    .ud-media-status { background: var(--aq-color-secondary-soft) !important; color: var(--pa-navy) !important; border: 0; box-shadow: var(--shadow-1); }
+    .ud-media-status { background: var(--aq-color-secondary-soft) !important; color: var(--aq-color-surface) !important; border: 0; box-shadow: var(--shadow-1); }
     .ud-media-status .status-dot { background: currentColor !important; }
     .ud-media-status.محجوز { background: var(--aq-color-warning-bg) !important; color: var(--aq-color-warning) !important; }
     .ud-media-status.مباع { background: var(--aq-color-danger-bg) !important; color: var(--aq-color-danger) !important; }
     .ud-media-id { background: rgba(13,13,15,0.62) !important; border: 1px solid rgba(255,255,255,0.18); }
-    .ud-name { font-size: 30px; font-weight: 900; color: var(--pa-ink); letter-spacing: -0.01em; }
-    .ud-sec-title { font-weight: 900; color: var(--pa-ink); }
-    .ud-sec-title::after { content: ""; flex: 0 0 28px; height: 2px; background: var(--pa-orange); border-radius: 2px; margin-inline-start: 4px; }
-    .ud-sec-title .ico { color: var(--pa-orange); }
+    .ud-name { font-size: 30px; font-weight: 900; color: var(--aq-color-canvas); letter-spacing: -0.01em; }
+    .ud-sec-title { font-weight: 900; color: var(--aq-color-canvas); }
+    .ud-sec-title::after { content: ""; flex: 0 0 28px; height: 2px; background: var(--aq-color-accent); border-radius: 2px; margin-inline-start: 4px; }
+    .ud-sec-title .ico { color: var(--aq-color-accent); }
     .ud-actions .icon-action-btn { border-radius: 999px; }
-    .ud-actions .icon-action-btn:hover { border-color: var(--pa-navy) !important; background: var(--aq-color-surface-accent) !important; color: var(--pa-navy) !important; }
-    .ud-actions .icon-action-btn.ud-act-primary:hover { background: var(--pa-orange) !important; border-color: var(--pa-orange) !important; }
+    .ud-actions .icon-action-btn:hover { border-color: var(--aq-color-surface) !important; background: var(--aq-color-surface-accent) !important; color: var(--aq-color-surface) !important; }
+    .ud-actions .icon-action-btn.ud-act-primary:hover { background: var(--aq-color-accent) !important; border-color: var(--aq-color-accent) !important; }
     /* ---- عناوين المودالات: توقيع برتقالي ---- */
-    .modal-title { border-inline-start: 3px solid var(--pa-orange); padding-inline-start: 12px; font-weight: 900; color: var(--pa-ink); }
+    .modal-title { border-inline-start: 3px solid var(--aq-color-accent); padding-inline-start: 12px; font-weight: 900; color: var(--aq-color-canvas); }
     .aq-admin-card > h3, .aq-section-block > h2, .aq-devs-title, .ud-top-title { font-weight: 900; }
     /* ---- سعر المتر: بطاقات على الهوية بدل التدرّج الأخضر القديم ---- */
     #priceStatsModal .ps-media::before { background: linear-gradient(180deg, rgba(13,13,15,0.30) 0%, rgba(13,13,15,0.15) 55%, rgba(13,13,15,0.62) 100%) !important; }
-    #priceStatsModal .ps-media { background: var(--pa-ink); }
-    #priceStatsModal .ps-price { color: var(--pa-ink); font-weight: 900; }
-    #priceStatsModal .ps-group-title .ico { color: var(--pa-orange); }
+    #priceStatsModal .ps-media { background: var(--aq-color-canvas); }
+    #priceStatsModal .ps-price { color: var(--aq-color-canvas); font-weight: 900; }
+    #priceStatsModal .ps-group-title .ico { color: var(--aq-color-accent); }
     /* ---- الرقاقة النشطة في شريط النتائج والأزرار الأساسية ---- */
     .aq-btn--primary { border-radius: 12px; }
 
@@ -4229,33 +4219,16 @@
      * ====================================================================================================== */
     :root {
       /* أسطح — 3 درجات */
-      --aq-color-canvas: #0B1430; --aq-color-surface: #131F45; --aq-color-surface-subtle: #182650; --aq-color-surface-muted: #1F2E5C; --aq-color-surface-accent: #1B2A5A;
       /* نص */
-      --aq-color-text: #F4F5F3; --aq-color-text-secondary: rgba(244,245,243,0.78); --aq-color-text-muted: #A9B3C9; --aq-color-text-placeholder: #8B96B0; --aq-color-text-disabled: rgba(244,245,243,0.38);
       /* حدود */
-      --aq-color-border: rgba(255,255,255,0.10); --aq-color-border-strong: rgba(255,255,255,0.20); --aq-color-border-subtle: rgba(255,255,255,0.08);
       /* "الأساسي" على الداكن = فاتح (أزرار بيضاء بنص كحلي، عناوين/أسعار فاتحة) */
-      --aq-color-primary: #F4F5F3; --aq-color-primary-dark: #FFFFFF; --aq-color-primary-deep: #E3E7F0; --aq-color-on-primary: #0B1430;
-      --aq-color-primary-soft: rgba(255,255,255,0.10); --aq-color-primary-line: rgba(255,255,255,0.22);
-      --aq-color-primary-tint-1: rgba(255,255,255,0.05); --aq-color-primary-tint-2: rgba(255,255,255,0.09); --aq-color-primary-tint-3: rgba(255,255,255,0.14); --aq-color-primary-tint-4: rgba(255,255,255,0.26);
       /* الأكسنت */
-      --aq-color-accent-soft: rgba(233,104,46,0.16); --aq-color-accent-line: rgba(233,104,46,0.42); --aq-color-accent-text: #F5A16E; --aq-color-on-accent-strong: #0B1430;
-      --aq-color-secondary-soft: rgba(184,216,152,0.16); --aq-color-secondary-line: rgba(184,216,152,0.40); --aq-color-secondary-text: #B8D898;
       /* الحالات على الداكن */
-      --aq-color-success: #8FD9A8; --aq-color-success-bg: rgba(30,110,69,0.24); --aq-color-success-border: rgba(143,217,168,0.35); --aq-color-success-solid: #1E6E45;
-      --aq-color-warning: #F5C965; --aq-color-warning-bg: rgba(138,100,18,0.28); --aq-color-warning-border: rgba(245,201,101,0.35); --aq-color-warning-solid: #8A6412;
-      --aq-color-danger: #F5A19A; --aq-color-danger-bg: rgba(176,39,31,0.26); --aq-color-danger-border: rgba(245,161,154,0.35); --aq-color-danger-solid: #B0271F;
-      --aq-color-info: #8FB8E8; --aq-color-info-bg: rgba(28,74,117,0.32); --aq-color-info-border: rgba(143,184,232,0.35);
       /* ظلال أعمق، هالة خفيفة */
-      --shadow-1: 0 1px 2px rgba(0,0,0,0.30); --shadow-2: 0 8px 24px rgba(0,0,0,0.35); --shadow-3: 0 24px 56px rgba(0,0,0,0.45);
       --aq-elev-surface: 0 1px 2px rgba(0,0,0,0.25), 0 8px 20px rgba(0,0,0,0.25); --aq-elev-card: 0 2px 6px rgba(0,0,0,0.25), 0 18px 40px rgba(0,0,0,0.35);
       --aq-elev-card-hover: 0 4px 10px rgba(0,0,0,0.3), 0 28px 60px rgba(0,0,0,0.45); --aq-elev-panel: 0 12px 30px rgba(0,0,0,0.4); --aq-elev-modal: 0 30px 80px rgba(0,0,0,0.6);
-      --aq-overlay: rgba(3,7,20,0.72); --aq-focus-ring: 0 0 0 3px rgba(233,104,46,0.35);
-      --aq-bg-muted-1: rgba(255,255,255,0.04); --aq-bg-muted-2: rgba(255,255,255,0.07); --aq-bg-muted-3: rgba(255,255,255,0.10);
-      --aq-border-gold: rgba(255,255,255,0.12); --aq-border-accent-strong: rgba(255,255,255,0.28);
-      --pa-ink: #0B1430; --pa-navy: #131F45;
       /* الهيدر يندمج مع الكانفس */
-      --aq-header-bg: #0B1430; --aq-header-line: rgba(255,255,255,0.08); --aq-header-shadow: 0 1px 0 rgba(255,255,255,0.04);
+      --aq-header-line: rgba(255,255,255,0.08); --aq-header-shadow: 0 1px 0 rgba(255,255,255,0.04);
     }
     html, body { background: var(--aq-color-canvas); color: var(--aq-color-text); }
     body { background-image: none !important; }
@@ -4370,14 +4343,7 @@
      * (شبكة على الديسكتوب / عرض أفقي على الموبايل)، شريط سفلي. عرض فقط — نفس الـ DOM/ids/الوظائف.
      * ====================================================================================================== */
     :root {
-      --aq-color-canvas: #0D0D0F; --aq-color-surface: #17171A; --aq-color-surface-subtle: #1F1F23; --aq-color-surface-muted: #26262B; --aq-color-surface-accent: #232326;
-      --aq-color-text: #F6F5F2; --aq-color-text-secondary: rgba(246,245,242,0.78); --aq-color-text-muted: #A8A8AE; --aq-color-text-placeholder: #8C8C93;
-      --aq-color-border: rgba(255,255,255,0.09); --aq-color-border-strong: rgba(255,255,255,0.18); --aq-color-border-subtle: rgba(255,255,255,0.07);
-      --aq-color-accent: #F2A93B; --aq-color-accent-hover: #E39A2A; --aq-color-accent-soft: rgba(242,169,59,0.16); --aq-color-accent-line: rgba(242,169,59,0.45); --aq-color-accent-text: #F2A93B; --aq-color-on-accent: #1A1200; --aq-color-on-accent-strong: #1A1200;
-      --aq-color-primary: #F6F5F2; --aq-color-on-primary: #111111; --aq-color-primary-soft: rgba(255,255,255,0.10); --aq-color-primary-line: rgba(255,255,255,0.22);
-      --aq-color-secondary-text: #B8D898; --aq-focus-ring: 0 0 0 3px rgba(242,169,59,0.35);
-      --pa-orange: #F2A93B; --pa-ink: #0D0D0F; --pa-navy: #17171A; --aq-header-bg: #0D0D0F;
-      --aq-overlay: rgba(0,0,0,0.75);
+      --aq-header-bg: #0D0D0F;
     }
     html, body { background: var(--aq-color-canvas); }
     .aq-phone-cta, #searchBtn, #nlSearchBtn, #editSaveBtn, #dashboardView .dash-cta, .access-gate-box button, #loadMoreBtn, .aq-notif-badge { color: var(--aq-color-on-accent) !important; }
@@ -4407,7 +4373,6 @@
     body.app-view-search .aq-hero-eyebrow { margin-bottom: 12px; }
     body.app-view-search .aq-hero-title { font-size: clamp(32px, 4vw, 56px); margin-bottom: 8px; }
     body.app-view-search .aq-hero-sub { margin: 0; }
-    :root { --aq-hero-overlap: 140px; }
     body.app-view-search .aq-console {
       display: block; width: 100%; max-width: 960px; margin-inline: auto;
       background: rgba(23,23,26,0.94); border: 1px solid var(--aq-color-border-strong); border-radius: 20px;
@@ -4643,7 +4608,6 @@
     .um-badge.role-SALES { background: rgba(184,216,152,0.14) !important; color: #B8D898 !important; border: 1px solid rgba(184,216,152,0.4) !important; }
     .um-badge.role-DATA_ENTRY { background: rgba(196,160,240,0.14) !important; color: #C4A0F0 !important; border: 1px solid rgba(196,160,240,0.4) !important; }
     .um-badge.status-active, .um-badge.is-active { background: rgba(143,217,168,0.14) !important; color: #8FD9A8 !important; border: 1px solid rgba(143,217,168,0.4) !important; }
-    :root { --aq-role-owner-bg: rgba(242,169,59,0.14); --aq-role-owner-fg: #F2A93B; --aq-role-manager-bg: rgba(143,184,232,0.14); --aq-role-manager-fg: #8FB8E8; --aq-role-sales-bg: rgba(184,216,152,0.14); --aq-role-sales-fg: #B8D898; --aq-role-entry-bg: rgba(196,160,240,0.14); --aq-role-entry-fg: #C4A0F0; }
     /* الحقول (بما فيها حقول datalist) والأزرار الثانوية داخل المودالات */
     input[list], input[type="search"], .aq-list-search input { background: rgba(255,255,255,0.06) !important; color: #fff !important; border-color: rgba(255,255,255,0.14) !important; }
     .um-chips button, .aq-chip-tag, .arc-chip { background: rgba(255,255,255,0.06); color: var(--aq-color-text); border: 1px solid rgba(255,255,255,0.14); }
@@ -4739,7 +4703,7 @@
     /* ---- تنظيف بقايا الثيم السابق (أخضر/كحلي/ذهبي فاتح) بعد مراجعة كل الصفحات والنوافذ ---- */
     :root {
       --border-gold: rgba(255,255,255,0.14);          /* كان خطًّا كحليًّا شبه خفي على الداكن */
-      --aq-color-primary-deep: #17171A;               /* كان أزرق فاتح — يظهر كخلفية احتياطية وفي الرسوم */
+      /* كان أزرق فاتح — يظهر كخلفية احتياطية وفي الرسوم */
     }
     /* خلفية الهيرو الاحتياطية + الأغلفة الفارغة خارج شاشة البحث */
     .aq-hero-media { background: #17171A; }
@@ -4921,7 +4885,6 @@
     /* F-4: عناصر النظام (شريط التمرير، منتقي التاريخ، القوائم) تتبع الثيم الداكن */
     :root { color-scheme: dark; }
     /* F-5: لون حلقة التركيز الموحّد = العنبري (كان التوكن لسه أبيض) */
-    :root { --aq-focus-outline: 2px solid var(--aq-color-accent); --aq-neutral-disabled: rgba(255,255,255,0.14); }
     /* F-1: العنصر النشط في شريط التنقّل السفلي — نص/أيقونة داكنة فوق العنبري (كان أبيض على عنبري = تباين 2.0) */
     @media (max-width: 1024px) {
       .aq-header #appNav .app-nav-btn.is-active { color: #1A1200 !important; }
