@@ -10810,6 +10810,35 @@
   }
   editDeveloperInput.addEventListener('input', refreshEditProjectSuggestions);
 
+  /* ---------- F-01: وراثة رابط موقع المشروع (Google Maps) — وضع "إضافة وحدة" فقط ---------- */
+  // القاعدة: خانة "رابط موقع المشروع" في فورم الوحدة تتملّى من **سجل المشروع نفسه**
+  // (getProjectProfile → "Location URL") وبس — مش من آخر وحدة، ولا من وحدة تانية، ولا من أي
+  // قيمة متخزَّنة في المتصفح. لو المشروع مالوش رابط مسجَّل أو مش موجود في سجل المشاريع →
+  // الخانة تفضل فاضية ويقدر المستخدم يكتب رابط يدوي للوحدة دي بس.
+  // بيشتغل في وضع 'add' بس: تعديل الوحدة (loadUnitIntoEditForm) والنسخ (cloneUnit) و"عرض السعر"
+  // ما يتأثروش خالص. قراءة فقط — مافيش أي كتابة في سجل المشروع.
+  let editProjectMapUrlSeq = 0;   // آخر تغيير للمشروع هو اللي يكسب لو الردود رجعت بترتيب مختلف
+  function applyProjectMapUrlFromProjectRecord() {
+    if (editModalMode !== 'add') return;
+    const urlField = editForm.elements['projectLocationUrl'];
+    if (!urlField) return;
+    const proj = editProjectNameInput.value.trim();
+    const seq = ++editProjectMapUrlSeq;
+    urlField.value = '';            // تفضية فورية: مايفضلش رابط مشروع قديم بعد ما الاسم اتغيّر
+    if (!proj) return;
+    google.script.run.withSuccessHandler(function(res) {
+      if (seq !== editProjectMapUrlSeq || editModalMode !== 'add') return;    // رد قديم أو الوضع اتغيّر
+      if (editProjectNameInput.value.trim() !== proj) return;                 // المستخدم غيّر المشروع
+      if (!res || !res.success || !res.found) return;                         // مشروع غير مسجَّل → فاضية
+      urlField.value = String(res['Location URL'] || '').trim();
+    }).withFailureHandler(function() {
+      /* فشل الجلب: الخانة تفضل فاضية — المستخدم يقدر يكتب الرابط يدويًا */
+    }).getProjectProfile(proj, getAuthCreds());
+  }
+  // 'change' بس (اختيار من القائمة أو الخروج من الخانة بعد تغيير الاسم) — مش كل ضغطة زرار.
+  // تعبئة الذكاء الاصطناعي بتعمل dispatch لـ change على نفس الخانة، فبتمشي على نفس المسار.
+  editProjectNameInput.addEventListener('change', applyProjectMapUrlFromProjectRecord);
+
   // المرحلة 3.2: تغيير اسم المشروع **لا** يجيب بيانات آخر وحدة تلقائيًا — نفس سلوك add.html
   // بالظبط (اتشال الربط التلقائي عشان متعارضش مع تعبئة الذكاء الاصطناعي على نفس الخانات).
   // التعبئة من آخر وحدة تحصل فقط عند الضغط اليدوي على زر #editFetchLastSimilarBtn.
