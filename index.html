@@ -2582,7 +2582,7 @@
     body.aq-search-ui .aq-sort-field select {
       width: auto; min-width: 160px; background: var(--aq-prop-surface); color: var(--aq-prop-text);
       border: 1px solid var(--aq-prop-border); border-radius: var(--aq-radius-pill);
-      padding: 8px 14px; font-size: var(--aq-fs-small); font-weight: 700; color-scheme: light;
+      padding: 8px 14px; font-size: var(--aq-fs-small); font-weight: 700; color-scheme: dark;   /* قائمة ترتيب النتائج: القائمة المنسدلة الأصلية تتبع الثيم الداكن */
     }
     body.aq-search-ui .aq-sort-field select:focus {
       border-color: var(--aq-prop-green); box-shadow: var(--aq-focus-ring);
@@ -3141,7 +3141,7 @@
     /* قائمة اختيار المشروع في الإحصاءات: صارت حقلًا فاتحًا على لوحة بيضاء */
     #statsView .chart-select {
       background: var(--aq-prop-surface); color: var(--aq-prop-text);
-      border: 1px solid var(--aq-prop-border); color-scheme: light;
+      border: 1px solid var(--aq-prop-border); color-scheme: dark;   /* منتقي المخطط في الإحصاءات: قائمة منسدلة داكنة */
     }
     /* زر التنقّل داخل الهيدر: لا يقلب لخلفية داكنة عند الضغط */
     .aq-header #appNav .app-nav-btn:active { background: var(--aq-header-active); color: var(--aq-header-fg); }   /* LOCAL REDESIGN PHASE 2: هيدر navy */
@@ -3379,7 +3379,7 @@
     #editModal input:focus, #editModal select:focus, #editModal textarea:focus {
       outline: none; border-color: var(--aq-prop-green); box-shadow: var(--aq-focus-ring); background: var(--aq-prop-surface);
     }
-    #editModal select { color-scheme: light; }
+    #editModal select { color-scheme: dark; }   /* قوائم مودال تعديل الوحدة: قوائم منسدلة داكنة */
     #editModal textarea { min-height: 110px; resize: vertical; }
     #editModal textarea[name="notes"] { min-height: 72px; }   /* ملاحظات: ارتفاع مريح بلا فراغ زائد */
     /* الأرقام والهواتف والروابط: ltr داخل RTL */
