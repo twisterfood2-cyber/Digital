@@ -4944,6 +4944,50 @@
     .ud-restore-error b { color: var(--aq-color-danger); font-weight: 800; }
     .ud-restore-error span { font-weight: 600; color: var(--aq-color-text); }
     .ud-restore-error .ud-restore-error-open { min-height: 32px; padding: 0 12px; font-size: 12px; }
+
+    /* ============================================================
+     * لوحة الإشعارات = قائمة منسدلة **تحت جرس الإشعارات** (قرار المالك 2026-09-24)
+     * بدل النافذة المنبثقة في نص الشاشة. نفس الـ DOM ونفس الصدفة (.modal-overlay/.modal-box)
+     * ونفس السلوك (فتح/قفل/Escape/الضغط بره) — تغيير مكان وحجم بس:
+     *   - الطبقة الخلفية شفافة (بدون تعتيم ولا blur) عشان تفضل ماسك النقر بره فقط.
+     *   - الصندوق ثابت (fixed) تحت الجرس مباشرة؛ مكانه بيتحسب من موضع الجرس نفسه
+     *     (متغيّرات --notif-anchor-*) فيشتغل صح في RTL وLTR وعلى أي عرض شاشة.
+     *   - على الموبايل: نفس القائمة تحت الهيدر بعرض الشاشة ناقص هوامش (مش ورقة بكامل الارتفاع).
+     * ============================================================ */
+    #notifModal.modal-overlay {
+      align-items: flex-start; justify-content: flex-start;
+      padding: 0; overflow: visible;
+      background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none;
+    }
+    #notifModal .notif-box {
+      position: fixed;
+      top: var(--notif-anchor-top, calc(var(--aq-header-h) + 8px));
+      inset-inline-end: var(--notif-anchor-end, 16px);
+      width: min(380px, calc(100vw - 24px)); max-width: none; min-height: 0;
+      max-height: var(--notif-anchor-max-h, 70vh);
+      display: flex; flex-direction: column;
+      padding: var(--aq-space-4);
+      border-radius: var(--radius-lg);
+      animation: aqNotifDrop .14s ease-out both;
+    }
+    #notifModal .modal-header { margin-bottom: var(--aq-space-3); flex: 0 0 auto; }
+    #notifModal .notif-list { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding-inline-end: 2px; }
+    #notifModal .aq-results-pager { flex: 0 0 auto; margin-top: var(--aq-space-3); }
+    /* سهم صغير ناحية الجرس — بيتمركز تحته بالظبط */
+    #notifModal .notif-box::after {
+      content: ""; position: absolute; top: -7px; inset-inline-end: var(--notif-arrow-end, 16px);
+      width: 12px; height: 12px; transform: rotate(45deg); pointer-events: none;
+      background: var(--aq-color-surface);
+      border-block-start: 1px solid var(--aq-color-border); border-inline-start: 1px solid var(--aq-color-border);
+    }
+    @keyframes aqNotifDrop { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+    @media (max-width: 640px) {
+      #notifModal.modal-overlay { align-items: flex-start; }
+      #notifModal .notif-box {
+        inset-inline: 8px; width: auto; min-height: 0;
+        border-radius: var(--radius-lg); border-inline: 1px solid var(--aq-color-border);
+      }
+    }
   </style>
 </head>
 <body>
@@ -6059,7 +6103,7 @@
 </div>
 
 <!-- PHASE 4 / STEP 3 (Report 062): مركز الإشعارات — نفس نمط .modal-overlay/.modal-box القائم (desktop: صندوق مثبّت، mobile: ورقة بكامل الارتفاع) -->
-<div class="modal-overlay" id="notifModal" role="dialog" aria-modal="true" aria-labelledby="notifModalTitle">
+<div class="modal-overlay" id="notifModal" role="dialog" aria-modal="false" aria-labelledby="notifModalTitle">
   <div class="modal-box notif-box">
     <div class="modal-header">
       <div class="modal-title" id="notifModalTitle">الإشعارات <span class="notif-unread-label" id="notifUnreadLabel"></span></div>
@@ -15929,8 +15973,26 @@
         list.innerHTML = '<div class="aq-alert aq-alert--danger" role="alert">' + escHtml_('تعذّر تحميل الإشعارات — ' + ((err && err.message) || 'تحقّق من الاتصال')) + '</div>'; pager.hidden = true;
       });
     }
-    function open_() { modal.classList.add('open'); bell.setAttribute('aria-expanded', 'true'); fetchPage_(1, false); setTimeout(function () { var c = document.getElementById('notifModalCloseBtn'); if (c) c.focus(); }, 0); }
+    /* اللوحة منسدلة تحت الجرس (قرار المالك 2026-09-24): بنحسب مكانها من مستطيل الجرس نفسه
+       عشان تفضل ملزوقة بيه في RTL وLTR وعلى أي عرض — من غير أي تغيير في الـ DOM أو المنطق. */
+    function positionPanel_() {
+      var box = modal.querySelector('.notif-box');
+      if (!box) return;
+      var r = bell.getBoundingClientRect();
+      if (!r.width && !r.height) return;                       // الجرس مخفي (قبل الدخول) — نسيب القيم الافتراضية
+      var vw = document.documentElement.clientWidth, vh = document.documentElement.clientHeight;
+      var rtl = getComputedStyle(box).direction === 'rtl';   // اتجاه الصندوق نفسه هو اللي بيحدّد معنى inset-inline-end (الصفحة RTL من الـ CSS مش من سمة dir)
+      var top = Math.round(r.bottom + 10);
+      var bellEnd = rtl ? r.left : vw - r.right;               // المسافة من حافة الشاشة (جهة النهاية) لحافة الجرس
+      var end = Math.max(8, Math.round(bellEnd));
+      modal.style.setProperty('--notif-anchor-top', top + 'px');
+      modal.style.setProperty('--notif-anchor-end', end + 'px');
+      modal.style.setProperty('--notif-anchor-max-h', Math.max(220, Math.min(620, Math.round(vh - top - 16))) + 'px');   // قائمة منسدلة مش ورقة بطول الشاشة
+      modal.style.setProperty('--notif-arrow-end', Math.max(10, Math.round(bellEnd + r.width / 2 - end - 6)) + 'px');
+    }
+    function open_() { modal.classList.add('open'); bell.setAttribute('aria-expanded', 'true'); positionPanel_(); fetchPage_(1, false); setTimeout(function () { var c = document.getElementById('notifModalCloseBtn'); if (c) c.focus(); }, 0); }
     function close_() { modal.classList.remove('open'); bell.setAttribute('aria-expanded', 'false'); }
+    window.addEventListener('resize', function () { if (modal.classList.contains('open')) positionPanel_(); }, { passive: true });
     bell.addEventListener('click', function () { if (modal.classList.contains('open')) close_(); else open_(); });
     document.getElementById('notifModalCloseBtn').addEventListener('click', close_);
     modal.addEventListener('click', function (e) { if (e.target === modal) close_(); });
