@@ -15894,7 +15894,7 @@
       if (diff < 86400000) return 'منذ ' + Math.floor(diff / 3600000) + ' ساعة';
       try { return new Date(t).toLocaleString('ar-EG-u-nu-latn', { timeZone: 'Africa/Cairo', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; }   /* Report 075: أرقام لاتينية زي باقي التطبيق (نفس اللغة/التوقيت) */
     }
-    var TYPE_ICON = { UNIT_CREATED: ICON.building, PRICE_CHANGED: ICON.tag, UNIT_RESTORED: ICON.clipboard, SYSTEM: ICON.alert };
+    var TYPE_ICON = { UNIT_CREATED: ICON.building, PRICE_CHANGED: ICON.tag, UNIT_RESTORED: ICON.clipboard, SYSTEM: ICON.alert, UNIT_SHARED_WHATSAPP: ICON.share, UNIT_EXPORTED_PDF: ICON.file };
     function itemHtml_(n) {
       return '<button type="button" class="notif-item' + (n.unread ? ' is-unread' : '') + '" data-id="' + escHtml_(n.id) + '" data-entity-type="' + escHtml_(n.entityType || '') + '" data-entity-id="' + escHtml_(n.entityId || '') + '" aria-label="' + escHtml_(n.title) + '">' +
         '<span class="notif-dot" aria-hidden="true"></span>' +
