@@ -3950,6 +3950,17 @@
     .notif-unread-label { font-size: var(--aq-fs-small); color: var(--muted); font-weight: 600; margin-inline-start: 6px; }
     .notif-markall { font-size: var(--aq-fs-small); }
     .notif-list { display: flex; flex-direction: column; gap: 8px; min-height: 120px; }
+    /* مركز نشاط الوحدات (2026-09-25): صف تصفية + سطر نوع الحدث — توكنات وخط الموقع كما هي */
+    .notif-filters { display: flex; gap: 6px; margin-bottom: var(--aq-space-3); }
+    .notif-filter {
+      flex: 0 0 auto; padding: 6px 14px; border-radius: var(--radius-pill, 999px); cursor: pointer;
+      background: transparent; border: 1px solid var(--aq-color-border); color: var(--aq-color-text-muted);
+      font-family: var(--aq-font); font-size: var(--aq-fs-small); font-weight: 700;
+    }
+    .notif-filter:hover { border-color: var(--aq-color-border-strong, var(--aq-color-border)); color: var(--aq-color-text); }
+    .notif-filter.is-active { background: var(--aq-color-surface-accent); border-color: var(--aq-color-primary-line); color: var(--aq-color-text); }
+    .notif-kind { display: block; font-size: var(--aq-fs-label); font-weight: 800; color: var(--aq-color-accent); letter-spacing: 0; margin-bottom: 2px; }
+    .notif-kind .ico { width: 13px; height: 13px; vertical-align: -2px; margin-inline-end: 4px; }
     .notif-item { display: grid; grid-template-columns: 10px 1fr auto; gap: 10px; align-items: start; width: 100%; text-align: start; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm, 10px); background: var(--bg); color: var(--text); font-family: var(--aq-font); cursor: pointer; }
     .notif-item:hover { border-color: var(--border-gold); }
     .notif-item.is-unread { background: var(--aq-color-surface-accent); border-color: var(--aq-color-primary-line); }
@@ -6074,6 +6085,10 @@
         <button type="button" class="aq-btn aq-btn--ghost notif-markall" id="notifMarkAllBtn">تعليم الكل كمقروء</button>
         <button class="modal-close" id="notifModalCloseBtn" aria-label="إغلاق"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
       </div>
+    </div>
+    <div class="notif-filters" role="tablist" aria-label="تصفية الإشعارات">
+      <button type="button" class="notif-filter is-active" id="notifFilterAll" role="tab" aria-selected="true">الكل</button>
+      <button type="button" class="notif-filter" id="notifFilterUnread" role="tab" aria-selected="false">غير المقروء</button>
     </div>
     <div id="notifList" class="notif-list" aria-live="polite"></div>
     <div class="aq-results-pager" id="notifPager" hidden><button type="button" class="aq-btn aq-btn--secondary" id="notifLoadMoreBtn">عرض المزيد</button></div>
@@ -8827,6 +8842,21 @@
     }, { passive: true });
   })();
 
+  /* ---------- تسجيل نشاط الوحدة (مشاركة/تصدير) — بعد نجاح العملية الفعلية فقط ----------
+   * قاعدة 2026-09-25: الحدث يتسجّل لما العملية **تتنفّذ فعلًا** — مش عند عرض الزر، ولا فتح
+   * نافذة المشاركة/التصدير، ولا دخول المسار، ولا محاولة فاشلة أو ملغاة. السيرفر بيسجّل صف
+   * نشاط لكل عملية (التاريخ الكامل) وبيقرّر لوحده إشعار الجرس (تجميع بالساعة) — الواجهة
+   * مابتقررش حاجة من ده. فشل التسجيل ما بيأثرش على المشاركة/التصدير نفسها إطلاقًا. */
+  function logUnitActivity_(unitId, projectName, action) {
+    var id = String(unitId || '').trim();
+    if (!id) return;                                  // عرض سعر تقديري بلا رقم وحدة → مافيش نشاط
+    try {
+      google.script.run
+        .withFailureHandler(backgroundFailure_('تسجيل نشاط الوحدة'))
+        .logUnitActivity(id, projectName || '', action, getAuthCreds());
+    } catch (e) { /* التسجيل تحسين فقط */ }
+  }
+
   /* ---------- مشاركة بيانات الوحدة عبر واتساب (مع الصور لو الجهاز بيدعم) ---------- */
   function buildUnitShareText(u) {
     const hasDiscount = Number(u['Discount Percentage']) > 0;
@@ -8874,12 +8904,13 @@
       return;
     }
     // على اللابتوب/الكمبيوتر: نص بس مباشرة على واتساب (Web Share API بالصور مش مدعومة كويس هنا)
-    if (u['Unit ID']) google.script.run.withFailureHandler(backgroundFailure_('تسجيل نشاط الوحدة')).logUnitActivity(u['Unit ID'], u['Project Name'], 'WhatsApp', getAuthCreds()); // عرض السعر التقديري بلا رقم وحدة — لا نسجّل نشاطًا
     const lines = buildUnitShareText(u);
 
     const waDomain = ['h', 't', 't', 'p', 's', ':', '/', '/'].join('') + ['w', 'a', '.', 'm', 'e'].join('');
     const url = waDomain + '/?text=' + encodeURIComponent(lines);
-    window.open(url, '_blank');
+    const waWin = window.open(url, '_blank');
+    // المشاركة اتنفّذت فعلًا (واتساب اتفتح) → دلوقتي بس نسجّل النشاط. لو المتصفح حجب النافذة → مافيش نشاط.
+    if (waWin) logUnitActivity_(u['Unit ID'], u['Project Name'], 'WhatsApp');
   }
   window.shareOnWhatsApp = shareOnWhatsApp;
 
@@ -8971,8 +9002,9 @@
         showToast('الجهاز ده مش بيدعم مشاركة الصور، هتتشارك التفاصيل بس', 'error');
       }
 
-      google.script.run.withFailureHandler(backgroundFailure_('تسجيل نشاط الوحدة')).logUnitActivity(shareImagesUnit['Unit ID'], shareImagesUnit['Project Name'], 'WhatsApp', getAuthCreds());
       await navigator.share(shareData);
+      // نجحت المشاركة فعلًا (الإلغاء بيرمي AbortError وما بيوصلش هنا) → نسجّل النشاط
+      logUnitActivity_(shareImagesUnit['Unit ID'], shareImagesUnit['Project Name'], 'WhatsApp');
       shareImagesModal.classList.remove('open');
     } catch (err) {
       if (err.name !== 'AbortError') {
@@ -9034,7 +9066,7 @@
       pdfAgentPhoneInput.value = localStorage.getItem('pdfAgentPhone') || '';
     } catch (e) {}
     pdfContactModal.classList.add('open');
-    if (u['Unit ID']) google.script.run.withFailureHandler(backgroundFailure_('تسجيل نشاط الوحدة')).logUnitActivity(u['Unit ID'], u['Project Name'], 'PDF', getAuthCreds()); // عرض سعر تقديري بلا رقم وحدة — لا نسجّل نشاطًا
+    // مافيش تسجيل نشاط هنا: ده مجرد فتح نافذة بيانات المسوّق. التسجيل بعد إنشاء الملف بنجاح (generateUnitPDF).
   }
   window.downloadUnitPDF = downloadUnitPDF;
 
@@ -9549,6 +9581,7 @@
       try {
         var directEngine = await loadDirectPdfEngine_();
         await directEngine.exportUnit(u, agentName, agentPhone);
+        logUnitActivity_(u['Unit ID'], u['Project Name'], 'PDF');   // الملف اتعمل ونزل فعلًا (المحرّك المباشر)
         restoreExportBtn_();
         return;
       } catch (directErr) {
@@ -9843,6 +9876,7 @@
       if (timedOut) return; // بوابة أخيرة: لا تنزيل بعد إعلان الفشل للمستخدم مهما حدث
       const pdfFileName = (u['Property Type'] || 'Unit') + ' - ' + (u['Unit Area (sqm)'] || '') + ' sqm';
       pdf.save(pdfFileName.replace(/[\\/:*?"<>|]/g, '') + '.pdf');
+      logUnitActivity_(u['Unit ID'], u['Project Name'], 'PDF');   // الملف اتحفظ فعلًا (المحرّك القديم)
     } catch (err) {
       if (!timedOut) showToast('حدث خطأ أثناء تجهيز الملف: ' + err.message, 'error');
     } finally {
@@ -15906,7 +15940,7 @@
     var modal = document.getElementById('notifModal'), list = document.getElementById('notifList'), pager = document.getElementById('notifPager');
     var moreBtn = document.getElementById('notifLoadMoreBtn'), markAllBtn = document.getElementById('notifMarkAllBtn'), unreadLabel = document.getElementById('notifUnreadLabel');
     if (!bell || !modal || !list) return;
-    var state = { items: [], page: 0, total: 0, unread: 0, loading: false, seq: 0 };
+    var state = { items: [], page: 0, total: 0, unread: 0, loading: false, seq: 0, unreadOnly: false };
 
     function setUnread(n) {
       state.unread = Math.max(0, Number(n) || 0);
@@ -15931,16 +15965,27 @@
       try { return new Date(t).toLocaleString('ar-EG-u-nu-latn', { timeZone: 'Africa/Cairo', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; }   /* Report 075: أرقام لاتينية زي باقي التطبيق (نفس اللغة/التوقيت) */
     }
     var TYPE_ICON = { UNIT_CREATED: ICON.building, PRICE_CHANGED: ICON.tag, UNIT_RESTORED: ICON.clipboard, SYSTEM: ICON.alert, UNIT_SHARED_WHATSAPP: ICON.share, UNIT_EXPORTED_PDF: ICON.file };
+    /* عنوان الحدث (السطر الأول) — الاسم والوحدة بيفضلوا في نص الإشعار المخزَّن زي ما هو */
+    var TYPE_LABEL = { UNIT_CREATED: 'وحدة جديدة', UNIT_SHARED_WHATSAPP: 'مشاركة وحدة', UNIT_EXPORTED_PDF: 'تصدير ملف PDF', PRICE_CHANGED: 'تغيّر السعر', UNIT_RESTORED: 'استرجاع وحدة', SYSTEM: 'تنبيه' };
     function itemHtml_(n) {
       return '<button type="button" class="notif-item' + (n.unread ? ' is-unread' : '') + '" data-id="' + escHtml_(n.id) + '" data-entity-type="' + escHtml_(n.entityType || '') + '" data-entity-id="' + escHtml_(n.entityId || '') + '" aria-label="' + escHtml_(n.title) + '">' +
         '<span class="notif-dot" aria-hidden="true"></span>' +
-        '<span><span class="notif-title">' + (TYPE_ICON[n.type] || '') + ' ' + escHtml_(n.title) + '</span>' + (n.body ? '<div class="notif-body">' + escHtml_(n.body) + '</div>' : '') + '</span>' +
+        '<span class="notif-main">' +
+          '<span class="notif-kind">' + (TYPE_ICON[n.type] || '') + escHtml_(TYPE_LABEL[n.type] || 'إشعار') + '</span>' +
+          '<span class="notif-title">' + escHtml_(n.title) + '</span>' +
+          (n.body ? '<span class="notif-body">' + escHtml_(n.body) + '</span>' : '') +
+        '</span>' +
         '<span class="notif-time" dir="rtl">' + escHtml_(timeAgo_(n.createdAt)) + '</span>' +
       '</button>';
     }
     function render_(append, added) {
       if (!append) list.innerHTML = '';
-      if (!state.items.length) { list.innerHTML = '<div class="notif-empty"><h3>لا توجد إشعارات</h3><p>هيظهر هنا أي إشعار جديد يخصّك.</p></div>'; pager.hidden = true; return; }
+      if (!state.items.length) {
+        list.innerHTML = state.unreadOnly
+          ? '<div class="notif-empty"><h3>مفيش إشعارات غير مقروءة</h3><p>كل الإشعارات اتقريت — اضغط «الكل» لعرض السجل.</p></div>'
+          : '<div class="notif-empty"><h3>لا توجد إشعارات</h3><p>هيظهر هنا أي إشعار جديد يخصّك.</p></div>';
+        pager.hidden = true; return;
+      }
       list.insertAdjacentHTML('beforeend', (append ? added : state.items).map(itemHtml_).join(''));
       pager.hidden = !(state.items.length < state.total);
       moreBtn.disabled = state.loading;
@@ -15949,7 +15994,7 @@
       var mySeq = ++state.seq;
       state.loading = true; moreBtn.disabled = true;
       if (!append) list.innerHTML = '<div class="aq-skeleton aq-skeleton--card"></div><div class="aq-skeleton aq-skeleton--card"></div>';
-      return AqarDataService.get('getNotifications', [{ page: page, pageSize: PAGE }, getAuthCreds()]).then(function (res) {
+      return AqarDataService.get('getNotifications', [{ page: page, pageSize: PAGE, unreadOnly: state.unreadOnly }, getAuthCreds()]).then(function (res) {
         if (mySeq !== state.seq) return;
         state.loading = false;
         if (!res || res.success !== true || !Array.isArray(res.notifications)) {
@@ -15986,6 +16031,19 @@
     function close_() { modal.classList.remove('open'); bell.setAttribute('aria-expanded', 'false'); }
     window.addEventListener('resize', function () { if (modal.classList.contains('open')) positionPanel_(); }, { passive: true });
     bell.addEventListener('click', function () { if (modal.classList.contains('open')) close_(); else open_(); });
+    /* تصفية الكل / غير المقروء — نفس الأكشن القائم (getNotifications) بمعامل unreadOnly المدعوم أصلًا في السيرفر */
+    var filterAllBtn = document.getElementById('notifFilterAll'), filterUnreadBtn = document.getElementById('notifFilterUnread');
+    function setFilter_(unreadOnly) {
+      if (state.unreadOnly === unreadOnly) return;
+      state.unreadOnly = unreadOnly;
+      filterAllBtn.classList.toggle('is-active', !unreadOnly);
+      filterUnreadBtn.classList.toggle('is-active', unreadOnly);
+      filterAllBtn.setAttribute('aria-selected', String(!unreadOnly));
+      filterUnreadBtn.setAttribute('aria-selected', String(unreadOnly));
+      fetchPage_(1, false);
+    }
+    filterAllBtn.addEventListener('click', function () { setFilter_(false); });
+    filterUnreadBtn.addEventListener('click', function () { setFilter_(true); });
     document.getElementById('notifModalCloseBtn').addEventListener('click', close_);
     modal.addEventListener('click', function (e) { if (e.target === modal) close_(); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && modal.classList.contains('open')) close_(); });
