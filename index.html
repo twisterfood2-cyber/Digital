@@ -1427,6 +1427,20 @@
       margin-top: 24px; padding-top: 15px; border-top: 1px solid var(--border-gold);
       font-size:  var(--aq-fs-button); font-weight: 700; color: var(--gold-soft); line-height: 2;
     }
+    /* كارت "AqaR Digital": كشف جزء أكبر من **نفس النص** بدل إخفائه بالكامل، والزر ينزل تحته.
+     * الحالة المطوية = معاينة بارتفاع محسوب من المساحة الفاضية أسفل الشاشة (--about-preview-h)
+     * مع تلاشٍ سفلي بدل قصّ حادّ؛ الحالة المفتوحة = النص كامل زي ما هو بالظبط.
+     * بدون أي تغيير في الخط أو الحجم أو الألوان أو التوكنات. */
+    #dashboardView .dash-about { display: flex; flex-direction: column; }
+    #dashboardView .dash-about .dash-about-details { flex: 0 1 auto; min-height: 0; }
+    #dashboardView .dash-about .dash-about-details.is-collapsed {
+      max-height: var(--about-preview-h, 180px); overflow: hidden;
+      -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 42px), transparent 100%);
+              mask-image: linear-gradient(to bottom, #000 calc(100% - 42px), transparent 100%);
+    }
+    /* أول عنوان داخل المعاينة: بدون هامش علوي كبير عشان يبان نص أكتر في نفس المساحة */
+    #dashboardView .dash-about .dash-about-details.is-collapsed > h3:first-child { margin-top: 14px; }
+    #dashboardView .dash-about-toggle { align-self: flex-start; margin-top: auto; }
     @media (max-width: 640px) {
       #dashboardView .dash-about { padding: 18px 16px 20px; }
       #dashboardView .dash-about .about-title { font-size:  var(--aq-fs-title-lg); }
@@ -5487,11 +5501,7 @@
 
             <p class="about-lead"><span class="ltr" dir="ltr">AqaR Digital</span> هي منصّة رقمية صُممت لتجميع وتنظيم البيانات العقارية في بيئة واحدة تساعد فرق التسويق والمبيعات على الوصول إلى المعلومات التي يحتاجون إليها بسرعة ووضوح، وتحويل البيانات العقارية من معلومات متفرقة إلى أدوات عملية يمكن الاعتماد عليها في العمل اليومي.</p>
 
-            <button type="button" class="toggle-details-btn dash-about-toggle" id="dashAboutToggle" aria-expanded="false" aria-controls="dashAboutDetails">
-              <span class="label">قراءة المزيد عن AqaR Digital</span><span class="chevron">▾</span>
-            </button>
-
-            <div class="dash-about-details" id="dashAboutDetails" style="display:none;">
+            <div class="dash-about-details is-collapsed" id="dashAboutDetails">
             <h3>رؤيتنا</h3>
             <p>نسعى إلى بناء منظومة رقمية أكثر تنظيمًا وشفافية لسوق التسويق العقاري المصري، من خلال تسهيل الوصول إلى بيانات الوحدات والمشروعات والأسعار وأنظمة السداد، وتقديم المعلومات بصورة تساعد المتخصصين على فهم السوق واتخاذ قرارات أفضل.</p>
             <p>فنحن نؤمن أن المعلومة العقارية الدقيقة والمنظمة هي أحد أهم أصول شركات التسويق العقاري، وأن التكنولوجيا يمكن أن تجعل إدارتها ومشاركتها والاستفادة منها أكثر كفاءة.</p>
@@ -5515,6 +5525,11 @@
 
             <p class="about-tagline"><span class="ltr" dir="ltr">AqaR Digital</span> — لأن البيانات العقارية عندما تُنظَّم جيدًا، تتحول من معلومات إلى قيمة.</p>
             </div>
+
+            <button type="button" class="toggle-details-btn dash-about-toggle" id="dashAboutToggle" aria-expanded="false" aria-controls="dashAboutDetails">
+              <span class="label">قراءة المزيد عن AqaR Digital</span><span class="chevron">▾</span>
+            </button>
+
           </article>
         </div>
 
@@ -14067,6 +14082,10 @@
         var p = document.getElementById('dashPanel-' + k);
         if (p) p.hidden = (k !== key);
       });
+      // كارت "AqaR Digital" في "الرئيسية": نحسب ارتفاع المعاينة بعد ما اللوحة تبقى ظاهرة فعلًا
+      if (key === 'home' && typeof window.__aqarSizeAboutPreview === 'function') {
+        requestAnimationFrame(function () { window.__aqarSizeAboutPreview(); });
+      }
       // إيقاف مؤقّت حضور المستخدمين عند مغادرة قسمي "المستخدمون"/"سجل العمليات"
       if (key !== 'users' && typeof window.__aqarStopUsersPresencePoll === 'function') window.__aqarStopUsersPresencePoll();
       dashCloseDrawer();
@@ -14720,10 +14739,33 @@
       // Phase 3D Hotfix: طيّ/فتح مقال "AqaR Digital" التعريفي — نفس نمط #advancedFiltersToggle القائم
       // (display none/block + تبديل نص + دوران السهم)، بلا مكوّن جديد وبلا مودال.
       var dat = document.getElementById('dashAboutToggle');
+      /* ارتفاع المعاينة = المساحة الفاضية لحد أسفل الشاشة (ناقص الزر وهوامشه)، بحد أدنى معقول.
+         بيتحسب من مكان الكتلة نفسها فيشتغل على أي مقاس، ومن غير أي رقم ثابت في الـ CSS. */
+      function sizeAboutPreview_() {
+        var block = document.getElementById('dashAboutDetails');
+        if (!block || !block.classList.contains('is-collapsed')) return;
+        var btn = document.getElementById('dashAboutToggle');
+        var top = block.getBoundingClientRect().top;
+        if (top <= 0) return;                                  // الكتلة مش ظاهرة (قسم تاني مفتوح)
+        var card = block.closest('.dash-about');
+        var pad = card ? parseFloat(getComputedStyle(card).paddingBottom) || 24 : 24;
+        var btnH = btn ? Math.round(btn.getBoundingClientRect().height) || 44 : 44;
+        var reserve = btnH + pad + 16;                         // الزر + الهامش السفلي للكارت + فسحة
+        var avail = Math.round(window.innerHeight - top - reserve);
+        var natural = block.scrollHeight;                      // ارتفاع النص الكامل (المعاينة ما بتأثرش عليه)
+        // نكشف جزءًا كبيرًا دائمًا (MIN_PREVIEW ≈ 10 أسطر بنفس الخط الحالي)، ولو فيه مساحة فاضية
+        // أكبر أسفل الشاشة نستغلها كلها — وبدون تجاوز ارتفاع النص الفعلي.
+        var MIN_PREVIEW = 240;   // ≈ 7 أسطر بنفس الخط الحالي — حد أدنى يضمن كشفًا معتبرًا على أي مقاس
+        block.style.setProperty('--about-preview-h', Math.min(natural, Math.max(MIN_PREVIEW, avail)) + 'px');
+      }
+      window.addEventListener('resize', sizeAboutPreview_, { passive: true });
+      window.__aqarSizeAboutPreview = sizeAboutPreview_;
+      sizeAboutPreview_();
       if (dat) dat.addEventListener('click', function () {
         var block = document.getElementById('dashAboutDetails');
-        var isOpen = block.style.display === 'none';
-        block.style.display = isOpen ? 'block' : 'none';
+        var isOpen = block.classList.contains('is-collapsed');   // مطوي دلوقتي ⇒ الضغطة بتفتح
+        block.classList.toggle('is-collapsed', !isOpen);
+        if (!isOpen) sizeAboutPreview_();                        // رجعنا للمعاينة ⇒ نعيد الحساب
         this.classList.toggle('open', isOpen);
         this.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
         this.querySelector('.label').textContent = isOpen ? 'إخفاء التفاصيل' : 'قراءة المزيد عن AqaR Digital';
