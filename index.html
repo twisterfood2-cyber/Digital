@@ -14085,6 +14085,9 @@
       // كارت "AqaR Digital" في "الرئيسية": نحسب ارتفاع المعاينة بعد ما اللوحة تبقى ظاهرة فعلًا
       if (key === 'home' && typeof window.__aqarSizeAboutPreview === 'function') {
         requestAnimationFrame(function () { window.__aqarSizeAboutPreview(); });
+        // إعادة محاولة قصيرة: عند فتح اللوحة مباشرة من الرابط (#dashboard) الكتلة بتكون لسه
+        // غير مرسومة في أول إطار، فالقياس بيرجع بدري ويفضل الارتفاع الاحتياطي.
+        setTimeout(function () { window.__aqarSizeAboutPreview(); }, 350);
       }
       // إيقاف مؤقّت حضور المستخدمين عند مغادرة قسمي "المستخدمون"/"سجل العمليات"
       if (key !== 'users' && typeof window.__aqarStopUsersPresencePoll === 'function') window.__aqarStopUsersPresencePoll();
