@@ -5463,8 +5463,8 @@
                home · stats (الإحصاءات والمخزون تبويب واحد) · profile (+ "تسجيل الخروج" الثابت).
                يقرّرها dashNavAllowed_() عبر dashIsOwner_() + DASH_NONOWNER_MENU. data-roles/data-perm للتوثيق فقط. -->
           <button type="button" class="dash-nav-item aq-subnav-item is-active" data-dash="home" data-roles="OWNER,MANAGER,DATA_ENTRY,SALES"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg><span>الرئيسية</span></button>
-          <button type="button" class="dash-nav-item aq-subnav-item" data-dash="developers" data-roles="OWNER" data-perm="MANAGE_DEVELOPERS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18ZM10 6h4M10 10h4M10 14h4M10 18h4"/></svg><span>المطوّرون</span></button>
-          <button type="button" class="dash-nav-item aq-subnav-item" data-dash="projects" data-roles="OWNER" data-perm="MANAGE_PROJECTS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M9 11h.01M15 11h.01M9 15h.01M15 15h.01"/></svg><span>المشروعات</span></button>
+          <button type="button" class="dash-nav-item aq-subnav-item" data-dash="developers" data-perm="VIEW_DEVELOPERS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18ZM10 6h4M10 10h4M10 14h4M10 18h4"/></svg><span>المطوّرون</span></button>
+          <button type="button" class="dash-nav-item aq-subnav-item" data-dash="projects" data-perm="VIEW_PROJECTS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M9 11h.01M15 11h.01M9 15h.01M15 15h.01"/></svg><span>المشروعات</span></button>
           <button type="button" class="dash-nav-item aq-subnav-item" data-dash="archive" data-roles="OWNER" data-perm="MANAGE_ARCHIVE"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h18v4H3zM5 8v12h14V8M10 12h4"/></svg><span>الأرشيف</span></button>
           <button type="button" class="dash-nav-item aq-subnav-item" data-dash="users" data-roles="OWNER" data-perm="MANAGE_USERS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 5.2a3.5 3.5 0 0 1 0 6.8M18 20a6.5 6.5 0 0 0-3.2-5.6"/></svg><span>المستخدمون</span></button>
           <button type="button" class="dash-nav-item aq-subnav-item" data-dash="stats" data-roles="OWNER,MANAGER,DATA_ENTRY,SALES" data-perm="VIEW_STATISTICS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span>الإحصاءات والمخزون</span></button>
@@ -7868,7 +7868,7 @@
    * - hasPermission() هنا **للواجهة فقط** (إخفاء أزرار). الحماية الحقيقية في الباك-إند.
    * ============================================================ */
   // مرآة للـ PERMISSIONS_BY_ROLE_ في Code.gs — للواجهة فقط. أي تغيير هنا لازم يتطابق مع السيرفر.
-  var CLIENT_BASE_PERMS = ['VIEW_UNITS','SEARCH_UNITS','FILTER_UNITS','VIEW_UNIT_DETAILS','SHARE_UNIT','EXPORT_UNIT','EXPORT_COMPARISON','CREATE_OFFER'];
+  var CLIENT_BASE_PERMS = ['VIEW_UNITS','SEARCH_UNITS','FILTER_UNITS','VIEW_UNIT_DETAILS','SHARE_UNIT','EXPORT_UNIT','EXPORT_COMPARISON','CREATE_OFFER','VIEW_DEVELOPERS','VIEW_PROJECTS'];
   // مرآة PERMISSIONS_BY_ROLE_ في Code.gs — للواجهة فقط (الحماية الحقيقية في الباك-إند).
   // عائلة "العرض": VIEW_STATISTICS = تبويب "الإحصاءات والمخزون" (تبويب واحد، للجميع)؛
   // VIEW_ACTIVITY_LOG = سجل نشاط إدخال الوحدات — قسم حسّاس داخل نفس التبويب، **OWNER فقط**
@@ -8017,6 +8017,29 @@
     // المرحلة 3.6+ — نبدأ نبضة الحضور (مؤقّت واحد فقط؛ الدالة نفسها بتمنع التكرار).
     if (typeof startPresenceHeartbeat === 'function') { try { startPresenceHeartbeat(); } catch (e) {} }
   }
+  /**
+   * يحوّل قسمَي «المطوّرون» و«المشروعات» إلى دليل للقراءة لمن يملك VIEW_* بلا MANAGE_*:
+   * عنوان ونصّ تمهيدي مناسبان، وإزالة زرّ الإضافة ومودال النموذج من الـDOM.
+   * لا يمسّ شيئًا لمن يملك MANAGE_* (المالك) — سلوكه كما هو بالحرف.
+   */
+  function applyLibraryReadOnly_() {
+    if (!roleActive()) return;
+    [['MANAGE_DEVELOPERS', 'dashPanel-developers', 'devAddBtn', 'devFormModal',
+      'دليل المطوّرين', 'ملفات المطوّرين العقاريين المسجّلين في النظام: اللوجو، نبذة الشركة، صاحبها وسنة التأسيس — للاطّلاع والدراسة.'],
+     ['MANAGE_PROJECTS', 'dashPanel-projects', 'projAddBtn', 'projFormModal',
+      'دليل المشروعات', 'ملفات المشروعات العقارية: البيانات الأساسية، النبذة، المميزات، الموقع وصور المشروع — للاطّلاع والدراسة.']
+    ].forEach(function (row) {
+      if (hasPermission(row[0])) return;                       // المالك: بلا أي تغيير
+      var panel = document.getElementById(row[1]);
+      if (!panel) return;
+      var t = panel.querySelector('.dash-page-title'); if (t) t.textContent = row[4];
+      var i = panel.querySelector('.aq-page-intro');   if (i) i.textContent = row[5];
+      var add = document.getElementById(row[2]);       if (add) add.remove();
+      var form = document.getElementById(row[3]);      if (form) form.remove();
+      var acts = panel.querySelector('.dev-page-actions'); if (acts && !acts.children.length) acts.remove();
+    });
+  }
+
   function applyRoleUiVisibility() {
     // زر "إدخال وحدة" في التنقّل: لا يُعرَض أصلًا لدور مؤكَّد بلا ADD_UNIT (SALES/MANAGER).
     // الحماية الحقيقية ليست الإخفاء: مسار #add محميّ بـ unlockAddThen (gateHasPerm_ ADD_UNIT)
@@ -8035,6 +8058,10 @@
       var _sv = document.getElementById('editSaveBtn');
       if (_sv) _sv.remove();
     }
+    // مكتبة المطوّرين/المشاريع: من يملك VIEW_* بلا MANAGE_* يرى **دليلًا للقراءة** لا شاشة إدارة.
+    // نفس قاعدة زر الحفظ أعلاه: إزالة من الـDOM لا إخفاء ولا disable — فلا يبدو شيء «معطّلًا».
+    // الحماية الحقيقية في الباك-إند (authorizeOwnerAdmin على كل أكشنات الكتابة).
+    applyLibraryReadOnly_();
     // لو النتائج اترسمت قبل ما نعرف الدور، نعيد رسمها بالصلاحيات الصحيحة
     if (roleActive() && typeof lastResults !== 'undefined' && lastResults && lastResults.length) {
       try { renderResults(lastResults); } catch (e) {}
@@ -8098,12 +8125,12 @@
                   title: 'إدارة المستخدمين', crumbs: ['لوحة التحكم'],
                   denyMsg: 'صلاحيتك الحالية لا تسمح بفتح هذا القسم' },
     developers: { hash: '#dashboard/developers', aliases: [],             view: 'dashboard', navId: 'adminFab', navPerm: null,
-                  perm: 'MANAGE_DEVELOPERS', section: 'developers', label: 'المطوّرون',
-                  title: 'إدارة بيانات المطوّرين', crumbs: ['لوحة التحكم'],
+                  perm: 'VIEW_DEVELOPERS', section: 'developers', label: 'المطوّرون',
+                  title: 'المطوّرون', crumbs: ['لوحة التحكم'],
                   denyMsg: 'صلاحيتك الحالية لا تسمح بفتح هذا القسم' },
     projects:   { hash: '#dashboard/projects',   aliases: [],             view: 'dashboard', navId: 'adminFab', navPerm: null,
-                  perm: 'MANAGE_PROJECTS',   section: 'projects',   label: 'المشروعات',
-                  title: 'إدارة المشروعات', crumbs: ['لوحة التحكم'],
+                  perm: 'VIEW_PROJECTS',   section: 'projects',   label: 'المشروعات',
+                  title: 'المشروعات', crumbs: ['لوحة التحكم'],
                   denyMsg: 'صلاحيتك الحالية لا تسمح بفتح هذا القسم' },
     archive:    { hash: '#dashboard/archive',    aliases: [],             view: 'dashboard', navId: 'adminFab', navPerm: null,
                   perm: 'MANAGE_ARCHIVE',    section: 'archive',    label: 'الأرشيف',
@@ -12870,7 +12897,7 @@
     }).withFailureHandler(apiFailure_('تعذّر تحميل قائمة المطوّرين والمشروعات')).getDeveloperProjectMap(getAuthCreds());
   }
   window.__aqarLoadDevelopers = function () {
-    if (typeof hasPermission === 'function' && !hasPermission('MANAGE_USERS')) return;   // إدارة بيانات المطوّرين — مالك فقط (authorizeOwnerAdmin_)
+    if (typeof hasPermission === 'function' && !hasPermission('VIEW_DEVELOPERS')) return;   // العرض لمن يملك VIEW_DEVELOPERS؛ الإدارة تبقى MANAGE_DEVELOPERS (مالك فقط)
     return loadDeveloperManagementSection.apply(this, arguments);
   };
 
@@ -12995,9 +13022,10 @@
         </div>
         <div class="aq-dev-card-foot">
           <span class="aq-dev-card-year">${p.foundedYear ? 'تأسست ' + devEsc_(p.foundedYear) : 'سنة التأسيس غير مسجّلة'}</span>
-          <span class="aq-list-actions">
+          <span class="aq-list-actions">${hasPermission('MANAGE_DEVELOPERS') ? `
             <button type="button" class="aq-btn aq-btn--ghost aq-btn--icon" title="تعديل" aria-label="تعديل ${devEsc_(name)}" onclick='editDevProfile(${payload})'>${ICON.edit}</button>
-            <button type="button" class="aq-btn aq-btn--danger aq-btn--icon" title="حذف" aria-label="حذف ${devEsc_(name)}" onclick="removeDevProfile('${nameJs}')">${ICON.trash}</button>
+            <button type="button" class="aq-btn aq-btn--danger aq-btn--icon" title="حذف" aria-label="حذف ${devEsc_(name)}" onclick="removeDevProfile('${nameJs}')">${ICON.trash}</button>` : `
+            <button type="button" class="aq-btn aq-btn--ghost aq-btn--icon" title="عرض الملف" aria-label="عرض ملف ${devEsc_(name)}" onclick="showDeveloperProfile('${nameJs}')">${ICON.eye}</button>`}
           </span>
         </div>
       </article>`;
@@ -13495,8 +13523,10 @@
           '<div class="aq-dev-card-foot">' +
             '<span class="aq-dev-card-year">' + devEsc_([p['City'], p['District']].filter(Boolean).join(' - ') || 'بلا مدينة/منطقة مسجَّلة') + '</span>' +
             '<span class="aq-list-actions">' +
-              '<button type="button" class="aq-btn aq-btn--ghost aq-btn--icon" title="تعديل" aria-label="تعديل ' + devEsc_(name) + '" onclick=\'editProject(' + payload + ')\'>' + ICON.edit + '</button>' +
-              '<button type="button" class="aq-btn aq-btn--danger aq-btn--icon" title="حذف" aria-label="حذف ' + devEsc_(name) + '" onclick="removeProject(\'' + nameJs + '\')">' + ICON.trash + '</button>' +
+              (hasPermission('MANAGE_PROJECTS')
+                ? '<button type="button" class="aq-btn aq-btn--ghost aq-btn--icon" title="تعديل" aria-label="تعديل ' + devEsc_(name) + '" onclick=\'editProject(' + payload + ')\'>' + ICON.edit + '</button>' +
+                  '<button type="button" class="aq-btn aq-btn--danger aq-btn--icon" title="حذف" aria-label="حذف ' + devEsc_(name) + '" onclick="removeProject(\'' + nameJs + '\')">' + ICON.trash + '</button>'
+                : '<button type="button" class="aq-btn aq-btn--ghost aq-btn--icon" title="عرض الملف" aria-label="عرض ملف ' + devEsc_(name) + '" onclick="showProjectProfile(\'' + nameJs + '\')">' + ICON.eye + '</button>') +
             '</span>' +
           '</div>' +
         '</article>';
@@ -13516,7 +13546,7 @@
 
   function loadProjectManagementSection() { loadProjectsList(); }
   window.__aqarLoadProjects = function () {
-    if (typeof hasPermission === 'function' && !hasPermission('MANAGE_PROJECTS')) return;   // إدارة المشروعات — مالك فقط (authorizeOwnerAdmin_)
+    if (typeof hasPermission === 'function' && !hasPermission('VIEW_PROJECTS')) return;   // العرض لمن يملك VIEW_PROJECTS؛ الإدارة تبقى MANAGE_PROJECTS (مالك فقط)
     return loadProjectManagementSection.apply(this, arguments);
   };
 
@@ -14040,9 +14070,11 @@
     // المستوى الثاني (تفويض، مش مجرد إخفاء زر): أقسام إدارية حصرية للمالك — أي مستخدم غير
     // OWNER يُمنَع من فتحها حتى لو استُدعيت dashSelect برمجيًا / عبر hash / Console / API.
     // مرآة للباك-إند authorizeOwnerAdmin_ (OWNER فقط) — والباك-إند يعيد التحقق دائمًا.
-    var DASH_PANEL_OWNER_ONLY = { developers: 1, projects: 1, archive: 1, users: 1, settings: 1, audit: 1 };
+    // developers/projects خرجا من هذه القائمة: صارا **دليلًا للقراءة** لكل دور (VIEW_*)،
+    // والإدارة داخلهما محكومة بـ DASH_PANEL_PERMS أدناه + الباك-إند (authorizeOwnerAdmin).
+    var DASH_PANEL_OWNER_ONLY = { archive: 1, users: 1, settings: 1, audit: 1 };
     // حارس دفاعي إضافي بالصلاحية ("الإحصاءات والمخزون" = VIEW_STATISTICS، متاحة لكل الأدوار).
-    var DASH_PANEL_PERMS = { users: 'MANAGE_USERS', developers: 'MANAGE_DEVELOPERS', projects: 'MANAGE_PROJECTS', archive: 'MANAGE_ARCHIVE', settings: 'MANAGE_SETTINGS', audit: 'MANAGE_USERS', stats: 'VIEW_STATISTICS' };
+    var DASH_PANEL_PERMS = { users: 'MANAGE_USERS', developers: 'VIEW_DEVELOPERS', projects: 'VIEW_PROJECTS', archive: 'MANAGE_ARCHIVE', settings: 'MANAGE_SETTINGS', audit: 'MANAGE_USERS', stats: 'VIEW_STATISTICS' };
 
     // "الإحصائيات والمخزون" — يُعرَض داخل شِل لوحة التحكم: نُعيد توطين #statsView داخل
     // #dashStatsMount (مرة واحدة)، ثم نفتح موديول الإحصائيات ببيانات الدخول (VIEW_STATISTICS).
