@@ -2904,6 +2904,11 @@
       overflow-y: auto; overflow-x: hidden; max-height: calc(100vh - 48px);
       box-shadow: var(--shadow-3);
     }
+    /* إخفاء شريط التمرير بصريًا في نافذة تفاصيل الوحدة فقط — التمرير نفسه يبقى كاملًا
+       (نفس أسلوب #appNav أعلى الملف). مقيّد بالمعرّفات لأن .ud-modal-body تستخدمها أيضًا
+       #projectProfileBody (ملف المشروع) ويجب ألّا يتأثّر شريطها. */
+    #unitCardOverlay, #unitCardOverlayBody { scrollbar-width: none; }
+    #unitCardOverlay::-webkit-scrollbar, #unitCardOverlayBody::-webkit-scrollbar { display: none; }
     .ud-top {
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
       padding: var(--aq-space-3) var(--aq-space-5) var(--aq-space-3) 64px; background: var(--aq-color-surface);
