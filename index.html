@@ -4990,6 +4990,49 @@
         border-radius: var(--radius-lg); border-inline: 1px solid var(--aq-color-border);
       }
     }
+
+    /* =========================================================================
+     * إعادة التوازن البصري (DARK_PREMIUM_VISUAL_REBALANCE_AUDIT)
+     * التشخيص: المشكلة ليست الباليتة — أعمق سواد يحتلّ 2.2% فقط من الشاشة،
+     * لكن أكثر من نصفها أسطح داكنة شبه فارغة (صندوق الفلاتر 98.8% فراغ،
+     * أقسام نافذة التفاصيل 95%+ فراغ). العلاج: كثافة أولًا، ثم تصحيح لوني انتقائي.
+     * ========================================================================= */
+
+    /* ---- 1) كثافة صندوق فلاتر استكشف — ديسكتوب فقط (الموبايل يحتفظ بمساحات اللمس) ----
+       لا فلتر يُحذف ولا أداة تُخفى: نفس الحقول ونفس الأزرار، بارتفاع أقلّ. */
+    @media (min-width: 1000px) {
+      body.app-view-explore .aq-console { padding: 12px 18px !important; }
+      body.app-view-explore .aq-console-modes { margin-bottom: 6px !important; }
+      body.app-view-explore .aq-console-mode { padding: 6px 16px !important; }
+      body.app-view-explore .aq-console .filters-card { gap: 6px 12px !important; }
+      /* «المزيد من الفلاتر» رابط نصّي كان يحجز صفًّا بارتفاع 44px */
+      body.app-view-explore .aq-console .filters-card > .toggle-details-btn {
+        min-height: 28px !important; height: auto !important; padding: 3px 2px !important;
+      }
+      body.app-view-explore .aq-console input:not([type="checkbox"]):not([type="radio"]),
+      body.app-view-explore .aq-console select { height: 42px !important; }
+      body.app-view-explore .aq-console .filters-card label { margin-bottom: 2px !important; }
+      body.app-view-explore .aq-console #searchBtn,
+      body.app-view-explore .aq-console #clearBtn,
+      body.app-view-explore .aq-console .btn-row > * { height: 44px !important; min-height: 44px !important; }
+    }
+
+    /* ---- 2) كثافة نافذة تفاصيل الوحدة — لا يُحذف أي قسم أو حقل أو قيمة ----
+       الأقسام كانت فارغة بين 94.6% و98.7%؛ نقلّل الهواء لا المعلومات. */
+    #unitCardOverlayBody .ud-sec { padding: 10px 12px 12px !important; }
+    #unitCardOverlayBody .ud-sec-title { padding: 6px 12px !important; }
+    #unitCardOverlayBody .ud-tile { padding: 6px 10px !important; }
+    #unitCardOverlayBody .ud-price-hero { padding: 10px 12px !important; }
+
+    /* ---- 3) تصحيح لوني انتقائي (لا تفتيح عام — التدقيق أثبت أن التفتيح الشامل يُبرز الفراغ) ----
+       (أ) منطقة المحتوى كانت ΔL* 1.9 عن الكانفس أي تحت عتبة الإدراك.
+       (ب) البطاقة كانت بنفس لون صندوق الفلاتر بالضبط ⇒ المنتج والأداة في مرتبة واحدة.
+           ترتفع البطاقة وحدها ويبقى صندوق الفلاتر كما هو (تابع لا منافس). */
+    body.app-view-explore #mainContainer,
+    body.app-view-dashboard #mainContainer { background: #131317; }
+    body.aq-search-ui .unit-card { background: #202026 !important; }
+    body.aq-search-ui .unit-media { background: #2A2A31 !important; }
+
   </style>
 </head>
 <body>
