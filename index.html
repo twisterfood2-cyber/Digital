@@ -50,7 +50,7 @@
   <script defer src="aqar-shell.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0D0D0F">
+  <meta name="theme-color" content="#0A0A0C">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -2535,7 +2535,7 @@
       background: transparent; border: 1px solid transparent;
       color: var(--aq-color-text-muted); border-radius: var(--radius-sm); min-height: var(--aq-btn-h); font-weight: 700;
     }
-    body.aq-search-ui .aq-console .toggle-details-btn:hover { background: var(--aq-color-surface-subtle); color: var(--aq-color-primary); }
+    body.aq-search-ui .aq-console .toggle-details-btn:hover { background: var(--aq-color-surface-hover); color: var(--aq-color-primary); }
     .aq-console-back {
       align-items: center; gap: 6px;
       background: transparent; border: 1px solid var(--aq-prop-border);
@@ -2887,7 +2887,7 @@
     }
     body.aq-search-ui .card-provenance { color: var(--aq-prop-text-faint); border-top-color: var(--aq-prop-border); }
     body.aq-search-ui .card-provenance a { color: var(--aq-prop-green); }
-    body.aq-search-ui .status-badge { background: var(--aq-color-secondary-soft); color: var(--aq-color-primary); border-color: var(--aq-color-secondary-line); }   /* LOCAL REDESIGN PHASE 2 */
+    body.aq-search-ui .status-badge { background: var(--aq-color-secondary-soft); color: var(--aq-color-secondary); border-color: var(--aq-color-secondary-line); }   /* LOCAL REDESIGN PHASE 2 — "متاح" تأخذ لونها الدلالي الليموني بدل الأبيض (تدقيق التباين) */
     body.aq-search-ui .status-badge.محجوز { background: var(--aq-color-warning-bg); color: var(--aq-color-warning); border-color: var(--aq-color-warning-border); }
     body.aq-search-ui .status-badge.مباع { background: var(--aq-color-danger-bg); color: var(--aq-color-danger); border-color: var(--aq-color-danger-border); }
 
@@ -2899,7 +2899,7 @@
     /* Report 069: عرض التفاصيل ثابت في كل السياقات (كان 460px خارج body.aq-search-ui — لوحة التحكم/الأرشيف) */
     .unit-card-overlay-box.unit-details-box { max-width: min(var(--aq-modal-full), 96vw); }
     .ud-modal-body {
-      position: relative; background: var(--aq-color-canvas); border-radius: var(--radius-lg);
+      position: relative; background: var(--aq-color-surface); border-radius: var(--radius-lg);
       border: 1px solid var(--aq-color-border);
       overflow-y: auto; overflow-x: hidden; max-height: calc(100vh - 48px);
       box-shadow: var(--shadow-3);
@@ -3627,7 +3627,7 @@
     }
     #dashboardView .section h3 { color: var(--aq-color-text); font-size: var(--aq-fs-card-title); font-weight: 700; letter-spacing: 0; text-transform: none; }
     #dashboardView .dash-about-toggle { background: transparent; border-color: transparent; color: var(--aq-color-text-muted); font-weight: 700; min-height: var(--aq-btn-h); }
-    #dashboardView .dash-about-toggle:hover { background: var(--aq-color-surface-subtle); border-color: transparent; color: var(--aq-color-primary); }
+    #dashboardView .dash-about-toggle:hover { background: var(--aq-color-surface-hover); border-color: transparent; color: var(--aq-color-primary); }
     #dashboardView .dash-live-card { background: var(--aq-color-primary-deep); border: 0; border-radius: var(--radius-lg); padding: var(--aq-space-4) var(--aq-space-5); margin: 0 0 var(--aq-space-5); }
     #dashboardView .um-empty { color: var(--aq-prop-text-muted); }
 
@@ -4373,7 +4373,7 @@
      * (شبكة على الديسكتوب / عرض أفقي على الموبايل)، شريط سفلي. عرض فقط — نفس الـ DOM/ids/الوظائف.
      * ====================================================================================================== */
     :root {
-      --aq-header-bg: #0D0D0F;
+      --aq-header-bg: #141418;   /* سطح خفيف بدل مطابقة الخلفية — تدقيق التباين */
     }
     html, body { background: var(--aq-color-canvas); }
     .aq-phone-cta, #searchBtn, #nlSearchBtn, #editSaveBtn, #dashboardView .dash-cta, .access-gate-box button, #loadMoreBtn, .aq-notif-badge { color: var(--aq-color-on-accent) !important; }
@@ -4546,16 +4546,16 @@
 
     /* ---- نافذة تفاصيل الوحدة على الثيم الداكن (طلب المالك): إطار مرفوع، رؤوس أقسام أهدأ، بلاطات أوضح، سعر بارز، شارة الحالة مقروءة ---- */
     #unitCardOverlay .unit-details-box, .unit-card-overlay-box.unit-details-box {
-      background: #111114 !important; border: 1px solid rgba(255,255,255,0.12) !important; border-radius: 22px;
+      background: #17171C !important; border: 1px solid rgba(255,255,255,0.12) !important; border-radius: 22px;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 2px 8px rgba(0,0,0,0.6), 0 30px 80px rgba(0,0,0,0.78) !important;
     }
     .ud-top { border-bottom: 1px solid rgba(255,255,255,0.10) !important; }
-    .ud-sec { background: #17171A !important; border: 1px solid rgba(255,255,255,0.08) !important; box-shadow: inset 0 1px 0 rgba(255,255,255,0.03); }
+    .ud-sec { background: #232329 !important; border: 1px solid rgba(255,255,255,0.08) !important; box-shadow: inset 0 1px 0 rgba(255,255,255,0.03); }
     .ud-sec-title { background: transparent !important; border: 0 !important; border-bottom: 1px solid rgba(255,255,255,0.07) !important; color: #fff; }
-    .ud-tile { background: #1F1F23 !important; border: 1px solid rgba(255,255,255,0.06) !important; }
+    .ud-tile { background: #2F2F37 !important; border: 1px solid rgba(255,255,255,0.06) !important; }
     .ud-tile-label { color: var(--aq-color-text-muted) !important; }
     .ud-tile-value { color: #fff !important; }
-    .ud-price-hero { background: #1F1F23 !important; border: 1px solid rgba(255,255,255,0.08) !important; border-inline-start: 3px solid var(--aq-color-accent) !important; box-shadow: inset 0 1px 0 rgba(255,255,255,0.04) !important; }
+    .ud-price-hero { background: #2F2F37 !important; border: 1px solid rgba(255,255,255,0.08) !important; border-inline-start: 3px solid var(--aq-color-accent) !important; box-shadow: inset 0 1px 0 rgba(255,255,255,0.04) !important; }
     .ud-price-label { color: var(--aq-color-text-muted) !important; }
     .ud-price-value { color: var(--aq-color-accent) !important; }
     .ud-media { background: #232328 !important; border: 1px solid rgba(255,255,255,0.10); }
