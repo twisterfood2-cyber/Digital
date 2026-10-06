@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <base target="_top">
+  <!-- Clean URLs (2026-10-06): المستند بقى يُخدَم من مسارات حقيقية (/dashboard/archive) عبر rewrite على Render،
+       فأي رابط نسبي في الصفحة (aqar-*.css, aqar-shell.js, manifest.json, assets/…, url(city-bg.jpg) جوّه <style>)
+       كان هيتحلّ على /dashboard/… ويرجع 404. base href="/" بيثبّت كل الروابط النسبية على الجذر.
+       آمن هنا: مفيش ولا href="#…" في الصفحة، ومفيش fetch بمسار نسبي (EXEC_URL مطلق)، وsw.js مسجَّل بمسار مطلق. -->
+  <base href="/" target="_top">
   <meta charset="UTF-8">
 
   <!-- ===== Link Preview / SEO — Open Graph + Twitter Card =====
@@ -7108,8 +7112,7 @@
    */
   const calcFabBtn = document.getElementById('calcFabBtn');
   calcFabBtn.addEventListener('click', function() {
-    if (location.hash !== '#quote') location.hash = 'quote';
-    else if (typeof window.__aqarReroute === 'function') window.__aqarReroute();
+    goRoute_('quote');   // Clean URLs: /quote (نفس الأثر — لو احنا عليه أصلًا بيعيد العرض فقط)
   });
 
   /* ---------- متوسط سعر المتر لكل منطقة - متاح للكل من غير كلمة سر ---------- */
@@ -7143,7 +7146,7 @@
     lastSearchBase_ = payload;
     requestSearchPage_(payload, 1, false).then(function (ok) {
       if (!ok) return;
-      if (typeof window.__aqarGoExplore === 'function') window.__aqarGoExplore(); else location.hash = 'explore';
+      if (typeof window.__aqarGoExplore === 'function') window.__aqarGoExplore(); else goRoute_('explore');
     });
   }
   function renderPriceStatsTable(rows) {
@@ -7227,14 +7230,13 @@
   };
   // "سعر المتر" — يفتح كصفحة داخل مساحة المحتوى الرئيسية (مش Modal). البيانات/المنطق كما هي.
   document.getElementById('priceInfoFabBtn').addEventListener('click', function() {
-    if (location.hash !== '#meter') location.hash = 'meter';
-    else if (typeof window.__aqarReroute === 'function') window.__aqarReroute();
+    goRoute_('meter');   // Clean URLs: /meter
   });
 
   // زر قديم مخفي (استُبدل بـ navAddUnitBtn → #add). أي نقرة عليه تمرّ على نفس
   // البوابة المبنيّة على الصلاحيات (unlockAddThen) عبر مسار الـ SPA — مافيش كلمة سر ثانوية.
   document.getElementById('addUnitFabBtn').addEventListener('click', function() {
-    if (location.hash !== '#add') location.hash = 'add'; else if (typeof window.__aqarReroute === 'function') window.__aqarReroute();
+    goRoute_('add');     // Clean URLs: /add
   });
 
   function openAddUnitModal() {
@@ -7775,7 +7777,7 @@
   // × في رأس الصفحة = الرجوع الواضح لشاشة البحث (الصفحة السابقة). مش بيغيّر بيانات سعر المتر.
   function __leaveMeterPage() {
     if (typeof window.__aqarGoSearch === 'function') window.__aqarGoSearch();
-    else { location.hash = ''; }
+    else { goRoute_('search'); }
   }
   document.getElementById('priceStatsCloseBtn').addEventListener('click', __leaveMeterPage);
   priceStatsModal.addEventListener('click', function(e) { if (e.target === this) __leaveMeterPage(); });
@@ -8215,6 +8217,96 @@
     }
     return null;
   }
+
+  /* ============================================================
+   * Clean URLs (2026-10-06) — طبقة مسارات نضيفة فوق الراوتر القائم، بلا أي تغيير في أسماء المسارات
+   * ولا في الصلاحيات ولا في العروض. الـ hash يفضل مدعوم للتوافق الخلفي فقط (روابط قديمة).
+   * المصدر الوحيد للمسار = ROUTE_REGISTRY نفسه: الـ path مشتق من الـ hash بالتحويل '#x' → '/x'
+   * (و'' → '/')، فمستحيل يحصل اختلاف بين الاتنين. Render بيعمل rewrite لأي مسار → /index.html،
+   * فالتطبيق هو اللي بيحسم المسار من location.pathname.
+   * ============================================================ */
+  (function deriveRoutePaths_() {
+    for (var k in ROUTE_REGISTRY) {
+      if (!Object.prototype.hasOwnProperty.call(ROUTE_REGISTRY, k)) continue;
+      var r = ROUTE_REGISTRY[k];
+      r.path = r.hash ? '/' + r.hash.slice(1) : '/';
+      r.aliasPaths = [];
+      for (var i = 0; i < (r.aliases || []).length; i++) r.aliasPaths.push('/' + r.aliases[i].slice(1));
+    }
+  })();
+
+  /** يوحّد صيغة المسار: فكّ الترميز + دمج الشرطات المتكررة + شيل الشرطة الأخيرة + حروف صغيرة.
+   *  مسارات المسارات كلها ASCII صغيرة، فالتوحيد بيخلّي /Explore و /explore/ و //explore نفس المسار. */
+  function normalizeRoutePath_(pathname) {
+    var p = String(pathname == null ? '/' : pathname);
+    try { p = decodeURIComponent(p); } catch (e) { /* ترميز غير صالح — نكمّل بالنص الخام */ }
+    p = p.replace(/\/{2,}/g, '/');
+    if (p.length > 1) p = p.replace(/\/+$/, '');
+    p = p.toLowerCase();
+    return p || '/';
+  }
+  /** pathname → مفتاح المسار، أو null لمسار غير معروف (نفس عقد resolveRouteKey بالحرف). */
+  function resolveRoutePathKey(pathname) {
+    var p = normalizeRoutePath_(pathname);
+    if (p === '/') return ROUTE_FALLBACK;
+    for (var k in ROUTE_REGISTRY) {
+      if (!Object.prototype.hasOwnProperty.call(ROUTE_REGISTRY, k)) continue;
+      var r = ROUTE_REGISTRY[k];
+      if (r.path && normalizeRoutePath_(r.path) === p) return k;
+      for (var i = 0; i < (r.aliasPaths || []).length; i++) if (normalizeRoutePath_(r.aliasPaths[i]) === p) return k;
+    }
+    return null;
+  }
+  /** المصدر الوحيد لقراءة المسار الحالي من الرابط: المسار أولًا، والهاش القديم كاحتياط على الجذر فقط. */
+  function currentRouteKeyFromUrl_() {
+    var k = resolveRoutePathKey(location.pathname);
+    if ((k === null || k === ROUTE_FALLBACK) && location.hash && normalizeRoutePath_(location.pathname) === '/') {
+      var hk = resolveRouteKey(location.hash);
+      if (hk) return hk;
+    }
+    return k;
+  }
+  /** يرجّع الرابط للجذر مع الحفاظ على الـ query — بدون reload وبدون إدخال سجل جديد. */
+  function clearRouteFromUrl_() {
+    if (!window.history || !history.replaceState) return;
+    try { history.replaceState('', document.title, '/' + location.search); } catch (e) {}
+  }
+  /** '#dashboard' العارية بمكافئها النضيف '/dashboard' — الاتنين معناهم "آخر قسم مفتوح" (السلوك القائم). */
+  function isBareDashboardUrl_() {
+    if (normalizeRoutePath_(location.pathname) === '/dashboard') return true;
+    return normalizeRoutePath_(location.pathname) === '/' && (location.hash === '#dashboard' || location.hash === '#dashboard/');
+  }
+  /** توحيد الرابط قبل الحسم (replaceState فقط — لا reload ولا سجل جديد ولا تغيير في العرض):
+   *   1) رابط هاش قديم على الجذر: /#explore → /explore  (و/#dashboard/archive → /dashboard/archive)
+   *   2) مسار معروف بصيغة غير قياسية: /Explore/ → /explore
+   *  الـ query بيتحفظ في الحالتين. الحارس: ما نكتبش مسار إلا لو بيحلّ لنفس مفتاح المسار. */
+  function syncUrlToRoute_() {
+    if (!window.history || !history.replaceState) return;
+    var raw = location.pathname, p = normalizeRoutePath_(raw);
+    if (p === '/' && location.hash) {
+      var hk = resolveRouteKey(location.hash);
+      if (!hk || hk === ROUTE_FALLBACK) return;
+      var hp = normalizeRoutePath_('/' + location.hash.slice(1));
+      if (resolveRoutePathKey(hp) !== hk) return;
+      try { history.replaceState('', document.title, hp + location.search); } catch (e) {}
+      return;
+    }
+    var k = resolveRoutePathKey(raw);
+    if (k && k !== ROUTE_FALLBACK && raw !== p) {
+      try { history.replaceState('', document.title, p + location.search); } catch (e) {}
+    }
+  }
+
+  /** تنقّل موحّد من أي scope (المعالجات خارج IIFE الراوتر): يستخدم راوتر الـClean URLs لمّا يكون جاهز،
+   *  وإلا يرجع للهاش القديم — نفس السلوك السابق بالحرف. المسار نفسه بييجي من ROUTE_REGISTRY. */
+  function goRoute_(key) {
+    if (typeof window.__aqarNavigate === 'function') { window.__aqarNavigate(key); return; }
+    var r = ROUTE_REGISTRY[key];
+    location.hash = (r && r.hash) ? r.hash.slice(1) : '';
+  }
+  /** هل الرابط الحالي على هذا المسار؟ — بديل path-aware للمقارنة القديمة (location.hash === r.hash). */
+  function isAtRoute_(key) { return currentRouteKeyFromUrl_() === key; }
+
   /** Phase 3C Hotfix: القاعدة الوحيدة لإظهار/إخفاء أي عنصر تنقّل (الشل + سايدبار اللوحة الداخلي):
    *  hidden + display:none → لا يُرسم، لا يشغل مساحة، لا يُركَّز، لا يُنقر. القرار نفسه يأتي دائمًا من
    *  ROUTE_REGISTRY → perm → canAccessRoute/uiAllows — لا قواعد إخفاء أخرى. */
@@ -9223,9 +9315,9 @@
     var draft = { name: __dpContextName };
     developerProfileModal.classList.remove('open');
     window.__aqarDeveloperDraft = draft;                                 // تُستهلك مرة واحدة عند فتح قسم "المطوّرون" (dashSelect)
-    var target = ROUTE_REGISTRY.developers.hash;                         // نفس مسار القسم القائم — بلا مسار جديد
-    if (location.hash === target) { if (typeof window.__aqarOpenAddDeveloper === 'function') { window.__aqarDeveloperDraft = null; window.__aqarOpenAddDeveloper(draft); } }
-    else location.hash = target;
+    // نفس مسار القسم القائم — بلا مسار جديد (Clean URLs: /dashboard/developers)
+    if (isAtRoute_('developers')) { if (typeof window.__aqarOpenAddDeveloper === 'function') { window.__aqarDeveloperDraft = null; window.__aqarOpenAddDeveloper(draft); } }
+    else goRoute_('developers');
   }
   function showDeveloperProfile(developerName) {
     __dpContextName = String(developerName || '').trim();   // Report 096: سياق المطوّر للحالة الفارغة
@@ -9521,9 +9613,9 @@
     closeProjectProfileModal();
     if (typeof closeUnitCardOverlay === 'function') closeUnitCardOverlay();
     window.__aqarProjectDraft = draft;                                   // تُستهلك مرة واحدة عند فتح قسم "المشروعات" (dashSelect)
-    var target = ROUTE_REGISTRY.projects.hash;                           // نفس مسار القسم القائم — بلا مسار جديد
-    if (location.hash === target) { if (typeof window.__aqarOpenAddProject === 'function') { window.__aqarProjectDraft = null; window.__aqarOpenAddProject(draft); } }
-    else location.hash = target;
+    // نفس مسار القسم القائم — بلا مسار جديد (Clean URLs: /dashboard/projects)
+    if (isAtRoute_('projects')) { if (typeof window.__aqarOpenAddProject === 'function') { window.__aqarProjectDraft = null; window.__aqarOpenAddProject(draft); } }
+    else goRoute_('projects');
   }
   function buildProjectProfileHtml_(res, unitLocationFallback) {
     if (!res || !res.success || res.found === false) {
@@ -10186,7 +10278,7 @@
      يتغيّر المسار فقط، فيتكفّل الراوتر القائم بالعرض والتاريخ (Back/Forward). */
   function goToResultsRoute_() {
     if (typeof window.__aqarGoExplore === 'function') window.__aqarGoExplore();
-    else location.hash = 'explore';
+    else goRoute_('explore');
   }
 
   (function wireSearchExperience_() {
@@ -11268,7 +11360,7 @@
   function handleEditClose() {
     if (editModalMode === 'quote') {
       if (typeof window.__aqarGoSearch === 'function') { window.__aqarGoSearch(); return; }
-      location.hash = '';
+      goRoute_('search');
       return;
     }
     closeEditModal();
@@ -11726,7 +11818,8 @@
 
     // 5) إقلاع نظيف مضمون (المصادقة أُنهيت بالفعل أعلاه): انتقال بلا hash يُنهي
     //    كل مؤقّت/مستمع/طلب معلّق، ويمنع زرّ الرجوع من إظهار #dashboard كمستخدم مُصادَق.
-    if (location.hash) location.replace(location.pathname + location.search);
+    // Clean URLs: المسار نفسه بقى يحمل الحالة، فالخروج من /dashboard/archive لازم يرجع للجذر — مش reload لنفس المسار المحمي.
+    if (location.hash || normalizeRoutePath_(location.pathname) !== '/') location.replace('/' + location.search);
     else location.reload();
   }
   window.__aqarLogout = logout;
@@ -11942,8 +12035,7 @@
     // خدمة ذاتية، والتحقق النهائي لكل عملية في السيرفر.
     if (typeof roleActive === 'function' && roleActive() &&
         typeof hasPermission === 'function' && !hasPermission('VIEW_STATISTICS')) {
-      if (location.hash !== '#profile') location.hash = 'profile';
-      else if (typeof window.__aqarReroute === 'function') window.__aqarReroute();
+      goRoute_('profile');   // Clean URLs: /dashboard/profile (والهاش القديم #profile لسه مدعوم)
       return;
     }
     if (typeof window.__aqarOpenDashboard === 'function') window.__aqarOpenDashboard();
@@ -12079,6 +12171,8 @@
     }
     window.addEventListener('hashchange', function () { setTimeout(reveal, 60); });
     window.addEventListener('load', function () { setTimeout(reveal, 300); });
+    // Clean URLs: التنقّل بقى pushState (مش بيطلق hashchange) — الراوتر بينده دي بعد كل حسم مسار.
+    window.__aqarRevealDashNav = function () { setTimeout(reveal, 60); };
   })();
 
   /* المرحلة 3.6+ — صياغة "آخر ظهور" (توقيت مصر — نفس اصطلاح التطبيق: dd/MM/yyyy + 12h ص/م). */
@@ -13976,15 +14070,15 @@
       return typeof roleActive === 'function' && roleActive()
           && typeof hasPermission === 'function' && hasPermission(perm);
     }
-    function denyGatedSection_(hashName, msg) {
-      // مستخدم داخل بجدّ لكن ناقص الصلاحية → رفض واضح + شيل الـ hash عشان reload مايفضلش عالق.
+    function denyGatedSection_(routeName, msg) {
+      // مستخدم داخل بجدّ لكن ناقص الصلاحية → رفض واضح + شيل المسار المحمي عشان reload مايفضلش عالق.
       if (window.__currentUser) {
         if (msg) showToast(msg, 'error');
-        if (location.hash === '#' + hashName) {
-          history.replaceState('', document.title, location.pathname + location.search);
-        }
+        // Clean URLs: نفس الغرض القديم، بس المسار المحمي ممكن يكون path (/dashboard/users) أو هاش قديم (#stats).
+        var key = ROUTE_REGISTRY[routeName] ? routeName : resolveRouteKey('#' + routeName);
+        if (key && currentRouteKeyFromUrl_() === key) clearRouteFromUrl_();
       }
-      // مش داخل لسه (بوابة الدخول ظاهرة): سيب الـ hash زيّ ما هو — بعد الدخول __aqarReroute هيفتحه.
+      // مش داخل لسه (بوابة الدخول ظاهرة): سيب الرابط زيّ ما هو — بعد الدخول __aqarReroute هيفتحه.
     }
 
     function unlockStatsThen(onOk) {
@@ -14896,16 +14990,36 @@
       window.scrollTo(0, 0);
     }
 
-    function goToDashboardHash() {
-      if (location.hash !== '#dashboard') location.hash = 'dashboard'; else route();
+    /* ============================================================
+     * Clean URLs — نقطة التنقّل الوحيدة: pushState لمسار المسار من ROUTE_REGISTRY ثم route().
+     * - نفس أثر الكود القديم بالحرف: route() بتتنفّذ دايمًا (زي ما تعيين الـ hash كان بيطلق hashchange).
+     * - لو احنا على نفس المسار أصلًا وبلا هاش → مفيش سجل جديد، بس إعادة عرض (نفس else route() القديمة).
+     * - الـ query بيتحفظ دايمًا (?unit=…). بيئة بلا History API → رجوع تلقائي للهاش القديم.
+     * ============================================================ */
+    function navigateTo_(key, explicitPath) {
+      var r = ROUTE_REGISTRY[key];
+      if (!r) { route(); return; }
+      var target = explicitPath || r.path || '/';
+      var samePath = normalizeRoutePath_(location.pathname) === normalizeRoutePath_(target);
+      if (!samePath || location.hash) {
+        if (window.history && history.pushState) {
+          try { history.pushState('', document.title, target + location.search); }
+          catch (e) { location.hash = r.hash ? r.hash.slice(1) : ''; return; }
+        } else {
+          location.hash = r.hash ? r.hash.slice(1) : '';               // متصفح بلا History API — السلوك القديم
+          return;
+        }
+      }
+      route();
     }
+    // '/dashboard' العارية = "آخر قسم مفتوح" (نفس معنى '#dashboard' القديمة) — enterDashSection_ بيثبّتها على القسم الفعلي.
+    function goToDashboardHash() { navigateTo_('dashboard', '/dashboard'); }
     // target اختياري: قسم لوحة التحكم اللي نفتح عليه مباشرة (مثال: 'developers' من الزر القديم).
-    // Phase 3B: الانتقال لقسم داخل لوحة التحكم = تغيير الـ hash إلى مسار القسم (المصدر الوحيد للحالة).
+    // Phase 3B: الانتقال لقسم داخل لوحة التحكم = تغيير المسار إلى مسار القسم (المصدر الوحيد للحالة).
     function dashNavigate(section) {
       var rk = routeKeyForDashSection(section);
       if (!rk) { dashSelect(section); return; }                        // احتياط: قسم بلا مسار (لا يوجد حاليًا)
-      var h = ROUTE_REGISTRY[rk].hash;
-      if (location.hash !== h) location.hash = h.slice(1); else route();
+      navigateTo_(rk);
     }
     function openDashboard(target) {
       unlockDashboardThen(function () {
@@ -14915,26 +15029,14 @@
     }
     window.__aqarOpenDashboard = openDashboard;
 
-    function goToStatsHash() {
-      if (location.hash !== '#stats') location.hash = 'stats'; else route();
-    }
-    function goToAddHash() {
-      if (location.hash !== '#add') location.hash = 'add'; else route();
-    }
-    function goToSearchHash() {
-      if (location.hash) history.pushState('', document.title, location.pathname + location.search);
-      route();
-    }
-    function goToExploreHash() {
-      if (location.hash !== '#explore') location.hash = 'explore'; else route();
-    }
+    function goToStatsHash()   { navigateTo_('stats'); }
+    function goToAddHash()     { navigateTo_('add'); }
+    function goToSearchHash()  { navigateTo_('search'); }
+    function goToExploreHash() { navigateTo_('explore'); }
     window.__aqarGoExplore = goToExploreHash;
-    function goToQuoteHash() {
-      if (location.hash !== '#quote') location.hash = 'quote'; else route();
-    }
-    function goToMeterHash() {
-      if (location.hash !== '#meter') location.hash = 'meter'; else route();
-    }
+    window.__aqarNavigate = navigateTo_;   // Clean URLs: جسر التنقّل للمعالجات خارج هذا الـIIFE (goRoute_)
+    function goToQuoteHash()   { navigateTo_('quote'); }
+    function goToMeterHash()   { navigateTo_('meter'); }
     // جسر للـ scope اللي فيه أزرار/مستمعات المودالين القديمة — للرجوع لشاشة البحث.
     window.__aqarGoSearch = goToSearchHash;
     // "الإحصائيات والمخزون" = قسم داخل لوحة التحكم (الشريط الجانبي يظل ظاهرًا). الـ hash #stats
@@ -14992,40 +15094,48 @@
       audit:      function () { enterDashSection_('audit'); }
     };
     function enterDashSection_(section, profileOnly) {
-      // '#dashboard' العارية (alias) = آخر قسم مفتوح — السلوك القائم لزر "لوحة التحكم"؛
-      // ونثبّت الـ hash على مسار القسم الفعلي حتى يعكس الرابط الحالة (بلا إدخال سجل جديد).
-      if (section === 'home' && (location.hash === '#dashboard' || location.hash === '#dashboard/')) {
+      // '/dashboard' العارية (أو '#dashboard' القديمة) = آخر قسم مفتوح — السلوك القائم لزر "لوحة التحكم"؛
+      // ونثبّت المسار على مسار القسم الفعلي حتى يعكس الرابط الحالة (بلا إدخال سجل جديد).
+      if (section === 'home' && isBareDashboardUrl_()) {
         section = dashCurrent || 'home';
         var rk = routeKeyForDashSection(section);
         if (rk && canAccessRoute(rk) !== true) { section = 'home'; rk = 'dashboard'; }
-        if (rk) history.replaceState('', document.title, location.pathname + location.search + ROUTE_REGISTRY[rk].hash);
+        if (rk && window.history && history.replaceState) {
+          try { history.replaceState('', document.title, ROUTE_REGISTRY[rk].path + location.search); } catch (e) {}
+        }
       }
       var open = function () { dashCurrent = section; showDashboardView(); };
       if (dashUnlocked()) { open(); return; }
       showSearchView();
       unlockDashboardThen(open, profileOnly ? { profileOnly: true } : undefined);
     }
-    // مزامنة العرض مع الـ hash — رجوع/تقديم/تحديث والوصول المباشر لأي مسار.
+    // مزامنة العرض مع الرابط — رجوع/تقديم/تحديث والوصول المباشر لأي مسار (Clean URLs + الهاش القديم).
     function route() {
+      syncUrlToRoute_();   // Clean URLs: ترقية الروابط القديمة + توحيد الصيغة (replaceState فقط)
       routeResolve_();
       // Phase 3C: Page Header يعكس المسار الفعلي بعد الحسم (alias/deny/pending) — عرض فقط
       if (window.__aqarPageHeader) { try { window.__aqarPageHeader.sync(); } catch (e) {} }
+      // Clean URLs: التنقّل بـ pushState مش بيطلق hashchange — نبقى نعلّم شريط اللوحة يظهر عنصره النشط (عرض فقط)
+      if (window.__aqarRevealDashNav) { try { window.__aqarRevealDashNav(); } catch (e) {} }
     }
     function routeResolve_() {
-      var key = resolveRouteKey(location.hash);
+      var key = currentRouteKeyFromUrl_();                                    // المسار أولًا، والهاش القديم كاحتياط
       if (!key || !ROUTE_ENTER[key]) { showSearchView(); return; }           // مسار غير معروف → fallback آمن
       var access = canAccessRoute(key);
       if (access === true) { ROUTE_ENTER[key](); return; }
       showSearchView();                                                       // لا نعرض أي محتوى محمي
-      if (access === false) denyGatedSection_(location.hash.slice(1), ROUTE_REGISTRY[key].denyMsg);
+      if (access === false) denyGatedSection_(key, ROUTE_REGISTRY[key].denyMsg);
       // access === 'pending' → الجلسة تُستعاد؛ __aqarReroute يعيد التقييم بعد الاستعادة (كما كان)
     }
     // واجهة تشخيص/اختبار للقراءة فقط — لا تُستخدم للتفويض
     window.__aqarRoutes = {
       registry: ROUTE_REGISTRY,
       resolve: resolveRouteKey,
+      resolvePath: resolveRoutePathKey,                                     // Clean URLs
+      normalizePath: normalizeRoutePath_,                                   // Clean URLs
       canAccess: canAccessRoute,
-      current: function () { return resolveRouteKey(location.hash) || ROUTE_FALLBACK; },
+      current: function () { return currentRouteKeyFromUrl_() || ROUTE_FALLBACK; },
+      currentPath: function () { return normalizeRoutePath_(location.pathname); },   // Clean URLs
       sectionKey: routeKeyForDashSection,                                   // Phase 3B
       currentSection: function () { return document.body.classList.contains('app-view-dashboard') ? dashCurrent : null; }
     };
@@ -15139,7 +15249,7 @@
       lastSearchBase_ = payload;
       requestSearchPage_(payload, 1, false).then(function (ok) {
         if (!ok) return;
-        if (typeof window.__aqarGoExplore === 'function') window.__aqarGoExplore(); else location.hash = 'explore';
+        if (typeof window.__aqarGoExplore === 'function') window.__aqarGoExplore(); else goRoute_('explore');
       });
     }
 
