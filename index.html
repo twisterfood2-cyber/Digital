@@ -3925,6 +3925,10 @@
        قبل فتحهما). 1690 = فوق تفاصيل الوحدة (1650) وتحت الـ lightbox (1700) وأقل من #aqConfirmModal (2200).
        #similarUnitsModal يبقى 1600 عمدًا لأن تفاصيل الوحدة تُفتح *من داخله* ويجب أن تعلوه. */
     #pdfContactModal, #shareImagesModal { z-index: 1690; }
+    /* (2026-10-07) ملف المطوّر يُفتح أيضًا من داخل "تفاصيل الوحدة" ويجب أن يظهر فوقها بلا إغلاقها
+       (نفس فلسفة #projectProfileModal). 1670 = فوق تفاصيل الوحدة (1650) وتحت نافذة بيانات وكيل PDF
+       (1690) التي يفتحها زر "تصدير PDF" من داخل ملف المطوّر نفسه — فلا تُدفَن تحته. */
+    #developerProfileModal { z-index: 1670; }
     .pp-chips { display: flex; flex-wrap: wrap; gap: 6px; }
     .aq-chip-input-row { display: flex; gap: 8px; }
     .aq-chip-input-row input { flex: 1; }
@@ -8634,9 +8638,9 @@
     const financeHtml = section(ICON.wallet, 'التفاصيل المالية', `${priceHero}${finTiles ? `<div class="ud-tiles">${finTiles}</div>` : ''}${resaleHtml}`, 'ud-sec-finance');
 
     /* ---------- معلومات المشروع ---------- */
-    const devTile = u['Developer Name'] ? `<div class="ud-tile">${ICON.building}<div class="ud-tile-txt"><span class="ud-tile-label">المطور</span><a class="ud-tile-value ud-link" href="javascript:void(0)" onclick='closeUnitCardOverlay(); showDeveloperProfile(${attrJson_(u['Developer Name'])})'>${esc(u['Developer Name'])}</a></div></div>` : '';
+    const devTile = u['Developer Name'] ? `<div class="ud-tile">${ICON.building}<div class="ud-tile-txt"><span class="ud-tile-label">المطور</span><a class="ud-tile-value ud-link" href="javascript:void(0)" onclick='event.stopPropagation(); showDeveloperProfile(${attrJson_(u['Developer Name'])})'>${esc(u['Developer Name'])}</a></div></div>` : '';
     // نفس منطق ud-name أعلاه بالحرف الواحد: رابط دومًا لو موجود اسم مشروع (بنفس فلسفة بلاطة "المطور").
-    // بخلاف بلاطة "المطور" - لا نغلق تفاصيل الوحدة عند الضغط (ملف المشروع يظهر فوقها).
+    // (2026-10-07) نفس بلاطة "المطور" بالضبط: لا نغلق تفاصيل الوحدة عند الضغط — ملف المشروع/المطوّر يظهر فوقها.
     const projTile = ppHas_(projectNameRaw) ? `<div class="ud-tile">${ICON.building}<div class="ud-tile-txt"><span class="ud-tile-label">اسم المشروع</span><span class="ud-tile-value">${projectIsClickable ? `<a class="ud-link" href="javascript:void(0)" onclick='event.stopPropagation(); showProjectProfile(${attrJson_(projectNameRaw)}, ${attrJson_(u['Project Location URL'] || '')}, ${attrJson_(u['Developer Name'] || '')})'>${esc(projectNameRaw)}</a>` : esc(projectNameRaw)}</span></div></div>` : '';
     const projTiles = [
       projTile,
@@ -9314,6 +9318,9 @@
   function dpAddDeveloperFromProfile_() {
     var draft = { name: __dpContextName };
     developerProfileModal.classList.remove('open');
+    // (2026-10-07) الانتقال لقسم آخر = مغادرة سياق الوحدة، فنغلق تفاصيل الوحدة تحتنا حتى لا تبقى فوق اللوحة
+    // (نفس ما يفعله ppAddProjectFromProfile_ أصلًا؛ قبل اليوم كانت مغلقة سلفًا من onclick بلاطة "المطور").
+    if (typeof closeUnitCardOverlay === 'function') closeUnitCardOverlay();
     window.__aqarDeveloperDraft = draft;                                 // تُستهلك مرة واحدة عند فتح قسم "المطوّرون" (dashSelect)
     // نفس مسار القسم القائم — بلا مسار جديد (Clean URLs: /dashboard/developers)
     if (isAtRoute_('developers')) { if (typeof window.__aqarOpenAddDeveloper === 'function') { window.__aqarDeveloperDraft = null; window.__aqarOpenAddDeveloper(draft); } }
@@ -10340,6 +10347,15 @@
       if (pcm && pcm.classList.contains('open')) { e.preventDefault(); if (typeof window.__aqarPhotoCropClose === 'function') window.__aqarPhotoCropClose(); else pcm.classList.remove('open'); return; }
       var dlm = document.getElementById('devLogoCropModal');   /* Report 090: محرّر اللوجو فوق مودال المطوّر */
       if (dlm && dlm.classList.contains('open')) { e.preventDefault(); if (typeof window.__aqarDevLogoCropClose === 'function') window.__aqarDevLogoCropClose(); else dlm.classList.remove('open'); return; }
+      /* (2026-10-07) الطبقات الأبناء التي تُفتح من داخل "تفاصيل الوحدة" (ملف المشروع / ملف المطوّر)
+       * تُغلق أولًا والأب يبقى كما هو — نفس مسار × والخلفية (إزالة .open فقط، بلا إعادة بناء ولا جلب).
+       * الشرط: لا طبقة أعلى منهما (aqConfirm / معرض الصور) مفتوحة أصلًا فتستهلك Escape. */
+      if (!document.querySelector('.aq-modal-overlay.aq-open, .lightbox-overlay.open')) {
+        var prjProf = document.getElementById('projectProfileModal');
+        if (prjProf && prjProf.classList.contains('open')) { e.preventDefault(); prjProf.classList.remove('open'); return; }
+        var devProf = document.getElementById('developerProfileModal');
+        if (devProf && devProf.classList.contains('open')) { e.preventDefault(); devProf.classList.remove('open'); return; }
+      }
       var ov = document.getElementById('unitCardOverlay');
       if (ov && ov.classList.contains('open')) { ov.classList.remove('open'); return; }
       /* Phase 2B: مودال التأكيد (aqConfirm) يعالج Escape بنفسه؛ معرض الصور له × فقط (كما هو). */
@@ -10347,10 +10363,6 @@
       /* مودال تفاصيل المستخدم overlay حقيقي → Escape يغلقه (نفس مسار × والخلفية: إزالة .open). */
       var um = document.getElementById('umUserModal');
       if (um && um.classList.contains('open')) { e.preventDefault(); um.classList.remove('open'); return; }
-      /* مودال ملف المطوّر (من بطاقات "أكثر المطوّرين نشاطًا" في الرئيسية أو رابط المطوّر
-       * في بطاقة الوحدة) — نفس مسار × والخلفية (إزالة .open فقط). */
-      var devProf = document.getElementById('developerProfileModal');
-      if (devProf && devProf.classList.contains('open')) { e.preventDefault(); devProf.classList.remove('open'); return; }
       /* Escape يغلق نموذج الوحدة (#editModal) عندما يكون مودالًا حقيقيًا فقط (تعديل/استنساخ/عرض SALES)
        * عبر نفس مسار زر × (handleEditClose). في وضعَي "إدخال وحدة" و"عرض السعر" النموذج صفحة
        * داخل المحتوى — لا إغلاق ولا تنقّل. لا إرسال للنموذج ولا مسّ بأي مودال آخر. */
