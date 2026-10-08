@@ -9444,6 +9444,29 @@
     pdfContactModal.classList.add('open');
   }
 
+  /* (2026-10-08) صور ورقة تصدير PDF تُحوَّل إلى data URL قبل اللقطة، عبر نفس المسار القائم في التطبيق
+   * (fetchImageAsDataUrl → الأكشن المسجَّل getUnitImageBase64) اللي بيستخدمه تصدير الوحدة والمقارنة ومشاركة الصور.
+   * السبب (مقيس على الإنتاج): html2canvas بـ useCORS بتطلب الصورة بوضع CORS، ومخزن R2 بيرجّعها 200 image/webp
+   * **بدون** Access-Control-Allow-Origin، فالمتصفح يحجبها وتظهر خانة اللوجو فاضية في الـ PDF بينما هي ظاهرة
+   * على الشاشة (الـ <img> العادية بلا crossorigin فمفيش فحص CORS أصلًا). الأكشن القائم بيقرأ R2 مباشرة
+   * وبيجلب روابط Drive القديمة بـ HTTP، فالمصدرين مدعومين. فشل الجلب = نسيب الرابط كما هو (نفس سلوك
+   * الصورة المكسورة القائم). مقصور على ورقة التصدير — صور الموقع وسلوكها ما بيتغيروش. */
+  async function inlinePdfSheetImages_(sheet, budgetMs) {
+    const imgs = Array.from(sheet.querySelectorAll('img')).filter((im) => {
+      const src = im.getAttribute('src') || '';
+      if (!src || src.slice(0, 5) === 'data:') return false;
+      try { return new URL(im.src, location.href).origin !== location.origin; } catch (e) { return false; }
+    });
+    if (!imgs.length) return;
+    const cap = (p) => Promise.race([p, new Promise((r) => setTimeout(r, budgetMs))]);
+    await cap(Promise.all(imgs.map((im) => {
+      const src = im.src;
+      return Promise.resolve(fetchImageAsDataUrl(src))
+        .then((dataUrl) => { if (dataUrl && im.src === src) im.src = dataUrl; })
+        .catch(() => {});
+    })));
+  }
+
   /* (2026-10-08) جاهزية ورقة تصدير PDF بدل الانتظار الثابت 300ms: ننتظر الخطوط ثم صور الورقة نفسها فقط،
    * بسقف زمني واحد. صورة واحدة لا تُحمَّل ما بتفشّلش التصدير (catch لكل صورة)، ومفيش انتظار شبكة بلا نهاية.
    * ورقة التصدير بتتركَّب عند left:-9999px، والتحميل المتأخر (lazy) ما بيحصلش هناك — فنرقّي صور الورقة
@@ -9506,6 +9529,7 @@
       `;
       document.body.appendChild(pageDiv);
 
+      await inlinePdfSheetImages_(pageDiv, 15000);
       await waitForPdfSheetReady_(pageDiv, 6000);
       /* (2026-10-08) سقف زمني على اللقطة نفسها: html2canvas بتنتظر صور الـ clone داخليًا، وخيار
        * imageTimeout مش كافٍ (مقيس: طلب صورة لا يستجيب كان بيعلّق التصدير بلا نهاية والزر يفضل
