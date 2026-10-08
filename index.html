@@ -3863,6 +3863,12 @@
     .aq-logo-tile--dev img { object-fit: contain; }
     #devProfileContent .dev-hero-logo { width: 176px; aspect-ratio: 4 / 3; margin: 0 auto 10px; background: #fff; border-radius: 8px; padding: 6px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
     #devProfileContent .dev-hero-logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    /* (2026-10-08) ورقة تصدير PDF تُركَّب على <body> خارج #devProfileContent، فالقاعدتان أعلاه لا تطابقانها
+       وكان اللوجو يُرسم بحجمه الطبيعي (قيس 800×600) فيخرج عن عرض الورقة (480px) ويُقصّ. نفس المقاسات هنا
+       بارتفاع صريح بدل aspect-ratio (أضمن داخل اللقطة)، ومقيَّدة بـ .aq-pdf-sheet وحدها — بلا أي أثر على
+       قائمة المطوّرين في اللوحة ولا محرّر اللوجو ولا العرض على الشاشة. */
+    .aq-pdf-sheet .dev-hero-logo { width: 176px; height: 132px; margin: 0 auto 10px; background: #fff; border-radius: 8px; padding: 6px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .aq-pdf-sheet .dev-hero-logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
     #devLogoCropModal .dl-preview-tile { --tile: 84px; }
     /* Report 097: حقل بحث القوائم الإدارية (المطوّرون/المشروعات) — نفس .aq-form-control + أيقونة بحث + زر مسح؛ يجلس في رأس البطاقة ويلتفّ تحت العنوان على الشاشات الضيقة */
     .aq-list-search { position: relative; flex: 0 1 320px; min-width: 200px; align-self: center; }
@@ -9438,13 +9444,32 @@
     pdfContactModal.classList.add('open');
   }
 
+  /* (2026-10-08) جاهزية ورقة تصدير PDF بدل الانتظار الثابت 300ms: ننتظر الخطوط ثم صور الورقة نفسها فقط،
+   * بسقف زمني واحد. صورة واحدة لا تُحمَّل ما بتفشّلش التصدير (catch لكل صورة)، ومفيش انتظار شبكة بلا نهاية.
+   * ورقة التصدير بتتركَّب عند left:-9999px، والتحميل المتأخر (lazy) ما بيحصلش هناك — فنرقّي صور الورقة
+   * إلى eager قبل الانتظار (داخل الورقة وحدها، بلا أي تغيير في سلوك صور الموقع). */
+  async function waitForPdfSheetReady_(sheet, budgetMs) {
+    const cap = (p) => Promise.race([p, new Promise((r) => setTimeout(r, budgetMs))]);
+    try { if (document.fonts && document.fonts.ready) await cap(document.fonts.ready); } catch (e) {}
+    const imgs = Array.from(sheet.querySelectorAll('img'));
+    imgs.forEach((im) => { if (im.getAttribute('loading') === 'lazy') im.setAttribute('loading', 'eager'); });
+    await cap(Promise.all(imgs.map((im) => {
+      if (im.complete && im.naturalWidth > 0) return Promise.resolve();
+      if (typeof im.decode === 'function') return im.decode().catch(() => {});
+      return new Promise((r) => { im.addEventListener('load', r, { once: true }); im.addEventListener('error', r, { once: true }); });
+    })));
+    /* إطارا رسم بعد الجاهزية حتى يستقرّ التخطيط قبل اللقطة */
+    await new Promise((r) => (window.requestAnimationFrame ? requestAnimationFrame(() => requestAnimationFrame(r)) : setTimeout(r, 50)));
+  }
+
   async function generateDevProfilePDF(agentName, agentPhone) {
     const btn = document.getElementById('devProfileExportPdfBtn');
     if (btn) { btn.disabled = true; btn.textContent = 'جاري التجهيز...'; }
 
+    let pageDiv = null;   /* (2026-10-08) مرفوع خارج try عشان التنظيف في finally لو اللقطة فشلت أو تجاوزت الوقت */
     try {
       const res = currentDevProfile;
-      const pageDiv = document.createElement('div');
+      pageDiv = document.createElement('div');
       pageDiv.className = 'aq-pdf-sheet';
       pageDiv.style.position = 'fixed';
       pageDiv.style.left = '-9999px';
@@ -9481,22 +9506,59 @@
       `;
       document.body.appendChild(pageDiv);
 
-      await new Promise(resolve => setTimeout(resolve, 300));
-      const canvas = await html2canvas(pageDiv, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+      await waitForPdfSheetReady_(pageDiv, 6000);
+      /* (2026-10-08) سقف زمني على اللقطة نفسها: html2canvas بتنتظر صور الـ clone داخليًا، وخيار
+       * imageTimeout مش كافٍ (مقيس: طلب صورة لا يستجيب كان بيعلّق التصدير بلا نهاية والزر يفضل
+       * "جاري التجهيز..." — سلوك سابق لهذا الإصلاح). التجاوز يرفع خطأً فيظهر التوست القائم،
+       * وورقة التصدير تُنزَع في finally، والزر يرجع لحالته. */
+      const canvas = await Promise.race([
+        html2canvas(pageDiv, { scale: 2, useCORS: true, backgroundColor: '#ffffff' }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('تجهيز الملف استغرق وقتًا أطول من المتوقع — حاول مرة أخرى')), 30000)),
+      ]);
       document.body.removeChild(pageDiv);
+      pageDiv = null;
 
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
       const margin = 10;
       const imgWidth = pageWidth - margin * 2;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', margin, margin, imgWidth, imgHeight);
+      const usableHeight = pageHeight - margin * 2;
+
+      /* (2026-10-08) ترقيم صفحات حقيقي — نفس منطق generateUnitPDF بالحرف (منسوخ، بلا helper مشترك حتى
+       * لا يتأثر تصدير الوحدة): الطول كان بيُحسب من نسبة الـ canvas ويُرسم صورة واحدة على صفحة A4 واحدة
+       * بلا أي addPage، فأي ملف أطول من صفحة كان يُقصّ بصمت. الحساب كله من أبعاد صفحة jsPDF نفسها. */
+      const pageHeightPx = Math.floor((usableHeight * canvas.width) / imgWidth);
+      let renderedPx = 0;
+      let first = true;
+      while (renderedPx < canvas.height) {
+        let sliceHeightPx = Math.min(pageHeightPx, canvas.height - renderedPx);
+        /* باقٍ ضئيل جدًا؟ ضمّه لنفس الشريحة بدل صفحة شبه فاضية (نفس عتبة تصدير الوحدة) */
+        const remainderAfter = canvas.height - (renderedPx + sliceHeightPx);
+        if (remainderAfter > 0 && remainderAfter < 20) sliceHeightPx += remainderAfter;
+
+        const pageCanvas = document.createElement('canvas');
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = sliceHeightPx;
+        const ctx = pageCanvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+        ctx.drawImage(canvas, 0, renderedPx, canvas.width, sliceHeightPx, 0, 0, canvas.width, sliceHeightPx);
+
+        const sliceHeightMM = (sliceHeightPx * imgWidth) / canvas.width;
+        if (!first) pdf.addPage();
+        pdf.addImage(pageCanvas.toDataURL('image/jpeg', 0.92), 'JPEG', margin, margin, imgWidth, sliceHeightMM);
+
+        renderedPx += sliceHeightPx;
+        first = false;
+      }
       pdf.save(res.developerName + ' Profile.pdf');
       showToast('تم تصدير الملف بنجاح', 'success');
     } catch (err) {
       showToast('حصل خطأ أثناء التصدير: ' + err.message, 'error');
     } finally {
+      if (pageDiv && pageDiv.parentNode) pageDiv.parentNode.removeChild(pageDiv);   /* ورقة التصدير ما تفضلش في الـ DOM لو فشلت اللقطة */
       if (btn) { btn.disabled = false; btn.textContent = 'تصدير PDF'; }
     }
   }
