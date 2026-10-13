@@ -4800,6 +4800,50 @@
                   0 0 24px 2px rgba(255,255,255,0.18), 0 0 70px 16px rgba(255,255,255,0.12),
                   0 34px 100px rgba(0,0,0,0.85) !important;
     }
+    /* ---- كارت تفاصيل الوحدة كنافذة معلّقة (طلب المالك 2026-10-13) ----
+       ثلاث طبقات مستقلة تصنع الفصل، والمفتاح هو الطبقة الوسطى:
+         1) ::before  سطح مضيء رمادي فاتح **أكبر من الكارت** يتلاشى إلى الأسود.
+         2) box-shadow ظل أسود عميق متعدّد الطبقات **يُلقيه الكارت على ذلك السطح** —
+            هذا ما يفصل جسم الكارت عن الضوء خلفه ويعطي إحساس الارتفاع. المحاولات السابقة
+            استعملت طبقات بيضاء هنا فذابت في السطح المضيء ولم يظهر أي فصل.
+         3) حافة محيطية معتدلة: خط داكن 1px + وهج أبيض خفيف 0.10 + حافة علوية مضيئة.
+       القاعدة مقيّدة بـ#unitCardOverlay وحده (أسبقية id+class وموضع لاحق) ⇒ القاعدة المشتركة
+       التي تشمل .modal-box و#projectProfileModal تبقى كما هي. الخلفية والحدود والأبعاد لم تُمسّ. */
+    #unitCardOverlay .unit-details-box {
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.28),
+                  0 0 0 1px rgba(0,0,0,0.92),
+                  0 0 13px 1px rgba(255,255,255,0.13),
+                  0 4px 10px rgba(0,0,0,0.68),
+                  0 12px 26px rgba(0,0,0,0.60),
+                  0 26px 54px rgba(0,0,0,0.46),
+                  0 48px 90px rgba(0,0,0,0.30) !important;
+    }
+    /* الـoverlay صندوق تمرير (overflow-y:auto ⇒ overflow-x محسوبة auto). السطح المضيء يمتدّ
+       خارج الكارت، فنمنع التمرير الأفقي صراحةً هنا — مقيّد بنافذة تفاصيل الوحدة وحدها. */
+    #unitCardOverlay.unit-card-overlay { overflow-x: hidden; }
+    /* السطح المضيء: أكبر من الكارت بـ190px أفقيًا و150px رأسيًا، خلف الكارت (z سالب) وفوق
+       خلفية النافذة المعتمة. pointer-events:none ⇒ لا يعطّل أي تفاعل. */
+    #unitCardOverlay .unit-details-box::before {
+      content: ""; position: absolute; pointer-events: none; z-index: -2;
+      inset: -170px -205px; border-radius: 120px;
+      background: radial-gradient(ellipse 70% 76% at 50% 50%,
+                  rgba(252,253,255,0.95) 0%, rgba(240,245,255,0.82) 32%,
+                  rgba(210,220,244,0.46) 60%, rgba(166,178,204,0.15) 82%, rgba(120,130,150,0) 100%);
+      filter: blur(72px);
+    }
+    /* شاشات أصغر: نفس التركيب بمقياس مصغّر حتى يبقى السطح داخل الإطار المرئي. */
+    @media (max-width: 900px) {
+      #unitCardOverlay .unit-details-box::before { inset: -80px -70px; border-radius: 60px; filter: blur(46px); }
+      #unitCardOverlay .unit-details-box {
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.28),
+                    0 0 0 1px rgba(0,0,0,0.92),
+                    0 0 10px 1px rgba(255,255,255,0.13),
+                    0 3px 8px rgba(0,0,0,0.68),
+                    0 9px 20px rgba(0,0,0,0.60),
+                    0 18px 38px rgba(0,0,0,0.46),
+                    0 32px 60px rgba(0,0,0,0.30) !important;
+      }
+    }
     .unit-card-overlay, .modal-overlay { background: rgba(0,0,0,0.88); }
     /* ---- صندوق البحث في استكشف: نفس إضاءة كارت التفاصيل ---- */
     body.app-view-explore .aq-console, body.app-view-search .aq-console {
