@@ -5317,7 +5317,10 @@
     <div class="grid" id="aqPrimaryFilters">
       <div id="fw_keyword">
         <label>بحث عام (كلمة مفتاحية)</label>
-        <input type="text" id="f_keyword" list="f_projectDatalist" placeholder="اسم مشروع، منطقة، ملاحظات..." autocomplete="off">
+        <input type="text" id="f_keyword" list="f_keywordDatalist" placeholder="اسم مشروع، منطقة، ملاحظات..." autocomplete="off">
+        <!-- قائمة خاصة بخانة البحث النصي وحدها (سجل الموظف + المشاريع). f_projectDatalist تبقى
+             كما هي لأن حقل «المشروع» في «بحث في الأرشيف» (#arcProject) يستخدمها أيضًا. -->
+        <datalist id="f_keywordDatalist"></datalist>
         <datalist id="f_projectDatalist"></datalist>
       </div>
       <div>
@@ -8129,6 +8132,8 @@
     if (typeof window.__aqarReroute === 'function') { try { window.__aqarReroute(); } catch (e) {} }
     // المرحلة 3.6+ — نبدأ نبضة الحضور (مؤقّت واحد فقط؛ الدالة نفسها بتمنع التكرار).
     if (typeof startPresenceHeartbeat === 'function') { try { startPresenceHeartbeat(); } catch (e) {} }
+    // الهوية اتحدّدت ⇒ نعيد بناء اقتراحات #f_keyword بسجل هذا الموظف وحده.
+    if (typeof window.aqRenderKeywordSuggestions_ === 'function') { try { window.aqRenderKeywordSuggestions_(); } catch (e) {} }
   }
   /**
    * يحوّل قسمَي «المطوّرون» و«المشروعات» إلى دليل للقراءة لمن يملك VIEW_* بلا MANAGE_*:
@@ -10367,6 +10372,12 @@
 
   function runSearch() {
     lastSearchBase_ = collectFilters();
+    // سجل البحث الشخصي لخانة الكلمة المفتاحية وحدها — يُسجَّل عند بحث فعلي لا عند كل حرف.
+    // لا يغيّر الفلاتر ولا البحث؛ مجرد تحديث ترتيب اقتراحات #f_keyword لهذا الموظف.
+    try {
+      if (window.aqKwAdd_) window.aqKwAdd_(lastSearchBase_.keyword);
+      if (window.aqRenderKeywordSuggestions_) window.aqRenderKeywordSuggestions_();
+    } catch (e) {}
     return requestSearchPage_(lastSearchBase_, 1, false);
   }
   /* خيارات الصفحة الأولى لـ getInitialSearchData(options, auth): نفس البحث الافتراضي بدون فلاتر، بترتيب f_sort الحالي */
@@ -11109,6 +11120,59 @@
     populateDistrictSelect(editDistrictSelect, editCitySelect.value, false);
   });
 
+  /* ---------- سجل بحث شخصي لخانة «بحث عام (كلمة مفتاحية)» وحدها (#f_keyword) ----------
+     المطلوب (قرار المالك 2026-10-14): اقتراحات هذه الخانة تظهر بترتيب **آخر استخدام**
+     (الأحدث أولًا) بدل الترتيب الأبجدي، وبسجل **منفصل لكل موظف**.
+
+     • التخزين: localStorage بمفتاح يحمل هوية الموظف من window.__currentUser
+       (userId وإلا email). بلا هوية (قبل الدخول) ⇒ **لا قراءة ولا كتابة** إطلاقًا.
+     • الترتيب النهائي للقائمة: سجل الموظف (الأحدث → الأقدم، بلا تكرار) ثم بقية أسماء
+       المشاريع أبجديًا كما كانت ⇒ لا تُفقد أي اقتراحات كانت متاحة.
+     • النطاق: هذه الخانة فقط. لا تمسّ #f_developer ولا أي select (النوع/المدينة/المنطقة)
+       ولا ترتيب النتائج ولا طريقة تطبيق الفلاتر ولا البحث نفسه.
+     • حدّ السجل 20 قيمة، والمقارنة بلا حساسية لحالة الأحرف ومع تشذيب المسافات.
+     • كل وصول للتخزين داخل try/catch (قد يرمي في وضع التصفح الخاص أو عند امتلاء التخزين).
+     ⚠ ملاحظة صريحة: هذا **فصل على مستوى الواجهة** لا حاجز أمني — من يفتح أدوات المطوّر على
+       نفس الجهاز يستطيع قراءة التخزين. الفصل المضمون يحتاج تخزينًا على الخادم (يحتاج موافقة). */
+  var AQ_KW_HIST_MAX = 20;
+  window.__aqKeywordProjects_ = window.__aqKeywordProjects_ || [];
+  function aqKwKey_() {
+    var u = window.__currentUser || {};
+    var id = String(u.userId || u.email || '').trim();
+    return id ? 'aqKwHist:' + id : '';
+  }
+  function aqKwRead_() {
+    var k = aqKwKey_(); if (!k) return [];
+    try {
+      var arr = JSON.parse(localStorage.getItem(k) || '[]');
+      return Array.isArray(arr) ? arr.filter(function (v) { return typeof v === 'string' && v.trim(); }) : [];
+    } catch (e) { return []; }
+  }
+  function aqKwAdd_(value) {
+    var k = aqKwKey_(); if (!k) return;
+    var v = String(value == null ? '' : value).trim(); if (!v) return;
+    var low = v.toLowerCase();
+    var list = aqKwRead_().filter(function (x) { return x.trim().toLowerCase() !== low; });
+    list.unshift(v);
+    try { localStorage.setItem(k, JSON.stringify(list.slice(0, AQ_KW_HIST_MAX))); } catch (e) {}
+  }
+  function aqRenderKeywordSuggestions_() {
+    var dl = document.getElementById('f_keywordDatalist'); if (!dl) return;
+    var seen = Object.create(null), out = [];
+    aqKwRead_().forEach(function (v) {
+      var l = v.trim().toLowerCase(); if (!seen[l]) { seen[l] = 1; out.push(v); }
+    });
+    (window.__aqKeywordProjects_ || []).forEach(function (p) {
+      var l = String(p).trim().toLowerCase(); if (l && !seen[l]) { seen[l] = 1; out.push(p); }
+    });
+    var frag = document.createDocumentFragment();
+    out.forEach(function (v) { var o = document.createElement('option'); o.value = v; frag.appendChild(o); });
+    dl.textContent = '';
+    dl.appendChild(frag);
+  }
+  window.aqKwAdd_ = aqKwAdd_;
+  window.aqRenderKeywordSuggestions_ = aqRenderKeywordSuggestions_;
+
   /* ---------- اقتراح ذكي: المطور → مشاريعه → المدينة والمنطقة تلقائيًا (فورم التعديل) ---------- */
   let editDevProjectMap = { developers: [], map: {} };
   const editDeveloperInput = editForm.elements['developer'];
@@ -11130,7 +11194,11 @@
       Object.keys(projects).forEach(p => allProjects.add(p));
     });
     const sortedProjects = Array.from(allProjects).sort((a, b) => a.localeCompare(b, 'ar'));
+    // f_projectDatalist كما كانت بالضبط — يستخدمها حقل «المشروع» في «بحث في الأرشيف» (#arcProject).
     document.getElementById('f_projectDatalist').innerHTML = sortedProjects.map(p => `<option value="${escHtml_(p)}">`).join('');
+    // وقائمة خانة البحث النصي وحدها: سجل الموظف أولًا (الأحدث → الأقدم) ثم نفس المشاريع أبجديًا.
+    window.__aqKeywordProjects_ = sortedProjects;
+    aqRenderKeywordSuggestions_();
   }).withFailureHandler(apiFailure_('تعذّر تحميل قائمة المطوّرين والمشروعات')).getDeveloperProjectMap(getAuthCreds());
 
   function refreshEditProjectSuggestions() {
@@ -11932,6 +12000,8 @@
 
     // 2) امسح حالة المصادقة في الذاكرة
     window.__currentUser = null;
+    // بلا هوية ⇒ اقتراحات #f_keyword ترجع لأسماء المشاريع وحدها (سجل الموظف السابق يختفي من القائمة).
+    if (typeof window.aqRenderKeywordSuggestions_ === 'function') { try { window.aqRenderKeywordSuggestions_(); } catch (e) {} }
     window.__aqarAuthRestoring = false;
 
     // 3) ألغِ الدخول المحفوظ / الدخول التلقائي المرتبط بالمستخدم
