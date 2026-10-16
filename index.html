@@ -6982,6 +6982,16 @@
   function attrJson_(o) { return escHtml_(JSON.stringify(o)); }
   // نسخة من كائن الوحدة كل قيمه النصية مهرَّبة — للقوالب الكبيرة (PDF) اللي بتعرض عشرات الحقول كنص فقط
   function escUnitFields_(u) { var out = {}; if (u && typeof u === 'object') { for (var k in u) { if (Object.prototype.hasOwnProperty.call(u, k)) out[k] = (typeof u[k] === 'string') ? escHtml_(u[k]) : u[k]; } } return out; }
+  /* عرض اسم المطوّر على كارت الوحدة فقط (قرار المالك 2026-10-16): الاسم المخزّن "dominar" يُعرض
+     "Dominar Developments". المقارنة بعد trim وبلا حساسية لحالة الأحرف؛ أي قيمة أخرى تُعرض كما هي
+     حرفيًا. Map (لا كائن) فلا خطر من مفاتيح البروتوتايب مثل toString/constructor.
+     القيمة المخزّنة في الوحدة وقاعدة البيانات لا تتغيّر، ولا يمسّ هذا تفاصيل الوحدة ولا البحث ولا
+     الفلاتر ولا التصدير ولا قوائم الإدخال ولا شريط المطوّرين — كلها تقرأ u['Developer Name'] مباشرة. */
+  const CARD_DEV_DISPLAY_ = new Map([['dominar', 'Dominar Developments']]);
+  function cardDevName_(v) {
+    const key = String(v == null ? '' : v).trim().toLowerCase();
+    return CARD_DEV_DISPLAY_.has(key) ? CARD_DEV_DISPLAY_.get(key) : v;
+  }
 
   function thumbFallback_(img) {
     if (!img || img.getAttribute('data-full-tried') === '1') return false;
@@ -8514,7 +8524,7 @@
           ${priceHtml}
           ${priceDropBadge}
           <div class="unit-foot-meta">
-            ${u['Developer Name'] ? `<div class="unit-dev-row">${ICON.building}<span class="dev-label">المطور:</span> <span class="dev-name">${escHtml_(u['Developer Name'])}</span></div>` : ''}
+            ${u['Developer Name'] ? `<div class="unit-dev-row">${ICON.building}<span class="dev-label">المطور:</span> <span class="dev-name">${escHtml_(cardDevName_(u['Developer Name']))}</span></div>` : ''}
             ${metaLine}
           </div>
           <span class="unit-cta" aria-hidden="true">عرض التفاصيل ${ICON.chevronLeft}</span>
