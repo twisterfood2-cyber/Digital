@@ -6982,48 +6982,38 @@
   function attrJson_(o) { return escHtml_(JSON.stringify(o)); }
   // نسخة من كائن الوحدة كل قيمه النصية مهرَّبة — للقوالب الكبيرة (PDF) اللي بتعرض عشرات الحقول كنص فقط
   function escUnitFields_(u) { var out = {}; if (u && typeof u === 'object') { for (var k in u) { if (Object.prototype.hasOwnProperty.call(u, k)) out[k] = (typeof u[k] === 'string') ? escHtml_(u[k]) : u[k]; } } return out; }
-  /* أسماء المطوّرين المعروضة للمستخدم (قرار المالك 2026-10-16، مُوسَّع): الاسم المخزّن "dominar"
-     يُعرض في كل واجهات المستخدم "Dominar Developments". المقارنة بعد trim وبلا حساسية لحالة الأحرف،
-     ومطابقة كاملة فقط — "Dominar Group" و"xdominar" تُعرض كما هي. Map (لا كائن) فلا خطر من مفاتيح
-     البروتوتايب مثل toString/constructor.
-     طبقة عرض فقط: القيمة المخزّنة في الوحدة/المشروع/الملف وفي قاعدة البيانات لا تتغيّر، ويبقى الاسم
-     الأصلي كما هو في كل ما هو عقد بيانات — قيم الفورم، قوائم الإدخال (datalist)، فلاتر البحث
-     والمطابقة، نداءات الـ API، مفاتيح الحفظ والشعارات، data-dev للتنقيب، والتصدير المُولَّد في
-     السيرفر. كل موضع عرض يحتفظ بتهريبه كما هو (escHtml_ / devEsc_ / ppEsc_ / textContent). */
-  const DEV_DISPLAY_NAMES_ = new Map([
-    /* القيمة المخزّنة (بعد trim+lowercase)  →  الاسم المعروض المعتمد.
-       نُدرج **الاسم النهائي المعتمد** و**الأسماء المخزّنة الحالية** معًا، فيظل العرض صحيحًا قبل
-       توحيد البيانات وبعده بلا أي تعديل ثانٍ (التوحيد المخزَّن قرار مالك منفصل ولم يُنفَّذ). */
-    ['dominar', 'Dominar Developments'],                            // الحالي
-    ['dominar developments', 'Dominar Developments'],               // النهائي المعتمد
-    ['empire', 'Empire State Developments'],                        // الحالي (وحدات مؤرشفة)
-    ['empire state development', 'Empire State Developments'],      // الحالي (اسم ملف المطوّر)
-    ['empire state developments', 'Empire State Developments'],     // النهائي المعتمد
-  ]);
+  /* أسماء المطوّرين والمشاريع المعروضة للمستخدم (قرار المالك 2026-10-17):
+     **القاعدة العامة = الأحرف الإنجليزية بحالة كبيرة (UPPERCASE)** — بلا أي استثناء لاسم بعينه
+     وبلا تسميات Title-Case. دي اتفاقية النظام من الأساس، مش قاعدة جديدة:
+       • القديم: Code.gs:726-729 «اسم المطور والمشروع بيتخزنوا بحروف كبيرة دايمًا (لو بالإنجليزي)
+         عشان نفس الاسم يفضل واحد موحّد في النظام، حتى لو اتكتب مرة كابيتال ومرة سمول».
+       • النقل الأمين: src/units/calc.js:79-80 ⇒ كل كتابة وحدة بتتخزن UPPER؛ وملفات المطوّرين
+         والمشاريع كذلك (devNameUpper · nameUpper)؛ ومفاتيح الفلاتر والخرائط trim().toUpperCase().
+     العربية ما بتتأثرش (مالهاش مقابل كبير)، فالقاعدة بتمسّ الإنجليزي بس — نفس سلوك القاعدة الأصلية
+     المُشتغّلة على بيانات عربية حقيقية في الإنتاج من سنين.
+     طبقة عرض فقط: القيمة المخزّنة لا تتغيّر من هنا. وكل موضع عرض يحتفظ بتهريبه كما هو
+     (escHtml_ / devEsc_ / ppEsc_ / textContent). */
   function devDisplayName_(v) {
-    const key = String(v == null ? '' : v).trim().toLowerCase();
-    return DEV_DISPLAY_NAMES_.has(key) ? DEV_DISPLAY_NAMES_.get(key) : v;
+    return typeof v === 'string' ? v.toUpperCase() : v;
   }
-  /* الاتجاه المعاكس — **مشتقّ من نفس الخريطة** فمصدر الحقيقة واحد: الاسم المعروض الذي يظهر في
-     اقتراحات فلتر المطوّر يُترجَم إلى القيمة المخزّنة **قبل الإرسال**، فتبقى دلالة الفلترة على
-     السيرفر كما هي حرفيًا (نفس indexOf على نفس القيم، وبلا أي تعديل في الباك-إند) ويعمل الاسمان:
-     «DOMINAR» كما كان، و«Dominar Developments» الجديد. المطابقة كاملة بعد trim وبلا حساسية لحالة
-     الأحرف؛ أي نص آخر (ومنه أي مطوّر آخر أو جزء من اسم) يُرسَل كما هو بالحرف. */
-  /* لأن أكثر من قيمة مخزّنة تشترك في اسم معروض واحد، نختار **أقصر** مفتاح مخزَّن لكل اسم معروض:
-     فلتر المطوّر على السيرفر مطابقة substring على الأحرف الكبيرة، و«DOMINAR» يطابق «DOMINAR» و
-     «DOMINAR DEVELOPMENTS» معًا ⇒ الفلترة تعمل قبل التوحيد وبعده بلا تغيير في أي قاعدة بحث. */
-  const DEV_FILTER_KEYS_ = (function () {
-    const m = new Map();
-    DEV_DISPLAY_NAMES_.forEach(function (shown, stored) {
-      const k = String(shown).toLowerCase();
-      const prev = m.get(k);
-      if (prev === undefined || String(stored).length < String(prev).length) m.set(k, stored);
-    });
-    return m;
-  })();
+  /* قيمة فلتر المطوّر قبل الإرسال: نفس تطبيع السيرفر بالحرف (trim + toUpperCase في
+     src/units/search.js) ⇒ دلالة الفلترة ما بتتغيّرش، والمستخدم يقدر يكتب «dominar» أو
+     «Dominar» أو «DOMINAR» ويلاقي نفس النتائج. */
   function devFilterValue_(v) {
-    const key = String(v == null ? '' : v).trim().toLowerCase();
-    return DEV_FILTER_KEYS_.has(key) ? DEV_FILTER_KEYS_.get(key) : v;
+    return v == null ? v : String(v).trim().toUpperCase();
+  }
+  /* خيارات datalist لأسماء المطوّرين/المشاريع: الاسم معروض بحالة أحرف كبيرة، وبلا قيمتين
+     بيختلفوا في حالة الأحرف بس (عشان ما يبانش اقتراحين لنفس الاسم). الترتيب الأصلي محفوظ،
+     والتهريب بـ escHtml_ زي ما كان بالظبط. */
+  function devOptionsHtml_(values) {
+    var seen = Object.create(null), out = [];
+    (values || []).forEach(function (v) {
+      var up = devDisplayName_(String(v == null ? '' : v).trim());
+      if (!up || seen[up]) return;
+      seen[up] = 1;
+      out.push('<option value="' + escHtml_(up) + '">');
+    });
+    return out.join('');
   }
 
   function thumbFallback_(img) {
@@ -7120,7 +7110,7 @@
       });
     });
     const developerValues = (opts.developers || []).slice().sort((a, b) => a.localeCompare(b, 'ar'));
-    document.getElementById('f_developerDatalist').innerHTML = developerValues.map(v => `<option value="${escHtml_(devDisplayName_(v))}">`).join('');
+    document.getElementById('f_developerDatalist').innerHTML = devOptionsHtml_(developerValues);
     restoreDropdownFilters();
   }
 
@@ -8537,7 +8527,7 @@
 
     return `
     <div class="unit-card status-${escHtml_(u['Status'])}" role="button" tabindex="0"
-         aria-label="عرض تفاصيل الوحدة ${escHtml_(u['Unit ID'])} - ${escHtml_(u['Property Type'])}${u['Project Name'] ? ' - ' + escHtml_(u['Project Name']) : ''}">
+         aria-label="عرض تفاصيل الوحدة ${escHtml_(u['Unit ID'])} - ${escHtml_(u['Property Type'])}${u['Project Name'] ? ' - ' + escHtml_(devDisplayName_(u['Project Name'])) : ''}">
       <div class="unit-media">
         ${coverHtml}
         <button type="button" class="fav-btn ${isFavorite(u['Unit ID']) ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite(${attrJs_(u['Unit ID'])}, this, ${currentPrice})" title="إضافة للمفضلة" aria-label="إضافة للمفضلة" aria-pressed="${isFavorite(u['Unit ID']) ? 'true' : 'false'}">${ICON.heart}</button>
@@ -8547,7 +8537,7 @@
       </div>
       <div class="unit-body">
         <div class="unit-info-block">
-          <div class="unit-title"><span class="unit-title-name">${escHtml_(u['Project Name'] || u['City'])}</span> <span class="unit-title-type">- ${escHtml_(u['Property Type'])}</span></div>
+          <div class="unit-title"><span class="unit-title-name">${escHtml_(devDisplayName_(u['Project Name']) || u['City'])}</span> <span class="unit-title-type">- ${escHtml_(u['Property Type'])}</span></div>
           <div class="unit-loc">${ICON.pin} ${escHtml_(u['City'])} - ${escHtml_(u['Area/District'])}</div>
           ${row1.length ? `<div class="unit-specs">${row1.join('')}</div>` : ''}
           ${row2.length ? `<div class="unit-specs unit-specs-2">${row2.join('')}</div>` : ''}
@@ -8630,7 +8620,7 @@
      * بلا أي Error - بلا حاجة لكاش أو نداء شبكة مسبق قبل الضغط. */
     const projectNameRaw = u['Project Name'];
     const projectIsClickable = has(projectNameRaw);
-    const projectNameDisplay = esc(projectNameRaw || u['City']);
+    const projectNameDisplay = esc(devDisplayName_(projectNameRaw) || u['City']);
     const projectNameLinkHtml = projectIsClickable
       ? `<a class="ud-link" href="javascript:void(0)" onclick='event.stopPropagation(); showProjectProfile(${attrJson_(projectNameRaw)}, ${attrJson_(u['Project Location URL'] || '')}, ${attrJson_(u['Developer Name'] || '')})'>${projectNameDisplay}</a>`
       : projectNameDisplay;
@@ -8739,7 +8729,7 @@
     const devTile = u['Developer Name'] ? `<div class="ud-tile">${ICON.building}<div class="ud-tile-txt"><span class="ud-tile-label">المطور</span><a class="ud-tile-value ud-link" href="javascript:void(0)" onclick='event.stopPropagation(); showDeveloperProfile(${attrJson_(u['Developer Name'])})'>${esc(devDisplayName_(u['Developer Name']))}</a></div></div>` : '';
     // نفس منطق ud-name أعلاه بالحرف الواحد: رابط دومًا لو موجود اسم مشروع (بنفس فلسفة بلاطة "المطور").
     // (2026-10-07) نفس بلاطة "المطور" بالضبط: لا نغلق تفاصيل الوحدة عند الضغط — ملف المشروع/المطوّر يظهر فوقها.
-    const projTile = ppHas_(projectNameRaw) ? `<div class="ud-tile">${ICON.building}<div class="ud-tile-txt"><span class="ud-tile-label">اسم المشروع</span><span class="ud-tile-value">${projectIsClickable ? `<a class="ud-link" href="javascript:void(0)" onclick='event.stopPropagation(); showProjectProfile(${attrJson_(projectNameRaw)}, ${attrJson_(u['Project Location URL'] || '')}, ${attrJson_(u['Developer Name'] || '')})'>${esc(projectNameRaw)}</a>` : esc(projectNameRaw)}</span></div></div>` : '';
+    const projTile = ppHas_(projectNameRaw) ? `<div class="ud-tile">${ICON.building}<div class="ud-tile-txt"><span class="ud-tile-label">اسم المشروع</span><span class="ud-tile-value">${projectIsClickable ? `<a class="ud-link" href="javascript:void(0)" onclick='event.stopPropagation(); showProjectProfile(${attrJson_(projectNameRaw)}, ${attrJson_(u['Project Location URL'] || '')}, ${attrJson_(u['Developer Name'] || '')})'>${esc(devDisplayName_(projectNameRaw))}</a>` : esc(devDisplayName_(projectNameRaw))}</span></div></div>` : '';
     const projTiles = [
       projTile,
       devTile,
@@ -9164,7 +9154,7 @@
       additionalPaymentLines.push(`➕ دفعة إضافية: ${_raw}${_count > 1 ? ' × ' + _count : ''} = ${fmtNum(_value)} جنيه${_due ? ' - ' + _due : ''}`);
     }
     return [
-      `🏢 ${u['Property Type']}${u['Project Name'] ? ' - ' + u['Project Name'] : ''}`,
+      `🏢 ${u['Property Type']}${u['Project Name'] ? ' - ' + devDisplayName_(u['Project Name']) : ''}`,
       `📍 ${u['City']} - ${u['Area/District']}`,
       `📐 المساحة: ${u['Unit Area (sqm)']} م²`,
       u['Rooms'] ? `🛏 عدد الغرف: ${u['Rooms']}` : '',
@@ -9700,7 +9690,7 @@
             ${coverImg ? `<img src="${escHtml_(getThumbUrl(coverImg))}" style="width:70px; height:70px; border-radius:8px; object-fit:cover; flex-shrink:0;" loading="lazy" decoding="async" onerror="thumbFallback_(this)">` : `<div style="width:70px; height:70px; border-radius:8px; background:var(--bg); flex-shrink:0; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:11px;">لا صورة</div>`}
             <div style="flex:1; min-width:0;">
               <div style="font-weight:800; color:var(--navy); font-size:13px;">${escHtml_(u['Property Type'] || '')} - ${escHtml_(u['Unit Area (sqm)'] || '-')} م²</div>
-              <div style="font-size:11px; color:var(--muted); margin-top:2px;">${escHtml_(u['Project Name'] || '')} - ${escHtml_(u['Area/District'] || '')}</div>
+              <div style="font-size:11px; color:var(--muted); margin-top:2px;">${escHtml_(devDisplayName_(u['Project Name']) || '')} - ${escHtml_(u['Area/District'] || '')}</div>
               <div style="font-weight:800; color:var(--gold); font-size:14px; margin-top:4px;">${fmtNum(u['Price'])} جنيه</div>
             </div>
           </div>
@@ -9858,7 +9848,7 @@
       '<div class="ud-top"><h3 class="ud-top-title">' + ICON.building + ' ملف المشروع</h3></div>' +
       '<div class="ud-body">' +
         coverHtml +
-        '<div class="ud-name" style="margin-top:10px;">' + ppEsc_(res['Project Name']) + '</div>' +
+        '<div class="ud-name" style="margin-top:10px;">' + ppEsc_(devDisplayName_(res['Project Name'])) + '</div>' +
         (ppHas_(res['Developer Name']) ? ('<div class="ud-type">' + ppEsc_(devDisplayName_(res['Developer Name'])) + '</div>') : '') +
         '<div class="ud-grid">' + basicHtml + aboutHtml + engHtml + '</div>' +
         '<div class="ud-grid ud-grid-2">' + featuresHtml + locHtml + galleryHtml + '</div>' +
@@ -10014,7 +10004,12 @@
       // لو الحارس الزمني ضرب أثناء انتظار الصور (تبويب ظاهر وتجاوزنا المهلة)، لا داعي لإكمال
       // أي عمل تقيل بعد كده - رسالة الفشل ظهرت للمستخدم بالفعل ويجب ألا يستمر أي شيء بعدها.
       if (timedOut) return;
-      u = escUnitFields_(u); // كل الحقول النصية مهرَّبة قبل قوالب الـ PDF (نفس النص المعروض، بدون تفسير HTML)
+      // اسم المطوّر/المشروع بحالة أحرف كبيرة **قبل** التهريب — لو اتعمل بعده كان هيلمس كيانات
+      // الـ HTML نفسها (&lt; ⟵ &LT;). نسخة جديدة فقط؛ كائن الوحدة الأصلي ما بيتغيّرش.
+      u = escUnitFields_(Object.assign({}, u, {
+        'Developer Name': devDisplayName_(u['Developer Name']),
+        'Project Name': devDisplayName_(u['Project Name']),
+      })); // كل الحقول النصية مهرَّبة قبل قوالب الـ PDF (نفس النص المعروض، بدون تفسير HTML)
 
       const detailRow = (label, value) => value ? `
         <div style="padding:8px 0; border-bottom:1px solid #E2E2E6; display:flex; justify-content:space-between; font-size:12px;">
@@ -10719,7 +10714,7 @@
       }},
       { label: 'نوع العقار', get: u => u['Property Type'] || '-' },
       { label: 'المطور', get: u => devDisplayName_(u['Developer Name']) || '-' },
-      { label: 'المشروع', get: u => u['Project Name'] || '-' },
+      { label: 'المشروع', get: u => devDisplayName_(u['Project Name']) || '-' },
       { label: 'المنطقة', get: u => (u['City'] || '') + ' - ' + (u['Area/District'] || '') },
       { label: 'المساحة', get: u => (u['Unit Area (sqm)'] || '-') + ' م²' },
       { label: 'مساحة الحديقة', get: u => u['Garden Area (sqm)'] ? u['Garden Area (sqm)'] + ' م²' : '-' },
@@ -11223,31 +11218,53 @@
   const editDeveloperDatalist = document.getElementById('editDeveloperDatalist');
   const editProjectDatalist = document.getElementById('editProjectDatalist');
 
-  google.script.run.withSuccessHandler(function(res) {
-    // Phase 3D Hotfix: قبل الدخول (أو بلا صلاحية) السيرفر يرد { authRequired: true } بلا developers —
-    // نتجاهل الرد بصمت بدل رمي استثناء غير مُعالَج (كان يظهر في Console قبل تسجيل الدخول فقط؛ لا تغيير
-    // في سلوك المستخدم المسجَّل دخوله — نفس النمط المستخدم بالفعل في نداء getDeveloperProjectMap الآخر).
-    if (!res || !res.developers) return;
-    editDevProjectMap = res;
-    editDeveloperDatalist.innerHTML = res.developers.map(d => `<option value="${escHtml_(d)}">`).join('');
+  /* السبب الجذري (2026-10-17): النداء ده كان بيتنفّذ **مرة واحدة وقت تحليل السكربت** — أي قبل
+     تسجيل الدخول. السيرفر بيرد { authRequired: true } بلا developers، فـ Phase 3D Hotfix بيتجاهل
+     الرد بصمت، ومافيش أي إعادة نداء بعد الدخول (attemptLogin → showApp → unlockApp من غير أي
+     reload) ⇒ قوائم اقتراح المطوّر والمشروع في فورم الوحدة كانت تفضل **فاضية طول الجلسة** لأي
+     مستخدم دخل بكلمة السر، وتشتغل بس لو الجلسة اتاستعادت تلقائيًا من localStorage وقت التحميل.
+     الإصلاح: نفس النداء بالحرف جوّه دالة مُسمّاة بتتنادى (1) هنا كما كان بالظبط، و(2) من
+     unlockApp بعد الدخول ولو البيانات لسه فاضية ⇒ نداء ناجح واحد لكل جلسة، بلا تكرار. */
+  function loadDevProjectMap_() {
+    google.script.run.withSuccessHandler(function(res) {
+      // Phase 3D Hotfix: قبل الدخول (أو بلا صلاحية) السيرفر يرد { authRequired: true } بلا developers —
+      // نتجاهل الرد بصمت بدل رمي استثناء غير مُعالَج (كان يظهر في Console قبل تسجيل الدخول فقط؛ لا تغيير
+      // في سلوك المستخدم المسجَّل دخوله — نفس النمط المستخدم بالفعل في نداء getDeveloperProjectMap الآخر).
+      if (!res || !res.developers) return;
+      editDevProjectMap = res;
+      editDeveloperDatalist.innerHTML = devOptionsHtml_(res.developers);
 
-    // نجمع كل أسماء المشاريع من كل المطورين في قائمة واحدة لاقتراحها في خانة البحث العام
-    const allProjects = new Set();
-    Object.values(res.map).forEach(projects => {
-      Object.keys(projects).forEach(p => allProjects.add(p));
-    });
-    const sortedProjects = Array.from(allProjects).sort((a, b) => a.localeCompare(b, 'ar'));
-    // f_projectDatalist كما كانت بالضبط — يستخدمها حقل «المشروع» في «بحث في الأرشيف» (#arcProject).
-    document.getElementById('f_projectDatalist').innerHTML = sortedProjects.map(p => `<option value="${escHtml_(p)}">`).join('');
-    // وقائمة خانة البحث النصي وحدها: سجل الموظف أولًا (الأحدث → الأقدم) ثم نفس المشاريع أبجديًا.
-    window.__aqKeywordProjects_ = sortedProjects;
-    aqRenderKeywordSuggestions_();
-  }).withFailureHandler(apiFailure_('تعذّر تحميل قائمة المطوّرين والمشروعات')).getDeveloperProjectMap(getAuthCreds());
+      // نجمع كل أسماء المشاريع من كل المطورين في قائمة واحدة لاقتراحها في خانة البحث العام
+      const allProjects = new Set();
+      Object.values(res.map).forEach(projects => {
+        Object.keys(projects).forEach(p => allProjects.add(p));
+      });
+      const sortedProjects = Array.from(allProjects).sort((a, b) => a.localeCompare(b, 'ar'));
+      // f_projectDatalist كما كانت بالضبط — يستخدمها حقل «المشروع» في «بحث في الأرشيف» (#arcProject).
+      document.getElementById('f_projectDatalist').innerHTML = devOptionsHtml_(sortedProjects);
+      // وقائمة خانة البحث النصي وحدها: سجل الموظف أولًا (الأحدث → الأقدم) ثم نفس المشاريع أبجديًا.
+      window.__aqKeywordProjects_ = sortedProjects;
+      aqRenderKeywordSuggestions_();
+      // لو المستخدم كان بدأ يكتب اسم مطوّر قبل ما البيانات توصل، نملّي اقتراحات مشاريعه فورًا
+      refreshEditProjectSuggestions();
+    }).withFailureHandler(apiFailure_('تعذّر تحميل قائمة المطوّرين والمشروعات')).getDeveloperProjectMap(getAuthCreds());
+  }
+  /** يُنادى من unlockApp بعد الدخول — مرة واحدة بس لو القائمة لسه فاضية (مش بديل للنداء الأول). */
+  window.aqEnsureDevProjectMap_ = function () {
+    if (editDevProjectMap.developers && editDevProjectMap.developers.length) return;
+    loadDevProjectMap_();
+  };
+  loadDevProjectMap_();
 
   function refreshEditProjectSuggestions() {
-    const dev = editDeveloperInput.value.trim();
-    const projects = (editDevProjectMap.map[dev]) ? Object.keys(editDevProjectMap.map[dev]) : [];
-    editProjectDatalist.innerHTML = projects.map(p => `<option value="${escHtml_(p)}">`).join('');
+    /* مفاتيح الخريطة اللي جاية من السيرفر كلها trim().toUpperCase() (getDeveloperProjectMap)،
+       فلازم نطبّع اللي المستخدم كتبه بنفس القاعدة بالحرف — وإلا «dominar» أو «Dominar» بيرجّعوا
+       undefined ومايظهرش ولا اقتراح مشروع (ده كان السبب الجذري التاني). hasOwnProperty عشان
+       مفتاح زي CONSTRUCTOR ما يلقطش حاجة من البروتوتايب. */
+    const dev = String(editDeveloperInput.value || '').trim().toUpperCase();
+    const map = editDevProjectMap.map || {};
+    const bucket = (dev && Object.prototype.hasOwnProperty.call(map, dev)) ? map[dev] : null;
+    editProjectDatalist.innerHTML = devOptionsHtml_(bucket ? Object.keys(bucket) : []);
   }
   editDeveloperInput.addEventListener('input', refreshEditProjectSuggestions);
 
@@ -11285,8 +11302,12 @@
   // التعبئة من آخر وحدة تحصل فقط عند الضغط اليدوي على زر #editFetchLastSimilarBtn.
   // 1:1 مع add.html: fetchLastSimilarUnitData().
   function editFetchLastSimilarUnitData() {
-    const dev = editDeveloperInput.value.trim();
-    const proj = editProjectNameInput.value.trim();
+    /* نفس تطبيع مفاتيح الخريطة (getDeveloperProjectMap بيبني المفاتيح trim+UPPER) — من غيره
+       الكتابة بحروف صغيرة كانت بترجّع «مفيش وحدة سابقة» رغم وجود وحدات فعلًا (خلل سابق،
+       أُثبت في المتصفح 2026-10-17). والوسيطان بيتبعتوا للسيرفر اللي بيعمل نفس trim+UPPER في
+       getProjectTypeDefaults، فالقيمة على السلك ما بتتغيّرش دلاليًا. */
+    const dev = String(editDeveloperInput.value || '').trim().toUpperCase();
+    const proj = String(editProjectNameInput.value || '').trim().toUpperCase();
     if (!dev || !proj) {
       showToast('لازم تكتب اسم المطور واسم المشروع الأول', 'error');
       return;
@@ -11981,6 +12002,10 @@
     document.documentElement.classList.remove('session-restoring'); // انتهت الاستعادة بنجاح — أزل السبلاش
     document.body.classList.add('aq-app-on'); // Phase 2A: إظهار هيكل الشِل (هيدر+سايدبار) — عرض فقط
     if (typeof window.__aqarNotifInit === 'function') window.__aqarNotifInit(); // Report 062: عدّ غير المقروء مرة عند فتح التطبيق (بعدها النبضة كل 90 ث)
+    // قوائم اقتراح المطوّر/المشروع: نداء التحميل الأول بيحصل وقت تحليل السكربت — أي قبل الدخول —
+    // فالرد بيكون { authRequired:true } ويُتجاهل. هنا بس (بعد ما الجلسة بقت صالحة) نعيد المحاولة
+    // لو القائمة لسه فاضية، فالمستخدم اللي دخل بكلمة السر يلاقي الاقتراحات زي اللي جلسته اتاستعادت.
+    if (typeof window.aqEnsureDevProjectMap_ === 'function') window.aqEnsureDevProjectMap_();
     document.getElementById('loginGate').style.display = 'none';
     document.getElementById('mainContainer').style.display = 'block';
     unlockApp();
@@ -13299,7 +13324,7 @@
     if (typeof loadDevProfilesList === 'function') loadDevProfilesList();
     google.script.run.withSuccessHandler(function (res) {
       var dl = document.getElementById('devProfileNameDatalist');
-      if (dl && res && res.developers) dl.innerHTML = res.developers.map(function (d) { return '<option value="' + escHtml_(d) + '">'; }).join('');
+      if (dl && res && res.developers) dl.innerHTML = devOptionsHtml_(res.developers);
     }).withFailureHandler(apiFailure_('تعذّر تحميل قائمة المطوّرين والمشروعات')).getDeveloperProjectMap(getAuthCreds());
   }
   window.__aqarLoadDevelopers = function () {
@@ -13916,6 +13941,7 @@
     }
     content.innerHTML = projects.map(function (p) {
       var name = String(p['Project Name'] || '');
+      var nameDisp = devDisplayName_(name);   // العرض فقط — name يبقى أصليًا للـ payload/الحذف
       var payload = JSON.stringify(p).replace(/&/g, '&amp;').replace(/'/g, '&#39;');
       var nameJs = name.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
       var cover = p['Cover Image URL'];
@@ -13924,16 +13950,16 @@
         '<article class="aq-dev-card">' +
           '<div class="aq-logo-tile aq-logo-tile--lg">' + tileHtml + '</div>' +
           '<div class="aq-list-body">' +
-            '<div class="aq-dev-card-name">' + devEsc_(name) + '</div>' +
+            '<div class="aq-dev-card-name">' + devEsc_(nameDisp) + '</div>' +
             '<div class="aq-dev-card-meta">' + devEsc_(devDisplayName_(p['Developer Name']) || 'بدون مطوّر مسجَّل') + '</div>' +
           '</div>' +
           '<div class="aq-dev-card-foot">' +
             '<span class="aq-dev-card-year">' + devEsc_([p['City'], p['District']].filter(Boolean).join(' - ') || 'بلا مدينة/منطقة مسجَّلة') + '</span>' +
             '<span class="aq-list-actions">' +
               (hasPermission('MANAGE_PROJECTS')
-                ? '<button type="button" class="aq-btn aq-btn--ghost aq-btn--icon" title="تعديل" aria-label="تعديل ' + devEsc_(name) + '" onclick=\'editProject(' + payload + ')\'>' + ICON.edit + '</button>' +
-                  '<button type="button" class="aq-btn aq-btn--danger aq-btn--icon" title="حذف" aria-label="حذف ' + devEsc_(name) + '" onclick="removeProject(\'' + nameJs + '\')">' + ICON.trash + '</button>'
-                : '<button type="button" class="aq-btn aq-btn--ghost aq-btn--icon" title="عرض الملف" aria-label="عرض ملف ' + devEsc_(name) + '" onclick="showProjectProfile(\'' + nameJs + '\')">' + ICON.eye + '</button>') +
+                ? '<button type="button" class="aq-btn aq-btn--ghost aq-btn--icon" title="تعديل" aria-label="تعديل ' + devEsc_(nameDisp) + '" onclick=\'editProject(' + payload + ')\'>' + ICON.edit + '</button>' +
+                  '<button type="button" class="aq-btn aq-btn--danger aq-btn--icon" title="حذف" aria-label="حذف ' + devEsc_(nameDisp) + '" onclick="removeProject(\'' + nameJs + '\')">' + ICON.trash + '</button>'
+                : '<button type="button" class="aq-btn aq-btn--ghost aq-btn--icon" title="عرض الملف" aria-label="عرض ملف ' + devEsc_(nameDisp) + '" onclick="showProjectProfile(\'' + nameJs + '\')">' + ICON.eye + '</button>') +
             '</span>' +
           '</div>' +
         '</article>';
@@ -13947,7 +13973,7 @@
       if (!res.success) { content.innerHTML = '<div class="aq-empty" style="grid-column:1/-1"><h3>تعذّر تحميل المشروعات</h3><p>' + devEsc_(res.message) + '</p></div>'; return; }
       renderProjectsList(res.projects);
       var dl = document.getElementById('projNameDatalist');
-      if (dl) dl.innerHTML = res.projects.map(function (p) { return '<option value="' + devEsc_(p['Project Name']) + '">'; }).join('');
+      if (dl) dl.innerHTML = devOptionsHtml_(res.projects.map(function (p) { return p['Project Name']; }));
     }).withFailureHandler(apiFailure_('تعذّر تحميل قائمة المشروعات')).getAllProjects(projMgmtAuth());
   }
 
@@ -15564,7 +15590,7 @@
           return;
         }
         tbody.innerHTML = res.units.map((u, i) => {
-          const desc = [u.propertyType, u.projectName, (u.city && u.district) ? (u.city + ' - ' + u.district) : (u.city || u.district), devDisplayName_(u.developer)]
+          const desc = [u.propertyType, devDisplayName_(u.projectName), (u.city && u.district) ? (u.city + ' - ' + u.district) : (u.city || u.district), devDisplayName_(u.developer)]
             .filter(Boolean).join(' · ');
           return `
             <tr class="stats-clickable-row" data-unit-id="${escHtml_(u.unitId || '')}">
@@ -15594,7 +15620,7 @@
         tbody.innerHTML = res.units.slice(0, 10).map(u => `
           <tr class="stats-clickable-row" data-unit-id="${escHtml_(u.unitId)}">
             <td>${escHtml_(u.unitId)}</td>
-            <td>${escHtml_(u.projectName || '-')}</td>
+            <td>${escHtml_(devDisplayName_(u.projectName) || '-')}</td>
             <td class="num">${u.pdfCount}</td>
             <td class="num">${u.whatsappCount}</td>
             <td class="num">${u.total}</td>
@@ -16266,7 +16292,7 @@
         '<article class="aq-dev-card arc-card" role="button" tabindex="0" data-unit-id="' + escHtml_(u['Unit ID']) + '" aria-label="فتح الوحدة المؤرشفة ' + escHtml_(u['Unit ID']) + '">' +
           '<div class="aq-logo-tile aq-logo-tile--lg">' + tile + '</div>' +
           '<div class="aq-list-body">' +
-            '<div class="aq-dev-card-name"><span class="unit-id" dir="ltr">' + escHtml_(u['Unit ID']) + '</span> — ' + escHtml_(u['Project Name'] || u['City'] || '') + ' <span class="unit-title-type">' + escHtml_(u['Property Type'] || '') + '</span></div>' +
+            '<div class="aq-dev-card-name"><span class="unit-id" dir="ltr">' + escHtml_(u['Unit ID']) + '</span> — ' + escHtml_(devDisplayName_(u['Project Name']) || u['City'] || '') + ' <span class="unit-title-type">' + escHtml_(u['Property Type'] || '') + '</span></div>' +
             '<div class="aq-dev-card-meta">' + escHtml_(devDisplayName_(u['Developer Name']) || 'بدون مطوّر') + ' · ' + escHtml_([u['City'], u['Area/District']].filter(Boolean).join(' - ')) + '</div>' +
             (specs ? '<div class="arc-card-specs">' + specs + '</div>' : '') +
           '</div>' +
@@ -16368,7 +16394,7 @@
       });
     }
     function confirmRestore_(u, btn) {
-      var text = 'هتسترجع الوحدة ' + u['Unit ID'] + (u['Project Name'] ? ' — ' + u['Project Name'] : '') + (u['Developer Name'] ? ' (' + devDisplayName_(u['Developer Name']) + ')' : '') +
+      var text = 'هتسترجع الوحدة ' + u['Unit ID'] + (u['Project Name'] ? ' — ' + devDisplayName_(u['Project Name']) : '') + (u['Developer Name'] ? ' (' + devDisplayName_(u['Developer Name']) + ')' : '') +
         ' إلى الوحدات النشطة بنفس الرقم وبنفس بياناتها. الاسترجاع هيترفض تلقائيًا لو فيه وحدة نشطة مطابقة. متأكد؟';
       aqConfirm({ title: 'استرجاع وحدة مؤرشفة', text: text, okText: 'نعم، استرجع', danger: true }).then(function (ok) {
         if (!ok) return;
