@@ -50,13 +50,23 @@
   async function loadImages(u, max) {
     const urls = String(u['Images'] || '').split(',').map((s) => s.trim()).filter(Boolean).slice(0, max || 5);
     const t0 = now(); const per = [];
-    const dataUrls = await Promise.all(urls.map((url, i) => new Promise((resolve) => {
+    const dataUrls = await Promise.all(urls.map((url, i) => {
       const s = now();
-      google.script.run
-        .withSuccessHandler((res) => { const ok = res && res.success; per.push({ i, ms: r0(now() - s), ok: !!ok }); resolve(ok ? res.dataUrl : null); })
-        .withFailureHandler(() => { per.push({ i, ms: r0(now() - s), ok: false }); resolve(null); })
-        .getUnitImageBase64(url, getAuthCreds());
-    })));
+      /* صور «عرض السعر» المؤقتة محليّة (blob:/data:) ومالهاش رابط على السيرفر — نمرّرها على نفس
+         محوّل الواجهة (window.fetchImageAsDataUrl) بلا أي نداء سيرفر. أي رابط تاني (R2/Drive)
+         بيفضل على نفس المسار الإنتاجي بالحرف الواحد. */
+      if (/^(blob|data):/.test(url) && typeof window.fetchImageAsDataUrl === 'function') {
+        return Promise.resolve(window.fetchImageAsDataUrl(url))
+          .then((d) => { per.push({ i, ms: r0(now() - s), ok: !!d, local: true }); return d || null; })
+          .catch(() => { per.push({ i, ms: r0(now() - s), ok: false, local: true }); return null; });
+      }
+      return new Promise((resolve) => {
+        google.script.run
+          .withSuccessHandler((res) => { const ok = res && res.success; per.push({ i, ms: r0(now() - s), ok: !!ok }); resolve(ok ? res.dataUrl : null); })
+          .withFailureHandler(() => { per.push({ i, ms: r0(now() - s), ok: false }); resolve(null); })
+          .getUnitImageBase64(url, getAuthCreds());
+      });
+    }));
     return { images: dataUrls.filter(Boolean), totalMs: r0(now() - t0), per: per.sort((a, b) => a.i - b.i), count: urls.length };
   }
 

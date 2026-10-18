@@ -9301,6 +9301,19 @@
 
   /* ---------- جلب صورة كـ base64 من السيرفر (لتفادي مشكلة CORS مع Drive) ---------- */
   function fetchImageAsDataUrl(url) {
+    /* صور «عرض السعر» المؤقتة محليّة (blob:/data:) — مافيش رابط على سيرفر يُجلَب، فنحوّلها محليًا.
+       نقطة واحدة بتغطّي كل المستهلكين: تصدير PDF (المحرك المباشر والقديم) والمقارنة ومشاركة الصور. */
+    if (typeof url === 'string' && url.lastIndexOf('data:', 0) === 0) return Promise.resolve(url);
+    if (typeof url === 'string' && url.lastIndexOf('blob:', 0) === 0) {
+      return fetch(url).then(function (r) { return r.blob(); }).then(function (b) {
+        return new Promise(function (res) {
+          var fr = new FileReader();
+          fr.onload = function () { res(String(fr.result)); };
+          fr.onerror = function () { res(null); };
+          fr.readAsDataURL(b);
+        });
+      }).catch(function () { return null; });
+    }
     return new Promise(resolve => {
       google.script.run
         .withSuccessHandler(res => resolve(res && res.success ? res.dataUrl : null))
@@ -9308,6 +9321,9 @@
         .getUnitImageBase64(url, getAuthCreds());
     });
   }
+  // محرك PDF المباشر (ملف منفصل) بيستخدم نفس المحوِّل ده بدل ما يكرّر المنطق — مصدر حقيقة واحد
+  // لمعالجة الروابط المحلية (blob:/data:) الخاصة بـ«عرض السعر».
+  window.fetchImageAsDataUrl = fetchImageAsDataUrl;
 
   /* ---------- توليد بروشور PDF لوحدة واحدة ---------- */
   /* Direct PDF Engine (pdf-lib + fontkit + Cairo) — المحرك الأساسي لتصدير الوحدة بعد اعتماد POC وبوابة التوافق.
@@ -11551,8 +11567,56 @@
     return div;
   }
 
+  /* صور «عرض السعر»: الوحدة هنا **مؤقتة** — مش بتتحفظ في القاعدة ولا بتدخل قائمة الوحدات —
+     فصورها بتتعالج **محليًا** (data URL) بلا أي رفع لتخزين دائم وبلا أي نداء سيرفر.
+     نفس قواعد الصيغة والحجم المطبَّقة على السيرفر (src/images/process.js + r2.js) متكرّرة هنا
+     بنفس الرسائل بالحرف، عشان المستخدم ياخد نفس الرفض لنفس الملف في الحالتين.
+     مسار الوحدات المحفوظة (إضافة/تعديل/نسخ) **ما اتغيّرش إطلاقًا**: لسه uploadUnitImage → R2.
+
+     ليه blob: مش data: ؟ حقل «Images» عقدُه نصّ مفصول بفواصل (`split(',')` في 10 مواضع)، و data URL
+     جوّاه فاصلة (`data:image/png;base64,…`) فكان بيتمزّق لشظيتين وتضيع الصور من التصدير والمشاركة.
+     blob: URL مافيهوش فاصلة، ونفس أصل الصفحة، فبيعدّي في العقد والمعاينة و html2canvas بلا أي تغيير. */
+  var QUOTE_IMG_MAX_BYTES = 10 * 1024 * 1024;                                   // = MAX_UPLOAD_BYTES
+  var QUOTE_IMG_ALLOWED = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif'];
+  var QUOTE_IMG_UNSUPPORTED = {
+    'image/heic': 'صيغة HEIC غير مدعومة — استخدم JPG أو PNG أو WebP',
+    'image/heif': 'صيغة HEIF غير مدعومة — استخدم JPG أو PNG أو WebP',
+    'image/bmp': 'صيغة BMP غير مدعومة — استخدم JPG أو PNG أو WebP'
+  };
+  function quoteImageReject_(file) {
+    var m = String(file.type || '').toLowerCase();
+    if (QUOTE_IMG_UNSUPPORTED[m]) return QUOTE_IMG_UNSUPPORTED[m];
+    if (QUOTE_IMG_ALLOWED.indexOf(m) === -1) return 'الملف ليس صورة صالحة';
+    if (file.size > QUOTE_IMG_MAX_BYTES) return 'الصورة أكبر من 10 ميجابايت — اختر صورة أصغر';
+    return '';
+  }
+  function addQuoteLocalImage_(file) {
+    var bad = quoteImageReject_(file);
+    if (bad) {
+      editImagesUploadMsg.style.color = 'var(--gold)';
+      editImagesUploadMsg.textContent = bad;
+      return;
+    }
+    editUploadingCount++;
+    var placeholder = addEditPlaceholderThumb();
+    editImagesUploadMsg.textContent = '';
+    try {
+      var blobUrl = URL.createObjectURL(file);
+      editUploadingCount--;
+      placeholder.remove();
+      editUnitImages.push(blobUrl);   // بلا فاصلة ⇒ يعدّي في عقد «Images» كما هو
+      renderEditImagesPreview();
+    } catch (e) {
+      editUploadingCount--;
+      placeholder.remove();
+      editImagesUploadMsg.style.color = 'var(--gold)';
+      editImagesUploadMsg.textContent = 'تعذّر تجهيز الصورة من الجهاز، حاول مرة أخرى';
+    }
+  }
+
   function uploadEditImageFile(file) {
     if (!file.type.startsWith('image/')) return;
+    if (editModalMode === 'quote') { addQuoteLocalImage_(file); return; }   // عرض السعر: محلي بلا رفع
     editUploadingCount++;
     const placeholder = addEditPlaceholderThumb();
     editImagesUploadMsg.textContent = '';
