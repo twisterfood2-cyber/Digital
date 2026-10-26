@@ -11708,8 +11708,26 @@
     if (e.target === editModal) handleEditClose();
   });
 
+  // (2026-10-26) Enter داخل أي حقل إدخال في النموذج لا يحفظ أبدًا: المتصفح بيعمل "implicit submission"
+  // (ضغطة وهمية على زر الحفظ) لما Enter يتداس في input — فكانت الوحدة بتتحفظ من غير قصد.
+  // نفس الشيء في Chromium على select مقفول (Enter عليه = إرسال النموذج، مش فتح القائمة).
+  // الحفظ بقى من زر الحفظ نفسه فقط. textarea (سطر جديد) والأزرار (تفعيل بالكيبورد) واختيار
+  // اقتراح من datalist أو قائمة select مفتوحة (بيتعامل معاهم المتصفح قبل الصفحة) مش متأثرين.
+  // أثناء الكتابة بـ IME لا نتدخل.
+  editForm.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' || e.isComposing || e.keyCode === 229) return;
+    var t = e.target;
+    if (t && t.tagName === 'SELECT') { e.preventDefault(); return; }
+    if (!t || t.tagName !== 'INPUT') return;
+    var ty = (t.type || '').toLowerCase();
+    if (ty === 'button' || ty === 'submit' || ty === 'reset' || ty === 'image' || ty === 'file') return;
+    e.preventDefault();
+  });
+
   editForm.addEventListener('submit', function(e) {
     e.preventDefault();
+    // (2026-10-26) طلب حفظ شغّال بالفعل (الزر متعطّل لحد ما الرد يرجع) — أي إرسال تاني يتجاهل.
+    if (editSaveBtn.disabled) return;
     // وضع "عرض السعر": النموذج للعرض/التصدير فقط — لا حفظ في الباك-إند.
     if (editModalMode === 'quote') return;
     // حارس دفاعي: دور بلا صلاحية كتابة وحدات (SALES) لا يحفظ من هذا النموذج إطلاقًا —
@@ -11774,7 +11792,12 @@
                 <button type="button" id="editDifferentUnitBtn" style="flex:1; padding:9px; border:none; border-radius:8px; background:var(--gold); color:var(--navy-deep); font-weight:700; font-size:12px; cursor:pointer;">وحدة مختلفة</button>
               </div>
             `;
+            // (2026-10-26) أزرار الاختيار دي بتبعت طلب كتابة مباشرة — ضغطتين سريعتين كانوا بيعملوا وحدتين.
+            // أول ضغطة تعطّل كل أزرار الاختيار؛ لو الطلب فشل ترجع تشتغل عشان المستخدم يعيد المحاولة.
+            var _setChoicesDisabled = function (off) { editMsg.querySelectorAll('button').forEach(function (b) { b.disabled = off; }); };
+            var _choiceBusy = function () { if (editSaveBtn.disabled) return true; _setChoicesDisabled(true); return false; };
             if (_canFullUpdate) document.getElementById('editSameUnitBtn').addEventListener('click', function() {
+              if (_choiceBusy()) return;
               editSaveBtn.disabled = true; editSaveBtn.textContent = 'جاري التحديث...';
               google.script.run.withSuccessHandler(function(res2) {
                 editSaveBtn.disabled = false; editSaveBtn.textContent = 'حفظ الوحدة الجديدة';
@@ -11782,9 +11805,10 @@
                 editMsg.className = res2.success ? 'success' : 'error';
                 editMsg.textContent = res2.message;
                 if (res2.success) { clearClientSearchCache(); runSearch(); resetAddUnitFormAfterSuccess(res2.message); }
-              }).withFailureHandler(apiFailure_('تعذّر تحديث الوحدة — لم يتم حفظ أي تعديل', function(){ try{ editSaveBtn.disabled=false; editSaveBtn.textContent='حفظ الوحدة الجديدة'; }catch(e){} })).confirmAddAsSameUnit(data, res.matchUnitId);
+              }).withFailureHandler(apiFailure_('تعذّر تحديث الوحدة — لم يتم حفظ أي تعديل', function(){ try{ editSaveBtn.disabled=false; editSaveBtn.textContent='حفظ الوحدة الجديدة'; _setChoicesDisabled(false); }catch(e){} })).confirmAddAsSameUnit(data, res.matchUnitId);
             });
             if (_canTermsUpdate) document.getElementById('editSameTermsBtn').addEventListener('click', function() {
+              if (_choiceBusy()) return;
               editSaveBtn.disabled = true; editSaveBtn.textContent = 'جاري تحديث السعر ونظام السداد...';
               // نرسل مجموعة مفاتيح تجارية/سداد محدّدة فقط — بدون أي حقل هوية. الباك-إند يتجاهل أي مفتاح آخر.
               var _terms = {
@@ -11810,9 +11834,10 @@
                 editMsg.className = res2.success ? 'success' : 'error';
                 editMsg.textContent = res2.message;
                 if (res2.success) { clearClientSearchCache(); runSearch(); resetAddUnitFormAfterSuccess(res2.message); }
-              }).withFailureHandler(apiFailure_('تعذّر تحديث الشروط التجارية — لم يتم حفظ أي تعديل', function(){ try{ editSaveBtn.disabled=false; editSaveBtn.textContent='حفظ الوحدة الجديدة'; }catch(e){} })).updateUnitCommercialTerms(res.matchUnitId, _terms, getAuthCreds());
+              }).withFailureHandler(apiFailure_('تعذّر تحديث الشروط التجارية — لم يتم حفظ أي تعديل', function(){ try{ editSaveBtn.disabled=false; editSaveBtn.textContent='حفظ الوحدة الجديدة'; _setChoicesDisabled(false); }catch(e){} })).updateUnitCommercialTerms(res.matchUnitId, _terms, getAuthCreds());
             });
             document.getElementById('editDifferentUnitBtn').addEventListener('click', function() {
+              if (_choiceBusy()) return;
               editSaveBtn.disabled = true; editSaveBtn.textContent = 'جاري الحفظ...';
               google.script.run.withSuccessHandler(function(res2) {
                 editSaveBtn.disabled = false; editSaveBtn.textContent = 'حفظ الوحدة الجديدة';
@@ -11820,7 +11845,7 @@
                 editMsg.className = res2.success ? 'success' : 'error';
                 editMsg.textContent = res2.message;
                 if (res2.success) { clearClientSearchCache(); runSearch(); resetAddUnitFormAfterSuccess(res2.message); }
-              }).withFailureHandler(apiFailure_('تعذّر حفظ الوحدة الجديدة — لم يتم حفظ أي بيانات', function(){ try{ editSaveBtn.disabled=false; editSaveBtn.textContent='حفظ الوحدة الجديدة'; }catch(e){} })).confirmAddAsNewUnit(data);
+              }).withFailureHandler(apiFailure_('تعذّر حفظ الوحدة الجديدة — لم يتم حفظ أي بيانات', function(){ try{ editSaveBtn.disabled=false; editSaveBtn.textContent='حفظ الوحدة الجديدة'; _setChoicesDisabled(false); }catch(e){} })).confirmAddAsNewUnit(data);
             });
             return;
           }
