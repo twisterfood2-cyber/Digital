@@ -5091,6 +5091,33 @@
     body.aq-search-ui .unit-card { background: #202026 !important; }
     body.aq-search-ui .unit-media { background: #2A2A31 !important; }
 
+    /* ===== منهجية متوسطات الأسعار المعتمدة (2026-11-16): تنبيه العيّنة، عدد المستبعدين، شجرة مدينة ← منطقة ← نوع، قائمة المستبعدين (للمالك) ===== */
+    .aq-avg-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: var(--aq-fs-caption); color: var(--aq-color-text-muted); }
+    .aq-avg-meta b { color: var(--aq-color-text); }
+    .aq-avg-warn { display: inline-block; padding: 1px 8px; border-radius: 999px; font-weight: 700; font-size: var(--aq-fs-caption);
+      color: var(--aq-color-warning); background: var(--aq-color-warning-bg); border: 1px solid var(--aq-color-warning-border); }
+    .aq-avg-excl { color: var(--aq-color-text-muted); }
+    .aq-avg-median { font-size: var(--aq-fs-caption); color: var(--aq-color-text-muted); margin-top: 2px; }
+    .aq-avg-tree details { border-top: 1px solid var(--aq-color-border-subtle); }
+    .aq-avg-tree details:first-child { border-top: 0; }
+    .aq-avg-tree summary { cursor: pointer; padding: 8px 6px; font-weight: 700; color: var(--aq-color-text); list-style-position: inside; }
+    .aq-avg-tree summary .aq-avg-sum-meta { font-weight: 400; font-size: var(--aq-fs-caption); color: var(--aq-color-text-muted); margin-inline-start: 6px; }
+    .aq-avg-tree details details { margin-inline-start: 12px; }
+    .aq-avg-row { display: flex; flex-direction: column; gap: 3px; padding: 6px 8px; margin: 0 0 4px 0; border-radius: var(--radius-sm); cursor: pointer; }
+    .aq-avg-row:hover { background: var(--aq-color-surface-hover); }
+    .aq-avg-row:focus-visible { outline: 2px solid var(--aq-color-primary); outline-offset: 2px; }
+    .aq-avg-row.is-static { cursor: default; }
+    .aq-avg-row-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; }
+    .aq-avg-row-type { font-weight: 700; color: var(--aq-color-text); }
+    .aq-avg-row-value { font-weight: 700; color: var(--aq-color-text); }
+    .aq-avg-row-label { font-size: var(--aq-fs-caption); color: var(--aq-color-text-muted); }
+    .aq-avg-note { font-size: var(--aq-fs-caption); color: var(--aq-color-text-muted); margin: 4px 0 8px; }
+    .aq-avg-type-select { margin: 0 0 10px; min-height: 36px; }
+    .aq-avg-excluded-table { width: 100%; border-collapse: collapse; font-size: var(--aq-fs-caption); }
+    .aq-avg-excluded-table th, .aq-avg-excluded-table td { padding: 6px; border-bottom: 1px solid var(--aq-color-border-subtle); text-align: start; vertical-align: top; }
+    .aq-avg-excluded-wrap { overflow-x: auto; }
+    #priceStatsModal .aq-avg-excluded { margin-top: 16px; }
+    #aqAvgStatusChip[hidden] { display: none !important; }
   </style>
 </head>
 <body>
@@ -5115,6 +5142,26 @@
       Chart.defaults.font.family = "'Cairo','Segoe UI',Tahoma,Arial,sans-serif";
     }
   });
+  /* جاهزية Chart.js (2026-11-17): المكتبة defer من الـ CDN، وبيانات الإحصاءات ممكن توصل قبلها (فتح /dashboard/stats بإعادة تحميل كاملة
+     أو شبكة/CDN بطيء) → كان new Chart بيرمي "Chart is not defined" ويوقف رسم باقي اللوحة كلها. aqWhenChart_(fn): لو المكتبة جاهزة
+     بينفّذ فورًا؛ وإلا بيأجّل لحد DOMContentLoaded (سكربتات defer بتخلص قبله، وبعد ضبط الألوان فوق). لو المكتبة ما اتحمّلتش أصلًا:
+     الرسوم بتتخطّى برسالة في الـ console، وباقي اللوحة بيترسم عادي. */
+  (function () {
+    var queue = [], settled = false, warned = false;
+    function warnOnce() { if (warned) return; warned = true; try { console.warn('[AqaR] Chart.js غير متاحة — الرسوم البيانية اتخطّت وباقي اللوحة اترسم'); } catch (e) {} }
+    function run(fn) { try { fn(); } catch (e) { try { console.error('[AqaR] تعذّر رسم الرسم البياني', e); } catch (e2) {} } }
+    window.aqWhenChart_ = function (fn) {
+      if (window.Chart) { fn(); return; }
+      if (settled) { warnOnce(); return; }     // المكتبة فشلت في التحميل — الرسم بيتخطّى
+      queue.push(fn);
+    };
+    document.addEventListener('DOMContentLoaded', function () {
+      settled = true;
+      var q = queue; queue = [];
+      if (window.Chart) { q.forEach(run); return; }
+      if (q.length) warnOnce();
+    });
+  })();
 </script>
 
 <script>
@@ -5413,6 +5460,7 @@
 <section class="aq-results-section" id="aqResultsSection">
   <div class="aq-results-bar">
     <span class="aq-chip aq-chip--static is-active" id="aqResultsCountChip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></svg><span id="resultsCount"></span></span>
+    <span class="aq-chip aq-chip--static" id="aqAvgStatusChip" hidden title="مفروض من كارت متوسط السعر — «مسح الفلاتر» يلغيه">الحالة: متاح فقط</span>
     <button type="button" id="favToggleBtn" class="aq-chip fav-toggle-btn" aria-pressed="false"><svg class="ico ico-fill" viewBox="0 0 24 24"><path d="m12 3 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.8 6.2 21l1.1-6.5L2.6 9.8l6.5-.9Z"/></svg><span id="favToggleLabel">المفضلة (0)</span></button>
     <span class="aq-results-bar-spacer"></span>
     <div class="aq-sort-field" id="aqSortHost">
@@ -5488,7 +5536,8 @@
       <!-- LEVEL 3 يبدأ هنا أيضًا: المنطقة والمطورون في صف واحد على Desktop (نفس .stats-grid-2 القائمة) -->
       <div class="stats-grid-2">
         <div class="section stats-mint-panel">
-          <h3>توزيع المخزون حسب المنطقة</h3>
+          <h3>متوسط سعر المتر حسب المدينة والمنطقة ونوع العقار</h3>
+          <div class="aq-avg-note" id="geoDistributionNote"></div>
           <div id="geoDistribution"></div>
         </div>
 
@@ -5529,6 +5578,19 @@
       <div class="section">
         <h3>تحليل الأسعار</h3>
         <div id="priceAnalytics"></div>
+      </div>
+
+      <!-- ح6: Villa / Townhouse / Twin House — قسم منفصل: متوسط ووسيط سعر الوحدة (جنيه للوحدة، مش للمتر) -->
+      <div class="section" id="villaAveragesSection">
+        <h3>متوسط سعر الوحدة — Villa / Townhouse / Twin House</h3>
+        <div class="aq-avg-note">السعر بعد الخصم لكل وحدة، من غير مساحة. كل نوع لوحده لكل مدينة ومنطقة.</div>
+        <div id="villaAverages" class="aq-avg-tree"></div>
+      </div>
+
+      <!-- ح5: قائمة الوحدات المستبعدة من المتوسطات — بتظهر للمالك بس (السيرفر بيبعت القائمة للمالك بس) -->
+      <div class="section" id="excludedUnitsSection" style="display:none">
+        <h3>الوحدات المستبعدة من المتوسطات</h3>
+        <div id="excludedUnitsList"></div>
       </div>
 
       <div class="section" id="paymentDeliverySection">
@@ -7143,8 +7205,43 @@
       exactArea: document.getElementById('f_exactArea').value,
       listingType: resaleMode ? 'ريسيل' : ''
     };
+    // قرار المالك (ز): البحث المفتوح من كارت متوسط السعر يفضل على «متاح» مع أي تغيير في باقي الفلاتر، لحد «مسح الفلاتر»
+    if (window.__aqAvgStatusLock) filters.status = window.__aqAvgStatusLock;
     return filters;
   }
+  /* قفل «متاح» لمسار كروت متوسطات الأسعار: يتفعّل من meterGoExplore_، ويتلغي بـ«مسح الفلاتر» أو البحث الذكي أو أي فتح بحث من لوحة التحكم. */
+  function aqAvgSetStatusLock_(status) {
+    window.__aqAvgStatusLock = status || null;
+    var chip = document.getElementById('aqAvgStatusChip');
+    if (chip) chip.hidden = !window.__aqAvgStatusLock;
+    if (!window.__aqAvgStatusLock) aqAvgRemoveAddedOptions_();
+  }
+  /* مسار كروت متوسطات الأسعار: لو قيمة المجموعة (مدينة/منطقة/نوع) مش موجودة في القائمة المنسدلة، تتضاف بنصّها المخزّن بالظبط
+     (من غير تعديل أو إعادة تسمية) ومتعلّمة data-aq-avg-added، وتتحدّد. مفيش تكرار: المقارنة بالقيمة نفسها. */
+  function aqAvgEnsureOption_(sel, value) {
+    if (!sel || !value) return;
+    var exists = false;
+    for (var i = 0; i < sel.options.length; i++) { if (sel.options[i].value === value) { exists = true; break; } }
+    if (!exists) {
+      var opt = document.createElement('option');
+      opt.value = value; opt.textContent = value;
+      opt.setAttribute('data-aq-avg-added', '1');
+      sel.appendChild(opt);
+    }
+    sel.value = value;
+  }
+  /* لما القفل يتلغي («مسح الفلاتر» / البحث الذكي / مؤشرات اللوحة) القيم المضافة بتتشال — البحث العادي يرجع لقوائمه الأصلية. */
+  function aqAvgRemoveAddedOptions_() {
+    ['f_city', 'f_district', 'f_propertyType'].forEach(function (id) {
+      var sel = document.getElementById(id);
+      if (!sel) return;
+      [].slice.call(sel.querySelectorAll('option[data-aq-avg-added]')).forEach(function (o) {
+        if (sel.value === o.value) sel.value = '';
+        o.remove();
+      });
+    });
+  }
+  window.aqAvgSetStatusLock_ = aqAvgSetStatusLock_;
 
   function restoreLastFilters() {
     let saved = null;
@@ -7209,6 +7306,7 @@
   const priceStatsModal = document.getElementById('priceStatsModal');
   const priceStatsSearchInput = document.getElementById('priceStatsSearchInput');
   let lastPriceStats = [];
+  let lastPriceStatsRes = null;   // آخر رد كامل (العدّادات + قائمة المستبعدين للمالك)
 
   /* [082/083 local prototype] "سعر المتر": رأس واحد لكل منطقة + كارت لكل نوع عقار داخلها.
    * البيانات من getDistrictPriceStats (083): name / propertyType / totalUnits / calculatedUnits / avgPricePerMeter (= SUM(Price)/SUM(Area)) / avgPrice (قديم).
@@ -7216,23 +7314,64 @@
   const PS_ICON_CHART = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>';
   const PS_ICON_PIN = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.5-6-10a6 6 0 0 1 12 0c0 4.5-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg>';
   const PS_ICON_ARROW = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>';
-  function psValueLabel_(t) {
-    return t.avgPricePerMeter !== null ? fmtNum(t.avgPricePerMeter) + ' ج/م²' : (t.avgPrice !== null ? fmtNum(t.avgPrice) + ' ج (إجمالي)' : '-');
+  /* منهجية متوسطات الأسعار المعتمدة (2026-11-16) — أدوات عرض مشتركة بين «سعر المتر» ولوحة التحكم (window.aqAvg_).
+     كل القيم محسوبة على السيرفر (getDistrictPriceStats / getDashboardStats): الواجهة بتعرض وبتفلتر بس، ومفيش أي حساب متوسطات هنا. */
+  function aqAvgIsUnitPrice_(g) { return !!g && g.indicatorType === 'UNIT_PRICE'; }
+  function aqAvgValue_(g) { return aqAvgIsUnitPrice_(g) ? g.avgUnitPrice : g.avgPricePerMeter; }
+  function aqAvgValueText_(g, v) {
+    if (v === undefined) v = aqAvgValue_(g);
+    if (v === null || v === undefined || v === '') return '-';
+    return fmtNum(v) + (aqAvgIsUnitPrice_(g) ? ' ج للوحدة' : ' ج/م²');
   }
+  function aqAvgLabel_(g) { return g.indicatorLabel || (aqAvgIsUnitPrice_(g) ? 'متوسط سعر الوحدة' : 'متوسط سعر المتر'); }
+  function aqAvgGeo_(g) { return (g.city || 'غير محدد') + ' — ' + (g.district || 'غير محدد'); }
+  function aqAvgMetaHtml_(g) {
+    return '<span><b>' + escHtml_(fmtNum(g.eligibleUnits)) + '</b> وحدة في الحساب</span>' +
+      (g.sampleWarning ? '<span class="aq-avg-warn">' + escHtml_(g.sampleWarning) + '</span>' : '') +
+      (g.excludedUnits > 0 ? '<span class="aq-avg-excl">مستبعد من الحساب: <b>' + escHtml_(fmtNum(g.excludedUnits)) + '</b></span>' : '') +
+      (g.notCalculatedUnits > 0 ? '<span class="aq-avg-excl">بيانات ناقصة (غير محسوبة): <b>' + escHtml_(fmtNum(g.notCalculatedUnits)) + '</b></span>' : '');
+  }
+  function aqAvgMedianHtml_(g) {
+    return aqAvgIsUnitPrice_(g) ? '<div class="aq-avg-median">الوسيط: ' + escHtml_(aqAvgValueText_(g, g.medianUnitPrice)) + '</div>' : '';
+  }
+  /* ح1: الفتح على نفس المجموعة بالظبط — مدينة + منطقة + نوع + «متاح» (مش بحث بكلمة). مجموعة قيمة من قيمها فاضية ما ينفعش تتفلتر بيها. */
+  function aqAvgCanGo_(g) { return !!(g && g.city && g.district && g.propertyType && g.propertyType !== 'غير محدد'); }
+  function aqAvgAttrs_(g) {
+    return ' data-city="' + escHtml_(g.city) + '" data-district="' + escHtml_(g.district) + '" data-type="' + escHtml_(g.propertyType) + '"';
+  }
+  function aqAvgGoFromEl_(el) {
+    if (!el) return;
+    var g = { city: el.getAttribute('data-city') || '', district: el.getAttribute('data-district') || '', propertyType: el.getAttribute('data-type') || '' };
+    if (aqAvgCanGo_(g)) meterGoExplore_(g.city, g.district, g.propertyType);
+  }
+  /* ح5: قائمة المستبعدين (رقم الوحدة + السبب) — السيرفر بيبعتها للمالك بس؛ مفيش قائمة = مفيش عرض. */
+  function aqAvgExcludedHtml_(list) {
+    if (!Array.isArray(list)) return '';
+    if (!list.length) return '<div class="empty-note">مفيش وحدات مستبعدة</div>';
+    return '<div class="aq-avg-note">الوحدات دي ما اتعدّلتش وبتظهر في البحث عادي؛ هي بس مش داخلة في حساب المتوسطات.</div>' +
+      '<div class="aq-avg-excluded-wrap"><table class="aq-avg-excluded-table"><thead><tr><th>الوحدة</th><th>المدينة / المنطقة</th><th>النوع</th><th>السبب</th></tr></thead><tbody>' +
+      list.map(function (x) {
+        return '<tr><td><button type="button" class="aq-btn aq-btn--ghost aq-avg-open-unit" data-unit="' + escHtml_(x.unitId) + '">' + escHtml_(x.unitId) + '</button></td>' +
+          '<td>' + escHtml_(aqAvgGeo_(x)) + '</td><td>' + escHtml_(x.propertyType) + '</td><td>' + escHtml_(x.reason) + '</td></tr>';
+      }).join('') + '</tbody></table></div>';
+  }
+  window.aqAvg_ = { isUnitPrice: aqAvgIsUnitPrice_, value: aqAvgValue_, valueText: aqAvgValueText_, label: aqAvgLabel_, geo: aqAvgGeo_,
+    metaHtml: aqAvgMetaHtml_, medianHtml: aqAvgMedianHtml_, canGo: aqAvgCanGo_, attrs: aqAvgAttrs_, goFromEl: aqAvgGoFromEl_, excludedHtml: aqAvgExcludedHtml_ };
   function psPlural_(n, one, few) { return fmtNum(n) + ' ' + (n >= 3 && n <= 10 ? few : one); }
-  /* "عرض الوحدات": نفس مسار الاستكشاف القائم (requestSearchPage_ → __aqarGoExplore) بفلتري district + propertyType الموجودين أصلًا في البحث؛
-     يملأ حقول الفورم (المدينة لو المنطقة تخص مدينة واحدة في CITY_DISTRICTS، المنطقة، نوع العقار لو موجود في القائمة) — بلا أي endpoint جديد. */
-  function meterGoExplore_(district, propertyType) {
+  /* "عرض الوحدات" (ح1): نفس مسار الاستكشاف القائم (requestSearchPage_ → __aqarGoExplore) بفلاتر البحث الموجودة أصلًا
+     city + district + propertyType + status='متاح' — نفس المجموعة بالظبط (المدينة من بيانات المجموعة، مش من CITY_DISTRICTS)، بلا أي endpoint جديد.
+     يملأ حقول الفورم لو القيم موجودة في القوائم؛ «الحالة» مالهاش حقل واجهة لكن بتتطبّق على البحث نفسه (نفس أسلوب لوحة التحكم). */
+  function meterGoExplore_(city, district, propertyType) {
     if (typeof requestSearchPage_ !== 'function') return;
-    var cities = Object.keys(CITY_DISTRICTS).filter(function (c) { return CITY_DISTRICTS[c].indexOf(district) !== -1; });
-    var city = cities.length === 1 ? cities[0] : '';
+    aqAvgSetStatusLock_(null);   // يشيل أي قيم مضافة من فتحة سابقة قبل الجديدة
     try {
-      if (city) { fCity.value = city; populateDistrictSelect(fDistrict, city, true, district); }
-      else { fCity.value = ''; populateDistrictSelect(fDistrict, '', true); }
-      var ft = document.getElementById('f_propertyType');
-      if (ft) { ft.value = propertyType || ''; if (ft.value !== (propertyType || '')) ft.value = ''; }
+      aqAvgEnsureOption_(fCity, city);
+      populateDistrictSelect(fDistrict, fCity.value, true, district);
+      aqAvgEnsureOption_(fDistrict, district);
+      aqAvgEnsureOption_(document.getElementById('f_propertyType'), propertyType);
     } catch (e) {}
-    var payload = { keyword: '', category: '', propertyType: propertyType || '', city: city, district: district, developer: '', finishing: '', rooms: '', minPrice: '', maxPrice: '', minArea: '', maxArea: '', exactArea: '', listingType: '' };
+    aqAvgSetStatusLock_('متاح');
+    var payload = { keyword: '', category: '', propertyType: propertyType || '', city: city || '', district: district || '', developer: '', finishing: '', rooms: '', minPrice: '', maxPrice: '', minArea: '', maxArea: '', exactArea: '', listingType: '', status: 'متاح' };
     lastSearchBase_ = payload;
     requestSearchPage_(payload, 1, false).then(function (ok) {
       if (!ok) return;
@@ -7253,30 +7392,32 @@
       return;
     }
 
-    // تجميع الصفوف حسب المنطقة (نفس التجميع القديم بالحرف) — رأس واحد للمنطقة ثم كارت لكل نوع عقار
+    // تجميع الصفوف حسب المدينة + المنطقة (ممنوع المنطقة لوحدها — مناطق بنفس الاسم في مدن مختلفة ما تتدمجش) — رأس لكل منطقة ثم كارت لكل نوع
     const byDistrict = {};
     const districtOrder = [];
     rows.forEach(d => {
-      if (!byDistrict[d.name]) { byDistrict[d.name] = []; districtOrder.push(d.name); }
-      byDistrict[d.name].push(d);
+      const k = (d.city || '') + '\u0000' + (d.district || d.name || '');
+      if (!byDistrict[k]) { byDistrict[k] = []; districtOrder.push(k); }
+      byDistrict[k].push(d);
     });
 
-    let totalUnits = 0, calcUnits = 0;
+    let calcUnits = 0, exclUnits = 0;
     const groups = document.createElement('div');
     groups.className = 'ps-groups';
 
-    districtOrder.forEach(district => {
-      const types = byDistrict[district];
-      const gTotal = types.reduce(function (n, t) { return n + (Number(t.totalUnits) || 0); }, 0);
-      const gCalc = types.reduce(function (n, t) { return n + (Number(t.calculatedUnits) || 0); }, 0);
-      totalUnits += gTotal; calcUnits += gCalc;
+    districtOrder.forEach(key => {
+      const types = byDistrict[key];
+      const head = types[0];
+      const gCalc = types.reduce(function (n, t) { return n + (Number(t.eligibleUnits) || 0); }, 0);
+      const gExcl = types.reduce(function (n, t) { return n + (Number(t.excludedUnits) || 0); }, 0);
+      calcUnits += gCalc; exclUnits += gExcl;
 
       const section = document.createElement('section');
       section.className = 'ps-group';
       section.innerHTML =
         '<div class="ps-group-head">' +
-          '<h3 class="ps-group-title">' + PS_ICON_PIN + escHtml_(district) + '</h3>' +
-          '<span class="ps-group-sub">' + escHtml_(psPlural_(types.length, 'نوع عقار', 'أنواع عقار')) + ' · ' + escHtml_(fmtNum(gTotal)) + ' وحدة · ' + escHtml_(fmtNum(gCalc)) + ' محسوبة</span>' +
+          '<h3 class="ps-group-title">' + PS_ICON_PIN + escHtml_(aqAvgGeo_(head)) + '</h3>' +
+          '<span class="ps-group-sub">' + escHtml_(psPlural_(types.length, 'نوع عقار', 'أنواع عقار')) + ' · ' + escHtml_(fmtNum(gCalc)) + ' وحدة في الحساب' + (gExcl ? ' · ' + escHtml_(fmtNum(gExcl)) + ' مستبعدة' : '') + '</span>' +
         '</div>' +
         '<div class="ps-grid' + (types.length >= 5 ? ' ps-grid--dense' : '') + '" style="--ps-n:' + types.length + ';--ps-n-lg:' + Math.min(types.length, 3) + ';--ps-n-md:' + Math.min(types.length, 2) + '">' + types.map(function (t) {
           return '<article class="ps-card">' +
@@ -7284,13 +7425,14 @@
             '<div class="ps-panel">' +
               '<div class="ps-price-row">' +
                 '<div>' +
-                  '<div class="ps-price-label">متوسط سعر المتر</div>' +
-                  '<div class="ps-price">' + escHtml_(psValueLabel_(t)) + '</div>' +
+                  '<div class="ps-price-label">' + escHtml_(aqAvgLabel_(t)) + '</div>' +
+                  '<div class="ps-price">' + escHtml_(aqAvgValueText_(t)) + '</div>' +
+                  aqAvgMedianHtml_(t) +
                 '</div>' +
                 '<span class="ps-icon">' + PS_ICON_CHART + '</span>' +
               '</div>' +
-              '<div class="ps-counts"><span><b>' + escHtml_(fmtNum(t.totalUnits)) + '</b> وحدة</span><span class="is-calc"><b>' + escHtml_(fmtNum(t.calculatedUnits)) + '</b> وحدة محسوبة</span></div>' +
-              '<button type="button" class="aq-btn aq-btn--secondary ps-view" data-district="' + escHtml_(district) + '" data-type="' + escHtml_(t.propertyType) + '" aria-label="عرض وحدات ' + escHtml_(t.propertyType) + ' في ' + escHtml_(district) + '">عرض الوحدات' + PS_ICON_ARROW + '</button>' +
+              '<div class="ps-counts aq-avg-meta">' + aqAvgMetaHtml_(t) + '</div>' +
+              (aqAvgCanGo_(t) ? '<button type="button" class="aq-btn aq-btn--secondary ps-view"' + aqAvgAttrs_(t) + ' aria-label="عرض الوحدات المتاحة ' + escHtml_(t.propertyType) + ' في ' + escHtml_(aqAvgGeo_(t)) + '">عرض الوحدات المتاحة' + PS_ICON_ARROW + '</button>' : '') +
             '</div>' +
           '</article>';
         }).join('') + '</div>';
@@ -7298,13 +7440,23 @@
     });
 
     content.appendChild(groups);
+    // ح5: قائمة المستبعدين بالتفصيل — بتوصل من السيرفر للمالك بس
+    if (lastPriceStatsRes && Array.isArray(lastPriceStatsRes.excludedUnitsList)) {
+      const ex = document.createElement('section');
+      ex.className = 'ps-group aq-avg-excluded';
+      ex.innerHTML = '<div class="ps-group-head"><h3 class="ps-group-title">الوحدات المستبعدة من المتوسطات (' + escHtml_(fmtNum(lastPriceStatsRes.excludedUnitsList.length)) + ')</h3></div>' +
+        aqAvgExcludedHtml_(lastPriceStatsRes.excludedUnitsList);
+      content.appendChild(ex);
+    }
     if (summary) {
-      summary.innerHTML = '<span>' + PS_ICON_PIN + escHtml_(psPlural_(districtOrder.length, 'منطقة', 'مناطق')) + '</span><span>' + PS_ICON_CHART + escHtml_(fmtNum(totalUnits)) + ' وحدة · ' + escHtml_(fmtNum(calcUnits)) + ' محسوبة</span>';
+      summary.innerHTML = '<span>' + PS_ICON_PIN + escHtml_(psPlural_(districtOrder.length, 'منطقة', 'مناطق')) + '</span><span>' + PS_ICON_CHART + escHtml_(fmtNum(calcUnits)) + ' وحدة متاحة في الحساب' + (exclUnits ? ' · ' + escHtml_(fmtNum(exclUnits)) + ' مستبعدة' : '') + '</span>';
     }
   }
   document.getElementById('priceStatsContent').addEventListener('click', function (e) {
     var btn = e.target.closest('.ps-view');
-    if (btn && btn.dataset.district) meterGoExplore_(btn.dataset.district, btn.dataset.type || '');
+    if (btn) { aqAvgGoFromEl_(btn); return; }
+    var u = e.target.closest('.aq-avg-open-unit');
+    if (u && typeof window.openUnitDetailsById_ === 'function') window.openUnitDetailsById_(u.getAttribute('data-unit'));
   });
 
   // تحميل متوسط سعر المتر — نفس نداء getDistrictPriceStats ونفس العرض بالظبط.
@@ -7314,7 +7466,8 @@
     if (c) c.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:24px;">جاري التحميل...</div>';
     google.script.run.withSuccessHandler(function(res) {
       if (!res || !res.success) { if (c) c.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:24px;">حصل خطأ في التحميل</div>'; return; }
-      lastPriceStats = res.districtStats;
+      lastPriceStatsRes = res;
+      lastPriceStats = res.districtStats || [];
       renderPriceStatsTable(lastPriceStats);
     }).withFailureHandler(apiFailure_('تعذّر تحميل إحصاءات أسعار المناطق')).getDistrictPriceStats(getAuthCreds());
   };
@@ -7401,7 +7554,8 @@
 
   /* بناء كائن وحدة (بمفاتيح أعمدة الشيت) من نموذج #editForm — لإعادة استخدام
    * downloadUnitPDF / shareOnWhatsApp / buildUnitShareText كما هي. الحسابات نفس
-   * منطق calcEditMonthlyInstallment (خصم/مقدم/قسط) + سعر المتر = بعد الخصم ÷ المساحة. */
+   * منطق calcEditMonthlyInstallment (خصم/مقدم/قسط) + سعر المتر بالمعادلة المعتمدة (ح8، نفس calc.js على السيرفر):
+   * بعد الخصم ÷ (داخلي + حديقة/3 + تراس/3 + روف/3)، ومفيش سعر متر لـ Villa / Townhouse / Twin House. */
   function buildQuoteUnitObject(withRealId) {
     var g = function (name) { var el = editForm.elements[name]; return el ? String(el.value || '').trim() : ''; };
     var num = function (v) { var n = parseFloat(String(v).replace(/,/g, '')); return isNaN(n) ? 0 : n; };
@@ -7410,7 +7564,9 @@
     var discountPercent = num(g('discountPercent'));
     var priceAfterDiscount = discountPercent > 0 ? Math.round(price - (price * discountPercent / 100)) : price;
     var unitArea = num(g('unitArea'));
-    var pricePerMeter = unitArea > 0 ? Math.round(priceAfterDiscount / unitArea) : '';
+    var weightedArea = unitArea + num(g('gardenArea')) / 3 + num(g('terraceArea')) / 3 + num(g('roofArea')) / 3;
+    var noPricePerMeterTypes = ['Villa', 'Townhouse', 'Twin House'];
+    var pricePerMeter = (weightedArea > 0 && noPricePerMeterTypes.indexOf(g('propertyType')) === -1) ? Math.round(priceAfterDiscount / weightedArea) : '';
 
     var downPaymentPercent = num(g('downPayment'));
     var downPaymentBase = g('downPaymentBase') === 'قبل الخصم' ? price : priceAfterDiscount;
@@ -7875,7 +8031,7 @@
   priceStatsSearchInput.addEventListener('input', function() {
     const kw = this.value.trim().toLowerCase();
     if (!kw) { renderPriceStatsTable(lastPriceStats); return; }
-    renderPriceStatsTable(lastPriceStats.filter(d => d.name.toLowerCase().includes(kw) || d.propertyType.toLowerCase().includes(kw)));
+    renderPriceStatsTable(lastPriceStats.filter(d => String(d.name || '').toLowerCase().includes(kw) || String(d.city || '').toLowerCase().includes(kw) || String(d.propertyType || '').toLowerCase().includes(kw)));
   });
 
   /* ---------- (أُزيلت وحدة "حاسبة السعر" بالكامل — البند 1) ----------
@@ -10618,6 +10774,7 @@
           return;
         }
         applyNaturalLanguageFilters(res.filters);
+        aqAvgSetStatusLock_(null);
         runSearch();
         msg.style.display = 'block';
         msg.style.color = 'var(--success-fg)';
@@ -10978,6 +11135,7 @@
     populateDistrictSelect(fDistrict, '', true);
     document.getElementById('nlSearchInput').value = '';
     document.getElementById('nlSearchMsg').style.display = 'none';
+    aqAvgSetStatusLock_(null);
     runSearch();
   });
 
@@ -15600,6 +15758,7 @@
      * ============================================================================ */
     function statsGoExplore_(filters) {
       filters = filters || {};
+      if (typeof window.aqAvgSetStatusLock_ === 'function') window.aqAvgSetStatusLock_(null);
       try {
         if (filters.developer != null) { var fd = document.getElementById('f_developer'); if (fd) fd.value = devDisplayName_(filters.developer); }
         if (filters.category != null) { var fc = document.getElementById('f_category'); if (fc) fc.value = filters.category; }
@@ -15788,6 +15947,8 @@
 
       const ctx = document.getElementById('priceHistoryCanvas').getContext('2d');
       if (priceHistoryChart) priceHistoryChart.destroy();
+      priceHistoryChart = null;
+      if (!window.Chart) { window.aqWhenChart_(function () { renderPriceHistoryChart(points); }); return; }   // جاهزية Chart.js (2026-11-17)
       priceHistoryChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -15918,10 +16079,16 @@
         return null;
       }
       var total = values.reduce(function (a, b) { return a + b; }, 0) || 1;
-      var chart = new Chart(canvas.getContext('2d'), {
-        type: 'doughnut',
-        data: { labels: labels, datasets: [{ data: values, backgroundColor: colors, borderColor: '#FFFFFF', borderWidth: 2 }] },
-        options: { responsive: true, maintainAspectRatio: false, cutout: '68%', plugins: { legend: { display: false }, tooltip: { rtl: true } } }
+      // نفس إعدادات الرسم بالظبط؛ الفرق إن الرسم بيستنى جاهزية Chart.js (aqWhenChart_) بدل ما يرمي خطأ يوقف باقي اللوحة.
+      // chart = حامل بنفس واجهة destroy() اللي بيستخدمها الرسم اللي بعده.
+      var chart = { _c: null, _off: false, destroy: function () { this._off = true; if (this._c) this._c.destroy(); } };
+      window.aqWhenChart_(function () {
+        if (chart._off) return;
+        chart._c = new Chart(canvas.getContext('2d'), {
+          type: 'doughnut',
+          data: { labels: labels, datasets: [{ data: values, backgroundColor: colors, borderColor: '#FFFFFF', borderWidth: 2 }] },
+          options: { responsive: true, maintainAspectRatio: false, cutout: '68%', plugins: { legend: { display: false }, tooltip: { rtl: true } } }
+        });
       });
       legend.innerHTML = labels.map(function (lbl, i) {
         var pct = Math.round((values[i] / total) * 1000) / 10;
@@ -15967,27 +16134,73 @@
      * ويُرسل بالفعل من getDashboardStats — بلا أي نداء إضافي). تجميع بالمنطقة (عبر كل
      * أنواع العقار فيها) + متوسط سعر متر مرجَّح بعدد الوحدات في كل مجموعة.
      * ============================================================================ */
-    function renderGeoDistribution_(districtStats) {
-      var el = document.getElementById('geoDistribution'); if (!el) return;
-      if (!districtStats || !districtStats.length) { el.innerHTML = '<div class="empty-note">لا توجد بيانات متاحة</div>'; return; }
-      var byDistrict = {};
-      districtStats.forEach(function (g) {
-        var d = byDistrict[g.name] || (byDistrict[g.name] = { name: g.name, count: 0, sumPpmWeighted: 0, countForPpm: 0 });
-        d.count += g.count || 0;
-        if (g.avgPricePerMeter) { d.sumPpmWeighted += g.avgPricePerMeter * (g.count || 0); d.countForPpm += (g.count || 0); }
+    /* ح2/ح6 — كل المجموعات المحسوبة (مفيش «أكبر 8»)، مدينة ← منطقة ← نوع، أقسام بتتفتح وتتقفل (<details>).
+     * المدينة والمنطقة دايمًا مع بعض، فمناطق بنفس الاسم من مدن مختلفة ما بتتدمجش. كل صف = مجموعة واحدة (نوع واحد) باسم المؤشر
+     * والقيمة والعدد والتنبيه والمستبعدين؛ الضغط (ح1) = بحث بالمدينة + المنطقة + النوع + «متاح». القيم من السيرفر كما هي. */
+    function avgTreeHtml_(list) {
+      var A = window.aqAvg_;
+      var cities = [], byCity = {};
+      list.forEach(function (g) {
+        var c = g.city || '';
+        if (!byCity[c]) { byCity[c] = { order: [], byDistrict: {} }; cities.push(c); }
+        var bc = byCity[c], d = g.district || g.name || '';
+        if (!bc.byDistrict[d]) { bc.byDistrict[d] = []; bc.order.push(d); }
+        bc.byDistrict[d].push(g);
       });
-      var rows = Object.values(byDistrict).sort(function (a, b) { return b.count - a.count; }).slice(0, 8);
-      var maxCount = Math.max.apply(null, rows.map(function (r) { return r.count; }).concat([1]));
-      el.innerHTML = rows.map(function (r) {
-        var ppm = r.countForPpm > 0 ? Math.round(r.sumPpmWeighted / r.countForPpm) : null;
-        return '<div class="stats-rank-row" data-district="' + escHtml_(r.name) + '">' +
-          '<span class="stats-rank-name">' + escHtml_(r.name) + '</span>' +
-          '<span class="stats-rank-meta">' + fmtNum(r.count) + ' وحدة' + (ppm ? ' · متوسط سعر المتر (تقديري) ' + fmtNum(ppm) + ' ج/م²' : '') + '</span>' +
-          '<div class="bar-track stats-rank-bar"><div class="bar-fill" style="width:' + (r.count / maxCount * 100) + '%"></div></div></div>';
+      var sumN = function (xs) { return xs.reduce(function (n, g) { return n + (Number(g.eligibleUnits) || 0); }, 0); };
+      return cities.map(function (c) {
+        var bc = byCity[c];
+        var all = []; bc.order.forEach(function (d) { all = all.concat(bc.byDistrict[d]); });
+        return '<details><summary><bdi>' + escHtml_(c || 'غير محدد') + '</bdi><span class="aq-avg-sum-meta">' + fmtNum(bc.order.length) + ' منطقة · ' + fmtNum(all.length) + ' مجموعة · ' + fmtNum(sumN(all)) + ' وحدة</span></summary>' +
+          bc.order.map(function (d) {
+            var gs = bc.byDistrict[d];
+            return '<details><summary><bdi>' + escHtml_((c || 'غير محدد') + ' — ' + (d || 'غير محدد')) + '</bdi><span class="aq-avg-sum-meta"><bdi>' + fmtNum(gs.length) + ' نوع · ' + fmtNum(sumN(gs)) + ' وحدة</bdi></span></summary>' +
+              gs.map(function (g) {
+                var go = A.canGo(g);
+                return '<div class="aq-avg-row' + (go ? '' : ' is-static') + '"' + (go ? A.attrs(g) + ' role="button" tabindex="0"' : '') + '>' +
+                  '<div class="aq-avg-row-top"><span class="aq-avg-row-type">' + escHtml_(g.propertyType) + '</span>' +
+                  '<span><span class="aq-avg-row-label">' + escHtml_(A.label(g)) + ': </span><span class="aq-avg-row-value">' + escHtml_(A.valueText(g)) + '</span></span></div>' +
+                  A.medianHtml(g) +
+                  '<div class="aq-avg-meta">' + A.metaHtml(g) + '</div></div>';
+              }).join('') + '</details>';
+          }).join('') + '</details>';
       }).join('');
-      el.querySelectorAll('.stats-rank-row').forEach(function (row) {
-        row.addEventListener('click', function () { statsGoExplore_({ keyword: row.getAttribute('data-district') }); });
+    }
+    function bindAvgRows_(el) {
+      el.querySelectorAll('.aq-avg-row[data-city]').forEach(function (row) {
+        row.addEventListener('click', function () { window.aqAvg_.goFromEl(row); });
         aqMakeKeyActivatable_(row);
+      });
+    }
+    function renderGeoDistribution_(res) {
+      var el = document.getElementById('geoDistribution'); if (!el) return;
+      var note = document.getElementById('geoDistributionNote');
+      var list = (res.districtStats || []).filter(function (g) { return !window.aqAvg_.isUnitPrice(g); });
+      if (note) {
+        note.textContent = 'المتاح بس · المتوسط الحسابي لسعر متر كل وحدة بعد الخصم (المساحة الداخلية + ثلث الحديقة والتراس والروف)' +
+          (typeof res.excludedCount === 'number' && res.excludedCount > 0 ? ' · ' + fmtNum(res.excludedCount) + ' وحدة مستبعدة من الحساب (مساحة خارجية أكبر من الداخلية)' : '');
+      }
+      if (!list.length) { el.innerHTML = '<div class="empty-note">لا توجد بيانات متاحة</div>'; return; }
+      el.className = 'aq-avg-tree';
+      el.innerHTML = avgTreeHtml_(list);
+      bindAvgRows_(el);
+    }
+    function renderVillaAverages_(res) {
+      var el = document.getElementById('villaAverages'); if (!el) return;
+      var list = (res.districtStats || []).filter(function (g) { return window.aqAvg_.isUnitPrice(g); });
+      if (!list.length) { el.innerHTML = '<div class="empty-note">لا توجد وحدات متاحة من النوع ده</div>'; return; }
+      el.innerHTML = avgTreeHtml_(list);
+      bindAvgRows_(el);
+    }
+    function renderExcludedUnits_(res) {
+      var section = document.getElementById('excludedUnitsSection');
+      var el = document.getElementById('excludedUnitsList');
+      if (!section || !el) return;
+      if (!Array.isArray(res.excludedUnitsList)) { section.style.display = 'none'; el.innerHTML = ''; return; }   // مش المالك
+      section.style.display = '';
+      el.innerHTML = window.aqAvg_.excludedHtml(res.excludedUnitsList);
+      el.querySelectorAll('.aq-avg-open-unit').forEach(function (b) {
+        b.addEventListener('click', function () { statsOpenUnit_(b.getAttribute('data-unit')); });
       });
     }
 
@@ -15998,6 +16211,7 @@
      * بلا أي تعديل أو إضافة في الباك-إند.
      * ============================================================================ */
     var devOpenName = null;
+    var lastStatsRes_ = null;   // آخر رد getDashboardStats (developerStats لتفاصيل المطوّر — ح4)
     function renderDeveloperRanking_(topDevelopers, total) {
       var el = document.getElementById('developerBars'); if (!el) return;
       if (!topDevelopers || !topDevelopers.length) { el.innerHTML = '<div class="empty-note">لا توجد بيانات بعد</div>'; return; }
@@ -16040,12 +16254,16 @@
         expand.innerHTML = buildDeveloperDrilldownHtml_(name, units);
         var btn = expand.querySelector('[data-explore-dev]');
         if (btn) btn.addEventListener('click', function (e) { e.stopPropagation(); statsGoExplore_({ developer: name }); });
+        expand.querySelectorAll('.aq-avg-row[data-city]').forEach(function (row) {
+          row.addEventListener('click', function (e) { e.stopPropagation(); window.aqAvg_.goFromEl(row); });
+          aqMakeKeyActivatable_(row);
+        });
       }).withFailureHandler(function () {
         expand.innerHTML = '<div class="empty-note">تعذّر تحميل بيانات المطوّر</div>';
       }).searchUnits({ developer: name }, getViewerAdminPin());
     }
     function buildDeveloperDrilldownHtml_(name, units) {
-      var byStatus = {}; var availableValue = 0, availableValueAfter = 0, ppmSum = 0, ppmCount = 0, discCount = 0;
+      var byStatus = {}; var availableValue = 0, availableValueAfter = 0, discCount = 0;
       units.forEach(function (u) {
         var st = u['Status'] || 'غير محدد';
         byStatus[st] = (byStatus[st] || 0) + 1;
@@ -16054,11 +16272,20 @@
           availableValue += price;
           availableValueAfter += Number(u['Price After Discount']) || price;
         }
-        var ppm = Number(u['Price per Meter']) || 0;
-        if (ppm > 0) { ppmSum += ppm; ppmCount++; }
         if ((Number(u['Discount Percentage']) || 0) > 0) discCount++;
       });
-      var avgPpm = ppmCount > 0 ? Math.round(ppmSum / ppmCount) : null;
+      // ح4: مؤشر منفصل لكل مطوّر + مدينة + منطقة + نوع، من getDashboardStats.developerStats (السيرفر) — مفيش متوسط واحد على كل الأنواع والمناطق
+      var devGroups = ((lastStatsRes_ && lastStatsRes_.developerStats) || []).filter(function (g) { return g.developer === name; });
+      var A = window.aqAvg_;
+      var devGroupsHtml = devGroups.length
+        ? '<div class="aq-avg-note">متوسطات الوحدات المتاحة لكل مدينة ومنطقة ونوع عقار:</div>' + devGroups.map(function (g) {
+            var go = A.canGo(g);
+            return '<div class="aq-avg-row' + (go ? '' : ' is-static') + '"' + (go ? A.attrs(g) + ' role="button" tabindex="0"' : '') + '>' +
+              '<div class="aq-avg-row-top"><span class="aq-avg-row-type">' + escHtml_(A.geo(g) + ' — ' + g.propertyType) + '</span>' +
+              '<span><span class="aq-avg-row-label">' + escHtml_(A.label(g)) + ': </span><span class="aq-avg-row-value">' + escHtml_(A.valueText(g)) + '</span></span></div>' +
+              A.medianHtml(g) + '<div class="aq-avg-meta">' + A.metaHtml(g) + '</div></div>';
+          }).join('')
+        : '<div class="aq-avg-note">مفيش وحدات متاحة داخلة في حساب المتوسطات للمطوّر ده.</div>';
       return '<div class="chart-summary">' +
         '<div class="stat"><div class="lbl">إجمالي الوحدات</div><div class="val">' + fmtNum(units.length) + '</div></div>' +
         '<div class="stat"><div class="lbl">متاح</div><div class="val">' + fmtNum(byStatus['متاح'] || 0) + '</div></div>' +
@@ -16066,31 +16293,62 @@
         '<div class="stat"><div class="lbl">مباع</div><div class="val">' + fmtNum(byStatus['مباع'] || 0) + '</div></div>' +
         '<div class="stat"><div class="lbl">قيمة المتاح (قبل الخصم)</div><div class="val">' + fmtNum(availableValue) + ' جنيه</div></div>' +
         '<div class="stat"><div class="lbl">قيمة المتاح (بعد الخصم)</div><div class="val">' + fmtNum(availableValueAfter) + ' جنيه</div></div>' +
-        (avgPpm ? '<div class="stat"><div class="lbl">متوسط سعر المتر</div><div class="val">' + fmtNum(avgPpm) + ' ج/م²</div></div>' : '') +
         '<div class="stat"><div class="lbl">وحدات بها خصم</div><div class="val">' + fmtNum(discCount) + '</div></div>' +
         '</div>' +
+        devGroupsHtml +
         '<button type="button" class="aq-btn aq-btn--ghost stats-dev-explore-btn" data-explore-dev>عرض كل وحدات ' + name + ' في استكشف ←</button>';
     }
 
     /* ============================================================================
      * LEVEL 5 — تحليل الأسعار (من districtStats الموجود + حقول الخصم الإضافية إن وُجدت)
      * ============================================================================ */
+    /* ح3 — الأعلى/الأقل: ترتيب جوّه كل نوع عقار لوحده؛ Villa/Townhouse/Twin House بسعر الوحدة؛ المجموعات اللي أقل من 3 وحدات
+     * ما بتدخلش الترتيب بس (بتفضل ظاهرة في الكروت بتنبيهها). اختيار النوع من قائمة؛ الافتراضي = النوع اللي عنده أكتر مجموعات مؤهّلة. */
+    var RANK_MIN_N = 3;
+    var rankTypeSel_ = null;
+    function priceRankHtml_(res, type) {
+      var A = window.aqAvg_;
+      var rows = (res.districtStats || []).filter(function (g) { return g.propertyType === type && (Number(g.eligibleUnits) || 0) >= RANK_MIN_N && A.value(g) != null; });
+      var sorted = rows.slice().sort(function (a, b) { return A.value(b) - A.value(a); });
+      // أعلى 3 وأقل 3؛ لو المجموعات أقل من 6 بتتقسم بينهم من غير تكرار (3 مجموعات = 2 فوق + 1 تحت)
+      var top = sorted.slice(0, Math.min(3, Math.ceil(sorted.length / 2)));
+      var bottom = sorted.slice(Math.max(top.length, sorted.length - 3)).reverse();
+      var unitWord = rows.length && A.isUnitPrice(rows[0]) ? 'سعر الوحدة' : 'سعر المتر';
+      function listHtml(title, list, accentCls) {
+        return '<div class="stats-mint-panel ' + accentCls + '"><h4>' + escHtml_(title) + '</h4>' + (list.length ? list.map(function (g) {
+          var go = A.canGo(g);
+          return '<div class="stats-price-item aq-avg-row' + (go ? '' : ' is-static') + '"' + (go ? A.attrs(g) + ' role="button" tabindex="0"' : '') + '>' +
+            '<div class="stats-price-item-name">' + escHtml_(A.geo(g)) + '</div>' +
+            '<div class="stats-price-item-sub">' + escHtml_(g.propertyType) + ' · ' + escHtml_(fmtNum(g.eligibleUnits)) + ' وحدة' + (g.excludedUnits > 0 ? ' · مستبعد ' + escHtml_(fmtNum(g.excludedUnits)) : '') + '</div>' +
+            '<div class="stats-price-item-value">' + escHtml_(A.valueText(g)) + '</div>' +
+            '</div>';
+        }).join('') : '<div class="empty-note">مفيش مجموعات فيها ' + RANK_MIN_N + ' وحدات أو أكتر</div>') + '</div>';
+      }
+      return '<div class="stats-grid-2">' + listHtml('أعلى متوسط ' + unitWord + ' — ' + type, top, 'stats-mint-panel--accentHigh') +
+        (sorted.length > 1 ? listHtml('أقل متوسط ' + unitWord + ' — ' + type, bottom, 'stats-mint-panel--accentLow') : '<div class="stats-mint-panel stats-mint-panel--accentLow"><h4>' + escHtml_('أقل متوسط ' + unitWord + ' — ' + type) + '</h4><div class="empty-note">مجموعة واحدة بس — مفيش مقارنة</div></div>') + '</div>';
+    }
     function renderPriceAnalytics_(res) {
       var el = document.getElementById('priceAnalytics'); if (!el) return;
-      var rows = (res.districtStats || []).filter(function (g) { return g.avgPricePerMeter; });
-      if (!rows.length) { el.innerHTML = '<div class="empty-note">لا توجد بيانات كافية</div>'; return; }
-      var sorted = rows.slice().sort(function (a, b) { return b.avgPricePerMeter - a.avgPricePerMeter; });
-      var top = sorted.slice(0, 3), bottom = sorted.slice(-3).reverse();
-      function listHtml(title, list, accentCls) {
-        return '<div class="stats-mint-panel ' + accentCls + '"><h4>' + title + '</h4>' + (list.length ? list.map(function (g) {
-          return '<div class="stats-price-item">' +
-            '<div class="stats-price-item-name">' + g.name + '</div>' +
-            '<div class="stats-price-item-sub">' + g.propertyType + '</div>' +
-            '<div class="stats-price-item-value">' + fmtNum(g.avgPricePerMeter) + ' ج/م²</div>' +
-            '</div>';
-        }).join('') : '<div class="empty-note">لا توجد بيانات كافية</div>') + '</div>';
+      var A = window.aqAvg_;
+      var all = res.districtStats || [];
+      if (!all.length) { el.innerHTML = '<div class="empty-note">لا توجد بيانات كافية</div>'; return; }
+      var typeCount = {};
+      all.forEach(function (g) { if ((Number(g.eligibleUnits) || 0) >= RANK_MIN_N) typeCount[g.propertyType] = (typeCount[g.propertyType] || 0) + 1; });
+      var types = Object.keys(typeCount).sort(function (a, b) { return (typeCount[b] - typeCount[a]) || a.localeCompare(b); });
+      var ppmTypes = types.filter(function (t) { return !all.some(function (g) { return g.propertyType === t && A.isUnitPrice(g); }); });
+      var unitTypes = types.filter(function (t) { return ppmTypes.indexOf(t) === -1; });
+      if (!rankTypeSel_ || types.indexOf(rankTypeSel_) === -1) rankTypeSel_ = ppmTypes[0] || unitTypes[0] || null;
+      var html = '';
+      if (rankTypeSel_) {
+        var opt = function (t) { return '<option value="' + escHtml_(t) + '"' + (t === rankTypeSel_ ? ' selected' : '') + '>' + escHtml_(t) + ' (' + fmtNum(typeCount[t]) + ' مجموعة)</option>'; };
+        html += '<label class="aq-avg-note" for="priceRankType">الترتيب جوّه نوع عقار واحد، وللمجموعات اللي فيها ' + RANK_MIN_N + ' وحدات متاحة أو أكتر بس:</label> ' +
+          '<select id="priceRankType" class="aq-avg-type-select">' +
+          (ppmTypes.length ? '<optgroup label="سعر المتر">' + ppmTypes.map(opt).join('') + '</optgroup>' : '') +
+          (unitTypes.length ? '<optgroup label="سعر الوحدة">' + unitTypes.map(opt).join('') + '</optgroup>' : '') +
+          '</select><div id="priceRankLists">' + priceRankHtml_(res, rankTypeSel_) + '</div>';
+      } else {
+        html += '<div class="empty-note">مفيش مجموعات فيها ' + RANK_MIN_N + ' وحدات أو أكتر للترتيب</div>';
       }
-      var html = '<div class="stats-grid-2">' + listHtml('أعلى متوسط سعر متر', top, 'stats-mint-panel--accentHigh') + listHtml('أقل متوسط سعر متر', bottom, 'stats-mint-panel--accentLow') + '</div>';
       if (typeof res.discountedUnitsCount === 'number') {
         var pct = res.total > 0 ? Math.round((res.discountedUnitsCount / res.total) * 1000) / 10 : 0;
         html += '<div class="chart-summary" style="margin-top:12px;">' +
@@ -16102,6 +16360,19 @@
         html += '<div class="stats-pending-note">مؤشرات الخصم (النسبة والمتوسط) ستظهر بعد نشر آخر تحديث للخادم.</div>';
       }
       el.innerHTML = html;
+      var bindRank = function () {
+        el.querySelectorAll('.aq-avg-row[data-city]').forEach(function (row) {
+          row.addEventListener('click', function () { A.goFromEl(row); });
+          aqMakeKeyActivatable_(row);
+        });
+      };
+      bindRank();
+      var sel = document.getElementById('priceRankType');
+      if (sel) sel.addEventListener('change', function () {
+        rankTypeSel_ = sel.value;
+        var box = document.getElementById('priceRankLists');
+        if (box) { box.innerHTML = priceRankHtml_(res, rankTypeSel_); bindRank(); }
+      });
     }
 
     /* ============================================================================
@@ -16131,7 +16402,10 @@
       renderStatsValuePanel_(res);
       renderCategoryDonut_(res.byCategory || {});
       renderStatusDonut_(res.byStatus || {}, res.archivedCount || 0);
-      renderGeoDistribution_(res.districtStats || []);
+      lastStatsRes_ = res;
+      renderGeoDistribution_(res);
+      renderVillaAverages_(res);
+      renderExcludedUnits_(res);
       renderDeveloperRanking_(res.topDevelopers || [], res.total || 0);
       renderPriceAnalytics_(res);
       renderPaymentDeliveryInsights_(res);
