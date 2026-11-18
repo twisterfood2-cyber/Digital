@@ -3569,6 +3569,8 @@
     #editModal:not(:has(#editSaveBtn)):not(.aq-quote-mode) .image-thumb .remove-img,
     #editModal:not(:has(#editSaveBtn)):not(.aq-quote-mode) #editImagesUploadMsg { display: none !important; }
     #editModal:not(:has(#editSaveBtn)):not(.aq-quote-mode) .image-thumb { cursor: default; }
+    /* (مراجعة 2026-11-18) خصم الكاش مش جزء من «عرض السعر»: القسم يتخفى هناك بس (إضافة/تعديل/استنساخ بيشيلوا .aq-quote-mode) */
+    #editModal.aq-quote-mode .aq-cash-discount-block { display: none !important; }
     /* عرض SALES بلا صور: عنوان قسم الصور يختفي بدل قسم فارغ */
     #editModal:not(:has(#editSaveBtn)):not(.aq-quote-mode) #editForm:has(#editImagesPreview:empty) .section-title:has(+ .aq-fg-images) { display: none; }
 
@@ -6868,6 +6870,33 @@
         <button type="button" id="addAdditionalPaymentBtn" class="aq-btn--form-secondary">+ دفعة أخرى</button>
       </div>
 
+      <!-- خصم الكاش (اختياري) — مستقل تمامًا عن «نسبة الخصم %» (خصم التقسيط) أعلاه ولا يغيّر أي حساب فيه.
+           بيتحسب على السعر الأصلي (قبل الخصم). سعر الكاش النهائي داخلي فقط — مش بيتعرض هنا ولا في التفاصيل. -->
+      <!-- (مراجعة 2026-11-18) القسم كله (العنوان + الحقول) جوّه غلاف واحد بيتخفى في وضع «عرض السعر» بالـ CSS بس
+           (#editModal.aq-quote-mode) — الإخفاء ما بيمسحش أي قيمة، و«عرض السعر» أصلًا ما بيحفظش. -->
+      <div class="aq-cash-discount-block" id="cashDiscountBlock">
+      <div class="section-title">خصم الكاش</div>
+      <div class="grid aq-fg-cash-discount" id="cashDiscountSection">
+        <div class="aq-c3">
+          <label for="editCashDiscountType">نوع خصم الكاش</label>
+          <select name="cashDiscountType" id="editCashDiscountType">
+            <option value="">غير محدد</option>
+            <option value="none">بدون خصم كاش</option>
+            <option value="percentage">نسبة مئوية</option>
+            <option value="fixed">مبلغ ثابت</option>
+          </select>
+        </div>
+        <div class="aq-c3" id="editCashDiscountValueWrap" style="display:none;">
+          <label for="editCashDiscountValue" id="editCashDiscountValueLabel">نسبة خصم الكاش %</label>
+          <input type="number" name="cashDiscountValue" id="editCashDiscountValue" step="any" inputmode="decimal">
+        </div>
+        <div class="aq-c6">
+          <div class="aq-form-hint" id="editCashDiscountHint">اختياري — بيتحسب على السعر الأصلي (قبل خصم التقسيط). لو الوحدة طلعت «نفس الوحدة»: «غير محدد» = خصمها المحفوظ يفضل زي ما هو، و«بدون خصم كاش» = يتشال.</div>
+          <div class="aq-form-hint" id="editCashDiscountError" role="alert" style="display:none; color:var(--aq-color-danger);"></div>
+        </div>
+      </div>
+      </div>
+
       <!-- قسم "بيانات المالك والمسؤول" مخفي من الواجهة (كل الشغل من مطورين — غير مستخدم).
            الحقول باقية في الـ DOM مخفية عمدًا: أعمدة الشيت (Owner Name / Owner Phone / Sales/Agent)
            وبيانات الوحدات القديمة تُحمَّل وتُحفظ كما هي بلا تغيير في الباك-إند أو بنية البيانات. -->
@@ -7988,6 +8017,8 @@
         const el = editForm.elements[name];
         if (el) el.value = fieldMap[name] || '';
       });
+      // خصم الكاش (مستقل عن خصم التقسيط): null = «غير محدد» — الحقل يفضل فاضي من غير أي افتراض
+      setCashDiscountFields_(u['Cash Discount Type'], u['Cash Discount Value']);
       // إظهار صفوف الدفعات الإضافية المنسوخة من الوحدة الأصلية (نفس منطق loadUnitIntoEditForm)
       editActiveAdditionalPaymentCount = 0;
       for (let _i = 1; _i <= ADDITIONAL_PAYMENT_MAX_SLOTS; _i++) {
@@ -8855,6 +8886,18 @@
     // الشهري نفسه غير متوفر (نفس شرط has() المستخدَم في بقية البلاطات).
     const quarterlyInstallment = u['Monthly Installment'] ? Number(u['Monthly Installment']) * 3 : '';
 
+    // خصم الكاش (مستقل عن خصم التقسيط): بيظهر الخصم بنوعه بس — **سعر الكاش النهائي مش بيتعرض إطلاقًا**.
+    // البلاطة بتظهر بس لما الكائن جاي من getUnitById/getArchivedUnitById (المفتاح موجود)؛ null = «غير محدد».
+    const cashDiscountTile = Object.prototype.hasOwnProperty.call(u, 'Cash Discount Type') ? (function () {
+      const t = u['Cash Discount Type'];
+      const v = Number(u['Cash Discount Value']);
+      const hasV = u['Cash Discount Value'] !== null && u['Cash Discount Value'] !== undefined && u['Cash Discount Value'] !== '' && isFinite(v);
+      let txt = 'غير محدد';
+      if (t === 'percentage' && hasV) txt = v + '% (نسبة مئوية)';
+      else if (t === 'fixed' && hasV) txt = fmtNum(v) + ' جنيه (مبلغ ثابت)';
+      return tile(ICON.tag, 'خصم الكاش', txt);
+    })() : '';
+
     const finTiles = [
       tile(ICON.wallet, 'المقدم', u['Down Payment'] ? esc(u['Down Payment']) + '% = ' + fmtNum(u['Down Payment Value']) + ' جنيه' : ''),
       tile(ICON.calendar, 'القسط الشهري', u['Monthly Installment'] ? fmtNum(u['Monthly Installment']) + ' جنيه' : ''),
@@ -8864,6 +8907,7 @@
       tile(ICON.clock, 'سنوات التقسيط', u['Installment Years'] ? esc(u['Installment Years']) + ' سنة' : ''),
       ...additionalPaymentTiles,
       tile(ICON.calc, 'طريقة الدفع', u['Payment Method']),
+      cashDiscountTile,
       tile(ICON.calendar, 'تاريخ التسليم', u['Delivery Date'])
     ].filter(Boolean).join('');
     const resaleHtml = u['Listing Type'] === 'ريسيل' ? `
@@ -11151,6 +11195,65 @@
   let verifiedPin = null;
   let unitWritePin = null; // كلمة سر (إدخال بيانات أو أدمن) تُرسل للسيرفر للتحقّق قبل حفظ/إضافة وحدة
 
+  /* ---------- خصم الكاش (اختياري) — مستقل تمامًا عن «نسبة الخصم %» (خصم التقسيط) ولا يدخل في أي حساب للتقسيط.
+   * نوع واحد بس: نسبة مئوية أو مبلغ ثابت، محسوب على السعر الأصلي. فاضي = «غير محدد» (مش = السعر الأصلي).
+   * سعر الكاش النهائي مش بيتحسب ولا بيتعرض في الواجهة. التحقق الموثوق على السيرفر (src/units/cash-discount.js)
+   * — ده نفس القواعد ونفس الرسائل عشان المستخدم يشوف الخطأ قبل الإرسال. */
+  const editCashDiscountType = document.getElementById('editCashDiscountType');
+  const editCashDiscountValue = document.getElementById('editCashDiscountValue');
+  const editCashDiscountValueWrap = document.getElementById('editCashDiscountValueWrap');
+  const editCashDiscountValueLabel = document.getElementById('editCashDiscountValueLabel');
+  const editCashDiscountError = document.getElementById('editCashDiscountError');
+  function showCashDiscountError_(msg) {
+    editCashDiscountError.textContent = msg || '';
+    editCashDiscountError.style.display = msg ? 'block' : 'none';
+  }
+  // (W4 — 2026-11-18) القائمة فيها حالتين من غير قيمة ولازم يفضلوا مختلفين:
+  //   ''     = «غير محدد»       → في «نفس الوحدة» الخصم المحفوظ يفضل زي ما هو (وفي باقي المسارات = NULL زي الأول).
+  //   'none' = «بدون خصم كاش»   → اختيار صريح: يتخزن NULL (وفي «نفس الوحدة» بيمسح الخصم المحفوظ).
+  const CASH_TYPE_NONE = 'none';
+  const cashTypeHasValue_ = function (t) { return t === 'percentage' || t === 'fixed'; };
+  function syncCashDiscountUi_() {
+    const type = editCashDiscountType.value;
+    if (!cashTypeHasValue_(type)) editCashDiscountValue.value = ''; // «غير محدد» / «بدون خصم كاش» = مفيش قيمة (مش صفر)
+    editCashDiscountValueWrap.style.display = cashTypeHasValue_(type) ? '' : 'none';
+    editCashDiscountValueLabel.textContent = type === 'fixed' ? 'مبلغ خصم الكاش (جنيه)' : 'نسبة خصم الكاش %';
+    // من غير min/max عمدًا: تحقق المتصفح الأصلي كان هيمنع الإرسال برسالة عامة بدل رسائلنا (نفس رسائل السيرفر)
+    showCashDiscountError_('');
+  }
+  /** تعبئة القسم من بيانات وحدة محفوظة — null/غياب = فاضي («غير محدد») من غير أي افتراض. */
+  function setCashDiscountFields_(type, value) {
+    const t = (type === 'percentage' || type === 'fixed') ? type : '';
+    editCashDiscountType.value = t;
+    syncCashDiscountUi_();
+    editCashDiscountValue.value = (t && value !== null && value !== undefined && value !== '') ? String(value) : '';
+  }
+  /** نفس قواعد السيرفر: '' = صالح؛ غير كده رسالة الخطأ. */
+  function validateCashDiscountClient_() {
+    const type = String(editCashDiscountType.value || '').trim();
+    const raw = String(editCashDiscountValue.value || '').trim().replace(/,/g, '');
+    if ((!type || type === CASH_TYPE_NONE) && !raw) return '';
+    if (!type || type === CASH_TYPE_NONE) return 'حدّد نوع خصم الكاش (نسبة مئوية أو مبلغ ثابت) قبل إدخال قيمته';
+    if (!cashTypeHasValue_(type)) return 'نوع خصم الكاش غير صالح — اختر «نسبة مئوية» أو «مبلغ ثابت»';
+    if (!raw) return 'أدخل قيمة خصم الكاش، أو اختر «بدون خصم كاش»';
+    // (W1) نفس الصيغة الصارمة بتاعة السيرفر: عشري صريح بس (المتصفح بيقبل 1e1 في type=number)
+    if (/^-\d+(\.\d+)?$/.test(raw)) return 'قيمة خصم الكاش لا يمكن أن تكون سالبة';
+    if (!/^\d+(\.\d+)?$/.test(raw)) return 'قيمة خصم الكاش يجب أن تكون رقمًا';
+    const v = Number(raw);
+    if (!isFinite(v)) return 'قيمة خصم الكاش يجب أن تكون رقمًا';
+    // (مراجعة 2026-11-18) النسبة 0 ≤ ن < 100 ، والمبلغ الثابت 0 ≤ م < السعر الأصلي (المساوي ممنوع)
+    if (type === 'percentage' && v >= 100) return 'نسبة خصم الكاش يجب أن تكون أقل من 100%';
+    if (type === 'fixed') {
+      const price = parseFloat(String((editForm.elements['price'] && editForm.elements['price'].value) || '').replace(/,/g, '')) || 0;
+      if (v >= price) return 'مبلغ خصم الكاش (' + v.toLocaleString('en-US') + ' جنيه) يجب أن يكون أقل من السعر الأصلي للوحدة (' + price.toLocaleString('en-US') + ' جنيه)';
+    }
+    return '';
+  }
+  editCashDiscountType.addEventListener('change', syncCashDiscountUi_);
+  editCashDiscountValue.addEventListener('input', function () { showCashDiscountError_(''); });
+  // editForm.reset() بيرجّع القائمة لـ «بدون» — نزامن إظهار خانة القيمة بعدها
+  editForm.addEventListener('reset', function () { setTimeout(syncCashDiscountUi_, 0); });
+
   /* ---------- حساب السعر بعد الخصم والمقدم والقسط الشهري التقريبي لحظيًا (فورم التعديل) ---------- */
   const editInstallmentFields = [
     'price', 'discountPercent', 'downPayment', 'downPaymentBase', 'paymentAmount', 'paymentCount', 'installmentYears',
@@ -11609,6 +11712,8 @@
         const el = editForm.elements[name];
         if (el) el.value = fieldMap[name] || '';
       });
+      // خصم الكاش (مستقل عن خصم التقسيط): null = «غير محدد» — الحقل يفضل فاضي من غير أي افتراض
+      setCashDiscountFields_(u['Cash Discount Type'], u['Cash Discount Value']);
       // إظهار صفوف الدفعات الإضافية المُحمَّلة فعليًا من الوحدة (حتى آخر دفعة بها قيمة) —
       // لا فجوات: لو الدفعة 2 فاضية والدفعة 3 مليانة (حالة غير متوقعة)، تظهر لغاية 3 لعرض كل البيانات.
       editActiveAdditionalPaymentCount = 0;
@@ -11904,6 +12009,17 @@
       return;
     }
 
+    // خصم الكاش: نفس تحقق السيرفر قبل الإرسال (رسالة واضحة جنب القسم + في رسالة النموذج)
+    var _cashErr = validateCashDiscountClient_();
+    if (_cashErr) {
+      showCashDiscountError_(_cashErr);
+      editMsg.className = 'error';
+      editMsg.style.display = 'block';
+      editMsg.textContent = _cashErr;
+      try { editCashDiscountType.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (_e) {}
+      return;
+    }
+
     editSaveBtn.disabled = true;
     editSaveBtn.textContent = editModalMode === 'clone' ? 'جاري الإضافة...' : 'جاري الحفظ...';
     editMsg.style.display = 'none';
@@ -11986,6 +12102,13 @@
                 additionalPayment4: (data && data.additionalPayment4) || '', additionalPayment4Count: (data && data.additionalPayment4Count) || '', additionalPayment4Due: (data && data.additionalPayment4Due) || '',
                 additionalPayment5: (data && data.additionalPayment5) || '', additionalPayment5Count: (data && data.additionalPayment5Count) || '', additionalPayment5Due: (data && data.additionalPayment5Due) || ''
               };
+              // خصم الكاش جزء من الشروط التجارية (مستقل عن discountPercent) — السيرفر بيتحقق منه على السعر الأصلي.
+              // (W4) ده برضه «نفس الوحدة»: «غير محدد» = ما نبعتش المفتاحين أصلًا ← السيرفر بيسيب الخصم المحفوظ زي ما هو؛
+              // «بدون خصم كاش» ('none') = مسح صريح؛ نسبة/مبلغ = تحديث.
+              if (data && data.cashDiscountType) {
+                _terms.cashDiscountType = data.cashDiscountType;
+                _terms.cashDiscountValue = (data.cashDiscountValue != null) ? String(data.cashDiscountValue) : '';
+              }
               google.script.run.withSuccessHandler(function(res2) {
                 editSaveBtn.disabled = false; editSaveBtn.textContent = 'حفظ الوحدة الجديدة';
                 editMsg.innerHTML = '';
