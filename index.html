@@ -6897,6 +6897,36 @@
       </div>
       </div>
 
+      <!-- وديعة الصيانة (اختياري) — REPORTS/MAINTENANCE_DEPOSIT_DESIGN_FINAL.md (A1–A16). معلومة للعرض بس: مش جزء من السعر
+           ولا من أي حساب (المقدم/الأقساط/سعر المتر/المتوسطات). بتظهر في «عرض السعر» كمان (بعكس خصم الكاش — A8).
+           المبلغ المحسوب للعرض بس ومش بيتبعت ولا بيتخزن. -->
+      <div class="aq-maintenance-deposit-block" id="maintenanceDepositBlock">
+      <div class="section-title">وديعة الصيانة</div>
+      <div class="grid aq-fg-maintenance-deposit" id="maintenanceDepositSection">
+        <div class="aq-c3">
+          <label for="editMaintenanceDepositType">نوع وديعة الصيانة</label>
+          <select name="maintenanceDepositType" id="editMaintenanceDepositType">
+            <option value="">غير محدد</option>
+            <option value="none">بدون وديعة صيانة</option>
+            <option value="percent_before_discount">نسبة من السعر قبل الخصم</option>
+            <option value="percent_after_discount">نسبة من السعر بعد الخصم</option>
+            <option value="percent_unconfirmed_base">نسبة — أساس الحساب غير مؤكد</option>
+            <option value="fixed">مبلغ ثابت</option>
+          </select>
+        </div>
+        <div class="aq-c3" id="editMaintenanceDepositValueWrap" style="display:none;">
+          <label for="editMaintenanceDepositValue" id="editMaintenanceDepositValueLabel">نسبة وديعة الصيانة %</label>
+          <input type="number" name="maintenanceDepositValue" id="editMaintenanceDepositValue" step="any" inputmode="decimal">
+        </div>
+        <div class="aq-c6">
+          <div class="aq-form-hint" id="editMaintenanceDepositPreview" style="display:none;"></div>
+          <div class="aq-form-hint" id="editMaintenanceDepositAiNote" role="status" style="display:none; white-space:pre-line;"></div>
+          <div class="aq-form-hint" id="editMaintenanceDepositHint">اختياري — معلومة للعرض بس، ومش بتدخل في السعر أو أي حساب. لو الوحدة طلعت «نفس الوحدة»: «غير محدد» = الوديعة المحفوظة تفضل زي ما هي، و«بدون وديعة صيانة» = تتسجل بدون.</div>
+          <div class="aq-form-hint" id="editMaintenanceDepositError" role="alert" style="display:none; color:var(--aq-color-danger);"></div>
+        </div>
+      </div>
+      </div>
+
       <!-- قسم "بيانات المالك والمسؤول" مخفي من الواجهة (كل الشغل من مطورين — غير مستخدم).
            الحقول باقية في الـ DOM مخفية عمدًا: أعمدة الشيت (Owner Name / Owner Phone / Sales/Agent)
            وبيانات الوحدات القديمة تُحمَّل وتُحفظ كما هي بلا تغيير في الباك-إند أو بنية البيانات. -->
@@ -7671,7 +7701,12 @@
       'Notes': g('notes'),
       'Images': (typeof editUnitImages !== 'undefined' ? editUnitImages : []).join(','),
       'Entered By': (window.__currentUser && window.__currentUser.name) || '',
-      'Date Added': '', 'Last Updated': ''
+      'Date Added': '', 'Last Updated': '',
+      // وديعة الصيانة: من الفورم زي ما هي (عرض بس). __quote = «عرض السعر» بس (السطر دايمًا — A8)؛
+      // مسار SALES بـ withRealId = وحدة حقيقية (السطر بس لو محددة — A9/A14).
+      'Maintenance Deposit Type': g('maintenanceDepositType') || null,
+      'Maintenance Deposit Value': g('maintenanceDepositValue') === '' ? null : Number(g('maintenanceDepositValue')),
+      __quote: (typeof editModalMode !== 'undefined' && editModalMode === 'quote')
     };
   }
 
@@ -7953,6 +7988,8 @@
     }
     renderAdditionalPaymentRows();
 
+    applyAiMaintenanceDeposit_(data); // وديعة الصيانة: تعبئة للمراجعة بس (أو ما يتلمسش لو مفيش معلومة)
+
     if (data.city) {
       const cityMatch = Object.keys(CITY_DISTRICTS).find(c => c === data.city || c.includes(data.city) || data.city.includes(c));
       if (cityMatch) {
@@ -8019,6 +8056,7 @@
       });
       // خصم الكاش (مستقل عن خصم التقسيط): null = «غير محدد» — الحقل يفضل فاضي من غير أي افتراض
       setCashDiscountFields_(u['Cash Discount Type'], u['Cash Discount Value']);
+      setMaintenanceDepositFields_(u['Maintenance Deposit Type'], u['Maintenance Deposit Value']);
       // إظهار صفوف الدفعات الإضافية المنسوخة من الوحدة الأصلية (نفس منطق loadUnitIntoEditForm)
       editActiveAdditionalPaymentCount = 0;
       for (let _i = 1; _i <= ADDITIONAL_PAYMENT_MAX_SLOTS; _i++) {
@@ -8897,6 +8935,10 @@
       else if (t === 'fixed' && hasV) txt = fmtNum(v) + ' جنيه (مبلغ ثابت)';
       return tile(ICON.tag, 'خصم الكاش', txt);
     })() : '';
+    // وديعة الصيانة (A7): بعد «خصم الكاش» وقبل «تاريخ التسليم»، بأيقونة غير أيقونة الخصومات. null = «غير محدد».
+    // المبلغ للعرض بس (قبل = Price، بعد = Price After Discount) — مش جزء من السعر ولا من أي إجمالي.
+    const maintenanceDepositTile = Object.prototype.hasOwnProperty.call(u, 'Maintenance Deposit Type')
+      ? tile(ICON.building, 'وديعة الصيانة', maintenanceDepositTileText_(u)) : '';
 
     const finTiles = [
       tile(ICON.wallet, 'المقدم', u['Down Payment'] ? esc(u['Down Payment']) + '% = ' + fmtNum(u['Down Payment Value']) + ' جنيه' : ''),
@@ -8908,6 +8950,7 @@
       ...additionalPaymentTiles,
       tile(ICON.calc, 'طريقة الدفع', u['Payment Method']),
       cashDiscountTile,
+      maintenanceDepositTile,
       tile(ICON.calendar, 'تاريخ التسليم', u['Delivery Date'])
     ].filter(Boolean).join('');
     const resaleHtml = u['Listing Type'] === 'ريسيل' ? `
@@ -9341,7 +9384,58 @@
   }
 
   /* ---------- مشاركة بيانات الوحدة عبر واتساب (مع الصور لو الجهاز بيدعم) ---------- */
+  /* ---------- وديعة الصيانة — نصوص العرض (الكارت / الواتساب / الـ PDF). معلومة عرض بس ومش بتدخل في أي إجمالي.
+   * المبلغ: قبل الخصم = Price، بعد الخصم = Price After Discount (المخزّن)، ومفيش مبلغ لـ percent_unconfirmed_base (A5)
+   * — نفس maintenanceDepositAmount على السيرفر. سعر الكاش عمره ما بيبقى أساس (A4). */
+  var MAINTENANCE_DEPOSIT_TYPES_ = ['none', 'percent_before_discount', 'percent_after_discount', 'percent_unconfirmed_base', 'fixed'];
+  function maintenanceDepositHasValue_(t) { return t === 'percent_before_discount' || t === 'percent_after_discount' || t === 'percent_unconfirmed_base' || t === 'fixed'; }
+  /** { type, value } صالح أو null (= غير محدد). قيمة مش صالحة مع النوع = غير محدد (حارس للعرض بس). */
+  function maintenanceDepositNormalize_(type, value) {
+    if (type === 'none') return { type: 'none', value: null };
+    if (!maintenanceDepositHasValue_(type)) return null;
+    if (value === null || value === undefined || value === '') return null;
+    const v = Number(value);
+    if (!isFinite(v) || v <= 0) return null;
+    if (type !== 'fixed' && v >= 100) return null;
+    return { type: type, value: v };
+  }
+  function maintenanceDepositAmountClient_(type, value, price, pad) {
+    const d = maintenanceDepositNormalize_(type, value);
+    if (!d || d.type === 'none' || d.type === 'percent_unconfirmed_base') return null;
+    if (d.type === 'fixed') return d.value;
+    const rawBase = d.type === 'percent_before_discount' ? price : pad; // مفيش رجوع لأساس تاني لو الأساس المطلوب ناقص
+    if (rawBase === '' || rawBase === null || rawBase === undefined) return null;
+    const base = Number(rawBase);
+    if (!isFinite(base) || base <= 0) return null;
+    return Math.round(base * d.value / 100);
+  }
+  /** نص الوديعة من غير بادئة — null = غير محددة. */
+  function maintenanceDepositPhrase_(type, value, price, pad) {
+    const d = maintenanceDepositNormalize_(type, value);
+    if (!d) return null;
+    if (d.type === 'none') return 'بدون وديعة صيانة';
+    if (d.type === 'fixed') return fmtNum(d.value) + ' جنيه';
+    if (d.type === 'percent_unconfirmed_base') return d.value + '% (أساس الحساب غير محدد)';
+    const amt = maintenanceDepositAmountClient_(d.type, d.value, price, pad);
+    return d.value + '% من السعر ' + (d.type === 'percent_before_discount' ? 'قبل' : 'بعد') + ' الخصم' + (amt != null ? ' = ' + fmtNum(amt) + ' جنيه' : '');
+  }
+  /** بلاطة كارت التفاصيل (A7). */
+  function maintenanceDepositTileText_(u) {
+    const d = maintenanceDepositNormalize_(u['Maintenance Deposit Type'], u['Maintenance Deposit Value']);
+    if (!d) return 'غير محدد';
+    if (d.type === 'fixed') return fmtNum(d.value) + ' جنيه (مبلغ ثابت)';
+    if (d.type === 'percent_unconfirmed_base') return d.value + '% — أساس الحساب غير محدد';
+    return maintenanceDepositPhrase_(d.type, d.value, u['Price'], u['Price After Discount']);
+  }
+  /** سطر المشاركة (الواتساب / الـ PDF): «عرض السعر» (__quote) = دايمًا (A8)؛ الوحدة الحقيقية = بس لو مش NULL (A9/A14). */
+  function maintenanceDepositShareText_(u) {
+    const phrase = maintenanceDepositPhrase_(u['Maintenance Deposit Type'], u['Maintenance Deposit Value'], u['Price'], u['Price After Discount']);
+    if (phrase == null) return u.__quote === true ? 'غير محددة' : '';
+    return phrase;
+  }
+
   function buildUnitShareText(u) {
+    const _mdShare = maintenanceDepositShareText_(u);
     const hasDiscount = Number(u['Discount Percentage']) > 0;
     // الدفعات الإضافية (حتى 5) - سطر مستقل لكل دفعة موجودة فعليًا؛ لا شيء يُضاف للوحدات القديمة
     const additionalPaymentLines = [];
@@ -9372,6 +9466,7 @@
       u['Monthly Installment'] ? `📆 القسط الشهري التقريبي: ${fmtNum(u['Monthly Installment'])} جنيه` : '',
       u['Monthly Installment'] ? `📅 القسط الربع سنوي التقريبي: ${fmtNum(Number(u['Monthly Installment']) * 3)} جنيه` : '',
       u['Other Payment Plans'] === 'نعم' ? '✅ متاح أنظمة سداد أخرى' : '',
+      _mdShare ? (_mdShare === 'بدون وديعة صيانة' ? '🛠 بدون وديعة صيانة' : `🛠 وديعة الصيانة: ${_mdShare}`) : '', // سطر مستقل للعرض بس — مش داخل في أي إجمالي
       u['Delivery Date'] ? `📅 التسليم: ${u['Delivery Date']}` : '',
       '',
       `رقم الوحدة: ${u['Unit ID']}`,
@@ -10359,6 +10454,7 @@
           ${detailRow('موعد الدفعات', u['Payment Schedule'])}
           ${additionalPaymentDetailRowsHtml}
           ${detailRow('عدد سنوات التقسيط', u['Installment Years'])}
+          ${detailRow('وديعة الصيانة', maintenanceDepositShareText_(u))}
           ${detailRow('تاريخ التسليم', u['Delivery Date'])}
           ${detailRow('أنظمة سداد أخرى', u['Other Payment Plans'])}
           ${detailRow('حالة الوحدة', u['Status'])}
@@ -11254,6 +11350,112 @@
   // editForm.reset() بيرجّع القائمة لـ «بدون» — نزامن إظهار خانة القيمة بعدها
   editForm.addEventListener('reset', function () { setTimeout(syncCashDiscountUi_, 0); });
 
+  /* ---------- وديعة الصيانة (اختياري) — REPORTS/MAINTENANCE_DEPOSIT_DESIGN_FINAL.md.
+   * 6 حالات: '' = «غير محدد» (NULL)، 'none' = «بدون وديعة صيانة» (بتتخزن صراحةً)، 3 أنواع نسبة، و'fixed'.
+   * معلومة عرض بس — مش بتدخل في calcEditMonthlyInstallment ولا أي حساب. المبلغ في المعاينة للعرض بس ومش بيتبعت.
+   * التحقق الموثوق على السيرفر (src/units/maintenance-deposit.js) — نفس القواعد ونفس الرسائل هنا. */
+  const editMaintenanceDepositType = document.getElementById('editMaintenanceDepositType');
+  const editMaintenanceDepositValue = document.getElementById('editMaintenanceDepositValue');
+  const editMaintenanceDepositValueWrap = document.getElementById('editMaintenanceDepositValueWrap');
+  const editMaintenanceDepositValueLabel = document.getElementById('editMaintenanceDepositValueLabel');
+  const editMaintenanceDepositError = document.getElementById('editMaintenanceDepositError');
+  const editMaintenanceDepositPreview = document.getElementById('editMaintenanceDepositPreview');
+  const editMaintenanceDepositAiNote = document.getElementById('editMaintenanceDepositAiNote');
+  function showMaintenanceDepositError_(msg) {
+    editMaintenanceDepositError.textContent = msg || '';
+    editMaintenanceDepositError.style.display = msg ? 'block' : 'none';
+  }
+  function clearMaintenanceDepositAiNote_() {
+    editMaintenanceDepositAiNote.textContent = '';
+    editMaintenanceDepositAiNote.style.display = 'none';
+  }
+  /** السعر والسعر بعد خصم التقسيط من الفورم — نفس معادلة calcEditMonthlyInstallment (عرض بس، مفيش أي كتابة). */
+  function maintenanceDepositFormPrices_() {
+    const num = function (name) { const el = editForm.elements[name]; return parseFloat(String((el && el.value) || '').replace(/,/g, '')) || 0; };
+    const price = num('price');
+    const disc = num('discountPercent');
+    return { price: price, pad: disc > 0 ? Math.round(price - (price * disc / 100)) : price };
+  }
+  function updateMaintenanceDepositPreview_() {
+    const type = editMaintenanceDepositType.value;
+    const raw = String(editMaintenanceDepositValue.value || '').trim();
+    let txt = '';
+    let warn = false;
+    if (maintenanceDepositHasValue_(type) && /^\d+(\.\d+)?$/.test(raw)) {
+      const v = Number(raw);
+      const pr = maintenanceDepositFormPrices_();
+      if (type === 'percent_unconfirmed_base') { txt = '⚠️ مش هيتحسب مبلغ لحد ما تحدد أساس الحساب (قبل الخصم أو بعده)'; warn = true; }
+      else if (type === 'fixed') { if (v > 0 && pr.price > 0 && v > pr.price) { txt = '⚠️ المبلغ أكبر من سعر الوحدة — اتأكد من الرقم'; warn = true; } }
+      else {
+        const amt = maintenanceDepositAmountClient_(type, v, pr.price, pr.pad);
+        if (amt != null) txt = '= ' + fmtNum(amt) + ' جنيه (للعرض بس)';
+      }
+    }
+    editMaintenanceDepositPreview.textContent = txt;
+    editMaintenanceDepositPreview.style.display = txt ? 'block' : 'none';
+    editMaintenanceDepositPreview.style.color = warn ? 'var(--aq-color-warning)' : '';
+  }
+  function syncMaintenanceDepositUi_() {
+    const type = editMaintenanceDepositType.value;
+    if (!maintenanceDepositHasValue_(type)) editMaintenanceDepositValue.value = ''; // «غير محدد» / «بدون» = مفيش قيمة (مش صفر)
+    editMaintenanceDepositValueWrap.style.display = maintenanceDepositHasValue_(type) ? '' : 'none';
+    editMaintenanceDepositValueLabel.textContent = type === 'fixed' ? 'مبلغ وديعة الصيانة (جنيه)' : 'نسبة وديعة الصيانة %';
+    // من غير min/max عمدًا (نفس خصم الكاش): رسائلنا = رسائل السيرفر
+    showMaintenanceDepositError_('');
+    updateMaintenanceDepositPreview_();
+  }
+  /** تعبئة القسم من وحدة محفوظة (getUnitById) أو من نتيجة الذكاء الاصطناعي — null/غياب = «غير محدد». */
+  function setMaintenanceDepositFields_(type, value) {
+    const t = MAINTENANCE_DEPOSIT_TYPES_.indexOf(type) !== -1 ? type : '';
+    editMaintenanceDepositType.value = t;
+    editMaintenanceDepositValue.value = (maintenanceDepositHasValue_(t) && value !== null && value !== undefined && value !== '') ? String(value) : '';
+    syncMaintenanceDepositUi_();
+  }
+  /** نفس قواعد السيرفر (A2/A3/A6/A16): '' = صالح؛ غير كده رسالة الخطأ. مفيش أي حد مربوط بالسعر ولا تحذير للنسب. */
+  function validateMaintenanceDepositClient_() {
+    const type = String(editMaintenanceDepositType.value || '').trim();
+    const raw = String(editMaintenanceDepositValue.value || '').trim().replace(/,/g, '');
+    if ((!type || type === 'none') && !raw) return '';
+    if (!type || type === 'none') return 'حدّد نوع وديعة الصيانة قبل إدخال قيمتها';
+    if (!maintenanceDepositHasValue_(type)) return 'نوع وديعة الصيانة غير صالح';
+    if (!raw) return 'أدخل قيمة وديعة الصيانة، أو اختر «بدون وديعة صيانة»';
+    if (/^-\d+(\.\d+)?$/.test(raw)) return 'قيمة وديعة الصيانة لا يمكن أن تكون سالبة';
+    if (!/^\d+(\.\d+)?$/.test(raw)) return 'قيمة وديعة الصيانة يجب أن تكون رقمًا';
+    const v = Number(raw);
+    if (!isFinite(v)) return 'قيمة وديعة الصيانة يجب أن تكون رقمًا';
+    if (type === 'fixed') return v > 0 ? '' : 'مبلغ وديعة الصيانة يجب أن يكون أكبر من صفر';
+    return (v > 0 && v < 100) ? '' : 'نسبة وديعة الصيانة يجب أن تكون أكبر من صفر وأقل من 100%';
+  }
+  /**
+   * نتيجة الذكاء الاصطناعي (§9.5) — مراجعة بس، الحفظ بزرار «حفظ» العادي.
+   * نوع '' ومفيش ملاحظة = القسم ما يتلمسش (عمره ما يمسح قيمة محفوظة ولا يحطها «بدون»).
+   * التنبيه والدليل بيتعرضوا كنص (textContent) — عمرهم ما بيتحطّوا HTML.
+   */
+  function applyAiMaintenanceDeposit_(data) {
+    clearMaintenanceDepositAiNote_();
+    if (!data || typeof data !== 'object') return;
+    const t = typeof data.maintenanceDepositType === 'string' ? data.maintenanceDepositType : '';
+    const note = typeof data.maintenanceDepositReviewNote === 'string' ? data.maintenanceDepositReviewNote : '';
+    const ev = typeof data.maintenanceDepositEvidence === 'string' ? data.maintenanceDepositEvidence : '';
+    if (!t && !note) return;
+    if (t && MAINTENANCE_DEPOSIT_TYPES_.indexOf(t) === -1) return;
+    if (t) setMaintenanceDepositFields_(t, data.maintenanceDepositValue);
+    const lines = [];
+    if (t) lines.push('اتملت بالذكاء الاصطناعي — راجعها قبل الحفظ');
+    if (note) lines.push('⚠️ ' + note);
+    if (ev) lines.push('من المصدر: «' + ev + '»');
+    editMaintenanceDepositAiNote.textContent = lines.join('\n');
+    editMaintenanceDepositAiNote.style.display = lines.length ? 'block' : 'none';
+    editMaintenanceDepositAiNote.style.color = (note || data.maintenanceDepositNeedsBaseConfirmation === true) ? 'var(--aq-color-warning)' : '';
+  }
+  editMaintenanceDepositType.addEventListener('change', function () { clearMaintenanceDepositAiNote_(); syncMaintenanceDepositUi_(); });
+  editMaintenanceDepositValue.addEventListener('input', function () { clearMaintenanceDepositAiNote_(); showMaintenanceDepositError_(''); updateMaintenanceDepositPreview_(); });
+  ['price', 'discountPercent'].forEach(function (n) {
+    const el = editForm.elements[n];
+    if (el) { el.addEventListener('input', updateMaintenanceDepositPreview_); el.addEventListener('change', updateMaintenanceDepositPreview_); }
+  });
+  editForm.addEventListener('reset', function () { setTimeout(function () { clearMaintenanceDepositAiNote_(); syncMaintenanceDepositUi_(); }, 0); });
+
   /* ---------- حساب السعر بعد الخصم والمقدم والقسط الشهري التقريبي لحظيًا (فورم التعديل) ---------- */
   const editInstallmentFields = [
     'price', 'discountPercent', 'downPayment', 'downPaymentBase', 'paymentAmount', 'paymentCount', 'installmentYears',
@@ -11714,6 +11916,7 @@
       });
       // خصم الكاش (مستقل عن خصم التقسيط): null = «غير محدد» — الحقل يفضل فاضي من غير أي افتراض
       setCashDiscountFields_(u['Cash Discount Type'], u['Cash Discount Value']);
+      setMaintenanceDepositFields_(u['Maintenance Deposit Type'], u['Maintenance Deposit Value']);
       // إظهار صفوف الدفعات الإضافية المُحمَّلة فعليًا من الوحدة (حتى آخر دفعة بها قيمة) —
       // لا فجوات: لو الدفعة 2 فاضية والدفعة 3 مليانة (حالة غير متوقعة)، تظهر لغاية 3 لعرض كل البيانات.
       editActiveAdditionalPaymentCount = 0;
@@ -12019,6 +12222,16 @@
       try { editCashDiscountType.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (_e) {}
       return;
     }
+    // وديعة الصيانة: نفس تحقق السيرفر قبل الإرسال
+    var _mdErr = validateMaintenanceDepositClient_();
+    if (_mdErr) {
+      showMaintenanceDepositError_(_mdErr);
+      editMsg.className = 'error';
+      editMsg.style.display = 'block';
+      editMsg.textContent = _mdErr;
+      try { editMaintenanceDepositType.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (_e) {}
+      return;
+    }
 
     editSaveBtn.disabled = true;
     editSaveBtn.textContent = editModalMode === 'clone' ? 'جاري الإضافة...' : 'جاري الحفظ...';
@@ -12108,6 +12321,11 @@
               if (data && data.cashDiscountType) {
                 _terms.cashDiscountType = data.cashDiscountType;
                 _terms.cashDiscountValue = (data.cashDiscountValue != null) ? String(data.cashDiscountValue) : '';
+              }
+              // وديعة الصيانة (§5.3): «غير محدد» = ما نبعتش المفتاحين ← الوديعة المحفوظة تفضل؛ «بدون» / نسبة / مبلغ = تتبعت.
+              if (data && data.maintenanceDepositType) {
+                _terms.maintenanceDepositType = data.maintenanceDepositType;
+                _terms.maintenanceDepositValue = (data.maintenanceDepositValue != null) ? String(data.maintenanceDepositValue) : '';
               }
               google.script.run.withSuccessHandler(function(res2) {
                 editSaveBtn.disabled = false; editSaveBtn.textContent = 'حفظ الوحدة الجديدة';
